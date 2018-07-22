@@ -1,17 +1,21 @@
 # mean-rest
-Middleware and tools for Restful API based MEAN stack (MongoDB, Express.js, AngularJS or Angular, and Node.js) end to end development. 
+Middleware and tools for Restful API based MEAN stack (MongoDB, Express.js, AngularJS or Angular, and Node.js) end to end web development. 
 
-It composes of two compoments: mean-rest-express for the back end and mean-rest-angular for the front end.
+It composes of two modules: **mean-rest-express** for the back end and **mean-rest-angular** for the front end.
 
-Both compoments take the single input from the Mongoose schema you defined, and generate Restful API for express on the fly (mean-rest-express), and generate Angular boilerplate code with ready-to-use UIs.
+Both modules take the single input from the Mongoose schema you defined, and generate Restful API for express on the fly (by mean-rest-express), and generate Angular boilerplate code with ready-to-use UIs (by mean-rest-angular).
 
 
+```
 
                  |------  mean-rest-express --------> Express REST API
                  |
    Schema / Views  
                  |
                  |------  mean-rest-angular --------> Angular Modules
+
+```
+
 ## mean-rest-express
 Usage:
 - Install mean-rest-express to your project
