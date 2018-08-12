@@ -7,9 +7,11 @@ function RestRouter(name) {
 	router.get('/', RestController.getAll);
 	let idParam = name + "Id";
 	router.get('/:' + idParam, RestController.getDetailsById);
-	router.delete('/:' + idParam, RestController.HardDeleteById);
 	router.put('/', RestController.Create);
-	
+	router.post('/:' + idParam, RestController.Update);
+
+	router.post('/', RestController.PostActions);
+
 	return router;
 }
 

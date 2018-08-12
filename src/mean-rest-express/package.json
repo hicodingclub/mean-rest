@@ -1,6 +1,6 @@
 {
   "name": "mean-rest-express",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Restful API exposure middleware for Express and Mongoose based framework. Provide Rest API automatically based on Mongoose schema. It can also work with mean-rest-angular to develop end to end MEAN stack web applications.",
   "main": "index.js",
   "scripts": {
@@ -24,5 +24,9 @@
   "bugs": {
     "url": "https://github.com/LuckyBang/mean-rest/issues"
   },
-  "homepage": "https://github.com/LuckyBang/mean-rest#readme"
+  "homepage": "https://github.com/LuckyBang/mean-rest#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "mongoose": "^5.2.6"
+  }
 }
