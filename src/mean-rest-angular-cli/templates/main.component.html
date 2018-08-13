@@ -1,0 +1,19 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+		<div class="card">
+		  <div class="card-header">
+			  <nav class="nav nav-pills">
+<%_ schemaArray.forEach(function(schm){ %>
+			    <a class="nav-item nav-link" routerLink="./<%-schm.schemaName%>" 
+			    	routerLinkActive="active"><%-schm.SchemaName%></a>
+<%_ }); %>
+			  </nav>
+		  </div>
+		  <div class="card-body">
+			<router-outlet></router-outlet>
+		  </div>
+		</div>
+	</div>
+  </div>
+</div>

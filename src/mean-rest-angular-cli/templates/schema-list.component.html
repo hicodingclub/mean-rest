@@ -1,0 +1,123 @@
+<div>
+
+	<div class="container">
+		<div class="row">
+		        <div class="action-buttons">
+					<a [routerLink]="['../new' ]" class="btn btn-outline-primary">Create</a>
+					<a routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
+						[ngClass]="{'disabled': !isItemSelected()}">Delete</a>
+				</div>
+		</div>
+		<div class="row">
+			<div class="col-3">
+			</div>
+			<div class="col-6">
+			  <div *ngIf="total_pages > 1">
+				  <ul class="pagination justify-content-center">
+				    <li class="page-item"
+				            [ngClass]="{'disabled': page<=1}">
+				      <a class="page-link" routerLink="." (click)="onPreviousPage()"
+				         aria-label="Previous">
+				        <span aria-hidden="true">&laquo;</span>
+				        <span class="sr-only">Previous</span>
+				      </a>
+				    </li>
+				    
+				    <li *ngIf="left_more" class="page-item"><a class="page-link">...</a></li>
+				    
+				    <li *ngFor="let p of pages;  let i = index" class="page-item"
+				    		[ngClass]="{'active': p==page}">
+				    	<a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
+				    </li>
+				    
+				    <li *ngIf="right_more" class="page-item"><a class="page-link">...</a></li>
+				    
+				    <li class="page-item"
+				            [ngClass]="{'disabled': page>=total_pages}">
+				      <a class="page-link" routerLink="." (click)="onNextPage()"
+				         aria-label="Next">
+				        <span aria-hidden="true">&raquo;</span>
+				        <span class="sr-only">Next</span>
+				      </a>
+				    </li>
+				  </ul>
+			  </div>
+			</div>
+			<div class="col-3">
+				<div class="total_counts">Total: <b>{{total_count}}</b> items</div>
+			</div>			
+		</div>
+	</div>
+	
+	<table class="table table-bordered table-hover">
+	    <thead class="thead-light">
+	    	<tr>
+		        <th scope="col">#</th>
+<%_ briefView.forEach( (field) => { %>
+		        <th scope="col"><%-field.FieldName%></th><%_ }) %>		        
+		        <th scope="col" style="width:8rem;"></th>
+		        <th scope="col" style="width:2rem;">
+		        	<input type="checkbox" [(ngModel)]="checkAll" (change)="onCheckAllChange()">
+		        </th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	        <tr *ngFor="let item of list;  let i = index">
+	            <td scope="row"><a [routerLink]="['./detail', item['_id'] ]">{{(page-1)*per_page+i+1}}</a></td>
+<%_ briefView.forEach( (field) => { %>	            
+	            <td>{{item['<%-field.fieldName%>']}}</td><%_ }) %>
+	            <td>
+	            	<a [routerLink]="['../detail', item['_id'] ]"><i class="fas fa-book-open" title="View Details"></i></a>
+	            	<a [routerLink]="['../edit', item['_id'] ]"><i class="fas fa-edit" title="Edit"></i></a>
+	            	<a routerLink="." (click)="onDelete(item['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a>
+	            </td>
+	            <td>      
+	            	<input type="checkbox" [(ngModel)]="checkedItem[i]"/>
+	            </td>
+	        </tr>
+	    </tbody>
+	</table>
+	
+	<div class="container">
+			<div class="row">
+			<div class="col-3">
+			</div>
+			<div class="col-6">
+			  <div *ngIf="total_pages > 1">
+				  <ul class="pagination justify-content-center">
+				    <li class="page-item"
+				            [ngClass]="{'disabled': page<=1}">
+				      <a class="page-link" routerLink="." (click)="onPreviousPage()"
+				         aria-label="Previous">
+				        <span aria-hidden="true">&laquo;</span>
+				        <span class="sr-only">Previous</span>
+				      </a>
+				    </li>
+				    
+				    <li *ngIf="left_more" class="page-item"><a class="page-link">...</a></li>
+				    
+				    <li *ngFor="let p of pages;  let i = index" class="page-item"
+				    		[ngClass]="{'active': p==page}">
+				    	<a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
+				    </li>
+				    
+				    <li *ngIf="right_more" class="page-item"><a class="page-link">...</a></li>
+				    
+				    <li class="page-item"
+				            [ngClass]="{'disabled': page>=total_pages}">
+				      <a class="page-link" routerLink="." (click)="onNextPage()"
+				         aria-label="Next">
+				        <span aria-hidden="true">&raquo;</span>
+				        <span class="sr-only">Next</span>
+				      </a>
+				    </li>
+				  </ul>
+			  </div>
+			</div>
+			<div class="col-3">
+				<div class="total_counts">Total: <b>{{total_count}}</b> items</div>
+			</div>			
+		</div>
+	</div>
+	
+</div>

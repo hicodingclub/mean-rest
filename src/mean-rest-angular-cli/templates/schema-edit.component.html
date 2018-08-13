@@ -1,0 +1,31 @@
+<div class="edit" *ngIf="detail">
+	<div class="action-buttons">
+        <a routerLink="../list"><i class="fas fa-angle-double-left" title="Back to list"></i></a>
+	</div>
+	
+	<div class="card" style="text-align: left;">
+	  <div class="card-body">
+	    <h4 class="card-title">{{action}} <%-SchemaName%></h4>    
+	    <form (ngSubmit)="onSubmit()" #editForm="ngForm">
+<%_ editView.forEach( (field) => { %>
+    <%_ if (field.type === "SchemaString") { %>
+	      <div class="form-group">
+	        <label for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
+	        <input type="text" class="form-control" id="<%-schemaName%>Edit<%-field.FieldName%>" 
+	                <%if (field.required) {%>required<%}%>
+	                [(ngModel)]="detail['<%-field.fieldName%>']" name="<%-schemaName%>Edit<%-field.FieldName%>"
+	                #<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+	    <%_if (field.required) {%>
+	        <div [hidden]="<%-schemaName%>Edit<%-field.FieldName%>.valid || <%-schemaName%>Edit<%-field.FieldName%>.pristine"
+     			class="alert alert-danger">
+	            <%-field.FieldName%> is required
+	        </div><%}%>
+	      </div>
+    <%_ } %>
+<%_ }) %>	
+	      <button type="submit" class="btn btn-success" 
+     			[disabled]="!editForm.form.valid">Submit</button>
+	    </form>
+	  </div>
+	</div>
+</div>

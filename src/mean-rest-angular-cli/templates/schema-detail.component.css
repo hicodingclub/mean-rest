@@ -1,0 +1,31 @@
+.detail {
+	width: 75%;
+	margin: 0 auto;
+}
+
+.action-buttons {
+	width: 100%;
+	float:right; 
+	text-align: right;
+	margin-bottom: 1.25rem;
+}
+.action-buttons .btn {
+	display: inline-block;
+	margin-left: 2.5rem;
+}
+.action-buttons .fa-angle-double-left {
+	float: left;
+	display: inline-block;
+	margin-left: 2.5rem;
+	margin-top:  0.75rem
+}
+
+.card-title {
+	text-align: center;
+}
+.card label {
+	font-size: 1.25rem;
+}
+.card span {
+	margin-left: 1rem;
+}
