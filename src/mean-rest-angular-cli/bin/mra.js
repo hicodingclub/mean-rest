@@ -96,7 +96,7 @@ var generateViewPicture = function(viewStr, schema) {
 					else defaultValue = "'" + defaultValue + "'";
 					break;
 				case "SchemaBoolean":
-					if (!defaultValue) defaultValue = false;
+					if (defaultValue !== false && !defaultValue) defaultValue = "null";
 					break;
 				case "SchemaNumber":
 					if (defaultValue !== 0 && !defaultValue) defaultValue = "null";

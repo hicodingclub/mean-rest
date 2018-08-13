@@ -23,24 +23,25 @@
 .card-title {
 	text-align: center;
 }
-.card label {
-	font-size: 1.25rem;
-}
+
 .card span {
 	margin-left: 1rem;
 }
 
+.form-group > label {
+	font-size: 1.25rem;
+}
 
-
-
+/*
 .ng-valid[required], .ng-valid.required  {
-  border-left: 5px solid #42A948; /* green */
+  border-left: 5px solid #42A948; /* green *
 }
-
+*/
+/*
 .ng-valid:not(form) {
-  border-left: 5px solid #42A948; /* green */
+  border-left: 5px solid #42A948; /* green *
 }
-
+*/
 
 .ng-invalid:not(form)  {
   border-left: 5px solid #a94442; /* red */
