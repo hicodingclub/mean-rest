@@ -1,0 +1,49 @@
+    <%_ if (field.type === "SchemaString") { %>
+	      <div class="form-group">
+	        <label for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
+	        <input type="text" class="form-control" id="<%-schemaName%>Edit<%-field.FieldName%>" 
+	                <%if (field.required) {%>required<%}%>
+	                [(ngModel)]="detail['<%-field.fieldName%>']" name="<%-schemaName%>Edit<%-field.FieldName%>"
+	                #<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+	    <%_if (field.required) {%>
+	        <div [hidden]="<%-schemaName%>Edit<%-field.FieldName%>.valid || <%-schemaName%>Edit<%-field.FieldName%>.pristine"
+     			class="alert alert-danger">
+	            <%-field.FieldName%> is required
+	        </div><%}%>
+	      </div>
+    <%_ } else if (field.type === "SchemaBoolean") { %>
+	      <fieldset class="form-group">
+	        <label for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
+	        <div class="form-check"
+		        <%_ if (field.required) {%>
+		          [ngClass]="{'ng-valid': detail['<%-field.fieldName%>'] == true || detail['<%-field.fieldName%>'] == false,
+		                      'ng-invalid': detail['<%-field.fieldName%>'] != true && detail['<%-field.fieldName%>'] != false}"
+		        <% } else { %>
+		          [ngClass]="{'ng-valid': true} "<%_ } %>
+		        >
+	          <div class="form-check-inline">
+		        <input type="radio" name="<%-schemaName%>Edit<%-field.FieldName%>" 
+		        	class="form-check-input"
+		        	<%if (field.required) {%>required<%}%>
+		        	id="<%-schemaName%>Edit<%-field.FieldName%>Yes" [value]="true" 
+		        	[(ngModel)]="detail['<%-field.fieldName%>']"
+		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		      	<label class="form-check-label">Yes</label>
+		      </div>
+	          <div class="form-check-inline">
+		        <input type="radio" name="<%-schemaName%>Edit<%-field.FieldName%>" 
+		        	class="form-check-input"
+		        	<%if (field.required) {%>required<%}%>
+		        	id="<%-schemaName%>Edit<%-field.FieldName%>No" [value]="false" 
+		        	[(ngModel)]="detail['<%-field.fieldName%>']"
+		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		      	<label class="form-check-label">No</label>
+		      </div>
+		    </div>
+	    <%_if (field.required) {%>
+	        <div [hidden]="<%-schemaName%>Edit<%-field.FieldName%>.valid || <%-schemaName%>Edit<%-field.FieldName%>.pristine"
+     			class="alert alert-danger">
+	            <%-field.FieldName%> is required
+	        </div><%}%>
+		  </fieldset>
+    <%_ } %>    
