@@ -9,6 +9,7 @@ function RestRouter(name) {
 	router.get('/:' + idParam, RestController.getDetailsById);
 	router.put('/', RestController.Create);
 	router.post('/:' + idParam, RestController.Update);
+	router.delete('/:' + idParam, RestController.HardDeleteById);
 
 	router.post('/', RestController.PostActions);
 
