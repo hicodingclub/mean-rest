@@ -63,7 +63,7 @@
 	    </thead>
 	    <tbody>
 	        <tr *ngFor="let item of list;  let i = index">
-	            <td scope="row"><a [routerLink]="['./detail', item['_id'] ]">{{(page-1)*per_page+i+1}}</a></td>
+	            <td scope="row"><a [routerLink]="['../detail', item['_id'] ]">{{(page-1)*per_page+i+1}}</a></td>
 <%_ briefView.forEach( (field) => { %>	            
 	            <td>{{item['<%-field.fieldName%>']}}</td><%_ }) %>
 	            <td>
