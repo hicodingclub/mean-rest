@@ -88,14 +88,31 @@ var generateViewPicture = function(viewStr, schema) {
 	let view = [];
 	viewDef.forEach((item) => {
 		if (item in schema.paths) {
-			
+			let type = schema.paths[item].constructor.name;
+			let defaultValue = schema.paths[item].defaultValue;
+			switch(type) {
+				case "SchemaString":
+					if (!defaultValue) defaultValue = "''";
+					else defaultValue = "'" + defaultValue + "'";
+					break;
+				case "SchemaBoolean":
+					if (!defaultValue) defaultValue = false;
+					break;
+				case "SchemaNumber":
+					if (defaultValue !== 0 && !defaultValue) defaultValue = "null";
+					break;					
+				default:
+					if (!defaultValue) defaultValue = "null";
+			}
 			view.push(
 					{fieldName: item,
 					 FieldName: capitalizeFirst(item),
-					 type: schema.paths[item].constructor.name,
+					 type: type,
 					 //TODO: required could be a function
 					 required: schema.paths[item].originalRequiredValue === true? true:false,
-					});
+					 defaultValue: defaultValue,
+					}
+			);
 		}
 	});
 	return view;
@@ -363,7 +380,7 @@ function main() {
 	});
 	
 	let mongooseSchema = views[0];
-	//console.log(mongooseSchema);
+	console.log(mongooseSchema);
 
 	let briefView = generateViewPicture(views[1], mongooseSchema);
 	let detailView = generateViewPicture(views[2], mongooseSchema);

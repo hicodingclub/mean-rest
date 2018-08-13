@@ -30,9 +30,8 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
       else {
           this.action="Create";
           this.detail = {
-              title: "",
-              digest: "",
-              body: ""
+<%_ createView.forEach( (field) => { %>
+              <%-field.fieldName%>: <%-field.defaultValue%>,  <%_ }); %>
           }
       }
   }
