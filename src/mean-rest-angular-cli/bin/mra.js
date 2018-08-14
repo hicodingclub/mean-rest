@@ -91,10 +91,16 @@ var generateViewPicture = function(viewStr, schema) {
 			let type = schema.paths[item].constructor.name;
 			let defaultValue = schema.paths[item].defaultValue;
 			let numberMin, numberMax;
+			let maxlength, minlength;
 			switch(type) {
 				case "SchemaString":
 					if (!defaultValue) defaultValue = "''";
 					else defaultValue = "'" + defaultValue + "'";
+					if (schema.paths[item].validators)
+						schema.paths[item].validators.forEach((val) => {
+							if (val.type == 'maxlength' && typeof val.maxlength === 'number') maxlength = val.maxlength;
+							if (val.type == 'minlength' && typeof val.minlength === 'number') minlength = val.minlength;
+						});
 					break;
 				case "SchemaBoolean":
 					if (defaultValue !== false && !defaultValue) defaultValue = "null";
@@ -119,6 +125,8 @@ var generateViewPicture = function(viewStr, schema) {
 					 defaultValue: defaultValue,
 					 numberMin: numberMin,
 					 numberMax: numberMax,
+					 maxlength: maxlength,
+					 minlength: minlength,
 					}
 			);
 		}
