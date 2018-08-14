@@ -14,7 +14,7 @@ export class MinNumber implements Validator {
     if (isNaN(minnum)) return null;     //only compare when max is a number
     //only compare when inputs are numbers
     if (typeof num == 'number' && num < minnum)
-        return { 'maxnumber': "must be no less than " + minnum };
+        return { 'minnumber': "must be no less than " + minnum };
     return null;
   }
 }
