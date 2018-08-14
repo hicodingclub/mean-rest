@@ -3,9 +3,9 @@ import { Router, ActivatedRoute, ParamMap }    from '@angular/router';
 import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-import { ModalConfig, Modal} from './modal';
-import { SnackBarConfig, SnackBar} from './snackbar';
-import { ErrorToastConfig, ErrorToast} from './errortoast';
+import { ModalConfig, Modal} from './util.modal';
+import { SnackBarConfig, SnackBar} from './util.snackbar';
+import { ErrorToastConfig, ErrorToast} from './util.errortoast';
 
 import { BaseService, ServiceError } from './base.service';
 
