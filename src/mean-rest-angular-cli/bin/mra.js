@@ -90,6 +90,7 @@ var generateViewPicture = function(viewStr, schema) {
 		if (item in schema.paths) {
 			let type = schema.paths[item].constructor.name;
 			let defaultValue = schema.paths[item].defaultValue;
+			let numberMin, numberMax;
 			switch(type) {
 				case "SchemaString":
 					if (!defaultValue) defaultValue = "''";
@@ -100,6 +101,11 @@ var generateViewPicture = function(viewStr, schema) {
 					break;
 				case "SchemaNumber":
 					if (defaultValue !== 0 && !defaultValue) defaultValue = "null";
+					if (schema.paths[item].validators)
+						schema.paths[item].validators.forEach((val) => {
+							if (val.type == 'min' && typeof val.min === 'number') numberMin = val.min;
+							if (val.type == 'max' && typeof val.max === 'number') numberMax = val.max;
+						});
 					break;					
 				default:
 					if (!defaultValue) defaultValue = "null";
@@ -111,6 +117,8 @@ var generateViewPicture = function(viewStr, schema) {
 					 //TODO: required could be a function
 					 required: schema.paths[item].originalRequiredValue === true? true:false,
 					 defaultValue: defaultValue,
+					 numberMin: numberMin,
+					 numberMax: numberMax,
 					}
 			);
 		}
@@ -380,7 +388,6 @@ function main() {
 	});
 	
 	let mongooseSchema = views[0];
-	console.log(mongooseSchema);
 
 	let briefView = generateViewPicture(views[1], mongooseSchema);
 	let detailView = generateViewPicture(views[2], mongooseSchema);

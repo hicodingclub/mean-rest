@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
+import { MinNumber, MaxNumber } from 'mean-rest-angular';
+
 import { <%-ModuleName%>RoutingModule } from './<%-moduleName%>-routing.module';
 import { <%-ModuleName%>Component } from './<%-moduleName%>.component';
 
@@ -24,7 +26,10 @@ import { <%-schm.SchemaName%>Service } from './<%-schm.schemaName%>/<%-schm.sche
   ],
   declarations: [
     <%-ModuleName%>Component,
-      
+    
+    MinNumber,
+    MaxNumber,
+    
  <%_ schemaArray.forEach(function(schm){ %>     
     <%-schm.SchemaName%>ListComponent, 
     <%-schm.SchemaName%>DetailComponent, 

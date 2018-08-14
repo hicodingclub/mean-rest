@@ -1,16 +1,18 @@
     <%_ if (field.type === "SchemaString") { %>
-	      <div class="form-group">
+	      <fieldset class="form-group">
 	        <label for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
 	        <input type="text" class="form-control" id="<%-schemaName%>Edit<%-field.FieldName%>" 
 	                <%if (field.required) {%>required<%}%>
 	                [(ngModel)]="detail['<%-field.fieldName%>']" name="<%-schemaName%>Edit<%-field.FieldName%>"
 	                #<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
-	    <%_if (field.required) {%>
 	        <div [hidden]="<%-schemaName%>Edit<%-field.FieldName%>.valid || <%-schemaName%>Edit<%-field.FieldName%>.pristine"
      			class="alert alert-danger">
-	            <%-field.FieldName%> is required
-	        </div><%}%>
-	      </div>
+	          <%_if (field.required) {%>
+	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.required">
+    	        <%-field.FieldName%> is required.
+  	          </div><%}%>
+	        </div>	        
+	      </fieldset>
     <%_ } else if (field.type === "SchemaBoolean") { %>
 	      <fieldset class="form-group">
 	        <label for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
@@ -46,4 +48,29 @@
 	            <%-field.FieldName%> is required
 	        </div><%}%>
 		  </fieldset>
+    <%_ } else if (field.type === "SchemaNumber") { %>
+	      <fieldset class="form-group">
+	        <label for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
+	        <input type="number" class="form-control" id="<%-schemaName%>Edit<%-field.FieldName%>" 
+	                <%if (field.required) {%>required<%}%>
+	                <%if (typeof field.numberMin === 'number') {%>minnumber="<%-field.numberMin%>"<%}%>
+	                <%if (typeof field.numberMax === 'number') {%>maxnumber="<%-field.numberMax%>"<%}%>
+	                [(ngModel)]="detail['<%-field.fieldName%>']" name="<%-schemaName%>Edit<%-field.FieldName%>"
+	                #<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+	        <div [hidden]="<%-schemaName%>Edit<%-field.FieldName%>.valid || <%-schemaName%>Edit<%-field.FieldName%>.pristine"
+     			class="alert alert-danger">
+	          <%_if (field.required) {%>
+	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.required">
+    	        <%-field.FieldName%> is required.
+  	          </div><%}%>
+	          <%_if (typeof field.numberMin === 'number') {%>
+	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.minnumber">
+    	        <%-field.FieldName%> {{<%-schemaName%>Edit<%-field.FieldName%>.errors.minnumber}}
+  	          </div><%}%>
+	          <%_if (typeof field.numberMax === 'number') {%>
+	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.maxnumber">
+    	        <%-field.FieldName%> {{<%-schemaName%>Edit<%-field.FieldName%>.errors.maxnumber}}.
+  	          </div><%}%>
+	        </div>	        
+	      </fieldset>
     <%_ } %>    
