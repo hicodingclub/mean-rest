@@ -48,7 +48,7 @@ export class BaseComponent {
         this.capitalItemName = itemName.charAt(0).toUpperCase() + itemName.substr(1);
     }
     
-    protected onServiceError(error:ServiceError) {
+    protected onServiceError(error:ServiceError):void {
         let errMsg:string;
         let more:string;
         if (error.clientErrorMsg) {
@@ -74,7 +74,7 @@ export class BaseComponent {
         errorToast.show();
     }
 
-    protected populatePages() {        
+    protected populatePages():void {        
         this.pages = []
         const SHOW_PAGE = 9;
         const HALF = (SHOW_PAGE-1)/2;
@@ -108,25 +108,25 @@ export class BaseComponent {
         }
     }
     
-    protected onNextPage() {
+    protected onNextPage():void {
         if (this.page >= this.total_pages) return;
         this.service.putToStorage("page", this.page + 1);
         this.router.navigate(['.', { page: this.page + 1 }], {relativeTo: this.route, });
     }
     
-    protected onPreviousPage() {
+    protected onPreviousPage():void {
         if (this.page <= 1) return;
         this.service.putToStorage("page", this.page - 1);
         this.router.navigate(['.', { page: this.page - 1 }], {relativeTo: this.route});
     }
 
-    protected onGotoPage(p:number) {
+    protected onGotoPage(p:number):void {
         if (p > this.total_pages || p < 1) return;
         this.service.putToStorage("page", p);
         this.router.navigate(['.', { page: p }], {relativeTo: this.route});
     }
     
-    protected populateDetail(id:string) {
+    protected populateDetail(id:string):void {
       this.service.getDetail(this.id).subscribe(
         detail => { 
             this.detail = detail;
@@ -135,7 +135,7 @@ export class BaseComponent {
       );
     }
         
-    protected populateList() {
+    protected populateList():void {
       let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
       let cached_page = parseInt(this.service.getFromStorage('page'));
       if (!url_page && cached_page && cached_page > 1) {
@@ -161,16 +161,17 @@ export class BaseComponent {
       );
     }
     
-    public onCheckAllChange() {
+    public onCheckAllChange():void {
         this.checkedItem = 
              Array.apply(null, Array(this.list.length)).
                 map(Boolean.prototype.valueOf,this.checkAll);
     }
-    public isItemSelected() {
+    
+    public isItemSelected():boolean {
         return this.checkedItem.some((value)=>{return value;})
     }
 
-    public onDeleteSelected() {
+    public onDeleteSelected():void {
         let deletedItem = [];
         this.checkedItem.forEach((value, index) => {
                 if (value) {
@@ -219,7 +220,7 @@ export class BaseComponent {
       modal.show();
     }
     
-    public onDelete(id:string, idx: number) {      
+    public onDelete(id:string, idx: number):void {      
       let modalConfig: ModalConfig = {
         title: "Delete Confirmation",
         content: "Are you sure you want to delete this " + this.itemName + " from the system?",
@@ -255,7 +256,7 @@ export class BaseComponent {
       modal.show();
     }
     
-    onSubmit() {
+    public onSubmit():void {
       if (this.id) {
           this.service.updateOne(this.id, this.detail).subscribe(
             result => {
@@ -287,5 +288,9 @@ export class BaseComponent {
             this.onServiceError
           );
       }
+    }
+    
+    public clearValueFromDetail(field:string):void {
+        if (this.detail && this.detail.hasOwnProperty(field)) delete this.detail[field];
     }
 }
