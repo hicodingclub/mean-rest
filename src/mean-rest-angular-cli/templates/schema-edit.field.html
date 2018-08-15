@@ -1,12 +1,35 @@
     <%_ if (field.type === "SchemaString") { %>
 	      <fieldset class="form-group">
 	        <label for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
+        <%_ if (field.enumValues) { %>
+	        <div class="form-check"
+		        <%_ if (field.required) {%>
+		          [ngClass]="{'ng-valid': enums['<%-field.fieldName%>'].includes(detail['<%-field.fieldName%>']),
+		                      'ng-invalid': !enums['<%-field.fieldName%>'].includes(detail['<%-field.fieldName%>'])}"
+		        <% } else { %>
+		          [ngClass]="{'ng-valid': true} "<%_ } %>
+		        >
+	          <%_ field.enumValues.forEach( (f) => { %>
+	          <div class="form-check-inline">
+		        <input type="radio" name="<%-schemaName%>Edit<%-field.FieldName%>" 
+		        	class="form-check-input"
+		        	<%if (field.required) {%>required<%}%>
+		        	id="<%-schemaName%>Edit<%-field.FieldName%><%-f%>" [value]="'<%-f%>'" 
+		        	[(ngModel)]="detail['<%-field.fieldName%>']"
+		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		      	<label class="form-check-label"><%-f%></label>
+		      </div>
+		     <%_ }) %>
+		    </div>
+        <%_ } else { %>
 	        <input type="text" class="form-control" id="<%-schemaName%>Edit<%-field.FieldName%>" 
 	                <%if (field.required) {%>required<%}%>
 	                <%if (typeof field.minlength === 'number') {%>minlength="<%-field.minlength%>"<%}%>
 	                <%if (typeof field.maxlength === 'number') {%>maxlength="<%-field.maxlength%>"<%}%>
 	                [(ngModel)]="detail['<%-field.fieldName%>']" name="<%-schemaName%>Edit<%-field.FieldName%>"
 	                #<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+        <%_ } %>
+        
 	        <div [hidden]="<%-schemaName%>Edit<%-field.FieldName%>.valid || <%-schemaName%>Edit<%-field.FieldName%>.pristine || <%-schemaName%>Edit<%-field.FieldName%>.errors.minlength"
      			class="alert alert-danger">
 	          <%_if (field.required) {%>

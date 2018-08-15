@@ -92,21 +92,22 @@ var generateViewPicture = function(viewStr, schema) {
 			let defaultValue = schema.paths[item].defaultValue;
 			let numberMin, numberMax;
 			let maxlength, minlength;
+			let enumValues;
 			switch(type) {
 				case "SchemaString":
-					if (!defaultValue) defaultValue = "''";
-					else defaultValue = "'" + defaultValue + "'";
+					if (! (typeof(defaultValue) == 'undefined')) {
+						defaultValue = "'" + defaultValue + "'";
+					}
 					if (schema.paths[item].validators)
 						schema.paths[item].validators.forEach((val) => {
 							if (val.type == 'maxlength' && typeof val.maxlength === 'number') maxlength = val.maxlength;
 							if (val.type == 'minlength' && typeof val.minlength === 'number') minlength = val.minlength;
+							if (val.type == 'enum' && Array.isArray(val.enumValues) && val.enumValues.length > 0) enumValues = val.enumValues;
 						});
 					break;
 				case "SchemaBoolean":
-					if (defaultValue !== false && !defaultValue) defaultValue = "null";
 					break;
 				case "SchemaNumber":
-					if (defaultValue !== 0 && !defaultValue) defaultValue = "null";
 					if (schema.paths[item].validators)
 						schema.paths[item].validators.forEach((val) => {
 							if (val.type == 'min' && typeof val.min === 'number') numberMin = val.min;
@@ -114,7 +115,7 @@ var generateViewPicture = function(viewStr, schema) {
 						});
 					break;					
 				default:
-					if (!defaultValue) defaultValue = "null";
+					;
 			}
 			view.push(
 					{fieldName: item,
@@ -127,6 +128,7 @@ var generateViewPicture = function(viewStr, schema) {
 					 numberMax: numberMax,
 					 maxlength: maxlength,
 					 minlength: minlength,
+					 enumValues: enumValues,
 					}
 			);
 		}
@@ -396,12 +398,19 @@ function main() {
 	});
 	
 	let mongooseSchema = views[0];
+	//console.log(mongooseSchema);
 
 	let briefView = generateViewPicture(views[1], mongooseSchema);
 	let detailView = generateViewPicture(views[2], mongooseSchema);
 	let createView = generateViewPicture(views[3], mongooseSchema);
 	let editView = generateViewPicture(views[4], mongooseSchema);
 	let seachView = generateViewPicture(views[5], mongooseSchema);
+	
+	let compositeEditView = editView.slice();
+	let editFields = editView.map( x=> x.fieldName);
+	for (let x in createView) {
+		if (!editFields.includes(x.fieldName)) compositeEditView.push(x);
+	}
 		
 	let schemaObj = {
 		schemaName: schemaName,
@@ -412,6 +421,7 @@ function main() {
 		createView: createView,
 		editView: editView,
 		seachView: seachView,
+		compositeEditView: compositeEditView,
 	}
 	
 	generateSourceFile(schemaName, templates.schemaBaseService, schemaObj, componentDir);
