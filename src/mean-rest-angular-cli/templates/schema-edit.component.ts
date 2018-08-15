@@ -35,7 +35,7 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
           this.action="Create";
           this.detail = {
 <%_ createView.forEach( (field) => { %>
-              <% if (! (typeof(field.defaultValue) == 'undefined')) {%><%-field.fieldName%>: <%-field.defaultValue%>,  <%_}%> <%_ }); %>
+              <% if ( typeof(field.defaultValue) !== 'undefined') {%><%-field.fieldName%>: <%-field.defaultValue%>,  <%_}%> <%_ }); %>
           }
       }
   }

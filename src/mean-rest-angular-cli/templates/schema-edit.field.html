@@ -19,7 +19,10 @@
 		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
 		      	<label class="form-check-label"><%-f%></label>
 		      </div>
-		     <%_ }) %>
+		      <%_ }) %>
+		      <% if (!field.required) {%><div *ngIf="enums['<%-field.fieldName%>'].includes(detail['<%-field.fieldName%>'])" 
+		          class="form-check-inline" (click)="clearValueFromDetail('<%-field.fieldName%>')">
+		          <i class="fas fa-times-circle" title="Clear"></i></div> <%}%>
 		    </div>
         <%_ } else { %>
 	        <input type="text" class="form-control" id="<%-schemaName%>Edit<%-field.FieldName%>" 
@@ -77,6 +80,9 @@
 		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
 		      	<label class="form-check-label">No</label>
 		      </div>
+		      <% if (!field.required) {%><div *ngIf="detail['<%-field.fieldName%>'] == true || detail['<%-field.fieldName%>'] == false" 
+		          class="form-check-inline" (click)="clearValueFromDetail('<%-field.fieldName%>')">
+		          <i class="fas fa-times-circle" title="Clear"></i></div> <%}%>
 		    </div>
 	    <%_if (field.required) {%>
 	        <div [hidden]="<%-schemaName%>Edit<%-field.FieldName%>.valid || <%-schemaName%>Edit<%-field.FieldName%>.pristine"

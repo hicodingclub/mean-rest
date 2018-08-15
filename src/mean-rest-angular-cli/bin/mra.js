@@ -95,7 +95,7 @@ var generateViewPicture = function(viewStr, schema) {
 			let enumValues;
 			switch(type) {
 				case "SchemaString":
-					if (! (typeof(defaultValue) == 'undefined')) {
+					if ( typeof(defaultValue) !== 'undefined') {
 						defaultValue = "'" + defaultValue + "'";
 					}
 					if (schema.paths[item].validators)
