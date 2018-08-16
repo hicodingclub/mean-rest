@@ -83,18 +83,25 @@ var generateSourceFile = function(keyname, template, renderObj, outputDir) {
 	});
 }
 
-var generateViewPicture = function(viewStr, schema) {
+var generateViewPicture = function(viewStr, schema, validators) {
 	let viewDef = viewStr.match(/\S+/g) || [];
 	let view = [];
 	viewDef.forEach((item) => {
 		if (item in schema.paths) {
+			let validatorArray;
+			if (validators && Array.isArray(validators[item])) {
+				validatorArray = validators[item];
+			}
+			
 			let type = schema.paths[item].constructor.name;
+			let jstype;
 			let defaultValue = schema.paths[item].defaultValue;
 			let numberMin, numberMax;
 			let maxlength, minlength;
 			let enumValues;
 			switch(type) {
 				case "SchemaString":
+					jstype = "string";
 					if ( typeof(defaultValue) !== 'undefined') {
 						defaultValue = "'" + defaultValue + "'";
 					}
@@ -106,8 +113,10 @@ var generateViewPicture = function(viewStr, schema) {
 						});
 					break;
 				case "SchemaBoolean":
+					jstype = "boolean";
 					break;
 				case "SchemaNumber":
+					jstype = "number";
 					if (schema.paths[item].validators)
 						schema.paths[item].validators.forEach((val) => {
 							if (val.type == 'min' && typeof val.min === 'number') numberMin = val.min;
@@ -121,6 +130,7 @@ var generateViewPicture = function(viewStr, schema) {
 					{fieldName: item,
 					 FieldName: capitalizeFirst(item),
 					 type: type,
+					 jstype: jstype,
 					 //TODO: required could be a function
 					 required: schema.paths[item].originalRequiredValue === true? true:false,
 					 defaultValue: defaultValue,
@@ -129,6 +139,7 @@ var generateViewPicture = function(viewStr, schema) {
 					 maxlength: maxlength,
 					 minlength: minlength,
 					 enumValues: enumValues,
+					 validators: validatorArray,
 					}
 			);
 		}
@@ -370,10 +381,26 @@ function main() {
   let schemas = require(inputFileModule);
   
   let schemaArray = [];
+  let validatorFields = [];
   let defaultSchema;
   for (let name in schemas) {
-	let views = schemas[name];
-	//views in [schema, briefView, detailView, CreateView, EditView, SearchView] format
+	let schemaDef = schemas[name];
+
+	if (typeof schemaDef !== 'object') {
+		console.error("Error: input file must export an object defining an object for each schema.");
+		_exit(1);
+	}
+
+	let views = schemaDef.views
+	let validators = schemaDef.validators;
+	let mongooseSchema = schemaDef.schema;
+//	console.log(mongooseSchema);
+//	mongooseSchema.paths.name.validators.forEach( (v) => {
+//		console.log(v);
+//		console.log("validator: ", v.validator);
+//	})
+
+	//views in [briefView, detailView, CreateView, EditView, SearchView] format
 	if (typeof views !== 'object' || !Array.isArray(views)) {
 		console.error("Error: input file must export an object defining an array for each schema.");
 		_exit(1);
@@ -397,24 +424,29 @@ function main() {
 		
 	});
 	
-	let mongooseSchema = views[0];
-	//console.log(mongooseSchema);
-
-	let briefView = generateViewPicture(views[1], mongooseSchema);
-	let detailView = generateViewPicture(views[2], mongooseSchema);
-	let createView = generateViewPicture(views[3], mongooseSchema);
-	let editView = generateViewPicture(views[4], mongooseSchema);
-	let seachView = generateViewPicture(views[5], mongooseSchema);
+	let briefView = generateViewPicture(views[0], mongooseSchema, validators);
+	let detailView = generateViewPicture(views[1], mongooseSchema, validators);
+	let createView = generateViewPicture(views[2], mongooseSchema, validators);
+	let editView = generateViewPicture(views[3], mongooseSchema, validators);
+	let seachView = generateViewPicture(views[4], mongooseSchema, validators);
 	
 	let compositeEditView = editView.slice();
 	let editFields = editView.map( x=> x.fieldName);
-	for (let x in createView) {
+	createView.forEach( function(x) {
 		if (!editFields.includes(x.fieldName)) compositeEditView.push(x);
-	}
-		
+	});
+	
+	let SchemaName = capitalizeFirst(schemaName);
+	compositeEditView.forEach(function(x){
+		if (x.validators) validatorFields.push( 
+			{ Directive: SchemaName+'Directive'+x.FieldName,
+			 schemaName: schemaName,
+			})
+	});
+	
 	let schemaObj = {
 		schemaName: schemaName,
-		SchemaName: capitalizeFirst(schemaName),
+		SchemaName: SchemaName,
 		apiBase: apiBase,
 		briefView: briefView,
 		detailView: detailView,
@@ -442,7 +474,6 @@ function main() {
 	generateSourceFile(schemaName, templates.schemaEditComponent, schemaObj, subComponentDir);
 	generateSourceFile(schemaName, templates.schemaEditComponentHtml, schemaObj, subComponentDir);
 	generateSourceFile(schemaName, templates.schemaEditComponentCss, schemaObj, subComponentDir);
-
 	
 	if (!defaultSchema) defaultSchema = schemaName;
 	schemaArray.push(schemaObj);
@@ -452,9 +483,10 @@ function main() {
 	moduleName: moduleName,
 	ModuleName: ModuleName,
 	schemaArray: schemaArray,
-	defaultSchema: defaultSchema
+	defaultSchema: defaultSchema,
+	validatorFields: validatorFields,
   }
-
+  //console.log(renderObj.validatorFields);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
 
   generateSourceFile(moduleName, templates.mainModule, renderObj, outputDir);
@@ -464,22 +496,6 @@ function main() {
   generateSourceFile(moduleName, templates.routingModule, renderObj, outputDir);  
   return;
 
-  // App name
-
-  // View engine
-  if (program.view === true) {
-    if (program.ejs) program.view = 'ejs'
-    if (program.hbs) program.view = 'hbs'
-    if (program.hogan) program.view = 'hjs'
-    if (program.pug) program.view = 'pug'
-  }
-
-  // Default view engine
-  if (program.view === true) {
-    warning('the default view engine will not be jade in future releases\n' +
-      "use `--view=jade' or `--help' for additional options")
-    program.view = 'jade'
-  }
 
   // Generate application
   emptyDirectory(destinationPath, function (empty) {

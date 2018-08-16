@@ -1,30 +1,33 @@
 var createError = require('http-errors');
 
-var views_collection = {}; //views in [schema, briefView, detailView, CreateView, EditView, SearchView] format
+var schema_collection = {};
+var views_collection = {}; //views in [briefView, detailView, CreateView, EditView, SearchView] format
 var model_collection = {};
 
 var loadContextVars = function(url) {
 	let arr = url.split('/');
 	if (arr.length < 2) throw(createError(500, "Cannot identify context name from routing path: " + url))
 	let name = arr[arr.length-2].toLowerCase();
+	let schema = schema_collection[name];
 	let model = model_collection[name];
 	let views = views_collection[name];
-	if (!model || !views) throw(createError(500, "Cannot load context from routing path " + url))
-	return {name: name, model: model, views: views};
+	if (!schema || !model || !views) throw(createError(500, "Cannot load context from routing path " + url))
+	return {name: name, schema: schema, model: model, views: views};
 }
 
 var RestController = function() {
 }
 
-RestController.register = function(name, views, model) {
+RestController.register = function(name, schema, views, model) {
+	schema_collection[name.toLowerCase()] = schema;
 	views_collection[name.toLowerCase()] = views;
 	model_collection[name.toLowerCase()] = model;
 };
 	
 RestController.getAll = function(req, res, next) {
-	let {name: name, model: model, views: views} = loadContextVars(req.originalUrl);
-	//views in [schema, briefView, detailView, CreateView, EditView, SearchView] format
-	let schema = views[0], briefView = views[1];
+	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req.originalUrl);
+	//views in [briefView, detailView, CreateView, EditView, SearchView] format
+	let briefView = views[0];
 	
 	let query = {};
 
@@ -79,9 +82,9 @@ RestController.getAll = function(req, res, next) {
 };
 	
 RestController.getDetailsById = function(req, res, next) {
-	let {name: name, model: model, views: views} = loadContextVars(req.originalUrl);
-	//views in [schema, briefView, detailView, CreateView, EditView, SearchView] format
-	let detailView = views[2];
+	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req.originalUrl);
+	//views in [briefView, detailView, CreateView, EditView, SearchView] format
+	let detailView = views[1];
 
 	let idParam = name + "Id";
 	let id = req.params[idParam];
@@ -92,7 +95,7 @@ RestController.getDetailsById = function(req, res, next) {
 };
 	
 RestController.HardDeleteById = function(req, res, next) {
-	let {name: name, model: model, views: views} = loadContextVars(req.originalUrl);
+	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req.originalUrl);
 	
 	let idParam = name + "Id";
 	let id = req.params[idParam];
@@ -128,7 +131,7 @@ RestController.PostActions = function(req, res, next) {
 }
 
 RestController.deleteManyByIds = function(req, res, next, ids) {
-	let {name: name, model: model, views: views} = loadContextVars(req.originalUrl);
+	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req.originalUrl);
 
 	model.deleteMany({"_id": {$in: ids}})
 		.exec(function (err, result) {
@@ -138,7 +141,7 @@ RestController.deleteManyByIds = function(req, res, next, ids) {
 };
 
 RestController.Create = function(req, res, next) {
-	let {name: name, model: model, views: views} = loadContextVars(req.originalUrl);
+	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req.originalUrl);
 	
 	let body = req.body;
 	if (typeof body === "string") {
@@ -156,24 +159,23 @@ RestController.Create = function(req, res, next) {
 };
 
 RestController.Update = function(req, res, next) {
-        let {name: name, model: model, views: views} = loadContextVars(req.originalUrl);
+	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req.originalUrl);
 
-        let body = req.body;
-        if (typeof body === "string") {
-            try {
-                body = JSON.parse(body);
-            } catch(e) {
-                next(createError(404, "Bad " + name + " document."));
-            }
+    let body = req.body;
+    if (typeof body === "string") {
+        try {
+            body = JSON.parse(body);
+        } catch(e) {
+            next(createError(404, "Bad " + name + " document."));
         }
+    }
 
-    	let idParam = name + "Id";
-    	let id = req.params[idParam];
-    	model.replaceOne({_id: id}, body, function (err, result) {
-                if (err) { return next(err); }
-                res.send();
-        });
+	let idParam = name + "Id";
+	let id = req.params[idParam];
+	model.replaceOne({_id: id}, body, function (err, result) {
+            if (err) { return next(err); }
+            res.send();
+    });
 };
-
 
 module.exports = RestController;

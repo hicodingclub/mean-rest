@@ -4,16 +4,16 @@ var RestController = require('./lib/mean_rest_express_controller')
 var RestRouter = require('./lib/mean_rest_express_router')
 
 function meanRestExpressRouter(schemas) {
-	var expressRouter = express.Router();
+	let expressRouter = express.Router();
 
-	var sub_routes = [];
-	for (var name in schemas) {
-		var views = schemas[name];
-		//views in [schema, briefView, detailView, CreateView, EditView, SearchView] format
+	let sub_routes = [];
+	for (let name in schemas) {
+		var schemaDef = schemas[name];
+		//schemaDef.views in [briefView, detailView, CreateView, EditView, SearchView] sequence
 		name = name.toLowerCase();
-		var model = mongoose.model(name, views[0], );
+		var model = mongoose.model(name, schemaDef.schema, );
 		
-		RestController.register(name, views, model);
+		RestController.register(name, schemaDef.schema, schemaDef.views, model);
 		
 		restRouter = RestRouter(name);
 		expressRouter.use("/" + name, restRouter)

@@ -15,7 +15,10 @@ import { <%-schm.SchemaName%>DetailComponent } from './<%-schm.schemaName%>/<%-s
 import { <%-schm.SchemaName%>EditComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-edit/<%-schm.schemaName%>-edit.component';
 import { <%-schm.SchemaName%>Service } from './<%-schm.schemaName%>/<%-schm.schemaName%>.service';
 <%_ }); %>
-
+<%_ validatorFields.forEach(function(validator){ %>     
+import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validator.schemaName%>-edit/<%-validator.schemaName%>-edit.component';
+<%_ }); %>
+    
 @NgModule({
   imports: [
     CommonModule,
@@ -30,11 +33,13 @@ import { <%-schm.SchemaName%>Service } from './<%-schm.schemaName%>/<%-schm.sche
     MinNumber,
     MaxNumber,
     
- <%_ schemaArray.forEach(function(schm){ %>     
+<%_ schemaArray.forEach(function(schm){ %>     
     <%-schm.SchemaName%>ListComponent, 
     <%-schm.SchemaName%>DetailComponent, 
     <%-schm.SchemaName%>EditComponent,
 <%_ }); %>
+<%_ validatorFields.forEach(function(validator){ %>     
+    <%-validator.Directive%>,<%_ }); %>
   ],
   exports: [
     <%-ModuleName%>Component,
