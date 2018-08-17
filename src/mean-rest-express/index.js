@@ -7,11 +7,11 @@ function meanRestExpressRouter(schemas) {
 	let expressRouter = express.Router();
 
 	let sub_routes = [];
-	for (let name in schemas) {
-		var schemaDef = schemas[name];
+	for (let schemaName in schemas) {
+		var schemaDef = schemas[schemaName];
 		//schemaDef.views in [briefView, detailView, CreateView, EditView, SearchView] sequence
-		name = name.toLowerCase();
-		var model = mongoose.model(name, schemaDef.schema, );
+		name = schemaName.toLowerCase();
+		var model = mongoose.model(schemaName, schemaDef.schema, );//model uses given name
 		
 		RestController.register(name, schemaDef.schema, schemaDef.views, model);
 		
