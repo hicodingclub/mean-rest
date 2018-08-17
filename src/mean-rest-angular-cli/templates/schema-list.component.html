@@ -53,8 +53,8 @@
 	    <thead class="thead-light">
 	    	<tr>
 		        <th scope="col">#</th>
-<%_ briefView.forEach( (field) => { %>
-		        <th scope="col"><%-field.FieldName%></th><%_ }) %>		        
+<%_ for (let field of briefView){ %>
+		        <th scope="col"><%-field.FieldName%></th><%_ } %>		        
 		        <th scope="col" style="width:8rem;"></th>
 		        <th scope="col" style="width:2rem;">
 		        	<input type="checkbox" [(ngModel)]="checkAll" (change)="onCheckAllChange()">
@@ -64,8 +64,10 @@
 	    <tbody>
 	        <tr *ngFor="let item of list;  let i = index">
 	            <td scope="row"><a [routerLink]="['../detail', item['_id'] ]">{{(page-1)*per_page+i+1}}</a></td>
-<%_ briefView.forEach( (field) => { %>	            
-	            <td>{{item['<%-field.fieldName%>']}}</td><%_ }) %>
+<%_ for (let field of briefView){ %>
+	            <td><%if(field.type!='ObjectId') {%>  {{item['<%-field.fieldName%>']}} <%_
+	            	}else{%>  {{item['<%-field.fieldName%>']?item['<%-field.fieldName%>'].value:""}}  <%_}%>
+	            </td><%_ } %>
 	            <td>
 	            	<a [routerLink]="['../detail', item['_id'] ]"><i class="fas fa-book-open" title="View Details"></i></a>
 	            	<a [routerLink]="['../edit', item['_id'] ]"><i class="fas fa-edit" title="Edit"></i></a>

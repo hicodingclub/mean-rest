@@ -9,9 +9,11 @@
 	  <div class="card-body">
 	    <h4 class="card-title">Blog Detail</h4>    
 		<div class="card-text">
-<%_ detailView.forEach( (field) => { %>	            
+<%_ for (let field of briefView){ %>
 			<label><b><%-field.FieldName%>:</b></label>
-				<span>{{detail['<%-field.fieldName%>']}}</span><br><%_ }) %>
+				<span><%if(field.type!='ObjectId') {%>  {{detail['<%-field.fieldName%>']}} <%_
+	            	}else{%>  {{detail['<%-field.fieldName%>']?detail['<%-field.fieldName%>'].value:""}}<%}%>
+				</span><br><%_}%>
 		</div>
 	  </div>
 	</div>

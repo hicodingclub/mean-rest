@@ -4,10 +4,10 @@
 		<div class="card">
 		  <div class="card-header">
 			  <nav class="nav nav-pills">
-<%_ schemaArray.forEach(function(schm){ %>
+<%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
 			    <a class="nav-item nav-link" routerLink="./<%-schm.schemaName%>" 
 			    	routerLinkActive="active"><%-schm.SchemaName%></a>
-<%_ }); %>
+<%_ } %>
 			  </nav>
 		  </div>
 		  <div class="card-body">

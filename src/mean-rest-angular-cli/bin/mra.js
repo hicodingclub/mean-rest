@@ -99,6 +99,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 			let numberMin, numberMax;
 			let maxlength, minlength;
 			let enumValues;
+			let ref;
 			switch(type) {
 				case "SchemaString":
 					jstype = "string";
@@ -122,7 +123,10 @@ var generateViewPicture = function(viewStr, schema, validators) {
 							if (val.type == 'min' && typeof val.min === 'number') numberMin = val.min;
 							if (val.type == 'max' && typeof val.max === 'number') numberMax = val.max;
 						});
-					break;					
+					break;
+				case "ObjectId":
+					jstype = "string";
+					if (schema.paths[item].options.ref) ref = schema.paths[item].options.ref.toLowerCase();
 				default:
 					;
 			}
@@ -131,6 +135,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 					 FieldName: capitalizeFirst(item),
 					 type: type,
 					 jstype: jstype,
+					 ref: ref,
 					 //TODO: required could be a function
 					 required: schema.paths[item].originalRequiredValue === true? true:false,
 					 defaultValue: defaultValue,
@@ -380,7 +385,7 @@ function main() {
   let inputFileModule = relativePath.substring(0, relativePath.length-3);
   let schemas = require(inputFileModule);
   
-  let schemaArray = [];
+  let schemaMap = {};
   let validatorFields = [];
   let defaultSchema;
   for (let name in schemas) {
@@ -395,18 +400,19 @@ function main() {
 	let validators = schemaDef.validators;
 	let mongooseSchema = schemaDef.schema;
 //	console.log(mongooseSchema);
-//	mongooseSchema.paths.name.validators.forEach( (v) => {
-//		console.log(v);
-//		console.log("validator: ", v.validator);
-//	})
+//	if (mongooseSchema.paths.person) {
+//		console.log("===person: ", mongooseSchema.paths.person.options);
+//	}
 
-	//views in [briefView, detailView, CreateView, EditView, SearchView] format
+	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 	if (typeof views !== 'object' || !Array.isArray(views)) {
 		console.error("Error: input file must export an object defining an array for each schema.");
 		_exit(1);
 	}
 	let schemaName = name.toLowerCase();
-	//let model = mongoose.model(schemaName, views[0], );
+	//let model = mongoose.model(name, mongooseSchema, ); //model uses given name
+	//console.log("----------------------------");
+	//console.log(model);
 	
 	let componentDir = path.join(outputDir, schemaName);
 	if(!fs.existsSync(componentDir)) {
@@ -429,6 +435,7 @@ function main() {
 	let createView = generateViewPicture(views[2], mongooseSchema, validators);
 	let editView = generateViewPicture(views[3], mongooseSchema, validators);
 	let seachView = generateViewPicture(views[4], mongooseSchema, validators);
+	let indexView = generateViewPicture(views[5], mongooseSchema, validators);
 	
 	let compositeEditView = editView.slice();
 	let editFields = editView.map( x=> x.fieldName);
@@ -453,36 +460,19 @@ function main() {
 		createView: createView,
 		editView: editView,
 		seachView: seachView,
+		indexView: indexView,
 		compositeEditView: compositeEditView,
+		componentDir: componentDir,
 	}
 	
-	generateSourceFile(schemaName, templates.schemaBaseService, schemaObj, componentDir);
-	generateSourceFile(schemaName, templates.schemaService, schemaObj, componentDir);
-	generateSourceFile(schemaName, templates.schemaComponent, schemaObj, componentDir);
-
-	subComponentDir = path.join(componentDir, schemaName+'-list');
-	generateSourceFile(schemaName, templates.schemaListComponent, schemaObj, subComponentDir);
-	generateSourceFile(schemaName, templates.schemaListComponentHtml, schemaObj, subComponentDir);
-	generateSourceFile(schemaName, templates.schemaListComponentCss, schemaObj, subComponentDir);
-
-	subComponentDir = path.join(componentDir, schemaName+'-detail');
-	generateSourceFile(schemaName, templates.schemaDetailComponent, schemaObj, subComponentDir);
-	generateSourceFile(schemaName, templates.schemaDetailComponentHtml, schemaObj, subComponentDir);
-	generateSourceFile(schemaName, templates.schemaDetailComponentCss, schemaObj, subComponentDir);
-
-	subComponentDir = path.join(componentDir, schemaName+'-edit');
-	generateSourceFile(schemaName, templates.schemaEditComponent, schemaObj, subComponentDir);
-	generateSourceFile(schemaName, templates.schemaEditComponentHtml, schemaObj, subComponentDir);
-	generateSourceFile(schemaName, templates.schemaEditComponentCss, schemaObj, subComponentDir);
-	
 	if (!defaultSchema) defaultSchema = schemaName;
-	schemaArray.push(schemaObj);
+	schemaMap[schemaName] = schemaObj;
   }
   
   let renderObj = {
 	moduleName: moduleName,
 	ModuleName: ModuleName,
-	schemaArray: schemaArray,
+	schemaMap: schemaMap,
 	defaultSchema: defaultSchema,
 	validatorFields: validatorFields,
   }
@@ -493,7 +483,35 @@ function main() {
   generateSourceFile(moduleName, templates.mainComponent, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainComponentHtml, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainComponentCss, renderObj, outputDir);
-  generateSourceFile(moduleName, templates.routingModule, renderObj, outputDir);  
+  generateSourceFile(moduleName, templates.routingModule, renderObj, outputDir); 
+  
+  for (let key in schemaMap) {
+	let schemaObj = renderObj.schemaMap[key];
+	let componentDir = schemaObj.componentDir;
+	let schemaName = schemaObj.schemaName;
+	//schemaObj.schemaMap = schemaMap;
+
+	generateSourceFile(schemaName, templates.schemaBaseService, schemaObj, componentDir);
+	generateSourceFile(schemaName, templates.schemaService, schemaObj, componentDir);
+	generateSourceFile(schemaName, templates.schemaComponent, schemaObj, componentDir);
+	
+	let subComponentDir = path.join(componentDir, schemaName+'-list');
+	generateSourceFile(schemaName, templates.schemaListComponent, schemaObj, subComponentDir);
+	generateSourceFile(schemaName, templates.schemaListComponentHtml, schemaObj, subComponentDir);
+	generateSourceFile(schemaName, templates.schemaListComponentCss, schemaObj, subComponentDir);
+	
+	subComponentDir = path.join(componentDir, schemaName+'-detail');
+	generateSourceFile(schemaName, templates.schemaDetailComponent, schemaObj, subComponentDir);
+	generateSourceFile(schemaName, templates.schemaDetailComponentHtml, schemaObj, subComponentDir);
+	generateSourceFile(schemaName, templates.schemaDetailComponentCss, schemaObj, subComponentDir);
+	
+	subComponentDir = path.join(componentDir, schemaName+'-edit');
+	generateSourceFile(schemaName, templates.schemaEditComponent, schemaObj, subComponentDir);
+	generateSourceFile(schemaName, templates.schemaEditComponentHtml, schemaObj, subComponentDir);
+	generateSourceFile(schemaName, templates.schemaEditComponentCss, schemaObj, subComponentDir);
+	  
+  }
+
   return;
 
 

@@ -4,12 +4,12 @@ import { Routes, RouterModule } from '@angular/router';
 import { <%-ModuleName%>Component } from './blogsys.component';
 
 //Import components for each schema
-<%_ schemaArray.forEach(function(schm){ %>
+<%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
 import { <%-schm.SchemaName%>ListComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list.component';
 import { <%-schm.SchemaName%>DetailComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail.component';
 import { <%-schm.SchemaName%>EditComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-edit/<%-schm.schemaName%>-edit.component';
-<%_ }); %>
-<%_ schemaArray.forEach(function(schm){ %>
+<%_ }%>
+<%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
 const <%-schm.schemaName%>RoutingPath = [
     {path: 'list', component: <%-schm.SchemaName%>ListComponent},
     {path: 'detail/:id', component: <%-schm.SchemaName%>DetailComponent},
@@ -17,15 +17,15 @@ const <%-schm.schemaName%>RoutingPath = [
     {path: 'new', component: <%-schm.SchemaName%>EditComponent},
     {path: '**', redirectTo: 'list', pathMatch: 'full'}
 ];
-<%_ }); %>
+<%_ }%>
 const routes: Routes = [
   { path: '<%-moduleName%>', 
     component: <%-ModuleName%>Component,
     children: [ 
                 {path: '',  redirectTo: '<%-defaultSchema%>', pathMatch: 'full'},
-<%_ schemaArray.forEach(function(schm){ %>
+<%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
                 {path: "<%-schm.schemaName%>",  children: <%-schm.schemaName%>RoutingPath},<%_
- }); %>
+ }%>
     ]
   }
 ];
