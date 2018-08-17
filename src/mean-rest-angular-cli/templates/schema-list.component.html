@@ -66,7 +66,8 @@
 	            <td scope="row"><a [routerLink]="['../detail', item['_id'] ]">{{(page-1)*per_page+i+1}}</a></td>
 <%_ for (let field of briefView){ %>
 	            <td><%if(field.type!='ObjectId') {%>  {{item['<%-field.fieldName%>']}} <%_
-	            	}else{%>  {{item['<%-field.fieldName%>']?item['<%-field.fieldName%>'].value:""}}  <%_}%>
+	            	}else{%>  <a [routerLink]="item['<%-field.fieldName%>']?['../../<%-field.ref%>/detail', item['<%-field.fieldName%>']['_id'] ]:['.']">
+	            	    {{item['<%-field.fieldName%>']?item['<%-field.fieldName%>'].value:""}}</a>  <%_}%>
 	            </td><%_ } %>
 	            <td>
 	            	<a [routerLink]="['../detail', item['_id'] ]"><i class="fas fa-book-open" title="View Details"></i></a>
