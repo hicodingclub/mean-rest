@@ -62,6 +62,7 @@ export class BaseComponent {
             }
         }
         console.info("Error: " + errMsg);
+        if (!errMsg) errMsg = "Unknown error.";
         if (errMsg.length > 80) {
             more = errMsg;
             errMsg = errMsg.substring(0, 80) + "...";

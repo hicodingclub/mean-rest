@@ -8,6 +8,24 @@ export class ServiceError {
     serverError:any;
 }
 
+export function formatReference(fields:string[], detail:any ):any {
+    for (let fnm of fields) {
+        if (typeof detail[fnm] == 'string') {
+            let id = detail[fnm];
+            detail[fnm] = {'_id': id, 'value': fnm};
+        } else if (typeof detail[fnm] == 'object') {
+            let id = detail[fnm]['_id'];
+            let referIndex = '';
+            for (let k in  detail[fnm]) {
+                if (k != '_id') referIndex += " " + detail[fnm][k];
+            }
+            referIndex = referIndex.replace(/^\s+|\s+$/g, '')
+            detail[fnm] = {'_id': id, 'value': referIndex? referIndex: fnm};
+        }
+    }
+    return detail;
+}
+
 export class BaseService {
     protected storage:any = {};
 
@@ -45,7 +63,7 @@ export class BaseService {
     protected formatList(list:any): any {
         return list;
     }
-    
+
     getList(page:number, per_page:number) {
         let httpOptions = {
             params: new HttpParams().set('__page', page.toString())
