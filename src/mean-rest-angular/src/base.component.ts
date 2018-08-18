@@ -19,12 +19,16 @@ export {ServiceError};
 
 export class BaseComponent {
     //For list and pagination
-    protected list:any[];
+    protected list:any[] = [];
     
     protected page: number = 1;
     protected per_page: number = 25;
     protected total_count: number = 0;
     protected total_pages: number = 0;
+    
+    protected searchText: string;
+    protected searchFields: string = "";//populated by sub-class
+    protected searchCondition: any;
     
     protected pages: number[] = [];
     protected left_more:boolean = false;
@@ -34,8 +38,11 @@ export class BaseComponent {
     protected checkedItem:boolean[] = [];
     
     //For edit and view details
-    protected detail:any;
+    protected detail:any = {};
     protected id:string;
+    //for fields with enum values
+    protected enums:any = {};
+    protected referenceFields = [];
 
     protected capitalItemName: string;
 
@@ -127,10 +134,32 @@ export class BaseComponent {
         this.router.navigate(['.', { page: p }], {relativeTo: this.route});
     }
     
+    protected formatReference(detail:any ):any {
+        for (let fnm of this.referenceFields) {
+            if (typeof detail[fnm] == 'string') {
+                let id = detail[fnm];
+                detail[fnm] = {'_id': id, 'value': fnm};
+            } else if (typeof detail[fnm] == 'object') {
+                let id = detail[fnm]['_id'];
+                let referIndex = '';
+                for (let k in  detail[fnm]) {
+                    if (k != '_id') referIndex += " " + detail[fnm][k];
+                }
+                referIndex = referIndex.replace(/^\s+|\s+$/g, '')
+                detail[fnm] = {'_id': id, 'value': referIndex? referIndex: fnm};
+            }
+        }
+        return detail;
+    }
+    protected formatDetail(detail:any ):any {
+        detail = this.formatReference(detail);
+        return detail;
+    }    
+    
     protected populateDetail(id:string):void {
       this.service.getDetail(this.id).subscribe(
         detail => { 
-            this.detail = detail;
+            this.detail = this.formatDetail(detail);
         },
         this.onServiceError
       );
@@ -144,10 +173,10 @@ export class BaseComponent {
           return;
       }
       let new_page = url_page? url_page: 1;
-        
+              
       this.service.getList(new_page, this.per_page).subscribe(
         result => { 
-            this.list = result.items;
+            this.list = result.items.map(x=>this.formatDetail(x));
             this.page = result.page;
             this.per_page = result.per_page;
             this.total_count = result.total_count;

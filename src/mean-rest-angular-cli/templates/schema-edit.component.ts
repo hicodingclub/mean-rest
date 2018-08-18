@@ -49,9 +49,6 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
   protected id:string;
   private action:string;
     
-  private enums:any = {};
-  private validators:any = {};
-
   constructor(
       protected router: Router,
       protected route: ActivatedRoute,
@@ -60,7 +57,7 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
 <%_ compositeEditView.forEach( (field) => { %>
           <%if (field.enumValues) {%>this.enums['<%-field.fieldName%>'] = [<%field.enumValues.forEach( (f)=>{%>'<%-f%>',<%})%>]; <% } _%>
 <%_ }); %>
-      }
+  }
 
   ngOnInit() {
       if (!this.id) this.id = this.route.snapshot.paramMap.get('id');

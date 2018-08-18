@@ -12,13 +12,20 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component implements OnInit {
   @Input() 
   protected id:string;
-        
+
   constructor(
       protected router: Router,
       protected route: ActivatedRoute,
       protected <%-schemaName%>Service: <%-SchemaName%>Service) {
-              super(<%-schemaName%>Service, router, route, ViewType.DETAIL);
-      }
+          super(<%-schemaName%>Service, router, route, ViewType.DETAIL);
+<%_ let objects = [];
+    for (let field of detailView) { 
+        if (field.type === "ObjectId") objects.push(field.fieldName);
+    }
+    if (objects.length > 0) {%>
+          this.referenceFields = [<%for (let fnm of objects) {%>'<%-fnm%>',<%}%>];
+<%}%> 
+  }
 
   ngOnInit() {
       if (!this.id) this.id = this.route.snapshot.paramMap.get('id');
