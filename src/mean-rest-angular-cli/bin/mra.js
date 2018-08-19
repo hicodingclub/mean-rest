@@ -100,6 +100,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 			let maxlength, minlength;
 			let enumValues;
 			let ref;
+			let format = "yyyy-MM-dd hh:mm:ss";
 			switch(type) {
 				case "SchemaString":
 					jstype = "string";
@@ -127,6 +128,11 @@ var generateViewPicture = function(viewStr, schema, validators) {
 				case "ObjectId":
 					jstype = "string";
 					if (schema.paths[item].options.ref) ref = schema.paths[item].options.ref.toLowerCase();
+					break;
+				case "SchemaDate":
+					jstype = "string";
+					if (schema.paths[item].options.format) format = schema.paths[item].options.format;
+					break;
 				default:
 					;
 			}
@@ -136,6 +142,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 					 type: type,
 					 jstype: jstype,
 					 ref: ref,
+					 format: format,
 					 //TODO: required could be a function
 					 required: schema.paths[item].originalRequiredValue === true? true:false,
 					 defaultValue: defaultValue,
@@ -399,10 +406,10 @@ function main() {
 	let views = schemaDef.views
 	let validators = schemaDef.validators;
 	let mongooseSchema = schemaDef.schema;
-//	console.log(mongooseSchema["_indexes"]);
-//	if (mongooseSchema.paths.person) {
-//		console.log("===person: ", mongooseSchema.paths.person.options);
-//	}
+//	console.log(mongooseSchema);
+	if (mongooseSchema.paths.birthday) {
+		console.log("===birthday: ", mongooseSchema.paths.birthday.options);
+	}
 
 	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 	if (typeof views !== 'object' || !Array.isArray(views)) {

@@ -18,12 +18,18 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
 <%_ briefView.forEach( (field) => { 
           if (field.enumValues) {%>
           this.enums['<%-field.fieldName%>'] = [<%field.enumValues.forEach( (f)=>{%>'<%-f%>',<%})%>]; <%}});%>
-<%_ let objects = [];
+<%_ let refObjects = [];
     for (let field of briefView) { 
-        if (field.type === "ObjectId") objects.push(field.fieldName);
+        if (field.type === "ObjectId") refObjects.push(field.fieldName);
     }
-    if (objects.length > 0) {%>
-          this.referenceFields = [<%for (let fnm of objects) {%>'<%-fnm%>',<%}%>];<%}%>
+    if (refObjects.length > 0) {%>
+          this.referenceFields = [<%for (let fnm of refObjects) {%>'<%-fnm%>',<%}%>];<%}%>
+<%_ let dateObjects = [];
+    for (let field of briefView) { 
+        if (field.type === "SchemaDate") dateObjects.push([field.fieldName, field.format]);
+    }
+    if (dateObjects.length > 0) {%>
+          this.dateFields = [<%for (let fnm of dateObjects) {%>['<%-fnm[0]%>', '<%-fnm[1]%>'],<%}%>];<%}%>
   }
 
   ngOnInit() {

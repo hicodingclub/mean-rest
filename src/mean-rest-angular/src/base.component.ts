@@ -57,6 +57,7 @@ export class BaseComponent {
     //for fields with enum values
     protected enums:any = {};
     protected referenceFields = [];
+    protected dateFields = [];
     //Search
     protected searchText: string;    
 
@@ -171,8 +172,42 @@ export class BaseComponent {
         }
         return detail;
     }
+    protected formatDate(detail:any ):any {
+        for (let item of this.dateFields) {
+            let fnm = item[0];
+            let fmt = item[1];
+            if (typeof detail[fnm] !== 'string') continue;
+            let dt = new Date(detail[fnm]);
+            
+            let dd, d = dt.getDate();
+            let MM, M = dt.getMonth()+1; 
+            let yyyy = dt.getFullYear();
+            let yy = yyyy.toString().slice(2);
+            let hh, h = dt.getHours();
+            let mm, m = dt.getMinutes();
+            let ss, s = dt.getSeconds();
+            
+            dd= d<10? '0'+d: d.toString();
+            MM= M<10? '0'+M: M.toString();
+            hh= h<10? '0'+h: h.toString();
+            mm= m<10? '0'+m: m.toString();
+            ss= s<10? '0'+s: s.toString();
+            
+            let date = fmt.replace(/yyyy/ig, yyyy.toString()).
+                           replace(/yy/ig, yy.toString()).
+                           replace(/MM/g, MM.toString()).
+                           replace(/dd/ig, dd.toString()).
+                           replace(/hh/ig, hh.toString()).
+                           replace(/mm/g, mm.toString()).
+                           replace(/ss/ig, ss.toString());
+                ;
+            detail[fnm] = date;
+        }
+        return detail;
+    }
     protected formatDetail(detail:any ):any {
         detail = this.formatReference(detail);
+        detail = this.formatDate(detail);
         return detail;
     }    
     

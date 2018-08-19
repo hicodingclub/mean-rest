@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+//import { NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
 
 import { MinNumber, MaxNumber } from 'mean-rest-angular';
 
@@ -24,6 +25,8 @@ import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validat
     CommonModule,
     HttpClientModule,
     FormsModule,
+    
+//    NgbCalendar,
     
     <%-ModuleName%>RoutingModule
   ],
