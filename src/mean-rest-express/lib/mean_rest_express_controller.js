@@ -17,6 +17,21 @@ var loadContextVars = function(url) {
 	return {name: name, schema: schema, model: model, views: views, populates: populates};
 }
 
+var createRegex = function(obj) {
+	//obj in {key: string} format
+	for (let prop in obj) {
+		let userInput = obj[prop];
+		obj[prop] = new RegExp(
+			    // Escape all special characters except *
+			    userInput.replace(/([.+?^=!:${}()|\[\]\/\\])/g, "\\$1")
+			      // Allow the use of * as a wildcard like % in SQL.
+			      .replace(/\*/g, ".*"),
+			    'i'
+			  );
+	}
+	return obj;
+}
+
 var RestController = function() {
 }
 
@@ -61,8 +76,12 @@ RestController.register = function(name, schema, views, model) {
 			detailView: getViewPopulates(schema, views[1])
 	}
 };
-	
+
 RestController.getAll = function(req, res, next) {
+	return RestController.searchAll(req, res, next, {});
+}
+
+RestController.searchAll = function(req, res, next, searchContext) {
 	let {name: name, schema: schema, model: model, views: views, populates:populates} 
 		= loadContextVars(req.originalUrl);
 	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
@@ -94,8 +113,23 @@ RestController.getAll = function(req, res, next) {
 	}
 	
 	let count = 0;
+	if (searchContext) {
+        // searchContext ={'$and', [{'$or', []},{'$and', []}]}
+		if (searchContext['$and']) {
+		  for (let obj of searchContext['$and']) {
+			for (let op of ["$or", "$and"]) {
+				if (op in obj) {
+				//searchContext[op] is an array of objects
+					if (obj[op].length == 0) obj[op] = [{}];//make sure at least one object inside
+				    obj[op] = obj[op].map(x=>createRegex(x));
+				}
+			}
+		  }
+		}
+		query = searchContext;
+	}
 	
-    model.countDocuments({}).exec(function(err, cnt) {
+    model.countDocuments(query).exec(function(err, cnt) {
         if (err) { return next(err); }
         count = cnt;
         
@@ -110,7 +144,7 @@ RestController.getAll = function(req, res, next) {
     	
     	let skipCount = (__page - 1) * __per_page;
     	
-    	let dbExec = model.find({}, briefView)
+    	let dbExec = model.find(query, briefView)
             .skip(skipCount)
             .limit(__per_page)
         for (let pi = 0; pi < populateArray.length; pi ++) {
@@ -191,8 +225,12 @@ RestController.PostActions = function(req, res, next) {
     	let ids = body;
         RestController.deleteManyByIds(req, res, next, ids);
         break;
+    case "Search":
+    	let searchContext = body;
+    	RestController.searchAll(req, res, next, searchContext);
+    	break;
     default:
-    	next(createError(404, "Bad Action: " + action));
+    	return next(createError(404, "Bad Action: " + action));
 	}
 }
 

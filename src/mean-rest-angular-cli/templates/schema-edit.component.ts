@@ -5,8 +5,8 @@ import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
 import { NG_VALIDATORS, Validator, ValidationErrors, AbstractControl } from '@angular/forms';
-<%_ compositeEditView.forEach( (field) => { %>
-<%if (field.validators) {%>
+<%_ compositeEditView.forEach( (field) => {
+if (field.validators) {%>
 @Directive({
   selector: '[<%-schemaName%>Directive<%-field.FieldName%>]',
   providers: [{provide: NG_VALIDATORS, useExisting: <%-SchemaName%>Directive<%-field.FieldName%>, multi: true}]
@@ -35,8 +35,7 @@ export class <%-SchemaName%>Directive<%-field.FieldName%> implements Validator {
     }
     return null;
   }
-}<%}%>
-<%_ }); %>
+}<%}}); %>
 
 
 @Component({
@@ -54,9 +53,9 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
       protected route: ActivatedRoute,
       protected <%-schemaName%>Service: <%-SchemaName%>Service) {
           super(<%-schemaName%>Service, router, route, ViewType.LIST);
-<%_ compositeEditView.forEach( (field) => { %>
-          <%if (field.enumValues) {%>this.enums['<%-field.fieldName%>'] = [<%field.enumValues.forEach( (f)=>{%>'<%-f%>',<%})%>]; <% } _%>
-<%_ }); %>
+<%_ compositeEditView.forEach( (field) => {
+          if (field.enumValues) {%>
+          this.enums['<%-field.fieldName%>'] = [<%field.enumValues.forEach( (f)=>{%>'<%-f%>',<%})%>]; <%}});%>
   }
 
   ngOnInit() {
@@ -68,8 +67,8 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
       else {
           this.action="Create";
           this.detail = {
-<%_ createView.forEach( (field) => { %>
-              <% if ( typeof(field.defaultValue) !== 'undefined') {%><%-field.fieldName%>: <%-field.defaultValue%>,  <%_}%> <%_ }); %>
+<%_ createView.forEach( (field) => {
+              if ( typeof(field.defaultValue) !== 'undefined') {%><%-field.fieldName%>: <%-field.defaultValue%>,  <%_}}); %>
           }
       }
   }

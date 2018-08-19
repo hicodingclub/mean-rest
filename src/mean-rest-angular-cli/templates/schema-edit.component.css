@@ -46,3 +46,10 @@
 .ng-invalid:not(form)  {
   border-left: 5px solid #a94442; /* red */
 }
+
+
+.icon-clear {
+  z-index: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}

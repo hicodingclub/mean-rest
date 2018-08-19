@@ -15,16 +15,15 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
       protected route: ActivatedRoute,
       protected <%-schemaName%>Service: <%-SchemaName%>Service) {
           super(<%-schemaName%>Service, router, route, ViewType.LIST);
-<%_ briefView.forEach( (field) => { %>
-          <%if (field.enumValues) {%>this.enums['<%-field.fieldName%>'] = [<%field.enumValues.forEach( (f)=>{%>'<%-f%>',<%})%>]; <% } _%>
-<%_ }); %>
+<%_ briefView.forEach( (field) => { 
+          if (field.enumValues) {%>
+          this.enums['<%-field.fieldName%>'] = [<%field.enumValues.forEach( (f)=>{%>'<%-f%>',<%})%>]; <%}});%>
 <%_ let objects = [];
     for (let field of briefView) { 
         if (field.type === "ObjectId") objects.push(field.fieldName);
     }
     if (objects.length > 0) {%>
-          this.referenceFields = [<%for (let fnm of objects) {%>'<%-fnm%>',<%}%>];
-<%}%>
+          this.referenceFields = [<%for (let fnm of objects) {%>'<%-fnm%>',<%}%>];<%}%>
   }
 
   ngOnInit() {
@@ -32,6 +31,14 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
   }
     
   public onTextSearchEnter(text:string):void {
-        console.log("===search for: ", text);
+      this.searchText = text;
+      let searchContext;
+      if (!this.searchText) searchContext = [];
+      else searchContext = [
+<%_for (let field of briefView) { 
+      if (field.type === "SchemaString") {%>
+            {'<%-field.fieldName%>': this.searchText},<%}}%>
+        ];
+      this.searchAdd("$or", searchContext);
   }
 }

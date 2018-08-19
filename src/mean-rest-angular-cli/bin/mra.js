@@ -399,7 +399,7 @@ function main() {
 	let views = schemaDef.views
 	let validators = schemaDef.validators;
 	let mongooseSchema = schemaDef.schema;
-//	console.log(mongooseSchema);
+//	console.log(mongooseSchema["_indexes"]);
 //	if (mongooseSchema.paths.person) {
 //		console.log("===person: ", mongooseSchema.paths.person.options);
 //	}
@@ -434,7 +434,7 @@ function main() {
 	let detailView = generateViewPicture(views[1], mongooseSchema, validators);
 	let createView = generateViewPicture(views[2], mongooseSchema, validators);
 	let editView = generateViewPicture(views[3], mongooseSchema, validators);
-	let seachView = generateViewPicture(views[4], mongooseSchema, validators);
+	let searchView = generateViewPicture(views[4], mongooseSchema, validators);
 	let indexView = generateViewPicture(views[5], mongooseSchema, validators);
 	
 	let compositeEditView = editView.slice();
@@ -459,7 +459,7 @@ function main() {
 		detailView: detailView,
 		createView: createView,
 		editView: editView,
-		seachView: seachView,
+		searchView: searchView,
 		indexView: indexView,
 		compositeEditView: compositeEditView,
 		componentDir: componentDir,

@@ -9,6 +9,24 @@ import { ErrorToastConfig, ErrorToast} from './util.errortoast';
 
 import { BaseService, ServiceError } from './base.service';
 
+
+function equalTwoSearchContextArrays (arr1, arr2) {
+    if (arr1.length == 0 && arr2.length == 0) return true;
+    //all object in array has format of {'field': 'value'} format
+    function compareObj(a, b) {
+        let a_s = JSON.stringify(a), b_s = JSON.stringify(b)
+        if (a_s < b_s)
+            return -1;
+        if (a_s > b_s)
+            return 1;
+        return 0;
+    }
+    arr1 = arr1.sort(compareObj);
+    arr2 = arr2.sort(compareObj);
+    if (JSON.stringify(arr1) == JSON.stringify(arr2)) return true;
+    return false;
+}
+
 export enum ViewType {
     LIST,
     DETAIL,
@@ -26,10 +44,6 @@ export class BaseComponent {
     protected total_count: number = 0;
     protected total_pages: number = 0;
     
-    protected searchText: string;
-    protected searchFields: string = "";//populated by sub-class
-    protected searchCondition: any;
-    
     protected pages: number[] = [];
     protected left_more:boolean = false;
     protected right_more:boolean = false;
@@ -43,6 +57,8 @@ export class BaseComponent {
     //for fields with enum values
     protected enums:any = {};
     protected referenceFields = [];
+    //Search
+    protected searchText: string;    
 
     protected capitalItemName: string;
 
@@ -53,6 +69,10 @@ export class BaseComponent {
         protected view: ViewType,
         protected itemName: string) {
         this.capitalItemName = itemName.charAt(0).toUpperCase() + itemName.substr(1);
+    }
+    
+    private getKey(key:string):string {
+        return this.itemName+this.view+key;
     }
     
     protected onServiceError(error:ServiceError):void {
@@ -118,19 +138,19 @@ export class BaseComponent {
     
     protected onNextPage():void {
         if (this.page >= this.total_pages) return;
-        this.service.putToStorage("page", this.page + 1);
+        this.service.putToStorage(this.getKey("page"), this.page + 1);
         this.router.navigate(['.', { page: this.page + 1 }], {relativeTo: this.route, });
     }
     
     protected onPreviousPage():void {
         if (this.page <= 1) return;
-        this.service.putToStorage("page", this.page - 1);
+        this.service.putToStorage(this.getKey("page"), this.page - 1);
         this.router.navigate(['.', { page: this.page - 1 }], {relativeTo: this.route});
     }
 
     protected onGotoPage(p:number):void {
         if (p > this.total_pages || p < 1) return;
-        this.service.putToStorage("page", p);
+        this.service.putToStorage(this.getKey("page"), p);
         this.router.navigate(['.', { page: p }], {relativeTo: this.route});
     }
     
@@ -164,17 +184,45 @@ export class BaseComponent {
         this.onServiceError
       );
     }
-        
+    
+    protected searchAdd(operation:string, fieldQueryList:any[]):void {
+        /* searchContext ={'$and', [{'$or', []},{'$and', []}]}
+        */
+        let context = this.service.getFromStorage(this.getKey("searchContext"));
+        let arr;
+        let newQuery = {};
+        newQuery[operation] = fieldQueryList;
+        if (context && context["$and"]) {
+            arr = context["$and"].filter(x=>(operation in x));
+            if (arr.length == 1 && equalTwoSearchContextArrays(arr[0][operation], fieldQueryList)) return; //no change
+            arr = context["$and"].filter(x=>!(operation in x));
+            arr.push(newQuery);
+            context["$and"] = arr;
+        } else {
+            if (fieldQueryList.length == 0) return; //no change
+            context = {"$and": [newQuery]};
+        }
+                
+        this.service.putToStorage(this.getKey("searchContext"), context);
+        this.service.putToStorage(this.getKey("searchText"), this.searchText);
+ 
+        this.service.putToStorage(this.getKey("page"), null);//start from 1st page
+        let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
+        if (url_page) this.router.navigate(['.', {}], {relativeTo: this.route});//start from 1st page
+        else this.populateList();
+    }
     protected populateList():void {
       let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
-      let cached_page = parseInt(this.service.getFromStorage('page'));
+      let cached_page = parseInt(this.service.getFromStorage(this.getKey("page")));
       if (!url_page && cached_page && cached_page > 1) {
           this.router.navigate(['.', { page: cached_page }], {relativeTo: this.route});
           return;
       }
       let new_page = url_page? url_page: 1;
+      let searchContext = this.service.getFromStorage(this.getKey("searchContext"));
+      this.searchText = this.service.getFromStorage(this.getKey("searchText"));;
               
-      this.service.getList(new_page, this.per_page).subscribe(
+      this.service.getList(new_page, this.per_page, searchContext).subscribe(
         result => { 
             this.list = result.items.map(x=>this.formatDetail(x));
             this.page = result.page;

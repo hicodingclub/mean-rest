@@ -21,9 +21,9 @@
 		      	<label class="form-check-label"><%-f%></label>
 		      </div>
 		      <%_ }) %>
-		      <% if (!field.required) {%><div *ngIf="enums['<%-field.fieldName%>'].includes(detail['<%-field.fieldName%>'])" 
-		          class="form-check-inline" (click)="clearValueFromDetail('<%-field.fieldName%>')">
-		          <i class="fas fa-times-circle" title="Clear"></i></div> <%}%>
+		      <% if (!field.required) {%><span *ngIf="enums['<%-field.fieldName%>'].includes(detail['<%-field.fieldName%>'])" 
+		          class="icon-clear" (click)="clearValueFromDetail('<%-field.fieldName%>')">
+		          <i class="fas fa-times-circle" title="Clear"></i></span> <%}%>
 		    </div>
         <%_ } else { %>
 	        <input type="text" class="form-control" id="<%-schemaName%>Edit<%-field.FieldName%>" 

@@ -46,15 +46,23 @@ export class BaseService {
         return list;
     }
 
-    getList(page:number, per_page:number) {
+    getList(page:number, per_page:number, searchContext:any) {
         let httpOptions = {
             params: new HttpParams().set('__page', page.toString())
                                     .set('__per_page', per_page.toString()),
         };
-
-        return this.http.get<any>(this.serviceUrl, httpOptions)
+        
+        if (!searchContext) {
+            return this.http.get<any>(this.serviceUrl, httpOptions)
+                .pipe(
+                    map(this.formatList),
+                    catchError(this.errorResponseHandler)
+                );
+        }
+        httpOptions["headers"] = new HttpHeaders({ 'Content-Type': 'application/json' });
+        httpOptions.params = httpOptions.params.set('action', "Search");
+        return this.http.post<any>(this.serviceUrl, searchContext, httpOptions)
             .pipe(
-                map(this.formatList),
                 catchError(this.errorResponseHandler)
             );
     }
