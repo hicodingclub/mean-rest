@@ -18,18 +18,7 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
       protected route: ActivatedRoute,
       protected <%-schemaName%>Service: <%-SchemaName%>Service) {
           super(<%-schemaName%>Service, router, route, ViewType.DETAIL);
-<%_ let refObjects = [];
-    for (let field of detailView) { 
-        if (field.type === "ObjectId") refObjects.push(field.fieldName);
-    }
-    if (refObjects.length > 0) {%>
-          this.referenceFields = [<%for (let fnm of refObjects) {%>'<%-fnm%>',<%}%>];<%}%> 
-<%_ let dateObjects = [];
-    for (let field of detailView) { 
-        if (field.type === "SchemaDate") dateObjects.push([field.fieldName, field.format]);
-    }
-    if (dateObjects.length > 0) {%>
-          this.dateFields = [<%for (let fnm of dateObjects) {%>['<%-fnm[0]%>', '<%-fnm[1]%>'],<%}%>];<%}%>
+<% let theView = detailView; %><%_ include schema-construct.component.ts %>
   }
 
   ngOnInit() {

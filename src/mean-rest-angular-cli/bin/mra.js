@@ -50,6 +50,7 @@ var templates = {
 	mainComponent: ["../templates/main.component.ts", ".component.ts", "main component file"],
 	mainComponentHtml: ["../templates/main.component.html", ".component.html", "main component html file"],
 	mainComponentCss: ["../templates/main.component.css", ".component.css", "main component css file"],
+	mainDirective: ["../templates/main.directive.ts", ".directive.ts", "main directive file"],
 	routingModule: ["../templates/routing.module.ts", "routing.module.ts", "routing module file"],
 	schemaBaseService: ["../templates/schema.base.service.ts", ".base.service.ts", "base service file"],
 	schemaService: ["../templates/schema.service.ts", ".service.ts", "service file"],
@@ -86,6 +87,7 @@ var generateSourceFile = function(keyname, template, renderObj, outputDir) {
 var generateViewPicture = function(viewStr, schema, validators) {
 	let viewDef = viewStr.match(/\S+/g) || [];
 	let view = [];
+	let hasDate = false;
 	viewDef.forEach((item) => {
 		if (item in schema.paths) {
 			let validatorArray;
@@ -100,7 +102,6 @@ var generateViewPicture = function(viewStr, schema, validators) {
 			let maxlength, minlength;
 			let enumValues;
 			let ref;
-			let format = "yyyy-MM-dd hh:mm:ss";
 			switch(type) {
 				case "SchemaString":
 					jstype = "string";
@@ -131,7 +132,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 					break;
 				case "SchemaDate":
 					jstype = "string";
-					if (schema.paths[item].options.format) format = schema.paths[item].options.format;
+					hasDate = true;
 					break;
 				default:
 					;
@@ -142,7 +143,6 @@ var generateViewPicture = function(viewStr, schema, validators) {
 					 type: type,
 					 jstype: jstype,
 					 ref: ref,
-					 format: format,
 					 //TODO: required could be a function
 					 required: schema.paths[item].originalRequiredValue === true? true:false,
 					 defaultValue: defaultValue,
@@ -156,7 +156,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 			);
 		}
 	});
-	return view;
+	return [view, hasDate,];
 }
 
 // CLI
@@ -390,11 +390,18 @@ function main() {
   
   let relativePath = relative(__dirname, inputFile);
   let inputFileModule = relativePath.substring(0, relativePath.length-3);
-  let schemas = require(inputFileModule);
+  let sysDef = require(inputFileModule);
+  let schemas = sysDef.schemas;
+  let config = sysDef.config;
   
   let schemaMap = {};
   let validatorFields = [];
   let defaultSchema;
+  let hasDate = false;
+  let dateFormat = "MM/DD/YYYY";
+  if (config && config.dateFormat) dateFormat = config.dateFormat;
+  let timeFormat = "hh:mm:ss";
+
   for (let name in schemas) {
 	let schemaDef = schemas[name];
 
@@ -437,12 +444,15 @@ function main() {
 		
 	});
 	
-	let briefView = generateViewPicture(views[0], mongooseSchema, validators);
-	let detailView = generateViewPicture(views[1], mongooseSchema, validators);
-	let createView = generateViewPicture(views[2], mongooseSchema, validators);
-	let editView = generateViewPicture(views[3], mongooseSchema, validators);
-	let searchView = generateViewPicture(views[4], mongooseSchema, validators);
-	let indexView = generateViewPicture(views[5], mongooseSchema, validators);
+	let schemaHasDate = false;
+	let [briefView, hasDate1] = generateViewPicture(views[0], mongooseSchema, validators);
+	let [detailView, hasDate2] = generateViewPicture(views[1], mongooseSchema, validators);
+	let [createView, hasDate3] = generateViewPicture(views[2], mongooseSchema, validators);
+	let [editView, hasDate4] = generateViewPicture(views[3], mongooseSchema, validators);
+	let [searchView, hasDate5] = generateViewPicture(views[4], mongooseSchema, validators);
+	let [indexView, hasDate6] = generateViewPicture(views[5], mongooseSchema, validators);
+	schemaHasDate = hasDate1||hasDate2||hasDate3||hasDate4||hasDate5||hasDate6;
+	if (schemaHasDate) hasDate = true;
 	
 	let compositeEditView = editView.slice();
 	let editFields = editView.map( x=> x.fieldName);
@@ -470,6 +480,8 @@ function main() {
 		indexView: indexView,
 		compositeEditView: compositeEditView,
 		componentDir: componentDir,
+		schemaHasDate: schemaHasDate,
+		dateFormat: dateFormat,
 	}
 	
 	if (!defaultSchema) defaultSchema = schemaName;
@@ -482,6 +494,8 @@ function main() {
 	schemaMap: schemaMap,
 	defaultSchema: defaultSchema,
 	validatorFields: validatorFields,
+	hasDate: hasDate,
+	dateFormat: dateFormat,
   }
   //console.log(renderObj.validatorFields);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
@@ -490,7 +504,8 @@ function main() {
   generateSourceFile(moduleName, templates.mainComponent, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainComponentHtml, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainComponentCss, renderObj, outputDir);
-  generateSourceFile(moduleName, templates.routingModule, renderObj, outputDir); 
+  generateSourceFile(moduleName, templates.routingModule, renderObj, outputDir);
+  if (hasDate)   generateSourceFile(moduleName, templates.mainDirective, renderObj, outputDir);
   
   for (let key in schemaMap) {
 	let schemaObj = renderObj.schemaMap[key];

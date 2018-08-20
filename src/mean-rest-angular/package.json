@@ -29,13 +29,13 @@
   "homepage": "https://github.com/LuckyBang/mean-rest#readme",
   "dependencies": {},
   "devDependencies": {
-    "typescript": "^3.0.1",
-    "rxjs": "^6.0.0",
-    "@angular/platform-browser": "^6.0.3",
-    "@angular/core": "^6.0.3",
-    "@angular/router": "^6.0.3",
     "@angular/common": "^6.0.3",
+    "@angular/core": "^6.0.3",
     "@angular/forms": "^6.0.3",
+    "@angular/platform-browser": "^6.0.3",
+    "@angular/router": "^6.0.3",
+    "rxjs": "^6.0.0",
+    "typescript": "^3.0.1",
     "zone.js": "^0.8.26"
   },
   "peerDependencies": {

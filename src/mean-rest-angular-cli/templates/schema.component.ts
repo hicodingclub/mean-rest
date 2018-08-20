@@ -15,5 +15,6 @@ export class <%-SchemaName%>Component extends BaseComponent {
       protected route: ActivatedRoute,
       protected view: ViewType ) {
         super(<%-schemaName%>Service, router, route, view, itemName);
+        <% if (schemaHasDate)  {%>this.dateFormat = "<%-dateFormat%>";<%}%>
     }
 }

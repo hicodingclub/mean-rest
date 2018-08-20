@@ -2,8 +2,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-//import { NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
-
+<% if (hasDate) {%>
+import { NgbModule, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'; 
+import { MraNgbDateFormatterService } from './<%-moduleName%>.directive';
+<%}%>
 import { MinNumber, MaxNumber } from 'mean-rest-angular';
 
 import { <%-ModuleName%>RoutingModule } from './<%-moduleName%>-routing.module';
@@ -25,16 +27,16 @@ import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validat
     CommonModule,
     HttpClientModule,
     FormsModule,
-    
-//    NgbCalendar,
+<% if (hasDate) {%>    
+    NgbModule,<%}%>
     
     <%-ModuleName%>RoutingModule
   ],
   declarations: [
-    <%-ModuleName%>Component,
-    
     MinNumber,
     MaxNumber,
+        
+    <%-ModuleName%>Component,
     
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
     <%-schm.SchemaName%>ListComponent, 
@@ -53,8 +55,10 @@ import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validat
 <%_ }%>
   ],
   providers: [
+<% if (hasDate) {%>    
+    {provide: NgbDateParserFormatter, useClass: MraNgbDateFormatterService},<%}%>
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
-   <%-schm.SchemaName%>Service,<%_ } %>
+    <%-schm.SchemaName%>Service,<%}%>
   ]
 })
 export class <%-ModuleName%>Module { }

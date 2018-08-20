@@ -9,12 +9,10 @@
 	  <div class="card-body">
 	    <h4 class="card-title">Blog Detail</h4>    
 		<div class="card-text">
-<%_ for (let field of detailView){ %>
-			<label><b><%-field.FieldName%>:</b></label>
-				<span><%if(field.type == 'ObjectId') {%>  <a [routerLink]="detail['<%-field.fieldName%>']?['../../../<%-field.ref%>/detail', detail['<%-field.fieldName%>']['_id'] ]:['.']">
-	            	    {{detail['<%-field.fieldName%>']?detail['<%-field.fieldName%>'].value:""}} </a><%_
-	            	}else{%>  {{detail['<%-field.fieldName%>']}}<%}%>
-				</span><br><%_}%>
+<%_ for (let field of detailView){ let fn = field.fieldName, ft = field.type; let ref_link = "../../../"%>
+			<label><b><%-fn%>:</b></label>
+			<span><% include schema-display.field.html %>
+			</span><br><%_}%>
 		</div>
 	  </div>
 	</div>

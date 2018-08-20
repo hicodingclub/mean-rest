@@ -1,0 +1,64 @@
+    <%_ if (field.type === "SchemaString") { %>
+	      <div class="row">
+	        <label class="col-4" for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
+	        <div class="col-8">
+        <%_ if (field.enumValues) { %>
+	        <div class="form-check">
+	          <%_ field.enumValues.forEach( (f) => { %>
+	          <div class="form-check-inline">
+		        <input type="radio" name="<%-schemaName%>Edit<%-field.FieldName%>" 
+		        	class="form-check-input"
+		        	id="<%-schemaName%>Edit<%-field.FieldName%><%-f%>" [value]="'<%-f%>'"
+		        	[(ngModel)]="detail['<%-field.fieldName%>']"
+		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		      	<label class="form-check-label"><%-f%></label>
+		      </div>
+		      <%_ }) %>
+		      <div *ngIf="enums['<%-field.fieldName%>'].includes(detail['<%-field.fieldName%>'])" 
+		          class="form-check-inline" (click)="clearValueFromDetail('<%-field.fieldName%>')">
+		          <i class="fas fa-times-circle" title="Clear"></i></div>
+		    </div>
+        <%_ } else { %>
+	        <input type="text" class="search-control" id="<%-schemaName%>Edit<%-field.FieldName%>" 
+	                [(ngModel)]="detail['<%-field.fieldName%>']" name="<%-schemaName%>Edit<%-field.FieldName%>"
+	                #<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+        <%_ } %>
+            </div> <!--col-8-->
+	      </div>
+    <%_ } else if (field.type === "SchemaBoolean") { %>
+	      <div class="row">
+	        <label class="col-4" for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
+	        <div class="col-8">
+	        <div class="form-check">
+	          <div class="form-check-inline">
+		        <input type="radio" name="<%-schemaName%>Edit<%-field.FieldName%>" 
+		        	class="form-check-input"
+		        	id="<%-schemaName%>Edit<%-field.FieldName%>Yes" [value]="true" 
+		        	[(ngModel)]="detail['<%-field.fieldName%>']"
+		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		      	<label class="form-check-label">Yes</label>
+		      </div>
+	          <div class="form-check-inline">
+		        <input type="radio" name="<%-schemaName%>Edit<%-field.FieldName%>" 
+		        	class="form-check-input"
+		        	id="<%-schemaName%>Edit<%-field.FieldName%>No" [value]="false"
+		        	[(ngModel)]="detail['<%-field.fieldName%>']"
+		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		      	<label class="form-check-label">No</label>
+		      </div>
+		      <div *ngIf="detail['<%-field.fieldName%>'] == true || detail['<%-field.fieldName%>'] == false" 
+		          class="form-check-inline" (click)="clearValueFromDetail('<%-field.fieldName%>')">
+		          <i class="fas fa-times-circle" title="Clear"></i></div>
+		    </div>
+		    </div> <!--col-8-->
+		  </div>
+    <%_ } else if (field.type === "SchemaNumber") { %>
+	      <div class="row">
+	        <label class="col-4" for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
+	        <div class="col-8">
+	        <input type="number" class="search-control col-8" id="<%-schemaName%>Edit<%-field.FieldName%>" 
+	                [(ngModel)]="detail['<%-field.fieldName%>']" name="<%-schemaName%>Edit<%-field.FieldName%>"
+	                #<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		    </div> <!--col-8-->
+	      </div>
+    <%_ } %>    

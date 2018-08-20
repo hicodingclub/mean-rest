@@ -10,10 +10,12 @@
 	    <form (ngSubmit)="onSubmit()" #editForm="ngForm">
 	    
 	     <div *ngIf="action == 'Edit'">
-<%_ editView.forEach( (field) => { %> <%_ include schema-edit.field.html %> <%_ }) %>
+<%_ editView.forEach( (field) => { let fn=field.fieldName, Fn=field.FieldName, sn=schemaName;
+%> <%_ include schema-edit.field.html %> <%_ }) %>
          </div>	
 	     <div *ngIf="action == 'Create'">
-<%_ createView.forEach( (field) => { %> <%_ include schema-edit.field.html %> <%_ }) %>
+<%_ createView.forEach( (field) => { let fn=field.fieldName, Fn=field.FieldName, sn=schemaName;
+%> <%_ include schema-edit.field.html %> <%_ }) %>
          </div>	
 	     <button type="submit" class="btn btn-success" 
      			[disabled]="!editForm.form.valid">Submit</button>

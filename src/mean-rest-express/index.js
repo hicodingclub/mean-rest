@@ -3,8 +3,9 @@ var express = require('express');
 var RestController = require('./lib/mean_rest_express_controller')
 var RestRouter = require('./lib/mean_rest_express_router')
 
-function meanRestExpressRouter(schemas) {
+function meanRestExpressRouter(sysDef) {
 	let expressRouter = express.Router();
+	let schemas = sysDef.schemas;
 
 	let sub_routes = [];
 	for (let schemaName in schemas) {

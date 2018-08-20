@@ -53,9 +53,9 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
       protected route: ActivatedRoute,
       protected <%-schemaName%>Service: <%-SchemaName%>Service) {
           super(<%-schemaName%>Service, router, route, ViewType.LIST);
-<%_ compositeEditView.forEach( (field) => {
-          if (field.enumValues) {%>
-          this.enums['<%-field.fieldName%>'] = [<%field.enumValues.forEach( (f)=>{%>'<%-f%>',<%})%>]; <%}});%>
+<% let theView = compositeEditView; %><%_ include schema-construct.component.ts %>
+      let detail = {};
+      this.detail = this.formatDetail(detail);
   }
 
   ngOnInit() {
@@ -66,10 +66,11 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
       }
       else {
           this.action="Create";
-          this.detail = {
-<%_ createView.forEach( (field) => {
-              if ( typeof(field.defaultValue) !== 'undefined') {%><%-field.fieldName%>: <%-field.defaultValue%>,  <%_}}); %>
+          let detail = {
+              <% createView.forEach( (field) => { let fn = field.fieldName;
+              if ( typeof(field.defaultValue) !== 'undefined') {%><%-fn%>: <%-field.defaultValue%>,  <%_}}); %>
           }
+          this.detail = this.formatDetail(detail);
       }
   }
 }

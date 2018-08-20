@@ -1,0 +1,4 @@
+<%if(ft == 'ObjectId') {%>  <a [routerLink]="detail['<%-fn%>']&&detail['<%-fn%>']['_id']?['<%-ref_link%><%-field.ref%>/detail', detail['<%-fn%>']['_id'] ]:['.']">
+	            	    {{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}} </a><%_
+	            	}else if(ft == 'SchemaDate') {%>  {{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}} <%_
+	            	}else{%>  {{detail['<%-fn%>']}}<%}%>

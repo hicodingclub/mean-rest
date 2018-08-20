@@ -27,6 +27,40 @@ function equalTwoSearchContextArrays (arr1, arr2) {
     return false;
 }
 
+function clone(obj:any):any {
+    let copy;
+
+    // Handle the 3 simple types, and null or undefined
+    if (null == obj || "object" != typeof obj) return obj;
+
+    // Handle Date
+    if (obj instanceof Date) {
+        copy = new Date();
+        copy.setTime(obj.getTime());
+        return copy;
+    }
+
+    // Handle Array
+    if (obj instanceof Array) {
+        copy = [];
+        for (var i = 0, len = obj.length; i < len; i++) {
+            copy[i] = clone(obj[i]);
+        }
+        return copy;
+    }
+
+    // Handle Object
+    if (obj instanceof Object) {
+        copy = {};
+        for (var attr in obj) {
+            if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
+        }
+        return copy;
+    }
+
+    throw new Error("Unable to copy obj! Its type isn't supported.");
+}
+
 export enum ViewType {
     LIST,
     DETAIL,
@@ -53,11 +87,13 @@ export class BaseComponent {
     
     //For edit and view details
     protected detail:any = {};
+    private _detail:any = {}; //a clone and used to send/receive from next work
     protected id:string;
     //for fields with enum values
     protected enums:any = {};
     protected referenceFields = [];
     protected dateFields = [];
+    protected dateFormat = "MM/DD/YYYY";
     //Search
     protected searchText: string;    
 
@@ -70,6 +106,7 @@ export class BaseComponent {
         protected view: ViewType,
         protected itemName: string) {
         this.capitalItemName = itemName.charAt(0).toUpperCase() + itemName.substr(1);
+        localStorage.removeItem("ngbDateformate");
     }
     
     private getKey(key:string):string {
@@ -156,52 +193,106 @@ export class BaseComponent {
     }
     
     protected formatReference(detail:any ):any {
+        let id, value;
         for (let fnm of this.referenceFields) {
             if (typeof detail[fnm] == 'string') {
-                let id = detail[fnm];
+                id = detail[fnm];
                 detail[fnm] = {'_id': id, 'value': fnm};
             } else if (typeof detail[fnm] == 'object') {
-                let id = detail[fnm]['_id'];
+                id = detail[fnm]['_id'];
                 let referIndex = '';
                 for (let k in  detail[fnm]) {
                     if (k != '_id') referIndex += " " + detail[fnm][k];
                 }
                 referIndex = referIndex.replace(/^\s+|\s+$/g, '')
                 detail[fnm] = {'_id': id, 'value': referIndex? referIndex: fnm};
+            } else {//not defined
+                detail[fnm] = {'_id': id, 'value': value};
+            }
+        }
+        return detail;
+    }
+    protected deFormatReference(detail:any ):any {
+        for (let fnm of this.referenceFields) {
+            if (typeof detail[fnm] !== 'object') { //not defined
+                //let date values undefined
+                delete detail[fnm];
+            } else {
+                let id = detail[fnm]['_id'];
+                if (typeof id !== 'string') delete detail[fnm];
+                else detail[fnm] = id;
             }
         }
         return detail;
     }
     protected formatDate(detail:any ):any {
-        for (let item of this.dateFields) {
-            let fnm = item[0];
-            let fmt = item[1];
-            if (typeof detail[fnm] !== 'string') continue;
-            let dt = new Date(detail[fnm]);
-            
-            let dd, d = dt.getDate();
-            let MM, M = dt.getMonth()+1; 
-            let yyyy = dt.getFullYear();
-            let yy = yyyy.toString().slice(2);
-            let hh, h = dt.getHours();
-            let mm, m = dt.getMinutes();
-            let ss, s = dt.getSeconds();
-            
-            dd= d<10? '0'+d: d.toString();
-            MM= M<10? '0'+M: M.toString();
-            hh= h<10? '0'+h: h.toString();
-            mm= m<10? '0'+m: m.toString();
-            ss= s<10? '0'+s: s.toString();
-            
-            let date = fmt.replace(/yyyy/ig, yyyy.toString()).
-                           replace(/yy/ig, yy.toString()).
-                           replace(/MM/g, MM.toString()).
-                           replace(/dd/ig, dd.toString()).
-                           replace(/hh/ig, hh.toString()).
-                           replace(/mm/g, mm.toString()).
-                           replace(/ss/ig, ss.toString());
-                ;
-            detail[fnm] = date;
+        for (let fnm of this.dateFields) {
+            let fmt = this.dateFormat;
+            let d, M, yyyy, h, m, s;
+            let value, date;
+            if (typeof detail[fnm] !== 'string') { //not defined
+                //important: let date values undefined
+                detail[fnm] = {'date':date, 'value': value};
+            }
+            else {
+                let dt = new Date(detail[fnm]);
+                
+                let dd, MM, hh, mm, ss;
+                d = dt.getDate();
+                M = dt.getMonth()+1; 
+                yyyy = dt.getFullYear();
+                
+                let yy = yyyy.toString().slice(2);
+                h = dt.getHours();
+                m = dt.getMinutes();
+                s = dt.getSeconds();
+                
+                dd= d<10? '0'+d: d.toString();
+                MM= M<10? '0'+M: M.toString();
+                hh= h<10? '0'+h: h.toString();
+                mm= m<10? '0'+m: m.toString();
+                ss= s<10? '0'+s: s.toString();
+                
+                value = fmt.replace(/yyyy/ig, yyyy.toString()).
+                               replace(/yy/ig, yy.toString()).
+                               replace(/MM/g, MM.toString()).
+                               replace(/dd/ig, dd.toString()).
+                               replace(/hh/ig, hh.toString()).
+                               replace(/mm/g, mm.toString()).
+                               replace(/ss/ig, ss.toString());
+                /*Datepicker uses NgbDateStruct as a model and not the native Date object. 
+                It's a simple data structure with 3 fields. Also note that months start with 1 (as in ISO 8601).
+                
+                we add h, m, s here
+                */
+                detail[fnm] = {'date':{ day: d, month: M, year: yyyy}, 'value': value}
+            }
+        }
+        return detail;
+    }
+    protected deFormatDate(detail:any ):any {
+        for (let fnm of this.dateFields) {
+            let d, M, yyyy, h, m, s;
+            let value;
+            if (typeof detail[fnm] !== 'object') { //not defined
+                //let date values undefined
+                delete detail[fnm];
+            }
+            else {
+                if (! detail[fnm].date) delete detail[fnm];
+                else {
+                    yyyy = detail[fnm].date.year;
+                    M = detail[fnm].date.month - 1;
+                    d = detail[fnm].date.day;
+                    
+                    if (typeof yyyy !== 'number' || typeof M !== 'number' || typeof d !== 'number') delete detail[fnm];
+                    
+                    else {
+                        let dt = new Date(yyyy, M, d, 0, 0, 0, 0);
+                        detail[fnm] = dt.toISOString();
+                    }
+                }
+            }
         }
         return detail;
     }
@@ -210,6 +301,14 @@ export class BaseComponent {
         detail = this.formatDate(detail);
         return detail;
     }    
+    
+    protected deFormatDetail(detail:any ):any {
+        let cpy = clone(detail);
+        
+        cpy = this.deFormatReference(cpy);
+        cpy = this.deFormatDate(cpy);
+        return cpy;
+    }
     
     protected populateDetail(id:string):void {
       this.service.getDetail(this.id).subscribe(
@@ -246,6 +345,7 @@ export class BaseComponent {
         if (url_page) this.router.navigate(['.', {}], {relativeTo: this.route});//start from 1st page
         else this.populateList();
     }
+    
     protected populateList():void {
       let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
       let cached_page = parseInt(this.service.getFromStorage(this.getKey("page")));
@@ -370,8 +470,9 @@ export class BaseComponent {
     }
     
     public onSubmit():void {
+      this._detail = this.deFormatDetail(this.detail);
       if (this.id) {
-          this.service.updateOne(this.id, this.detail).subscribe(
+          this.service.updateOne(this.id, this._detail).subscribe(
             result => {
                 var snackBarConfig: SnackBarConfig = {
                     content: this.capitalItemName + " updated."
@@ -385,7 +486,7 @@ export class BaseComponent {
           );
       }
       else {
-          this.service.createOne(this.detail).subscribe(
+          this.service.createOne(this._detail).subscribe(
             result => {
                 var snackBarConfig: SnackBarConfig = {
                     content: this.capitalItemName + " created."
@@ -394,7 +495,7 @@ export class BaseComponent {
                 snackBar.show();
                 
                 this.id = result["_id"];
-                this.detail = result;
+                this._detail = result;
                 
                 this.router.navigate(['../detail', this.id], {relativeTo: this.route});
             },

@@ -1,139 +1,195 @@
     <%_ if (field.type === "SchemaString") { %>
 	      <fieldset class="form-group">
-	        <label for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%></label>
         <%_ if (field.enumValues) { %>
 	        <div class="form-check"
 		        <%_ if (field.required) {%>
-		          [ngClass]="{'ng-valid': enums['<%-field.fieldName%>'].includes(detail['<%-field.fieldName%>']),
-		                      'ng-invalid': !enums['<%-field.fieldName%>'].includes(detail['<%-field.fieldName%>'])}"
+		          [ngClass]="{'ng-valid': enums['<%-fn%>'].includes(detail['<%-fn%>']),
+		                      'ng-invalid': !enums['<%-fn%>'].includes(detail['<%-fn%>'])}"
 		        <% } else { %>
 		          [ngClass]="{'ng-valid': true} "<%_ } %>
 		        >
 	          <%_ field.enumValues.forEach( (f) => { %>
 	          <div class="form-check-inline">
-		        <input type="radio" name="<%-schemaName%>Edit<%-field.FieldName%>" 
+		        <input type="radio" name="<%-sn%>Edit<%-Fn%>" 
 		        	class="form-check-input"
 		        	<%if (field.required) {%>required<%}%>
-		        	id="<%-schemaName%>Edit<%-field.FieldName%><%-f%>" [value]="'<%-f%>'"
-		        	<%if (field.validators) {%><%-schemaName%>Directive<%-field.FieldName%>=""<%}%> 
-		        	[(ngModel)]="detail['<%-field.fieldName%>']"
-		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		        	id="<%-sn%>Edit<%-Fn%><%-f%>" [value]="'<%-f%>'"
+		        	<%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
+		        	[(ngModel)]="detail['<%-fn%>']"
+		        	#<%-sn%>Edit<%-Fn%>="ngModel">
 		      	<label class="form-check-label"><%-f%></label>
 		      </div>
 		      <%_ }) %>
-		      <% if (!field.required) {%><span *ngIf="enums['<%-field.fieldName%>'].includes(detail['<%-field.fieldName%>'])" 
-		          class="icon-clear" (click)="clearValueFromDetail('<%-field.fieldName%>')">
+		      <% if (!field.required) {%><span *ngIf="enums['<%-fn%>'].includes(detail['<%-fn%>'])" 
+		          class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
 		          <i class="fas fa-times-circle" title="Clear"></i></span> <%}%>
 		    </div>
         <%_ } else { %>
-	        <input type="text" class="form-control" id="<%-schemaName%>Edit<%-field.FieldName%>" 
+	        <input type="text" class="form-control" id="<%-sn%>Edit<%-Fn%>" 
 	                <%if (field.required) {%>required<%}%>
 	                <%if (typeof field.minlength === 'number') {%>minlength="<%-field.minlength%>"<%}%>
 	                <%if (typeof field.maxlength === 'number') {%>maxlength="<%-field.maxlength%>"<%}%>
-		        	<%if (field.validators) {%><%-schemaName%>Directive<%-field.FieldName%>=""<%}%> 
-	                [(ngModel)]="detail['<%-field.fieldName%>']" name="<%-schemaName%>Edit<%-field.FieldName%>"
-	                #<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		        	<%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
+	                [(ngModel)]="detail['<%-fn%>']" name="<%-sn%>Edit<%-Fn%>"
+	                #<%-sn%>Edit<%-Fn%>="ngModel">
         <%_ } %>
-	        <div [hidden]="<%-schemaName%>Edit<%-field.FieldName%>.valid || <%-schemaName%>Edit<%-field.FieldName%>.pristine || <%-schemaName%>Edit<%-field.FieldName%>.errors.minlength"
+	        <div [hidden]="<%-sn%>Edit<%-Fn%>.valid || <%-sn%>Edit<%-Fn%>.pristine || <%-sn%>Edit<%-Fn%>.errors.minlength"
      			class="alert alert-danger">
 	          <%_if (field.required) {%>
-	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.required">
-    	        <%-field.FieldName%> is required.
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.required">
+    	        <%-Fn%> is required.
   	          </div><%}%>
 		      <%_if (field.validators) {%>
-	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.<%-schemaName%>Directive<%-field.FieldName%>">
-                {{<%-schemaName%>Edit<%-field.FieldName%>.errors.<%-schemaName%>Directive<%-field.FieldName%>}}
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>">
+                {{<%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>}}
   	          </div><%}%> 
 	          <%_if (typeof field.maxlength === 'number') {%>
-	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.maxlength">
-                <%-field.FieldName%> must be at most <%-field.maxlength%> characters long.
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.maxlength">
+                <%-Fn%> must be at most <%-field.maxlength%> characters long.
   	          </div><%}%>
 	        </div>
 	        <%_if (typeof field.minlength === 'number') {%>
-	        <div [hidden]="<%-schemaName%>Edit<%-field.FieldName%>.valid || !<%-schemaName%>Edit<%-field.FieldName%>.touched || !<%-schemaName%>Edit<%-field.FieldName%>.errors.minlength"
+	        <div [hidden]="<%-sn%>Edit<%-Fn%>.valid || !<%-sn%>Edit<%-Fn%>.touched || !<%-sn%>Edit<%-Fn%>.errors.minlength"
      			class="alert alert-danger">
-	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.minlength">
-                <%-field.FieldName%> must be at least <%-field.minlength%> characters long.
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.minlength">
+                <%-Fn%> must be at least <%-field.minlength%> characters long.
   	          </div>
 	        </div><%}%>        
 	      </fieldset>
     <%_ } else if (field.type === "SchemaBoolean") { %>
 	      <fieldset class="form-group">
-	        <label for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%></label>
 	        <div class="form-check"
 		        <%_ if (field.required) {%>
-		          [ngClass]="{'ng-valid': detail['<%-field.fieldName%>'] == true || detail['<%-field.fieldName%>'] == false,
-		                      'ng-invalid': detail['<%-field.fieldName%>'] != true && detail['<%-field.fieldName%>'] != false}"
+		          [ngClass]="{'ng-valid': detail['<%-fn%>'] == true || detail['<%-fn%>'] == false,
+		                      'ng-invalid': detail['<%-fn%>'] != true && detail['<%-fn%>'] != false}"
 		        <% } else { %>
 		          [ngClass]="{'ng-valid': true} "<%_ } %>
 		        >
 	          <div class="form-check-inline">
-		        <input type="radio" name="<%-schemaName%>Edit<%-field.FieldName%>" 
+		        <input type="radio" name="<%-sn%>Edit<%-Fn%>" 
 		        	class="form-check-input"
-		        	id="<%-schemaName%>Edit<%-field.FieldName%>Yes" [value]="true" 
+		        	id="<%-sn%>Edit<%-Fn%>Yes" [value]="true" 
 		        	<%if (field.required) {%>required<%}%>
-		        	<%if (field.validators) {%><%-schemaName%>Directive<%-field.FieldName%>=""<%}%> 
-		        	[(ngModel)]="detail['<%-field.fieldName%>']"
-		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		        	<%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
+		        	[(ngModel)]="detail['<%-fn%>']"
+		        	#<%-sn%>Edit<%-Fn%>="ngModel">
 		      	<label class="form-check-label">Yes</label>
 		      </div>
 	          <div class="form-check-inline">
-		        <input type="radio" name="<%-schemaName%>Edit<%-field.FieldName%>" 
+		        <input type="radio" name="<%-sn%>Edit<%-Fn%>" 
 		        	class="form-check-input"
-		        	id="<%-schemaName%>Edit<%-field.FieldName%>No" [value]="false"
+		        	id="<%-sn%>Edit<%-Fn%>No" [value]="false"
 		        	<%if (field.required) {%>required<%}%>
-		        	<%if (field.validators) {%><%-schemaName%>Directive<%-field.FieldName%>=""<%}%> 
-		        	[(ngModel)]="detail['<%-field.fieldName%>']"
-		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		        	<%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
+		        	[(ngModel)]="detail['<%-fn%>']"
+		        	#<%-sn%>Edit<%-Fn%>="ngModel">
 		      	<label class="form-check-label">No</label>
 		      </div>
-		      <% if (!field.required) {%><div *ngIf="detail['<%-field.fieldName%>'] == true || detail['<%-field.fieldName%>'] == false" 
-		          class="form-check-inline" (click)="clearValueFromDetail('<%-field.fieldName%>')">
+		      <% if (!field.required) {%><div *ngIf="detail['<%-fn%>'] == true || detail['<%-fn%>'] == false" 
+		          class="form-check-inline" (click)="clearValueFromDetail('<%-fn%>')">
 		          <i class="fas fa-times-circle" title="Clear"></i></div> <%}%>
 		    </div>
-	        <div [hidden]="<%-schemaName%>Edit<%-field.FieldName%>.valid || <%-schemaName%>Edit<%-field.FieldName%>.pristine"
+	        <div [hidden]="<%-sn%>Edit<%-Fn%>.valid || <%-sn%>Edit<%-Fn%>.pristine"
      			class="alert alert-danger">
 	          <%_if (field.required) {%>
-	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.required">
-    	        <%-field.FieldName%> is required.
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.required">
+    	        <%-Fn%> is required.
   	          </div><%}%>
 		      <%_if (field.validators) {%>
-	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.<%-schemaName%>Directive<%-field.FieldName%>">
-                {{<%-schemaName%>Edit<%-field.FieldName%>.errors.<%-schemaName%>Directive<%-field.FieldName%>}}
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>">
+                {{<%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>}}
   	          </div><%}%> 
 	        </div>
 		  </fieldset>
     <%_ } else if (field.type === "SchemaNumber") { %>
 	      <fieldset class="form-group">
-	        <label for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
-	        <input type="number" class="form-control" id="<%-schemaName%>Edit<%-field.FieldName%>" 
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%></label>
+	        <input type="number" class="form-control" id="<%-sn%>Edit<%-Fn%>" 
 	                <%if (typeof field.numberMin === 'number') {%>minnumber="<%-field.numberMin%>" min="<%-field.numberMin%>"<%}%>
 	                <%if (typeof field.numberMax === 'number') {%>maxnumber="<%-field.numberMax%>" max="<%-field.numberMax%>"<%}%>
 	                <%if (field.required) {%>required<%}%>
-		        	<%if (field.validators) {%><%-schemaName%>Directive<%-field.FieldName%>=""<%}%> 
-	                [(ngModel)]="detail['<%-field.fieldName%>']" name="<%-schemaName%>Edit<%-field.FieldName%>"
-	                #<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
-	        <div [hidden]="<%-schemaName%>Edit<%-field.FieldName%>.valid || <%-schemaName%>Edit<%-field.FieldName%>.pristine || <%-schemaName%>Edit<%-field.FieldName%>.errors.minnumber"
+		        	<%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
+	                [(ngModel)]="detail['<%-fn%>']" name="<%-sn%>Edit<%-Fn%>"
+	                #<%-sn%>Edit<%-Fn%>="ngModel">
+	        <div [hidden]="<%-sn%>Edit<%-Fn%>.valid || <%-sn%>Edit<%-Fn%>.pristine || <%-sn%>Edit<%-Fn%>.errors.minnumber"
      			class="alert alert-danger">
 	          <%_if (field.required) {%>
-	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.required">
-    	        <%-field.FieldName%> is required.
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.required">
+    	        <%-Fn%> is required.
   	          </div><%}%>
 		      <%_if (field.validators) {%>
-	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.<%-schemaName%>Directive<%-field.FieldName%>">
-                {{<%-schemaName%>Edit<%-field.FieldName%>.errors.<%-schemaName%>Directive<%-field.FieldName%>}}
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>">
+                {{<%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>}}
   	          </div><%}%> 
 	          <%_if (typeof field.numberMax === 'number') {%>
-	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.maxnumber">
-    	        <%-field.FieldName%> must be no greater than <%-field.numberMax%>
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.maxnumber">
+    	        <%-Fn%> must be no greater than <%-field.numberMax%>
   	          </div><%}%>
 	        </div>
 	        <%_if (typeof field.numberMin === 'number') {%>
-	        <div [hidden]="<%-schemaName%>Edit<%-field.FieldName%>.valid || <%-schemaName%>Edit<%-field.FieldName%>.untouched || !<%-schemaName%>Edit<%-field.FieldName%>.errors.minnumber"
+	        <div [hidden]="<%-sn%>Edit<%-Fn%>.valid || <%-sn%>Edit<%-Fn%>.untouched || !<%-sn%>Edit<%-Fn%>.errors.minnumber"
      			class="alert alert-danger">
-	          <div *ngIf="<%-schemaName%>Edit<%-field.FieldName%>.errors && <%-schemaName%>Edit<%-field.FieldName%>.errors.minnumber">
-    	        <%-field.FieldName%> must be no less than <%-field.numberMin%>
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.minnumber">
+    	        <%-Fn%> must be no less than <%-field.numberMin%>
   	          </div>
 	        </div><%}%>
+	      </fieldset>
+    <%_ } else if (field.type === "SchemaDate") { %>
+	      <fieldset class="form-group">
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%> </label> <span> (<%-dateFormat%>)</span>
+	        <div class="input-group">
+		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="<%-field.dateFormat%>"
+	                 <%if (field.required) {%>required<%}%>
+		        	 <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
+		             [(ngModel)]="detail['<%-fn%>']['date']" name="<%-sn%>Edit<%-Fn%>"
+		             ngbDatepicker #<%-sn%>Edit<%-Fn%>Date="ngbDatepicker" #<%-sn%>Edit<%-Fn%>="ngModel">
+		      <div class="input-group-append">
+		        <button class="btn btn-outline-secondary" (click)="<%-sn%>Edit<%-Fn%>Date.toggle()" type="button">
+		          <i class="fas fa-calendar-alt"></i>
+		        </button>
+		      </div>
+		    </div><!-- input group -->         
+	        <div [hidden]="<%-sn%>Edit<%-Fn%>.valid || <%-sn%>Edit<%-Fn%>.pristine || (<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.ngbDate)"
+	             class="alert alert-danger">
+	          <%_if (field.required) {%>
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.required && !(detail['<%-fn%>']?.date)">
+    	        <%-Fn%> is required.
+  	          </div><%}%>
+		      <%_if (field.validators) {%>
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>">
+                {{<%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>}}
+  	          </div><%}%> 
+	        </div>
+	        <div [hidden]="<%-sn%>Edit<%-Fn%>.valid || <%-sn%>Edit<%-Fn%>.untouched || !(<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.ngbDate)"
+     			class="alert alert-danger">
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.ngbDate">
+    	        <%-Fn%> must be in <%-dateFormat%> format.
+  	          </div>
+	        </div>
+	      </fieldset>
+    <%_ } else if (field.type === "ObjectId") { %>
+	      <fieldset class="form-group">
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%> </label>
+	        <span  class="icon-ref-search" (click)="refSearch('<%-fn%>')">
+		          <i class="fas fa-search" title="Search"></i></span>
+		    <input class="badge badge-light ref-badge" id="<%-sn%>Edit<%-Fn%>" [attr.disabled]="true"
+	                 <%if (field.required) {%>required<%}%>
+		        	 <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
+		             [ngModel]="detail['<%-fn%>']['value']" name="<%-sn%>Edit<%-Fn%>"
+		             #<%-sn%>Edit<%-Fn%>="ngModel">
+
+	        <div [hidden]="<%-sn%>Edit<%-Fn%>.valid || <%-sn%>Edit<%-Fn%>.pristine"
+	             class="alert alert-danger">
+	          <%_if (field.required) {%>
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.required && !(detail['<%-fn%>']?.date)">
+    	        <%-Fn%> is required.
+  	          </div><%}%>
+		      <%_if (field.validators) {%>
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>">
+                {{<%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>}}
+  	          </div><%}%> 
+	        </div>
 	      </fieldset>
     <%_ } %>    

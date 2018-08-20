@@ -77,17 +77,15 @@
 	        </tr>
 	    </thead>
 	    <tbody>
-	        <tr *ngFor="let item of list;  let i = index">
-	            <td scope="row"><a [routerLink]="['../detail', item['_id'] ]">{{(page-1)*per_page+i+1}}</a></td>
-<%_ for (let field of briefView){ let fn = field.fieldName, ft = field.type; %>
-	            <td><%if(ft == 'ObjectId') {%>  <a [routerLink]="item['<%-field.fieldName%>']?['../../<%-field.ref%>/detail', item['<%-field.fieldName%>']['_id'] ]:['.']">
-	            	    {{item['<%-fn%>']?item['<%-fn%>'].value:""}}</a>  <%_
-	            	}else{%>  {{item['<%-fn%>']}} <%_}%>
+	        <tr *ngFor="let detail of list;  let i = index">
+	            <td scope="row"><a [routerLink]="['../detail', detail['_id'] ]">{{(page-1)*per_page+i+1}}</a></td>
+<%_ for (let field of briefView){ let fn = field.fieldName, ft = field.type; let ref_link = "../../"; %>
+	            <td><% include schema-display.field.html %>
 	            </td><%_ } %>
 	            <td>
-	            	<a [routerLink]="['../detail', item['_id'] ]"><i class="fas fa-book-open" title="View Details"></i></a>
-	            	<a [routerLink]="['../edit', item['_id'] ]"><i class="fas fa-edit" title="Edit"></i></a>
-	            	<a routerLink="." (click)="onDelete(item['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a>
+	            	<a [routerLink]="['../detail', detail['_id'] ]"><i class="fas fa-book-open" title="View Details"></i></a>
+	            	<a [routerLink]="['../edit', detail['_id'] ]"><i class="fas fa-edit" title="Edit"></i></a>
+	            	<a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a>
 	            </td>
 	            <td>      
 	            	<input type="checkbox" [(ngModel)]="checkedItem[i]"/>
