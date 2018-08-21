@@ -70,13 +70,19 @@ export enum ViewType {
 export {ServiceError};
 
 export class BaseComponent {
+    private storage:any = {};
+
     //For list and pagination
     protected list:any[] = [];
     
+    protected majorUi = true;
+    
     protected page: number = 1;
-    protected per_page: number = 25;
+    protected per_page: number = 2;
     protected total_count: number = 0;
     protected total_pages: number = 0;
+    
+    private new_page;
     
     protected pages: number[] = [];
     protected left_more:boolean = false;
@@ -108,11 +114,7 @@ export class BaseComponent {
         this.capitalItemName = itemName.charAt(0).toUpperCase() + itemName.substr(1);
         localStorage.removeItem("ngbDateformate");
     }
-    
-    private getKey(key:string):string {
-        return this.itemName+this.view+key;
-    }
-    
+        
     protected onServiceError(error:ServiceError):void {
         let errMsg:string;
         let more:string;
@@ -174,22 +176,45 @@ export class BaseComponent {
         }
     }
     
+    private getKey(key:string):string {
+        return this.itemName+this.view+key;
+    }
+    private putToStorage(key:string, value:any):void {
+        if (this.majorUi) {
+            this.service.putToStorage(this.getKey(key), value);
+        } else {
+            this.storage[key] = value;
+        }
+    }
+    private getFromStorage(key:string):any {
+        if (this.majorUi) {
+            return this.service.getFromStorage(this.getKey(key));
+        } else {
+            return this.storage[key];
+        }
+    }
+    private routeToPage(page:number):void {
+        this.putToStorage("page", page);
+        if (this.majorUi) {
+            this.router.navigate(['.', { page: page }], {relativeTo: this.route, });
+        } else if (page != this.page) {
+            this.populateList();
+        }
+    }
+    
     protected onNextPage():void {
         if (this.page >= this.total_pages) return;
-        this.service.putToStorage(this.getKey("page"), this.page + 1);
-        this.router.navigate(['.', { page: this.page + 1 }], {relativeTo: this.route, });
+        this.routeToPage(this.page + 1);
     }
     
     protected onPreviousPage():void {
         if (this.page <= 1) return;
-        this.service.putToStorage(this.getKey("page"), this.page - 1);
-        this.router.navigate(['.', { page: this.page - 1 }], {relativeTo: this.route});
+        this.routeToPage(this.page - 1);
     }
 
     protected onGotoPage(p:number):void {
         if (p > this.total_pages || p < 1) return;
-        this.service.putToStorage(this.getKey("page"), p);
-        this.router.navigate(['.', { page: p }], {relativeTo: this.route});
+        this.routeToPage(p)
     }
     
     protected formatReference(detail:any ):any {
@@ -322,13 +347,14 @@ export class BaseComponent {
     protected searchAdd(operation:string, fieldQueryList:any[]):void {
         /* searchContext ={'$and', [{'$or', []},{'$and', []}]}
         */
-        let context = this.service.getFromStorage(this.getKey("searchContext"));
+        let context = this.getFromStorage("searchContext");
         let arr;
         let newQuery = {};
         newQuery[operation] = fieldQueryList;
         if (context && context["$and"]) {
             arr = context["$and"].filter(x=>(operation in x));
             if (arr.length == 1 && equalTwoSearchContextArrays(arr[0][operation], fieldQueryList)) return; //no change
+            
             arr = context["$and"].filter(x=>!(operation in x));
             arr.push(newQuery);
             context["$and"] = arr;
@@ -337,28 +363,40 @@ export class BaseComponent {
             context = {"$and": [newQuery]};
         }
                 
-        this.service.putToStorage(this.getKey("searchContext"), context);
-        this.service.putToStorage(this.getKey("searchText"), this.searchText);
- 
-        this.service.putToStorage(this.getKey("page"), null);//start from 1st page
-        let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
-        if (url_page) this.router.navigate(['.', {}], {relativeTo: this.route});//start from 1st page
-        else this.populateList();
+        this.putToStorage("searchContext", context);
+        this.putToStorage("searchText", this.searchText);
+        this.putToStorage("page", null);//start from 1st page
+
+        if (this.majorUi) {
+            let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
+            if (url_page) this.router.navigate(['.', {}], {relativeTo: this.route});//start from 1st page
+            else this.populateList();
+        } else {
+            this.populateList();
+        }
     }
     
     protected populateList():void {
-      let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
-      let cached_page = parseInt(this.service.getFromStorage(this.getKey("page")));
-      if (!url_page && cached_page && cached_page > 1) {
-          this.router.navigate(['.', { page: cached_page }], {relativeTo: this.route});
-          return;
-      }
-      let new_page = url_page? url_page: 1;
-      let searchContext = this.service.getFromStorage(this.getKey("searchContext"));
-      this.searchText = this.service.getFromStorage(this.getKey("searchText"));;
-              
-      this.service.getList(new_page, this.per_page, searchContext).subscribe(
-        result => { 
+        let new_page;
+        let searchContext, searchText;
+        if (this.majorUi) {
+          let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
+          let cached_page = parseInt(this.getFromStorage("page"));
+          if (!url_page && cached_page && cached_page > 1) {
+              //reflect page on the url
+              this.router.navigate(['.', { page: cached_page }], {relativeTo: this.route});
+              return;
+          }
+          new_page = url_page? url_page: 1;
+        }
+        else {
+          new_page = this.getFromStorage("page");
+          if (!new_page) new_page = 1;
+        }
+        searchContext = this.getFromStorage("searchContext");
+
+        this.service.getList(new_page, this.per_page, searchContext).subscribe(
+          result => { 
             this.list = result.items.map(x=>this.formatDetail(x));
             this.page = result.page;
             this.per_page = result.per_page;
@@ -366,12 +404,14 @@ export class BaseComponent {
             this.total_pages = result.total_pages;
             this.populatePages();
             
+            this.searchText = this.getFromStorage("searchText");
+
             this.checkedItem = 
                 Array.apply(null, Array(this.list.length)).map(Boolean.prototype.valueOf,false);
             this.checkAll = false;
-        },
-        this.onServiceError
-      );
+          },
+          this.onServiceError
+        );
     }
     
     public onCheckAllChange():void {
