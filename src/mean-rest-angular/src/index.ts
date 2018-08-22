@@ -1,4 +1,5 @@
 export { ViewType, BaseComponent } from './base.component';
+export { BaseComponentInterface } from './base.interface';
 export { ServiceError, BaseService } from './base.service';
 export { MaxNumber, MinNumber } from './directives';
 

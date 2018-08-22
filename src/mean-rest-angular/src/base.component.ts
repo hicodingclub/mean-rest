@@ -8,6 +8,7 @@ import { SnackBarConfig, SnackBar} from './util.snackbar';
 import { ErrorToastConfig, ErrorToast} from './util.errortoast';
 
 import { BaseService, ServiceError } from './base.service';
+import { BaseComponentInterface } from './base.interface';
 
 
 function equalTwoSearchContextArrays (arr1, arr2) {
@@ -69,7 +70,7 @@ export enum ViewType {
 
 export {ServiceError};
 
-export class BaseComponent {
+export class BaseComponent implements BaseComponentInterface {
     private storage:any = {};
 
     //For list and pagination
@@ -78,7 +79,7 @@ export class BaseComponent {
     protected majorUi = true;
     
     protected page: number = 1;
-    protected per_page: number = 2;
+    protected per_page: number = 25;
     protected total_count: number = 0;
     protected total_pages: number = 0;
     
@@ -99,6 +100,7 @@ export class BaseComponent {
     protected enums:any = {};
     protected referenceFields = [];
     protected dateFields = [];
+    protected indexFields = [];
     protected dateFormat = "MM/DD/YYYY";
     //Search
     protected searchText: string;    
@@ -114,7 +116,7 @@ export class BaseComponent {
         this.capitalItemName = itemName.charAt(0).toUpperCase() + itemName.substr(1);
         localStorage.removeItem("ngbDateformate");
     }
-        
+    
     protected onServiceError(error:ServiceError):void {
         let errMsg:string;
         let more:string;
@@ -217,6 +219,16 @@ export class BaseComponent {
         this.routeToPage(p)
     }
     
+    protected stringify(detail:any):string {
+        let str = "";
+        for (let fnm of this.indexFields) {
+            if (detail[fnm] && typeof detail[fnm] != 'object') str += " " + detail[fnm]
+        }
+        if (!str) str = detail["_id"]?detail["_id"]:"..."
+        str = str.replace(/^\s+|\s+$/g, '')
+        return str;
+    }
+
     protected formatReference(detail:any ):any {
         let id, value;
         for (let fnm of this.referenceFields) {
@@ -368,10 +380,13 @@ export class BaseComponent {
         this.putToStorage("page", null);//start from 1st page
 
         if (this.majorUi) {
+            //update the URL
             let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
             if (url_page) this.router.navigate(['.', {}], {relativeTo: this.route});//start from 1st page
+            //re-populate directly
             else this.populateList();
         } else {
+            //re-populate directly
             this.populateList();
         }
     }
@@ -546,5 +561,47 @@ export class BaseComponent {
     
     public clearValueFromDetail(field:string):void {
         if (this.detail && this.detail.hasOwnProperty(field)) delete this.detail[field];
+    }
+    
+    
+    //**** For parent component of modal UI
+    protected refSelectDirective:any;
+    protected selectComponents:any;
+    protected componentFactoryResolver:any;
+    public onRefSelect(fieldName:string) {
+        let viewContainerRef = this.refSelectDirective.viewContainerRef;
+        viewContainerRef.clear();
+        
+        let componentRef = this.selectComponents[fieldName]["componentRef"];
+        if (!componentRef) {
+            let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.selectComponents[fieldName]["type"]);
+            componentRef = viewContainerRef.createComponent(componentFactory);//create and insert in one call
+            this.selectComponents[fieldName]["componentRef"] = componentRef;//save it
+        } else {
+            viewContainerRef.insert(componentRef.hostView);
+        }
+        
+        let componentInstance = <BaseComponentInterface>componentRef.instance;
+ 
+        componentInstance.done.subscribe( (val) => {
+            let outputData = componentInstance.outputData;
+            if (outputData) this.detail[fieldName] = outputData;
+            if (val) viewContainerRef.detach(); //only detach. not destroy
+        });
+    }
+    //**** For child component of modal UI
+    public inputData;
+    public outputData;
+    public done:any;
+    selectCloseModal() {
+        this.done.emit(true);
+    }
+    selectItemSelected(num:number) {
+        let detail = this.list[num];
+        this.outputData = {"_id": detail["_id"], "value": this.stringify(detail)};
+        this.done.emit(true);
+    }
+    selectOnEscapeKey() {
+        this.selectCloseModal();
     }
 }

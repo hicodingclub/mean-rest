@@ -172,9 +172,9 @@
     <%_ } else if (field.type === "ObjectId") { %>
 	      <fieldset class="form-group">
 	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%> </label>
-	        <span  class="icon-ref-search" (click)="refSearch('<%-fn%>')">
+	        <span  class="icon-ref-search" (click)="onRefSelect('<%-field.fieldName%>')">
 		          <i class="fas fa-search" title="Search"></i></span>
-		    <input class="badge badge-light ref-badge" id="<%-sn%>Edit<%-Fn%>" [attr.disabled]="true"
+		    <input class="badge ref-badge" id="<%-sn%>Edit<%-Fn%>" [attr.disabled]="true"
 	                 <%if (field.required) {%>required<%}%>
 		        	 <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
 		             [ngModel]="detail['<%-fn%>']['value']" name="<%-sn%>Edit<%-Fn%>"

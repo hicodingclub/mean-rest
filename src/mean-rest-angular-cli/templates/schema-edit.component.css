@@ -57,10 +57,11 @@
 .ref-badge {
   display: block;
   min-width: 50px;
-  border: 1px solid rgba(0,0,0,.125);
+  border: 1px solid #eceff3; /*rgba(0,0,0,.125); */
+  background-color: #eceff3;
 }
 
-.icon-ref-search .icon-clear {
+.icon-ref-search, .icon-clear {
   z-index: 1;
   pointer-events: auto;
   cursor: pointer;

@@ -3,9 +3,9 @@ import { Router, ActivatedRoute }    from '@angular/router';
 
 import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
-
+<%if (schemaHasValidator) {%>
 import { NG_VALIDATORS, Validator, ValidationErrors, AbstractControl } from '@angular/forms';
-<%_ compositeEditView.forEach( (field) => {
+  <%_ compositeEditView.forEach( (field) => {
 if (field.validators) {%>
 @Directive({
   selector: '[<%-schemaName%>Directive<%-field.FieldName%>]',
@@ -35,8 +35,21 @@ export class <%-SchemaName%>Directive<%-field.FieldName%> implements Validator {
     }
     return null;
   }
-}<%}}); %>
+}  <%_}}); %>
+<%}%><%#comments: end of: if (schemaHasValidator)%>
+<%if (schemaHasRef) {%>
+import { ViewContainerRef, ComponentFactoryResolver, ViewChild, Type } from '@angular/core';
+    <%_ for (let field of compositeEditView) { 
+        if (field.Ref) {%>
+import { <%-field.Ref%>SelectComponent } from '../../<%-field.ref%>/<%-field.ref%>-list/<%-field.ref%>-select.component';<%}}%>
 
+@Directive({
+  selector: '[<%-schemaName%>-ref-select]',
+})
+export class <%-SchemaName%>RefSelectDirective {
+  constructor(public viewContainerRef: ViewContainerRef) { }
+}
+<%}%>
 
 @Component({
   selector: 'app-<%-schemaName%>-edit',
@@ -47,30 +60,38 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
   @Input() 
   protected id:string;
   private action:string;
-    
+<%if (schemaHasRef) {%>   
+  protected selectComponents = {
+  <%_ for (let field of compositeEditView) { 
+      if (field.Ref) {%>
+      "<%-field.fieldName%>": {"type":<%-field.Ref%>SelectComponent, "componentRef": null},<%}}%>
+  }
+  @ViewChild(<%-SchemaName%>RefSelectDirective) refSelectDirective: <%-SchemaName%>RefSelectDirective;
+<%}%>
   constructor(
+      <%if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
       protected router: Router,
       protected route: ActivatedRoute,
       protected <%-schemaName%>Service: <%-SchemaName%>Service) {
           super(<%-schemaName%>Service, router, route, ViewType.LIST);
 <% let theView = compositeEditView; %><%_ include schema-construct.component.ts %>
-      let detail = {};
-      this.detail = this.formatDetail(detail);
-  }
-
-  ngOnInit() {
-      if (!this.id) this.id = this.route.snapshot.paramMap.get('id');
-      if (this.id) {
-          this.action="Edit";
-          this.populateDetail(this.id);
-      }
-      else {
-          this.action="Create";
-          let detail = {
-              <% createView.forEach( (field) => { let fn = field.fieldName;
-              if ( typeof(field.defaultValue) !== 'undefined') {%><%-fn%>: <%-field.defaultValue%>,  <%_}}); %>
-          }
+          let detail = {};
           this.detail = this.formatDetail(detail);
-      }
-  }
+    }
+
+    ngOnInit() {
+        if (!this.id) this.id = this.route.snapshot.paramMap.get('id');
+        if (this.id) {
+            this.action="Edit";
+            this.populateDetail(this.id);
+        }
+        else {
+            this.action="Create";
+            let detail = {
+                <% createView.forEach( (field) => { let fn = field.fieldName;
+                if ( typeof(field.defaultValue) !== 'undefined') {%><%-fn%>: <%-field.defaultValue%>,  <%_}}); %>
+            }
+            this.detail = this.formatDetail(detail);
+        }
+    }
 }

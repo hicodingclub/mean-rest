@@ -1,4 +1,5 @@
-<%if(ft == 'ObjectId') {%>  <a [routerLink]="detail['<%-fn%>']&&detail['<%-fn%>']['_id']?['<%-ref_link%><%-field.ref%>/detail', detail['<%-fn%>']['_id'] ]:['.']">
-	            	    {{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}} </a><%_
+<%if(ft == 'ObjectId') {%>  <%if (ref_link){
+    %><a [routerLink]="detail['<%-fn%>']&&detail['<%-fn%>']['_id']?['<%-ref_link%><%-field.ref%>/detail', detail['<%-fn%>']['_id'] ]:['.']"> <%_}%>
+	            	    {{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}} <%if (ref_link){%></a><%_}%><%_
 	            	}else if(ft == 'SchemaDate') {%>  {{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}} <%_
 	            	}else{%>  {{detail['<%-fn%>']}}<%}%>

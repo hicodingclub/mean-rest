@@ -5,6 +5,9 @@
  * 
  * The cli part code is based on the "express" cli. 
  */
+
+const FIELD_NUMBER_FOR_SELECT_VIEW = 4;
+
 var ejs = require('ejs');
 var mongoose = require('mongoose');
 
@@ -58,6 +61,8 @@ var templates = {
 	schemaListComponent: ["../templates/schema-list.component.ts", "list.component.ts", "list component file"],
 	schemaListComponentHtml: ["../templates/schema-list.component.html", "list.component.html", "list component html file"],
 	schemaListComponentCss: ["../templates/schema-list.component.css", "list.component.css", "list component css file"],
+	schemaSelectComponent: ["../templates/schema-select.component.ts", "select.component.ts", "select component file"],
+	schemaSelectComponentHtml: ["../templates/schema-select.component.html", "select.component.html", "select component html file"],
 	schemaDetailComponent: ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file"],
 	schemaDetailComponentHtml: ["../templates/schema-detail.component.html", "detail.component.html", "detail component html file"],
 	schemaDetailComponentCss: ["../templates/schema-detail.component.css", "detail.component.css", "detail component css file"],
@@ -88,6 +93,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 	let viewDef = viewStr.match(/\S+/g) || [];
 	let view = [];
 	let hasDate = false;
+	let hasRef = false;
 	viewDef.forEach((item) => {
 		if (item in schema.paths) {
 			let validatorArray;
@@ -101,7 +107,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 			let numberMin, numberMax;
 			let maxlength, minlength;
 			let enumValues;
-			let ref;
+			let ref, Ref;
 			switch(type) {
 				case "SchemaString":
 					jstype = "string";
@@ -128,7 +134,11 @@ var generateViewPicture = function(viewStr, schema, validators) {
 					break;
 				case "ObjectId":
 					jstype = "string";
-					if (schema.paths[item].options.ref) ref = schema.paths[item].options.ref.toLowerCase();
+					if (schema.paths[item].options.ref) {
+						ref = schema.paths[item].options.ref.toLowerCase();
+						Ref = capitalizeFirst(ref);
+						hasRef = true;
+					}
 					break;
 				case "SchemaDate":
 					jstype = "string";
@@ -143,6 +153,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 					 type: type,
 					 jstype: jstype,
 					 ref: ref,
+					 Ref: Ref,
 					 //TODO: required could be a function
 					 required: schema.paths[item].originalRequiredValue === true? true:false,
 					 defaultValue: defaultValue,
@@ -156,7 +167,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 			);
 		}
 	});
-	return [view, hasDate,];
+	return [view, hasDate, hasRef];
 }
 
 // CLI
@@ -396,8 +407,10 @@ function main() {
   
   let schemaMap = {};
   let validatorFields = [];
+  let referenceFields = [];
   let defaultSchema;
   let hasDate = false;
+  let hasRef = false;
   let dateFormat = "MM/DD/YYYY";
   if (config && config.dateFormat) dateFormat = config.dateFormat;
   let timeFormat = "hh:mm:ss";
@@ -444,15 +457,16 @@ function main() {
 		
 	});
 	
-	let schemaHasDate = false;
-	let [briefView, hasDate1] = generateViewPicture(views[0], mongooseSchema, validators);
-	let [detailView, hasDate2] = generateViewPicture(views[1], mongooseSchema, validators);
-	let [createView, hasDate3] = generateViewPicture(views[2], mongooseSchema, validators);
-	let [editView, hasDate4] = generateViewPicture(views[3], mongooseSchema, validators);
-	let [searchView, hasDate5] = generateViewPicture(views[4], mongooseSchema, validators);
-	let [indexView, hasDate6] = generateViewPicture(views[5], mongooseSchema, validators);
-	schemaHasDate = hasDate1||hasDate2||hasDate3||hasDate4||hasDate5||hasDate6;
+	let [briefView, hasDate1, hasRef1] = generateViewPicture(views[0], mongooseSchema, validators);
+	let [detailView, hasDate2, hasRef2] = generateViewPicture(views[1], mongooseSchema, validators);
+	let [createView, hasDate3, hasRef3] = generateViewPicture(views[2], mongooseSchema, validators);
+	let [editView, hasDate4, hasRef4] = generateViewPicture(views[3], mongooseSchema, validators);
+	let [searchView, hasDate5, hasRef5] = generateViewPicture(views[4], mongooseSchema, validators);
+	let [indexView, hasDate6, hasRef6] = generateViewPicture(views[5], mongooseSchema, validators);
+	let schemaHasDate = hasDate1 || hasDate2 || hasDate3 || hasDate4 || hasDate5 || hasDate6;
+	let schemaHasRef = hasDate3 || hasRef4;
 	if (schemaHasDate) hasDate = true;
+	if (schemaHasRef) hasRef = true;
 	
 	let compositeEditView = editView.slice();
 	let editFields = editView.map( x=> x.fieldName);
@@ -461,11 +475,18 @@ function main() {
 	});
 	
 	let SchemaName = capitalizeFirst(schemaName);
+	let schemaHasValidator = false;
 	compositeEditView.forEach(function(x){
-		if (x.validators) validatorFields.push( 
+		if (x.validators) {
+			schemaHasValidator = true;
+			validatorFields.push( 
 			{ Directive: SchemaName+'Directive'+x.FieldName,
 			 schemaName: schemaName,
 			})
+		}
+		if (x.ref) {
+			referenceFields.push(x.ref);
+		}
 	});
 	
 	let schemaObj = {
@@ -480,21 +501,33 @@ function main() {
 		indexView: indexView,
 		compositeEditView: compositeEditView,
 		componentDir: componentDir,
-		schemaHasDate: schemaHasDate,
 		dateFormat: dateFormat,
+		schemaHasDate: schemaHasDate,
+		schemaHasRef: schemaHasRef,
+		schemaHasValidator: schemaHasValidator,
+		
+		FIELD_NUMBER_FOR_SELECT_VIEW: FIELD_NUMBER_FOR_SELECT_VIEW
 	}
 	
 	if (!defaultSchema) defaultSchema = schemaName;
 	schemaMap[schemaName] = schemaObj;
   }
-  
+  referenceFields = referenceFields.filter((value, index, self) => { 
+	    return self.indexOf(value) === index;
+	  });//de-duplicate
+  let referenceObjFields = referenceFields.map((value) => { 
+	    return {ref: value, Ref: capitalizeFirst(value)};
+	  });
+
   let renderObj = {
 	moduleName: moduleName,
 	ModuleName: ModuleName,
 	schemaMap: schemaMap,
 	defaultSchema: defaultSchema,
 	validatorFields: validatorFields,
+	referenceFields: referenceObjFields,
 	hasDate: hasDate,
+	hasRef: hasRef,
 	dateFormat: dateFormat,
   }
   //console.log(renderObj.validatorFields);
@@ -521,6 +554,10 @@ function main() {
 	generateSourceFile(schemaName, templates.schemaListComponent, schemaObj, subComponentDir);
 	generateSourceFile(schemaName, templates.schemaListComponentHtml, schemaObj, subComponentDir);
 	generateSourceFile(schemaName, templates.schemaListComponentCss, schemaObj, subComponentDir);
+	if (referenceFields.indexOf(schemaName) != -1) { //referenced by others, provide select component
+		generateSourceFile(schemaName, templates.schemaSelectComponent, schemaObj, subComponentDir);
+		generateSourceFile(schemaName, templates.schemaSelectComponentHtml, schemaObj, subComponentDir);
+    }
 	
 	subComponentDir = path.join(componentDir, schemaName+'-detail');
 	generateSourceFile(schemaName, templates.schemaDetailComponent, schemaObj, subComponentDir);
