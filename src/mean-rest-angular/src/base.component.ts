@@ -105,7 +105,7 @@ export class BaseComponent implements BaseComponentInterface {
     //Search
     protected searchText: string;    
 
-    protected capitalItemName: string;
+    protected ItemName: string;
 
     constructor(
         protected service: BaseService,
@@ -113,7 +113,7 @@ export class BaseComponent implements BaseComponentInterface {
         protected route: ActivatedRoute,
         protected view: ViewType,
         protected itemName: string) {
-        this.capitalItemName = itemName.charAt(0).toUpperCase() + itemName.substr(1);
+        this.ItemName = itemName.charAt(0).toUpperCase() + itemName.substr(1);
         localStorage.removeItem("ngbDateformate");
     }
     
@@ -459,7 +459,7 @@ export class BaseComponent implements BaseComponentInterface {
                 this.service.deleteManyByIds(deletedItem).subscribe(
                     result => {
                         let snackBarConfig: SnackBarConfig = {
-                            content: this.capitalItemName + " deleted"
+                            content: this.ItemName + " deleted"
                         }
                         let snackBar = new SnackBar(snackBarConfig);
                         snackBar.show();
@@ -501,7 +501,7 @@ export class BaseComponent implements BaseComponentInterface {
                 this.service.deleteOne(id).subscribe(
                     result => {
                         let snackBarConfig: SnackBarConfig = {
-                            content: this.capitalItemName + " deleted"
+                            content: this.ItemName + " deleted"
                         }
                         let snackBar = new SnackBar(snackBarConfig);
                         snackBar.show();
@@ -530,7 +530,7 @@ export class BaseComponent implements BaseComponentInterface {
           this.service.updateOne(this.id, this._detail).subscribe(
             result => {
                 var snackBarConfig: SnackBarConfig = {
-                    content: this.capitalItemName + " updated."
+                    content: this.ItemName + " updated."
                 }
                 var snackBar = new SnackBar(snackBarConfig);
                 snackBar.show();
@@ -544,7 +544,7 @@ export class BaseComponent implements BaseComponentInterface {
           this.service.createOne(this._detail).subscribe(
             result => {
                 var snackBarConfig: SnackBarConfig = {
-                    content: this.capitalItemName + " created."
+                    content: this.ItemName + " created."
                 }
                 var snackBar = new SnackBar(snackBarConfig);
                 snackBar.show();
@@ -560,7 +560,14 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     public clearValueFromDetail(field:string):void {
-        if (this.detail && this.detail.hasOwnProperty(field)) delete this.detail[field];
+        if (!this.detail || !this.detail.hasOwnProperty(field)) return;
+        if (typeof this.detail[field] == 'object') {//reference field
+            for (let prop in this.detail[field]) {
+                this.detail[field][prop] = undefined;
+            }
+        } else {
+            delete this.detail[field];
+        }
     }
     
     
@@ -568,13 +575,17 @@ export class BaseComponent implements BaseComponentInterface {
     protected refSelectDirective:any;
     protected selectComponents:any;
     protected componentFactoryResolver:any;
+    private componentSubscription
     public onRefSelect(fieldName:string) {
         let viewContainerRef = this.refSelectDirective.viewContainerRef;
         viewContainerRef.clear();
         
         let componentRef = this.selectComponents[fieldName]["componentRef"];
         if (!componentRef) {
-            let componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.selectComponents[fieldName]["type"]);
+            let comType = this.selectComponents[fieldName]["select-type"]
+            if (!comType) console.error("No component type found for: %s", "select-type");
+
+            let componentFactory = this.componentFactoryResolver.resolveComponentFactory(comType);
             componentRef = viewContainerRef.createComponent(componentFactory);//create and insert in one call
             this.selectComponents[fieldName]["componentRef"] = componentRef;//save it
         } else {
@@ -583,25 +594,100 @@ export class BaseComponent implements BaseComponentInterface {
         
         let componentInstance = <BaseComponentInterface>componentRef.instance;
  
-        componentInstance.done.subscribe( (val) => {
+        this.componentSubscription = componentInstance.done.subscribe( (val) => {
+            if (val) {
+                this.componentSubscription.unsubscribe();
+                viewContainerRef.detach(); //only detach. not destroy
+            }
             let outputData = componentInstance.outputData;
-            if (outputData) this.detail[fieldName] = outputData;
-            if (val) viewContainerRef.detach(); //only detach. not destroy
+            if (outputData) {
+                switch (outputData.action){
+                    case "selected":
+                        this.detail[fieldName] = outputData.value;
+                        break;
+                    case "view":
+                        this.onRefShow(fieldName, "select", outputData.value);//value is _id
+                        break;
+                    default:
+                        break;
+                }                
+            }
+        });
+    }
+    public onRefShow(fieldName:string, action:string, id:string) {
+        if (!id && this.detail[fieldName]) id = this.detail[fieldName]['_id'];
+        let viewContainerRef = this.refSelectDirective.viewContainerRef;
+        viewContainerRef.clear();
+        
+        let detailType = action + "-detail-type"; //eg: select-detail-type, pop-detail-type
+        let comType = this.selectComponents[fieldName][detailType]
+        if (!comType) console.error("No component type found for: %s", detailType);
+        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(comType);
+        let componentRef = viewContainerRef.createComponent(componentFactory);//create and insert in one call
+
+        let componentInstance = <BaseComponentInterface>componentRef.instance;
+        componentInstance.inputData = id;
+        
+        componentInstance.done.subscribe( (val) => {
+           if (val) {
+               componentInstance.done.unsubscribe();
+               viewContainerRef.clear();
+           }
+           let outputData = componentInstance.outputData;
+            if (outputData) {
+                switch (outputData.action){
+                    case "selected":
+                        this.detail[fieldName] = outputData.value;
+                        break;
+                    case "back":
+                        this.onRefSelect(fieldName);
+                        break;
+                    default:
+                        break;
+                }                
+            }
         });
     }
     //**** For child component of modal UI
     public inputData;
     public outputData;
     public done:any;
-    selectCloseModal() {
+    uiCloseModal() {
+        this.outputData = null;
         this.done.emit(true);
     }
+    uiOnEscapeKey() {
+        this.uiCloseModal();
+    }
+
     selectItemSelected(num:number) {
         let detail = this.list[num];
-        this.outputData = {"_id": detail["_id"], "value": this.stringify(detail)};
+        this.outputData = {action: "selected", 
+                            value: {"_id": detail["_id"], "value": this.stringify(detail)}
+                          };
         this.done.emit(true);
     }
-    selectOnEscapeKey() {
-        this.selectCloseModal();
+    
+    detailSelSelected() {
+        let detail = this.detail;
+        this.outputData = {action: "selected", 
+                            value: {"_id": detail["_id"], "value": this.stringify(detail)}
+                          };
+        this.done.emit(true);
+    }
+
+    selectViewDetail(num:number) {
+        let detail = this.list[num];
+        this.outputData = {action: "view", 
+                            value: detail["_id"]
+                          };
+        this.done.emit(true);
+    }
+    
+    detailSelBack() {
+        this.outputData = {action: "back", 
+                            value: null
+                          };
+        this.done.emit(true);
     }
 }

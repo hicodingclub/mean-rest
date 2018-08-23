@@ -66,6 +66,12 @@ var templates = {
 	schemaDetailComponent: ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file"],
 	schemaDetailComponentHtml: ["../templates/schema-detail.component.html", "detail.component.html", "detail component html file"],
 	schemaDetailComponentCss: ["../templates/schema-detail.component.css", "detail.component.css", "detail component css file"],
+
+	schemaDetailSelComponent: ["../templates/schema-detail-sel.component.ts", "detail-sel.component.ts", "detail select component file"],
+	schemaDetailSelComponentHtml: ["../templates/schema-detail-sel.component.html", "detail-sel.component.html", "detail select component html file"],
+	schemaDetailPopComponent: ["../templates/schema-detail-pop.component.ts", "detail-pop.component.ts", "detail pop component file"],
+	schemaDetailPopComponentHtml: ["../templates/schema-detail-pop.component.html", "detail-pop.component.html", "detail pop component html file"],
+	
 	schemaEditComponent: ["../templates/schema-edit.component.ts", "edit.component.ts", "edit component file"],
 	schemaEditComponentHtml: ["../templates/schema-edit.component.html", "edit.component.html", "edit component html file"],
 	schemaEditComponentCss: ["../templates/schema-edit.component.css", "edit.component.css", "edit component css file"],
@@ -563,6 +569,12 @@ function main() {
 	generateSourceFile(schemaName, templates.schemaDetailComponent, schemaObj, subComponentDir);
 	generateSourceFile(schemaName, templates.schemaDetailComponentHtml, schemaObj, subComponentDir);
 	generateSourceFile(schemaName, templates.schemaDetailComponentCss, schemaObj, subComponentDir);
+	if (referenceFields.indexOf(schemaName) != -1) { //referenced by others, provide select component
+		generateSourceFile(schemaName, templates.schemaDetailSelComponent, schemaObj, subComponentDir);
+		generateSourceFile(schemaName, templates.schemaDetailSelComponentHtml, schemaObj, subComponentDir);
+		generateSourceFile(schemaName, templates.schemaDetailPopComponent, schemaObj, subComponentDir);
+		generateSourceFile(schemaName, templates.schemaDetailPopComponentHtml, schemaObj, subComponentDir);
+    }
 	
 	subComponentDir = path.join(componentDir, schemaName+'-edit');
 	generateSourceFile(schemaName, templates.schemaEditComponent, schemaObj, subComponentDir);

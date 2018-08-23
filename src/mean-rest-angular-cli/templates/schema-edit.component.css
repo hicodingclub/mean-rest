@@ -3,6 +3,10 @@
 	margin: 0 auto;
 }
 
+fieldset > .form-control, .input-group, .form-check {
+	width: 90%
+}
+
 .action-buttons {
 	width: 100%;
 	float:right; 
@@ -55,8 +59,6 @@
 }
 
 .ref-badge {
-  display: block;
-  min-width: 50px;
   border: 1px solid #eceff3; /*rgba(0,0,0,.125); */
   background-color: #eceff3;
 }
@@ -65,4 +67,16 @@
   z-index: 1;
   pointer-events: auto;
   cursor: pointer;
+}
+
+.input-group > span {
+margin-left: 0.5rem;
+}
+.icon-clear-control {
+z-index: 1;
+vertical-align: middle;
+cursor: pointer;
+position: relative;
+margin-top: 0.6rem;
+margin-left: 0.5rem;
 }

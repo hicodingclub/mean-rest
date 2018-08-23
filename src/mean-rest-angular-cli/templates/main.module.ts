@@ -20,7 +20,9 @@ import { <%-schm.SchemaName%>Service } from './<%-schm.schemaName%>/<%-schm.sche
     <%_ if (schm.schemaHasRef) {%>import { <%-schm.SchemaName%>RefSelectDirective } from './<%-schm.schemaName%>/<%-schm.schemaName%>-edit/<%-schm.schemaName%>-edit.component';<%}%>
 <%_ } %>
 <%_ referenceFields.forEach(function(reference){ let ref = reference.ref, Ref = reference.Ref; %>     
-import { <%-Ref%>SelectComponent } from './<%-ref%>/<%-ref%>-list/<%-ref%>-select.component'; <%_ }); %>
+import { <%-Ref%>SelectComponent } from './<%-ref%>/<%-ref%>-list/<%-ref%>-select.component';
+import { <%-Ref%>DetailPopComponent } from './<%-ref%>/<%-ref%>-detail/<%-ref%>-detail-pop.component';
+import { <%-Ref%>DetailSelComponent } from './<%-ref%>/<%-ref%>-detail/<%-ref%>-detail-sel.component'; <%_ }); %>
 <%_ validatorFields.forEach(function(validator){ %>     
 import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validator.schemaName%>-edit/<%-validator.schemaName%>-edit.component'; <%_ }); %>
   
@@ -46,7 +48,9 @@ import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validat
     <%-schm.SchemaName%>EditComponent,
     <%_ if (schm.schemaHasRef) {%> <%-schm.SchemaName%>RefSelectDirective,<%}%> <%_ } %>
   <%_ referenceFields.forEach(function(reference){ let Ref = reference.Ref; %>     
-    <%-Ref%>SelectComponent, <%_ }); %>
+    <%-Ref%>SelectComponent,
+    <%-Ref%>DetailPopComponent,
+    <%-Ref%>DetailSelComponent, <%_ }); %>
   <%_ validatorFields.forEach(function(validator){ %>     
     <%-validator.Directive%>,<%_ }); %>
   ],
@@ -57,7 +61,9 @@ import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validat
     <%-schm.SchemaName%>DetailComponent,
     <%-schm.SchemaName%>EditComponent,<%_ }%>
   <%_ referenceFields.forEach(function(reference){ let Ref = reference.Ref; %>     
-    <%-Ref%>SelectComponent, <%_ }); %>
+    <%-Ref%>SelectComponent,
+    <%-Ref%>DetailPopComponent,
+    <%-Ref%>DetailSelComponent, <%_ }); %>
   ],
   providers: [
   <%_ if (hasDate) {%>    
@@ -68,7 +74,9 @@ import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validat
 <%_ if (hasRef) {%>
   entryComponents: [ 
     <%_ referenceFields.forEach(function(reference){ let Ref = reference.Ref; %>     
-    <%-Ref%>SelectComponent, <%_ }); %> 
+    <%-Ref%>SelectComponent, 
+    <%-Ref%>DetailPopComponent,
+    <%-Ref%>DetailSelComponent, <%_ }); %> 
   ]<%}%>
 })
 export class <%-ModuleName%>Module { }

@@ -1,0 +1,40 @@
+<div class="select-model show" (keyup.esc)="uiOnEscapeKey()" tabindex="0">
+  <div class="select-model-content">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ItemName}} Detail</h5>
+        <button type="button" class="close" aria-label="Close" (click)="uiCloseModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+<!--  model body starts -->
+
+
+<div class="detail" *ngIf="detail">
+	<div class="action-buttons">
+	</div>
+	
+	<div class="card" style="text-align: left;">
+	  <div class="card-body">
+		<div class="card-text">
+<%_ for (let field of detailView){ let fn = field.fieldName, ft = field.type; let ref_link = "../../../"%>
+			<label><b><%-fn%>:</b></label>
+			<span><% include schema-display.field.html %>
+			</span><br><%_}%>
+		</div>
+	  </div>
+	</div>
+</div>
+
+
+
+<!--  model body ends -->
+
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div> 

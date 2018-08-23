@@ -41,6 +41,8 @@ export class <%-SchemaName%>Directive<%-field.FieldName%> implements Validator {
 import { ViewContainerRef, ComponentFactoryResolver, ViewChild, Type } from '@angular/core';
     <%_ for (let field of compositeEditView) { 
         if (field.Ref) {%>
+import { <%-field.Ref%>DetailSelComponent } from '../../<%-field.ref%>/<%-field.ref%>-detail/<%-field.ref%>-detail-sel.component';
+import { <%-field.Ref%>DetailPopComponent } from '../../<%-field.ref%>/<%-field.ref%>-detail/<%-field.ref%>-detail-pop.component';
 import { <%-field.Ref%>SelectComponent } from '../../<%-field.ref%>/<%-field.ref%>-list/<%-field.ref%>-select.component';<%}}%>
 
 @Directive({
@@ -64,7 +66,11 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
   protected selectComponents = {
   <%_ for (let field of compositeEditView) { 
       if (field.Ref) {%>
-      "<%-field.fieldName%>": {"type":<%-field.Ref%>SelectComponent, "componentRef": null},<%}}%>
+      "<%-field.fieldName%>": {
+          "select-type":<%-field.Ref%>SelectComponent, 
+          "select-detail-type": <%-field.Ref%>DetailSelComponent,
+           "pop-detail-type": <%-field.Ref%>DetailPopComponent,
+           "componentRef": null},<%}}%>
   }
   @ViewChild(<%-SchemaName%>RefSelectDirective) refSelectDirective: <%-SchemaName%>RefSelectDirective;
 <%}%>

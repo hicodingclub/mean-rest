@@ -1,9 +1,9 @@
-<div class="select-model show" (keyup.esc)="selectOnEscapeKey()" tabindex="0">
+<div class="select-model show" (keyup.esc)="uiOnEscapeKey()" tabindex="0">
   <div class="select-model-content">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Select {{itemName}}</h5>
-        <button type="button" class="close" aria-label="Close" (click)="selectCloseModal()">
+        <h5 class="modal-title">Select {{ItemName}}</h5>
+        <button type="button" class="close" aria-label="Close" (click)="uiCloseModal()">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -42,11 +42,11 @@
 	        </tr>
 	    </thead>
 	    <tbody>
-	        <tr *ngFor="let detail of list;  let i = index" (click)="selectItemSelected(i)" style="cursor: pointer">
-	            <td scope="row"><a [routerLink]="['../detail', detail['_id'] ]">{{(page-1)*per_page+i+1}}</a></td>
+	        <tr *ngFor="let detail of list;  let i = index" >
+	            <td scope="row"><a [routerLink]="['.']" (click)="selectViewDetail(i)">{{(page-1)*per_page+i+1}}</a></td>
 <%_ for (let field of briefView.slice(0,FIELD_NUMBER_FOR_SELECT_VIEW)){ 
 				let fn = field.fieldName, ft = field.type; let ref_link = null; %>
-	            <td><% include schema-display.field.html %>
+	            <td (click)="selectItemSelected(i)"  style="cursor: pointer"><% include schema-display.field.html %>
 	            </td><%_ } %>
 	        </tr>
 	    </tbody>

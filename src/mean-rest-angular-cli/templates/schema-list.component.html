@@ -9,7 +9,7 @@
 					(blur)="onTextSearchEnter(<%-schemaName%>TextSearch.value)" 
 				    placeholder="Search for <%for (let field of briefView){ if(field.type == 'SchemaString') {%><%-field.fieldName%>, <%}}%>...">
 				<span *ngIf="searchText" 
-		          class="icon-clear" (click)="onTextSearchEnter('')">
+		          class="icon-clear-inside" (click)="onTextSearchEnter('')">
 		          <i class="fas fa-times-circle" title="Clear"></i></span>
 			</div>
 			<div class="col-1">
