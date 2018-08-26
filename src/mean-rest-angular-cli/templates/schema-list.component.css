@@ -21,7 +21,7 @@ td a i.fa-trash-alt:hover {
 }
 .action-buttons .btn {
 	display: inline-block;
-	margin-left: 2.5rem;
+	margin-left: 10px;
 }
 
 
@@ -33,7 +33,7 @@ td a i.fa-trash-alt:hover {
 }
 
 .search-control {
-	width: 90%;
+	width: 85%;
     font-size: 0.9rem;
     padding: 5px 10px 5px 10px;
     border: 1px solid #ddd; /* Add a grey border */
@@ -56,11 +56,19 @@ position: relative;
 margin-left: -25px;
 }
 
+.pointer {
+  cursor: pointer;
+}
+.icon-search {
+  z-index: 1;
+  pointer-events: auto;
+  margin-left: 20px;
+}
 
 .select-model {
     display: block; 
     position: fixed; 
-    z-index: 1; 
+    z-index: 100; 
     padding-top: 100px; 
     left: 0;
     top: 0;
@@ -95,4 +103,12 @@ table {
 tr th:first-child{
     width:8%;
     white-space:nowrap;
+}
+
+.single-line-edit {
+	
+}
+
+.single-line-edit > .row {
+	padding-bottom: 2px;
 }

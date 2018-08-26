@@ -11,13 +11,14 @@ import { MinNumber, MaxNumber } from 'mean-rest-angular';
 import { <%-ModuleName%>RoutingModule } from './<%-moduleName%>-routing.module';
 import { <%-ModuleName%>Component } from './<%-moduleName%>.component';
 
+<% if (hasRef) {%>import { <%-ModuleName%>RefSelectDirective } from './<%-moduleName%>.component';<%}%>
+
 //Import components for each schema
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
 import { <%-schm.SchemaName%>ListComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list.component';
 import { <%-schm.SchemaName%>DetailComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail.component';
 import { <%-schm.SchemaName%>EditComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-edit/<%-schm.schemaName%>-edit.component';
 import { <%-schm.SchemaName%>Service } from './<%-schm.schemaName%>/<%-schm.schemaName%>.service';
-    <%_ if (schm.schemaHasRef) {%>import { <%-schm.SchemaName%>RefSelectDirective } from './<%-schm.schemaName%>/<%-schm.schemaName%>-edit/<%-schm.schemaName%>-edit.component';<%}%>
 <%_ } %>
 <%_ referenceFields.forEach(function(reference){ let ref = reference.ref, Ref = reference.Ref; %>     
 import { <%-Ref%>SelectComponent } from './<%-ref%>/<%-ref%>-list/<%-ref%>-select.component';
@@ -41,12 +42,11 @@ import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validat
     MaxNumber,
         
     <%-ModuleName%>Component,
-    
+    <% if (hasRef) {%><%-ModuleName%>RefSelectDirective,<%}%>
   <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
     <%-schm.SchemaName%>ListComponent, 
     <%-schm.SchemaName%>DetailComponent, 
-    <%-schm.SchemaName%>EditComponent,
-    <%_ if (schm.schemaHasRef) {%> <%-schm.SchemaName%>RefSelectDirective,<%}%> <%_ } %>
+    <%-schm.SchemaName%>EditComponent,<%}%>
   <%_ referenceFields.forEach(function(reference){ let Ref = reference.Ref; %>     
     <%-Ref%>SelectComponent,
     <%-Ref%>DetailPopComponent,

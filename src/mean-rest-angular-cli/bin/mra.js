@@ -496,6 +496,8 @@ function main() {
 	});
 	
 	let schemaObj = {
+		moduleName: moduleName,
+		ModuleName: ModuleName,
 		schemaName: schemaName,
 		SchemaName: SchemaName,
 		apiBase: apiBase,

@@ -3,15 +3,11 @@
 	<div class="container search">
 		<div class="row">
 			<div class="col-8">
-				<input type="search" id="<%-schemaName%>TextSearch" class="search-control" 
-					#<%-schemaName%>TextSearch [(ngModel)]="searchText"
-					(keyup.enter)="onTextSearchEnter(<%-schemaName%>TextSearch.value)"
-					(blur)="onTextSearchEnter(<%-schemaName%>TextSearch.value)" 
-				    placeholder="Search for <%for (let field of briefView){ if(field.type == 'SchemaString') {%><%-field.fieldName%>, <%}}%>...">
-				<span *ngIf="searchText" 
-		          class="icon-clear-inside" (click)="onTextSearchEnter('')">
-		          <i class="fas fa-times-circle" title="Clear"></i></span>
-			</div>
+			    <%_ include schema-search.bar.html %>
+		        <span class="icon-search " [hidden]="moreSearchOpened" (click)="toggleMoreSearch()">
+		            <i  class="fas fa-caret-down" title="More"></i>
+		        </span>
+		    </div>
 			<div class="col-1">
 			</div>
 			<div class="col-3">
@@ -22,6 +18,35 @@
 				</div>
 			</div>
 		</div>
+
+		<div class="row"  *ngIf="!moreSearchOpened">
+	       	<div class="col-1"></div> <!-- indent -->
+			<div class="col-8" style="text-align: left;">
+				<span class="badge badge-pill badge-secondary" *ngFor="let value of searchMoreDetail">
+				    <a (click)="toggleMoreSearch()" class="pointer"> {{value}}</a></span>
+			</div>
+		</div>
+		
+	    <div class="row"  *ngIf="moreSearchOpened">
+	       	<div class="col-1"></div> <!-- indent -->
+	       	<div class="col-8">
+				<div class="card">
+				  <div class="card-body">
+<%_ briefView.forEach( (field) => { let fn=field.fieldName, Fn=field.FieldName, sn=schemaName;
+	if (field.type != 'SchemaString') {%> <%_ include schema-search.field.html %> 
+<%_ }}) %>
+				  	<div class="action-buttons" style="margin-top: 10px;">
+						<button type="button" class="btn btn-outline-success" (click)="onSearchClear()">Reset</button>
+						<button type="button" class="btn btn-success" (click)="searchList()">Search</button>
+				    </div>
+				  </div>
+				</div>
+		    </div>
+	       	<div class="col-1"><!-- search button -->
+	       	</div> 
+        </div>	
+
+
 		<hr/>
 		<div class="row"><% include schema-list.pagination.html %>
 		</div>
@@ -63,3 +88,6 @@
 	</div>
 	
 </div>
+
+<%_ if (schemaHasRef) {%>
+<ng-template <%-moduleName%>-ref-select></ng-template><%}%>

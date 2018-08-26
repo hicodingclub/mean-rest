@@ -1,64 +1,82 @@
-    <%_ if (field.type === "SchemaString") { %>
+	    <div class="single-line-edit">
 	      <div class="row">
-	        <label class="col-4" for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
+	        <div class="col-3"><label for="<%-sn%>Edit<%-Fn%>"><%-Fn%></label></div>
 	        <div class="col-8">
+
+    <%_ if (field.type === "SchemaString") { %>
         <%_ if (field.enumValues) { %>
-	        <div class="form-check">
+	        <div class="form-check"
 	          <%_ field.enumValues.forEach( (f) => { %>
 	          <div class="form-check-inline">
-		        <input type="radio" name="<%-schemaName%>Edit<%-field.FieldName%>" 
+		        <input type="radio" name="<%-sn%>Edit<%-Fn%>" 
 		        	class="form-check-input"
-		        	id="<%-schemaName%>Edit<%-field.FieldName%><%-f%>" [value]="'<%-f%>'"
-		        	[(ngModel)]="detail['<%-field.fieldName%>']"
-		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		        	id="<%-sn%>Edit<%-Fn%><%-f%>" [value]="'<%-f%>'"
+		        	#<%-sn%>Edit<%-Fn%>="ngModel">
 		      	<label class="form-check-label"><%-f%></label>
 		      </div>
 		      <%_ }) %>
-		      <div *ngIf="enums['<%-field.fieldName%>'].includes(detail['<%-field.fieldName%>'])" 
-		          class="form-check-inline" (click)="clearValueFromDetail('<%-field.fieldName%>')">
-		          <i class="fas fa-times-circle" title="Clear"></i></div>
 		    </div>
         <%_ } else { %>
-	        <input type="text" class="search-control" id="<%-schemaName%>Edit<%-field.FieldName%>" 
-	                [(ngModel)]="detail['<%-field.fieldName%>']" name="<%-schemaName%>Edit<%-field.FieldName%>"
-	                #<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+	        <input type="text" class="form-control" id="<%-sn%>Edit<%-Fn%>" 
+		        	<%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
+	                [(ngModel)]="detail['<%-fn%>']" name="<%-sn%>Edit<%-Fn%>"
+	                #<%-sn%>Edit<%-Fn%>="ngModel">
         <%_ } %>
-            </div> <!--col-8-->
-	      </div>
     <%_ } else if (field.type === "SchemaBoolean") { %>
-	      <div class="row">
-	        <label class="col-4" for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
-	        <div class="col-8">
 	        <div class="form-check">
 	          <div class="form-check-inline">
-		        <input type="radio" name="<%-schemaName%>Edit<%-field.FieldName%>" 
+		        <input type="radio" name="<%-sn%>Edit<%-Fn%>" 
 		        	class="form-check-input"
-		        	id="<%-schemaName%>Edit<%-field.FieldName%>Yes" [value]="true" 
-		        	[(ngModel)]="detail['<%-field.fieldName%>']"
-		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		        	id="<%-sn%>Edit<%-Fn%>Yes" [value]="true" 
+		        	[(ngModel)]="detail['<%-fn%>']"
+		        	#<%-sn%>Edit<%-Fn%>="ngModel">
 		      	<label class="form-check-label">Yes</label>
 		      </div>
 	          <div class="form-check-inline">
-		        <input type="radio" name="<%-schemaName%>Edit<%-field.FieldName%>" 
+		        <input type="radio" name="<%-sn%>Edit<%-Fn%>" 
 		        	class="form-check-input"
-		        	id="<%-schemaName%>Edit<%-field.FieldName%>No" [value]="false"
-		        	[(ngModel)]="detail['<%-field.fieldName%>']"
-		        	#<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
+		        	id="<%-sn%>Edit<%-Fn%>No" [value]="false"
+		        	[(ngModel)]="detail['<%-fn%>']"
+		        	#<%-sn%>Edit<%-Fn%>="ngModel">
 		      	<label class="form-check-label">No</label>
 		      </div>
-		      <div *ngIf="detail['<%-field.fieldName%>'] == true || detail['<%-field.fieldName%>'] == false" 
-		          class="form-check-inline" (click)="clearValueFromDetail('<%-field.fieldName%>')">
-		          <i class="fas fa-times-circle" title="Clear"></i></div>
 		    </div>
-		    </div> <!--col-8-->
-		  </div>
     <%_ } else if (field.type === "SchemaNumber") { %>
-	      <div class="row">
-	        <label class="col-4" for="<%-schemaName%>Edit<%-field.FieldName%>"><%-field.FieldName%></label>
-	        <div class="col-8">
-	        <input type="number" class="search-control col-8" id="<%-schemaName%>Edit<%-field.FieldName%>" 
-	                [(ngModel)]="detail['<%-field.fieldName%>']" name="<%-schemaName%>Edit<%-field.FieldName%>"
-	                #<%-schemaName%>Edit<%-field.FieldName%>="ngModel">
-		    </div> <!--col-8-->
+	        <input type="number" class="form-control" id="<%-sn%>Edit<%-Fn%>" 
+	                [(ngModel)]="detail['<%-fn%>']" name="<%-sn%>Edit<%-Fn%>"
+	                #<%-sn%>Edit<%-Fn%>="ngModel">
+    <%_ } else if (field.type === "SchemaDate") { %>
+	        <div class="input-group">
+		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="<%-field.dateFormat%>"
+		             [(ngModel)]="detail['<%-fn%>']['date']" name="<%-sn%>Edit<%-Fn%>"
+		             ngbDatepicker #<%-sn%>Edit<%-Fn%>Date="ngbDatepicker" #<%-sn%>Edit<%-Fn%>="ngModel">
+		      <div class="input-group-append">
+		        <button class="btn btn-outline-secondary" (click)="<%-sn%>Edit<%-Fn%>Date.toggle()" type="button">
+		          <i class="fas fa-calendar-alt"></i>
+		        </button>
+		      </div>
+		    </div><!-- input group -->         
+    <%_ } else if (field.type === "ObjectId") { %>
+		    <div class="input-group">
+		      <a (click)="detail['<%-fn%>']['_id']&&onRefShow('<%-field.fieldName%>', 'pop', detail['<%-fn%>']['_id'])">
+		        <input class="form-control ref-badge" id="<%-sn%>Edit<%-Fn%>" [attr.disabled]="true"
+		             [ngClass]="{'pointer': detail['<%-fn%>']['_id']}"
+		             [ngModel]="detail['<%-fn%>']['value']" name="<%-sn%>Edit<%-Fn%>"
+		             #<%-sn%>Edit<%-Fn%>="ngModel"> </a>
+	          <div class="input-group-append">
+	          	<span  class="icon-search" (click)="onRefSelect('<%-fn%>')">
+		          	<i class="fas fa-search" title="Search"></i></span>
+		      </div>		             
+			</div>
+    <%_ } %>
+    
 	      </div>
-    <%_ } %>    
+	      
+	      <div class="col-1">
+		    <span class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')"
+		        *ngIf="checkValueDefinedFromDetail(['<%-fn%>'])"
+		        ><i class="fas fa-times-circle" title="Clear"></i></span>
+	      </div>
+	    </div>
+      </div>
+      

@@ -14,14 +14,7 @@
 	<div class="container search">
 		<div class="row">
 			<div class="col-8">
-				<input type="search" id="<%-schemaName%>TextSearch" class="search-control" 
-					#<%-schemaName%>TextSearch [(ngModel)]="searchText"
-					(keyup.enter)="onTextSearchEnter(<%-schemaName%>TextSearch.value)"
-					(blur)="onTextSearchEnter(<%-schemaName%>TextSearch.value)" 
-				    placeholder="Search for <%for (let field of briefView){ if(field.type == 'SchemaString') {%><%-field.fieldName%>, <%}}%>...">
-				<span *ngIf="searchText" 
-		          class="icon-clear" (click)="onTextSearchEnter('')">
-		          <i class="fas fa-times-circle" title="Clear"></i></span>
+			    <%_ include schema-search.bar.html %>
 			</div>
 			<div class="col-1">
 			</div>

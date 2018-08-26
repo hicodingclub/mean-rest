@@ -2,7 +2,7 @@ import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { Router, ActivatedRoute }    from '@angular/router';
 
 import { <%-SchemaName%>DetailComponent } from './<%-schemaName%>-detail.component';
-import { <%-SchemaName%>Service } from '../person.service';
+import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
 @Component({
   selector: 'app-<%-schemaName%>-detail-pop',
@@ -18,7 +18,7 @@ export class <%-SchemaName%>DetailPopComponent extends <%-SchemaName%>DetailComp
         protected router: Router,
         protected route: ActivatedRoute,
         protected <%-schemaName%>Service: <%-SchemaName%>Service) {
-            super(router, route, <%-schemaName%>Service);
+            super(<%if (schemaHasRef) {%>null,<%}%>router, route, <%-schemaName%>Service);
             this.majorUi = false;
     }
 

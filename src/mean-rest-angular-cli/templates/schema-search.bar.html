@@ -1,0 +1,8 @@
+				<input type="search" id="<%-schemaName%>TextSearch" class="search-control" 
+					#<%-schemaName%>TextSearch [(ngModel)]="searchText"
+					(keyup.enter)="searchList()"
+				    placeholder="Search for <%for (let field of briefView){ if(field.type == 'SchemaString') {%><%-field.fieldName%>, <%}}%>...">
+				<span class="icon-clear-inside" >
+		            <i *ngIf="!searchText" class="fas fa-search" (click)="searchList()" title="Search"></i>
+		            <i *ngIf="searchText" class="fas fa-times-circle" (click)="onSearchTextClear()" title="Clear"></i>
+		        </span>

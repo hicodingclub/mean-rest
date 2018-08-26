@@ -18,7 +18,7 @@ export class <%-SchemaName%>SelectComponent extends <%-SchemaName%>ListComponent
         protected router: Router,
         protected route: ActivatedRoute,
         protected <%-schemaName%>Service: <%-SchemaName%>Service) {
-            super(router, route, <%-schemaName%>Service);
+            super(<%if (schemaHasRef) {%>null,<%}%> router, route, <%-schemaName%>Service);
             this.majorUi = false;
     }
 

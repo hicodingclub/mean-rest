@@ -32,6 +32,12 @@ var createRegex = function(obj) {
 	return obj;
 }
 
+var checkAndSetValue = function(obj, model) {
+	//obj in {key: value} format
+
+	return obj;
+}
+
 var RestController = function() {
 }
 
@@ -97,7 +103,6 @@ RestController.searchAll = function(req, res, next, searchContext) {
 	let query = {};
 
 	//get the query parameters ?a=b&c=d, but filter out unknown ones
-	//TODO: support the nested objects
 	
 	const PER_PAGE = 25, MAX_PER_PAGE = 1000;
 	
@@ -114,22 +119,24 @@ RestController.searchAll = function(req, res, next, searchContext) {
 	
 	let count = 0;
 	if (searchContext) {
+		console.log("searchContext is ....", searchContext);
         // searchContext ={'$and', [{'$or', []},{'$and', []}]}
 		if (searchContext['$and']) {
-		  for (let obj of searchContext['$and']) {
-			for (let op of ["$or", "$and"]) {
-				if (op in obj) {
-				//searchContext[op] is an array of objects
-					if (obj[op].length == 0) obj[op] = [{}];//make sure at least one object inside
-				    obj[op] = obj[op].map(x=>createRegex(x));
-				}
-			}
+		  for (let subContext of searchContext['$and']) {
+			  if ('$or' in subContext) {
+				  if (subContext['$or'].length == 0) subContext['$or'] = [{}];
+				  subContext['$or']=subContext['$or'].map(x=>createRegex(x));
+			  } else if ( '$and' in subContext) {
+				  if (subContext['$and'].length == 0) subContext['$and'] = [{}];
+				  subContext['$and']=subContext['$and'].map(x=>checkAndSetValue(x,model));
+			  }
 		  }
 		}
 		query = searchContext;
+		//console.log("query is ....", query['$and'][0]['$or'], query['$and'][1]['$and']);
 	}
-	
-    model.countDocuments(query).exec(function(err, cnt) {
+
+	model.countDocuments(query).exec(function(err, cnt) {
         if (err) { return next(err); }
         count = cnt;
         

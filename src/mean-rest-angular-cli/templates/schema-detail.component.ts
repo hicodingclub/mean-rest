@@ -4,6 +4,9 @@ import { Router, ActivatedRoute }    from '@angular/router';
 import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
+<%if (schemaHasRef) {%>
+import { ComponentFactoryResolver } from '@angular/core';<%}%>
+
 @Component({
   selector: 'app-<%-schemaName%>-detail',
   templateUrl: './<%-schemaName%>-detail.component.html',
@@ -14,10 +17,12 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
   protected id:string;
 
   constructor(
+      <%if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
       protected router: Router,
       protected route: ActivatedRoute,
       protected <%-schemaName%>Service: <%-SchemaName%>Service) {
-          super(<%-schemaName%>Service, router, route, ViewType.DETAIL);
+          super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
+                <%-schemaName%>Service, router, route, ViewType.DETAIL);
 <% let theView = detailView; %><%_ include schema-construct.component.ts %>
   }
 

@@ -12,6 +12,8 @@ import { BaseComponentInterface } from './base.interface';
 
 
 function equalTwoSearchContextArrays (arr1, arr2) {
+    if (!arr1) arr1 = [];
+    if (!arr2) arr2 = [];
     if (arr1.length == 0 && arr2.length == 0) return true;
     //all object in array has format of {'field': 'value'} format
     function compareObj(a, b) {
@@ -98,12 +100,11 @@ export class BaseComponent implements BaseComponentInterface {
     protected id:string;
     //for fields with enum values
     protected enums:any = {};
+    protected stringFields = [];
     protected referenceFields = [];
     protected dateFields = [];
     protected indexFields = [];
     protected dateFormat = "MM/DD/YYYY";
-    //Search
-    protected searchText: string;    
 
     protected ItemName: string;
 
@@ -235,7 +236,7 @@ export class BaseComponent implements BaseComponentInterface {
             if (typeof detail[fnm] == 'string') {
                 id = detail[fnm];
                 detail[fnm] = {'_id': id, 'value': fnm};
-            } else if (typeof detail[fnm] == 'object') {
+            } else if (detail[fnm] && (typeof detail[fnm] == 'object') ) {
                 id = detail[fnm]['_id'];
                 let referIndex = '';
                 for (let k in  detail[fnm]) {
@@ -262,17 +263,11 @@ export class BaseComponent implements BaseComponentInterface {
         }
         return detail;
     }
-    protected formatDate(detail:any ):any {
-        for (let fnm of this.dateFields) {
+    protected formatDateField(field:string):any {
             let fmt = this.dateFormat;
             let d, M, yyyy, h, m, s;
-            let value, date;
-            if (typeof detail[fnm] !== 'string') { //not defined
-                //important: let date values undefined
-                detail[fnm] = {'date':date, 'value': value};
-            }
-            else {
-                let dt = new Date(detail[fnm]);
+
+                let dt = new Date(field);
                 
                 let dd, MM, hh, mm, ss;
                 d = dt.getDate();
@@ -290,7 +285,7 @@ export class BaseComponent implements BaseComponentInterface {
                 mm= m<10? '0'+m: m.toString();
                 ss= s<10? '0'+s: s.toString();
                 
-                value = fmt.replace(/yyyy/ig, yyyy.toString()).
+                let value = fmt.replace(/yyyy/ig, yyyy.toString()).
                                replace(/yy/ig, yy.toString()).
                                replace(/MM/g, MM.toString()).
                                replace(/dd/ig, dd.toString()).
@@ -302,7 +297,18 @@ export class BaseComponent implements BaseComponentInterface {
                 
                 we add h, m, s here
                 */
-                detail[fnm] = {'date':{ day: d, month: M, year: yyyy}, 'value': value}
+                return {'date':{ day: d, month: M, year: yyyy}, 'value': value}
+
+    }
+    protected formatDate(detail:any ):any {
+        for (let fnm of this.dateFields) {
+            let value, date;
+            if (typeof detail[fnm] !== 'string') { //not defined
+                //important: let date values undefined
+                detail[fnm] = {'date':date, 'value': value};
+            }
+            else {
+                detail[fnm] = this.formatDateField(detail[fnm]);
             }
         }
         return detail;
@@ -356,28 +362,61 @@ export class BaseComponent implements BaseComponentInterface {
       );
     }
     
-    protected searchAdd(operation:string, fieldQueryList:any[]):void {
+    protected searchList():void {
+        this.moreSearchOpened = false;
+        let d = this.detail;
+        for (let s of this.stringFields) {
+            d[s] = this.searchText;
+        }
+        let orSearchContext = [], andSearchContext = [];
+        for (let prop in d) {
+            if (typeof d[prop] == 'string') {
+                let o = {}
+                o[prop] = d[prop];
+                orSearchContext.push(o);
+            }
+        }
+        
+        this.searchMoreDetail = []
+        let d2 = this.deFormatDetail(d);
+        for (let prop in d2) {
+            if (this.stringFields.indexOf(prop) == -1) {
+                let o = {}
+                o[prop] = d2[prop];
+                andSearchContext.push(o);
+                
+                let valueToShow;
+                if(typeof d[prop] != 'object') valueToShow = d[prop];
+                else if (d[prop]['date']) { //Date fields
+                    let dt = this.formatDateField(d2[prop])
+                    valueToShow = dt.value;
+                } else if (d[prop]['_id']) { //Refer Object
+                    valueToShow = d[prop]['value'];
+                }
+                this.searchMoreDetail.push(prop + ": " + valueToShow);
+            }
+        }
+
+        let searchContext = {'$and': [{'$or': orSearchContext},{'$and': andSearchContext}]};
         /* searchContext ={'$and', [{'$or', []},{'$and', []}]}
         */
         let context = this.getFromStorage("searchContext");
-        let arr;
-        let newQuery = {};
-        newQuery[operation] = fieldQueryList;
         if (context && context["$and"]) {
-            arr = context["$and"].filter(x=>(operation in x));
-            if (arr.length == 1 && equalTwoSearchContextArrays(arr[0][operation], fieldQueryList)) return; //no change
-            
-            arr = context["$and"].filter(x=>!(operation in x));
-            arr.push(newQuery);
-            context["$and"] = arr;
-        } else {
-            if (fieldQueryList.length == 0) return; //no change
-            context = {"$and": [newQuery]};
-        }
+            let cachedOr, cachedAnd;
+            for (let sub of context["$and"]) {
+                if ('$and' in sub) cachedAnd = sub['$and'];
+                else if ('$or' in sub) cachedOr = sub['$or'];
+            }
+            if (equalTwoSearchContextArrays(cachedOr, orSearchContext) 
+                && equalTwoSearchContextArrays(cachedAnd, andSearchContext)) {
+                return;
+            }
+        } 
                 
-        this.putToStorage("searchContext", context);
+        this.putToStorage("searchContext", searchContext);
         this.putToStorage("searchText", this.searchText);
         this.putToStorage("page", null);//start from 1st page
+        this.putToStorage("searchMoreDetail", this.searchMoreDetail);
 
         if (this.majorUi) {
             //update the URL
@@ -389,6 +428,25 @@ export class BaseComponent implements BaseComponentInterface {
             //re-populate directly
             this.populateList();
         }
+    }
+    protected loadUIFromCache():void {
+        //Now let's reload the search condition to UI
+        this.searchText = this.getFromStorage("searchText");
+        this.searchMoreDetail = this.getFromStorage("searchMoreDetail");
+        let searchContext = this.getFromStorage("searchContext");
+        let _detail = {};
+        if (searchContext && searchContext['$and']) {
+            for (let context of searchContext['$and']) {
+                if ('$and' in context) {
+                    for (let item of context['$and']) {
+                        for (let p in item) {
+                            _detail[p] = item[p];
+                        }
+                    }
+                }
+            }
+        }
+        this.detail = this.formatDetail(_detail)
     }
     
     protected populateList():void {
@@ -409,6 +467,7 @@ export class BaseComponent implements BaseComponentInterface {
           if (!new_page) new_page = 1;
         }
         searchContext = this.getFromStorage("searchContext");
+        this.loadUIFromCache();      
 
         this.service.getList(new_page, this.per_page, searchContext).subscribe(
           result => { 
@@ -419,8 +478,6 @@ export class BaseComponent implements BaseComponentInterface {
             this.total_pages = result.total_pages;
             this.populatePages();
             
-            this.searchText = this.getFromStorage("searchText");
-
             this.checkedItem = 
                 Array.apply(null, Array(this.list.length)).map(Boolean.prototype.valueOf,false);
             this.checkAll = false;
@@ -560,8 +617,9 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     public clearValueFromDetail(field:string):void {
-        if (!this.detail || !this.detail.hasOwnProperty(field)) return;
-        if (typeof this.detail[field] == 'object') {//reference field
+        if (!this.detail.hasOwnProperty(field)) return;
+        if (typeof this.detail[field] == 'undefined') return;
+        if (typeof this.detail[field] == 'object') {//reference field or date
             for (let prop in this.detail[field]) {
                 this.detail[field][prop] = undefined;
             }
@@ -570,6 +628,19 @@ export class BaseComponent implements BaseComponentInterface {
         }
     }
     
+    public checkValueDefinedFromDetail(field:string):boolean {
+        let d = this.detail;
+        if (!d.hasOwnProperty(field)) return false;
+        if (typeof d[field] == 'undefined') return false;
+        if (typeof this.detail[field] == 'number' 
+            || typeof d[field] == 'string'
+            || typeof d[field] == 'boolean') return true;
+        if (typeof d[field] == 'object') {
+            if ('date' in d[field] && typeof d[field]['date'] == 'object') return true;
+            if ('_id' in d[field] && typeof d[field]['_id'] == 'string') return true;
+        }
+        return false;
+    }
     
     //**** For parent component of modal UI
     protected refSelectDirective:any;
@@ -689,5 +760,24 @@ export class BaseComponent implements BaseComponentInterface {
                             value: null
                           };
         this.done.emit(true);
+    }
+    
+    //Search more in the list view
+        //Search
+    protected searchText: string;
+    protected searchMoreDetail: any;
+    public moreSearchOpened:boolean = false;
+    toggleMoreSearch() {
+        this.moreSearchOpened = !this.moreSearchOpened;
+    }    
+    onSearchTextClear():void {
+      this.searchText = undefined;
+      if (!this.moreSearchOpened) this.searchList();
+    }
+    onSearchClear() {
+        this.searchText = undefined;
+        let detail = {};
+        this.detail = this.formatDetail(detail);
+        this.searchList();
     }
 }

@@ -63,7 +63,7 @@ fieldset > .form-control, .input-group, .form-check {
   background-color: #eceff3;
 }
 
-.icon-ref-search, .icon-clear {
+.icon-search, .icon-clear {
   z-index: 1;
   pointer-events: auto;
   cursor: pointer;
@@ -72,6 +72,7 @@ fieldset > .form-control, .input-group, .form-check {
 .input-group > span {
 margin-left: 0.5rem;
 }
+
 .icon-clear-control {
 z-index: 1;
 vertical-align: middle;

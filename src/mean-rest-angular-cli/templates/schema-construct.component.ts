@@ -1,6 +1,9 @@
 <%_ for (let field of theView) { let fn = field.fieldName;
         if (field.enumValues) {%>
           this.enums['<%-fn%>'] = [<%for (let ev of field.enumValues) {%>'<%-ev%>',<%}%>]; <%}}%>
+<%_ for (let field of theView) { let fn = field.fieldName;
+        if (field.type == "SchemaString") {%>
+          this.stringFields.push('<%-fn%>');<%}}%>
 <%_ let refObjects = [];
     for (let field of theView) { 
         if (field.type === "ObjectId") refObjects.push(field.fieldName);
