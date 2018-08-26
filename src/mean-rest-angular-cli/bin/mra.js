@@ -432,10 +432,13 @@ function main() {
 	let views = schemaDef.views
 	let validators = schemaDef.validators;
 	let mongooseSchema = schemaDef.schema;
-//	console.log(mongooseSchema);
-	if (mongooseSchema.paths.birthday) {
-		console.log("===birthday: ", mongooseSchema.paths.birthday.options);
-	}
+	//console.log(mongooseSchema);
+//	if (mongooseSchema.paths.author) {
+//		console.log("===author: ", mongooseSchema.paths.author.options);
+//	}
+//	if (mongooseSchema.paths.person) {
+//		console.log("===person: ", mongooseSchema.paths.person.options);
+//	}
 
 	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 	if (typeof views !== 'object' || !Array.isArray(views)) {
@@ -470,7 +473,7 @@ function main() {
 	let [searchView, hasDate5, hasRef5] = generateViewPicture(views[4], mongooseSchema, validators);
 	let [indexView, hasDate6, hasRef6] = generateViewPicture(views[5], mongooseSchema, validators);
 	let schemaHasDate = hasDate1 || hasDate2 || hasDate3 || hasDate4 || hasDate5 || hasDate6;
-	let schemaHasRef = hasDate3 || hasRef4;
+	let schemaHasRef = hasRef1 || hasRef3 || hasRef4;
 	if (schemaHasDate) hasDate = true;
 	if (schemaHasRef) hasRef = true;
 	
@@ -516,6 +519,7 @@ function main() {
 		
 		FIELD_NUMBER_FOR_SELECT_VIEW: FIELD_NUMBER_FOR_SELECT_VIEW
 	}
+	//console.log("======schemaObj", schemaObj);
 	
 	if (!defaultSchema) defaultSchema = schemaName;
 	schemaMap[schemaName] = schemaObj;
