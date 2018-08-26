@@ -32,9 +32,16 @@ var createRegex = function(obj) {
 	return obj;
 }
 
-var checkAndSetValue = function(obj, model) {
-	//obj in {key: value} format
-
+var checkAndSetValue = function(obj, schema) {
+	//obj in {item: value} format
+	for (let item in obj) {
+		if (item in schema.paths) {
+			let type = schema.paths[item].constructor.name;
+			if (type == 'SchemaDate') {
+				obj[item] = new Date(obj[item]);
+			}
+		}
+	}
 	return obj;
 }
 
@@ -128,7 +135,7 @@ RestController.searchAll = function(req, res, next, searchContext) {
 				  subContext['$or']=subContext['$or'].map(x=>createRegex(x));
 			  } else if ( '$and' in subContext) {
 				  if (subContext['$and'].length == 0) subContext['$and'] = [{}];
-				  subContext['$and']=subContext['$and'].map(x=>checkAndSetValue(x,model));
+				  subContext['$and']=subContext['$and'].map(x=>checkAndSetValue(x,schema));
 			  }
 		  }
 		}

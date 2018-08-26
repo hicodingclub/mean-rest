@@ -45,9 +45,9 @@
 	        <input type="number" class="form-control" id="<%-sn%>Edit<%-Fn%>" 
 	                [(ngModel)]="detail['<%-fn%>']" name="<%-sn%>Edit<%-Fn%>"
 	                #<%-sn%>Edit<%-Fn%>="ngModel">
-    <%_ } else if (field.type === "SchemaDate") { %>
+    <%_ } else if (field.type === "SchemaDate") { %> 
 	        <div class="input-group">
-		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="<%-field.dateFormat%>"
+		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="<%-dateFormat%>"
 		             [(ngModel)]="detail['<%-fn%>']['date']" name="<%-sn%>Edit<%-Fn%>"
 		             ngbDatepicker #<%-sn%>Edit<%-Fn%>Date="ngbDatepicker" #<%-sn%>Edit<%-Fn%>="ngModel">
 		      <div class="input-group-append">

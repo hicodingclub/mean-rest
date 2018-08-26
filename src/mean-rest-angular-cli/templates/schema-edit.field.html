@@ -140,7 +140,7 @@
 	      <fieldset class="form-group">
 	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%> </label> <span> (<%-dateFormat%>)</span>
 	        <div class="input-group">
-		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="<%-field.dateFormat%>"
+		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="<%-dateFormat%>"
 	                 <%if (field.required) {%>required<%}%>
 		        	 <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
 		             [(ngModel)]="detail['<%-fn%>']['date']" name="<%-sn%>Edit<%-Fn%>"
