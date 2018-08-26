@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
 import { BaseComponent, ViewType } from 'mean-rest-angular';
 
@@ -36,8 +37,9 @@ export class <%-SchemaName%>Component extends BaseComponent {
       protected <%-schemaName%>Service: <%-SchemaName%>Service,
       protected router: Router,
       protected route: ActivatedRoute,
+      protected location: Location,
       protected view: ViewType ) {
-        super(<%-schemaName%>Service, router, route, view, itemName);
+        super(<%-schemaName%>Service, router, route, location, view, itemName);
         <% if (schemaHasDate)  {%>  this.dateFormat = "<%-dateFormat%>";<%}%>
         this.indexFields = [<%for (let field of indexView) {%>'<%-field.fieldName%>',<%}%>];
     }

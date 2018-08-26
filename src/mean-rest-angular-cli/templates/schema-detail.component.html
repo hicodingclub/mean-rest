@@ -1,6 +1,6 @@
 <div class="detail" *ngIf="detail">
 	<div class="action-buttons">
-        <a routerLink="../../list"><i class="fas fa-angle-double-left" title="Back to list"></i></a>
+        <a href="javascript:void(0)" (click)="goBack()"><i class="fas fa-angle-double-left" title="Back"></i></a>
 		<a [routerLink]="['../../edit', detail['_id'] ]" class="btn btn-outline-primary">Edit</a>
 		<a routerLink="." class="btn btn-outline-primary" (click)="onDelete(detail['_id'], null)">Delete</a>
 	</div>

@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
 
 import { <%-SchemaName%>ListComponent } from './<%-schemaName%>-list.component';
@@ -17,8 +18,9 @@ export class <%-SchemaName%>SelectComponent extends <%-SchemaName%>ListComponent
     constructor(
         protected router: Router,
         protected route: ActivatedRoute,
+        protected location: Location,
         protected <%-schemaName%>Service: <%-SchemaName%>Service) {
-            super(<%if (schemaHasRef) {%>null,<%}%> router, route, <%-schemaName%>Service);
+            super(<%if (schemaHasRef) {%>null,<%}%> router, route, location, <%-schemaName%>Service);
             this.majorUi = false;
     }
 

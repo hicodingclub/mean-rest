@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
 
 import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
@@ -20,9 +21,10 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
       <%if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
       protected router: Router,
       protected route: ActivatedRoute,
+      protected location: Location,
       protected <%-schemaName%>Service: <%-SchemaName%>Service) {
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
-                <%-schemaName%>Service, router, route, ViewType.DETAIL);
+                <%-schemaName%>Service, router, route, location, ViewType.DETAIL);
 <% let theView = detailView; %><%_ include schema-construct.component.ts %>
   }
 

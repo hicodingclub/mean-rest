@@ -7,6 +7,9 @@
 		        <span class="icon-search " [hidden]="moreSearchOpened" (click)="toggleMoreSearch()">
 		            <i  class="fas fa-caret-down" title="More"></i>
 		        </span>
+		        <span class="icon-search " [hidden]="!moreSearchOpened" (click)="toggleMoreSearch()">
+		            <i  class="fas fa-caret-up" title="Less"></i>
+		        </span>
 		    </div>
 			<div class="col-1">
 			</div>

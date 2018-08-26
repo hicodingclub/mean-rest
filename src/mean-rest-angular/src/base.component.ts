@@ -1,4 +1,5 @@
 import { Router, ActivatedRoute, ParamMap }    from '@angular/router';
+import { Location } from '@angular/common';
 
 import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -112,6 +113,7 @@ export class BaseComponent implements BaseComponentInterface {
         protected service: BaseService,
         protected router: Router,
         protected route: ActivatedRoute,
+        protected location: Location,
         protected view: ViewType,
         protected itemName: string) {
         this.ItemName = itemName.charAt(0).toUpperCase() + itemName.substr(1);
@@ -218,6 +220,11 @@ export class BaseComponent implements BaseComponentInterface {
     protected onGotoPage(p:number):void {
         if (p > this.total_pages || p < 1) return;
         this.routeToPage(p)
+    }
+    
+    protected goBack() {
+        // window.history.back();
+        this.location.back();
     }
     
     protected stringify(detail:any):string {

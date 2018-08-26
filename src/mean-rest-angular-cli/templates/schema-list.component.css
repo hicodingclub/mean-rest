@@ -60,9 +60,12 @@ margin-left: -25px;
   cursor: pointer;
 }
 .icon-search {
+	
   z-index: 1;
   pointer-events: auto;
+  cursor: pointer;
   margin-left: 20px;
+  padding-top: 10px;
 }
 
 .select-model {
