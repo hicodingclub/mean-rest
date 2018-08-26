@@ -424,6 +424,7 @@ export class BaseComponent implements BaseComponentInterface {
         this.putToStorage("searchText", this.searchText);
         this.putToStorage("page", null);//start from 1st page
         this.putToStorage("searchMoreDetail", this.searchMoreDetail);
+        this.putToStorage("detail", this.detail);
 
         if (this.majorUi) {
             //update the URL
@@ -440,20 +441,8 @@ export class BaseComponent implements BaseComponentInterface {
         //Now let's reload the search condition to UI
         this.searchText = this.getFromStorage("searchText");
         this.searchMoreDetail = this.getFromStorage("searchMoreDetail");
-        let searchContext = this.getFromStorage("searchContext");
-        let _detail = {};
-        if (searchContext && searchContext['$and']) {
-            for (let context of searchContext['$and']) {
-                if ('$and' in context) {
-                    for (let item of context['$and']) {
-                        for (let p in item) {
-                            _detail[p] = item[p];
-                        }
-                    }
-                }
-            }
-        }
-        this.detail = this.formatDetail(_detail)
+        let detail = this.getFromStorage("detail");
+        if (detail) this.detail = detail;
     }
     
     protected populateList():void {
