@@ -6,7 +6,7 @@
           this.stringFields.push('<%-fn%>');<%}}%>
 <%_ let refObjects = [];
     for (let field of theView) { 
-        if (field.type === "ObjectId") refObjects.push(field.fieldName);
+        if (field.type === "ObjectId"){ refObjects.push(field.fieldName);}
     }
     if (refObjects.length > 0) {%>
           this.referenceFields = [<%for (let fnm of refObjects) {%>'<%-fnm%>',<%}%>];<%}%>

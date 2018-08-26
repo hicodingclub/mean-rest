@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
 
 import { <%-SchemaName%>ListComponent } from './<%-schemaName%>-list.component';
-import { <%-SchemaName%>Service } from '../person.service';
+import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
 @Component({
   selector: 'app-<%-schemaName%>-select',
