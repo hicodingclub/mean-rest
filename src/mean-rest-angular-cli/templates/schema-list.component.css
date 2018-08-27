@@ -103,6 +103,12 @@ table {
     word-wrap: break-word;
 }
 
+.highlighted-row {
+	
+background-color: rgba(0, 0, 0, .05)
+}
+
+
 tr th:first-child{
     width:8%;
     white-space:nowrap;

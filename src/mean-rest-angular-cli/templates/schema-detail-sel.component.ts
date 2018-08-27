@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
 
@@ -15,6 +15,9 @@ export class <%-SchemaName%>DetailSelComponent extends <%-SchemaName%>DetailComp
     @Input() inputData;
     @Output() outputData;
     done = new EventEmitter<boolean>();
+    
+    @ViewChild('<%-ModuleName%>Modal') protected focusEl:ElementRef;
+
     constructor(
         protected router: Router,
         protected route: ActivatedRoute,

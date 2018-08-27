@@ -78,6 +78,7 @@ export class BaseComponent implements BaseComponentInterface {
 
     //For list and pagination
     protected list:any[] = [];
+    protected currentNumInList;
     
     protected majorUi = true;
     
@@ -660,6 +661,7 @@ export class BaseComponent implements BaseComponentInterface {
         }
         
         let componentInstance = <BaseComponentInterface>componentRef.instance;
+        componentInstance.setFocus();
  
         this.componentSubscription = componentInstance.done.subscribe( (val) => {
             if (val) {
@@ -694,7 +696,8 @@ export class BaseComponent implements BaseComponentInterface {
 
         let componentInstance = <BaseComponentInterface>componentRef.instance;
         componentInstance.inputData = id;
-        
+        componentInstance.setFocus();
+       
         componentInstance.done.subscribe( (val) => {
            if (val) {
                componentInstance.done.unsubscribe();
@@ -719,6 +722,11 @@ export class BaseComponent implements BaseComponentInterface {
     public inputData;
     public outputData;
     public done:any;
+    protected focusEl; //ElementRef
+    setFocus() {
+        if (this.focusEl)
+            this.focusEl.nativeElement.focus();
+    }
     uiCloseModal() {
         this.outputData = null;
         this.done.emit(true);
@@ -728,6 +736,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
 
     selectItemSelected(num:number) {
+        this.currentNumInList = num;
         let detail = this.list[num];
         this.outputData = {action: "selected", 
                             value: {"_id": detail["_id"], "value": this.stringify(detail)}
@@ -744,6 +753,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
 
     selectViewDetail(num:number) {
+        this.currentNumInList = num;
         let detail = this.list[num];
         this.outputData = {action: "view", 
                             value: detail["_id"]
