@@ -4,5 +4,8 @@ npm install
 npm run build
   A /lib directory is generated with the ts files compiled to .js files
 
+npm run package
+  A /dist directroy is generated. This uses ng-packagr to build the angular packages
+
 npm publish
   This will publish the package.json and /lib/*.* to npm
