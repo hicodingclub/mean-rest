@@ -32,7 +32,7 @@ var _exit = process.exit
 // Re-assign process.exit because of commander
 process.exit = exit
 
-var views_collection = {}; //views in [schema, briefView, detailView, CreateView, EditView, SearchView] format
+var views_collection = {}; //views in [schema, briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 var model_collection = {};
 
 var basedirFile = function(relativePath) {
@@ -100,6 +100,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 	let view = [];
 	let hasDate = false;
 	let hasRef = false;
+	let hasEditor = false;
 	viewDef.forEach((item) => {
 		if (item in schema.paths) {
 			let validatorArray;
@@ -114,6 +115,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 			let maxlength, minlength;
 			let enumValues;
 			let ref, Ref;
+			let editor = false;
 			switch(type) {
 				case "SchemaString":
 					jstype = "string";
@@ -126,6 +128,10 @@ var generateViewPicture = function(viewStr, schema, validators) {
 							if (val.type == 'minlength' && typeof val.minlength === 'number') minlength = val.minlength;
 							if (val.type == 'enum' && Array.isArray(val.enumValues) && val.enumValues.length > 0) enumValues = val.enumValues;
 						});
+					if (schema.paths[item].options.editor == true) {
+						editor = true;
+						hasEditor = true;
+					}					
 					break;
 				case "SchemaBoolean":
 					jstype = "boolean";
@@ -160,6 +166,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 					 jstype: jstype,
 					 ref: ref,
 					 Ref: Ref,
+					 editor: editor,
 					 //TODO: required could be a function
 					 required: schema.paths[item].originalRequiredValue === true? true:false,
 					 defaultValue: defaultValue,
@@ -173,7 +180,7 @@ var generateViewPicture = function(viewStr, schema, validators) {
 			);
 		}
 	});
-	return [view, hasDate, hasRef];
+	return [view, hasDate, hasRef, hasEditor];
 }
 
 // CLI
@@ -465,17 +472,19 @@ function main() {
 		}
 		
 	});
-	
+	//briefView, detailView, CreateView, EditView, SearchView, indexView]
 	let [briefView, hasDate1, hasRef1] = generateViewPicture(views[0], mongooseSchema, validators);
 	let [detailView, hasDate2, hasRef2] = generateViewPicture(views[1], mongooseSchema, validators);
-	let [createView, hasDate3, hasRef3] = generateViewPicture(views[2], mongooseSchema, validators);
-	let [editView, hasDate4, hasRef4] = generateViewPicture(views[3], mongooseSchema, validators);
+	let [createView, hasDate3, hasRef3, hasEditor3] = generateViewPicture(views[2], mongooseSchema, validators);
+	let [editView, hasDate4, hasRef4, hasEditor4] = generateViewPicture(views[3], mongooseSchema, validators);
 	let [searchView, hasDate5, hasRef5] = generateViewPicture(views[4], mongooseSchema, validators);
 	let [indexView, hasDate6, hasRef6] = generateViewPicture(views[5], mongooseSchema, validators);
 	let schemaHasDate = hasDate1 || hasDate2 || hasDate3 || hasDate4 || hasDate5 || hasDate6;
 	let schemaHasRef = hasRef1 || hasRef3 || hasRef4;
+	let schemaHasEditor = hasEditor3 || hasEditor4;
 	if (schemaHasDate) hasDate = true;
 	if (schemaHasRef) hasRef = true;
+	if (schemaHasEditor) hasEditor = true;
 	
 	let compositeEditView = editView.slice();
 	let editFields = editView.map( x=> x.fieldName);
@@ -515,6 +524,7 @@ function main() {
 		dateFormat: dateFormat,
 		schemaHasDate: schemaHasDate,
 		schemaHasRef: schemaHasRef,
+		schemaHasEditor: schemaHasEditor,
 		schemaHasValidator: schemaHasValidator,
 		
 		FIELD_NUMBER_FOR_SELECT_VIEW: FIELD_NUMBER_FOR_SELECT_VIEW
@@ -540,6 +550,7 @@ function main() {
 	referenceFields: referenceObjFields,
 	hasDate: hasDate,
 	hasRef: hasRef,
+	hasEditor: hasEditor,
 	dateFormat: dateFormat,
   }
   //console.log(renderObj.validatorFields);
@@ -556,6 +567,8 @@ function main() {
 	let schemaObj = renderObj.schemaMap[key];
 	let componentDir = schemaObj.componentDir;
 	let schemaName = schemaObj.schemaName;
+	if (referenceFields.indexOf(schemaName) != -1) schemaObj.referred = true;
+	else schemaObj.referred = false;
 	//schemaObj.schemaMap = schemaMap;
 
 	generateSourceFile(schemaName, templates.schemaBaseService, schemaObj, componentDir);

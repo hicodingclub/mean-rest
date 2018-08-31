@@ -16,8 +16,6 @@ export class <%-SchemaName%>SelectComponent extends <%-SchemaName%>ListComponent
     @Output() outputData;
     done = new EventEmitter<boolean>();
     
-    @ViewChild('<%-ModuleName%>Modal') protected focusEl:ElementRef;
-
     constructor(
         protected router: Router,
         protected route: ActivatedRoute,

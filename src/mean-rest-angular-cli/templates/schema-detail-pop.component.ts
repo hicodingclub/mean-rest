@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter, Output, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, AfterViewInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
 
@@ -16,8 +16,6 @@ export class <%-SchemaName%>DetailPopComponent extends <%-SchemaName%>DetailComp
     @Output() outputData;
     done = new EventEmitter<boolean>();
     
-    @ViewChild('<%-ModuleName%>Modal') protected focusEl:ElementRef;
-
     constructor(
         protected router: Router,
         protected route: ActivatedRoute,

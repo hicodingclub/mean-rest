@@ -24,6 +24,18 @@ fieldset > .form-control, .input-group, .form-check {
 	margin-top:  0.75rem
 }
 
+.action-buttons-center {
+	width: 100%;
+	float:right; 
+	text-align: center;
+	margin-bottom: 1.25rem;
+}
+.action-buttons-center .btn {
+	display: inline-block;
+	margin-left: 2.5rem;
+}
+
+
 .card-title {
 	text-align: center;
 }

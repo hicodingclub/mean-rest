@@ -1,4 +1,4 @@
-    <%_ if (field.type === "SchemaString") { %>
+    <%_ if (field.type === "SchemaString" && !field.editor) { %>
 	      <fieldset class="form-group">
 	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%></label>
         <%_ if (field.enumValues) { %>
@@ -56,6 +56,35 @@
                 <%-Fn%> must be at least <%-field.minlength%> characters long.
   	          </div>
 	        </div><%}%>        
+	      </fieldset>
+    <%_ } else if (field.type === "SchemaString" && field.editor) { %>
+	      <fieldset class="form-group">
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%></label>
+    	    <div mra-richtext-select="<%-sn%>Edit<%-Fn%>"></div>
+		  	<div class="action-buttons" style="margin-top: 10px;">
+				<button type="button" class="btn btn-outline-success" (click)="onEdtiorPreview('<%-sn%>Edit<%-Fn%>')">Preview</button>
+		    </div>
+		    
+	        <div [hidden]="<%-sn%>Edit<%-Fn%>.valid"
+     			class="alert alert-danger">
+	          <%_if (field.required) {%>
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.required">
+    	        <%-Fn%> is required.
+  	          </div><%}%>
+		      <%_if (field.validators) {%>
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>">
+                {{<%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>}}
+  	          </div><%}%> 
+	          <%_if (typeof field.maxlength === 'number') {%>
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.maxlength">
+                <%-Fn%> must be at most <%-field.maxlength%> characters long.
+  	          </div><%}%>
+	          <%_if (typeof field.minlength === 'number') {%>
+ 	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.minlength">
+                <%-Fn%> must be at least <%-field.minlength%> characters long.
+	          </div><%}%>        
+	        </div>
+		    
 	      </fieldset>
     <%_ } else if (field.type === "SchemaBoolean") { %>
 	      <fieldset class="form-group">

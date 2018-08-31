@@ -71,7 +71,7 @@ margin-left: -25px;
 .select-model {
     display: block; 
     position: fixed; 
-    z-index: 100; 
+    z-index: 1000; 
     padding-top: 100px; 
     left: 0;
     top: 0;

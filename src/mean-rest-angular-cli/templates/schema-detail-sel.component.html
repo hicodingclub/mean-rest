@@ -23,7 +23,7 @@
 	  <div class="card-body">
 	    <h4 class="card-title">{{ItemName}} Detail</h4>    
 		<div class="card-text">
-<%_ for (let field of detailView){ let fn = field.fieldName, ft = field.type; let ref_link = "../../../"%>
+<%_ let view = 'detail'; for (let field of detailView){ let fn = field.fieldName, ft = field.type; let ref_link = "../../../"%>
 			<label><b><%-fn%>:</b></label>
 			<span><% include schema-display.field.html %>
 			</span><br><%_}%>

@@ -6,11 +6,10 @@ import { FormsModule } from '@angular/forms';
 import { NgbModule, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap'; 
 import { MraNgbDateFormatterService } from './<%-moduleName%>.directive';
 <%}%>
-import { MinNumber, MaxNumber } from 'mean-rest-angular';
+import { MraModule } from 'mean-rest-angular';
 
 import { <%-ModuleName%>RoutingModule } from './<%-moduleName%>-routing.module';
 import { <%-ModuleName%>Component } from './<%-moduleName%>.component';
-
 <% if (hasRef) {%>import { <%-ModuleName%>RefSelectDirective } from './<%-moduleName%>.component';<%}%>
 
 //Import components for each schema
@@ -34,13 +33,11 @@ import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validat
     FormsModule,
     <%_ if (hasDate) {%>    
     NgbModule,<%}%>
+    MraModule,
     
     <%-ModuleName%>RoutingModule
   ],
   declarations: [
-    MinNumber,
-    MaxNumber,
-        
     <%-ModuleName%>Component,
     <% if (hasRef) {%><%-ModuleName%>RefSelectDirective,<%}%>
   <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>

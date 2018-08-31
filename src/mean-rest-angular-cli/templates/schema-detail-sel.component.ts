@@ -16,8 +16,6 @@ export class <%-SchemaName%>DetailSelComponent extends <%-SchemaName%>DetailComp
     @Output() outputData;
     done = new EventEmitter<boolean>();
     
-    @ViewChild('<%-ModuleName%>Modal') protected focusEl:ElementRef;
-
     constructor(
         protected router: Router,
         protected route: ActivatedRoute,

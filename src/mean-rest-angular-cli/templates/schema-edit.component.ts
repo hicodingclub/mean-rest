@@ -21,8 +21,11 @@ export class <%-SchemaName%>Directive<%-field.FieldName%> implements Validator {
   ];
   validate(control: AbstractControl): ValidationErrors | null {
     let value = control.value;
-    let result = true;
+    return this.validateValue(value);
+  }
+  validateValue(value:any): ValidationErrors | null {
     //only compare when input presents
+    let result = true;
     if (typeof value == '<%-field.jstype%>') {
         for (let idx = 0; idx < this.validators.length; idx ++) {
             let obj = this.validators[idx];
@@ -41,6 +44,9 @@ export class <%-SchemaName%>Directive<%-field.FieldName%> implements Validator {
 
 <%if (schemaHasRef) {%>
 import { ComponentFactoryResolver } from '@angular/core';<%}%>
+<%if (schemaHasEditor) {%>
+import { QueryList, ViewChildren } from '@angular/core';
+import { MraRichTextSelectDirective } from 'mean-rest-angular';<%}%>
 
 @Component({
   selector: 'app-<%-schemaName%>-edit',
@@ -48,10 +54,17 @@ import { ComponentFactoryResolver } from '@angular/core';<%}%>
   styleUrls: ['./<%-schemaName%>-edit.component.css']
 })
 export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component implements OnInit {        
-  @Input() 
-  protected id:string;
-  private action:string;
-  constructor(
+    @Input() 
+    protected id:string;
+    private action:string;
+<%if (schemaHasEditor) {%>
+    @ViewChildren(MraRichTextSelectDirective) textEditors: QueryList<MraRichTextSelectDirective>;
+  <% for (let field of compositeEditView) { let fn=field.fieldName, Fn=field.FieldName; 
+    if (field.type === "SchemaString" && field.editor) { %>
+    private <%-schemaName%>Edit<%-Fn%> = {valid: true};
+<% }}%><%}%>
+        
+    constructor(
       <%if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
       protected router: Router,
       protected route: ActivatedRoute,
@@ -60,6 +73,17 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
           super( <%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
                  <%-schemaName%>Service, router, route, location, ViewType.LIST);
 <% let theView = compositeEditView; %><%_ include schema-construct.component.ts %>
+<% for (let field of compositeEditView) { let fn=field.fieldName, Fn=field.FieldName; 
+    if (field.type === "SchemaString" && field.editor) { %>
+          this.textEditorMap['<%-schemaName%>Edit<%-Fn%>'] = {
+            required: <%if (field.required) {%>true <%}else{%> false <%}%>,
+            <%if (typeof field.maxlength === 'number') {%>maxlength: <%-field.maxlength%>,<%}%>
+            <%if (typeof field.minlength === 'number') {%>minlength: <%-field.minlength%>,<%}%>
+            <%if (field.validators) {%>validators: new <%-SchemaName%>Directive<%-field.FieldName%>(), <%}%>
+            fieldState: this.<%-schemaName%>Edit<%-Fn%>,
+            fieldName: '<%-fn%>'
+          };<% }}%>
+          
           let detail = {};
           this.detail = this.formatDetail(detail);
     }
@@ -79,4 +103,5 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
             this.detail = this.formatDetail(detail);
         }
     }
+
 }

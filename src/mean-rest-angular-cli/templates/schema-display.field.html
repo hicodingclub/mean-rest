@@ -2,4 +2,7 @@
     %><a [routerLink]="detail['<%-fn%>']&&detail['<%-fn%>']['_id']?['<%-ref_link%><%-field.ref%>/detail', detail['<%-fn%>']['_id'] ]:['.']"> <%_}%>
 	            	    {{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}} <%if (ref_link){%></a><%_}%><%_
 	            	}else if(ft == 'SchemaDate') {%>  {{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}} <%_
+	            	}else if(ft === "SchemaString" && field.editor && view == 'detail') {%> 
+	            	 <div mra-richtext-show="<%-schemaName%>Detail<%-field.FieldName%>"></div>
+	            	{{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}} <%_
 	            	}else{%>  {{detail['<%-fn%>']}}<%}%>

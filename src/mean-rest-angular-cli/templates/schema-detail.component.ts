@@ -7,6 +7,9 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
 <%if (schemaHasRef) {%>
 import { ComponentFactoryResolver } from '@angular/core';<%}%>
+<%if (schemaHasEditor) {%>
+import { QueryList, ViewChildren } from '@angular/core';
+import { MraRichTextShowDirective } from 'mean-rest-angular';<%}%>
 
 @Component({
   selector: 'app-<%-schemaName%>-detail',
@@ -16,6 +19,8 @@ import { ComponentFactoryResolver } from '@angular/core';<%}%>
 export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component implements OnInit {
   @Input() 
   protected id:string;
+<%if (schemaHasEditor) {%>
+  @ViewChildren(MraRichTextShowDirective) textEditors: QueryList<MraRichTextShowDirective>;<%}%>
 
   constructor(
       <%if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
@@ -26,6 +31,11 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
                 <%-schemaName%>Service, router, route, location, ViewType.DETAIL);
 <% let theView = detailView; %><%_ include schema-construct.component.ts %>
+<% for (let field of detailView) { let fn=field.fieldName, Fn=field.FieldName; 
+    if (field.type === "SchemaString" && field.editor) { %>
+          this.textEditorMap['<%-schemaName%>Detail<%-Fn%>'] = {
+            fieldName: '<%-fn%>'
+          };<% }}%>
   }
 
   ngOnInit() {
