@@ -365,6 +365,7 @@ export class BaseComponent implements BaseComponentInterface {
       this.service.getDetail(this.id).subscribe(
         detail => { 
             this.detail = this.formatDetail(detail);
+            this.extraFieldsUnload();//unload data to text editors, etc
         },
         this.onServiceError
       );
@@ -579,6 +580,8 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     public onSubmit():void {
+      if (!this.extraFieldsLoad()) return; //error from other non ngModel fields;
+        
       this._detail = this.deFormatDetail(this.detail);
       if (this.id) {
           this.service.updateOne(this.id, this._detail).subscribe(
@@ -641,7 +644,7 @@ export class BaseComponent implements BaseComponentInterface {
     
     //**** For parent component of modal UI
     protected refSelectDirective:any;
-    protected selectComponents:any;
+    protected selectComponents:any; //{fieldName: component-type} format
     protected componentFactoryResolver:any;
     private componentSubscription
     public onRefSelect(fieldName:string) {
@@ -785,5 +788,78 @@ export class BaseComponent implements BaseComponentInterface {
         let detail = {};
         this.detail = this.formatDetail(detail);
         this.searchList();
+    }
+    
+    //This is for editor
+    protected textEditors:any; //type of QueryList<T>
+    protected textEditorMap:any = {};
+    
+    protected extraFieldsUnload() {//from server
+        if (this.textEditors) {
+            this.textEditors.forEach(editor=>{
+                
+                let fieldName = editor.name;
+                let validatorObj = this.textEditorMap[fieldName];
+                if (!validatorObj) return;
+                
+                let content = this.detail[validatorObj.fieldName]
+                if (content) editor.setContent(content);
+            });
+        }
+    }
+        
+    protected extraFieldsLoad() {//to server
+        let result = true;
+        if (this.textEditors) {
+            let array = this.textEditors.toArray();
+            for (let editor of array) {
+                let fieldName = editor.name;
+                let [content,text] = editor.getContent();
+                let validatorObj = this.textEditorMap[fieldName];
+                if (!validatorObj) continue;
+                
+                let fieldState = validatorObj.fieldState;
+                fieldState.errors = {};
+                if (!content) {
+                    if (validatorObj.required) {
+                        fieldState.errors.required = true;
+                        fieldState.valid = false;
+                        result = false;
+                    }
+                    continue;
+                }
+                if ('minlength' in validatorObj && text.length < validatorObj.minlength) {
+                    fieldState.valid = false;
+                    fieldState.errors.minlength = true;
+                    result = false;
+                    continue;
+                }
+                if ('maxlength' in validatorObj && text.length > validatorObj.maxlength) {
+                    fieldState.valid = false;
+                    fieldState.errors.maxlength = true;
+                    result = false;
+                    continue;
+                }
+                if ('validators' in validatorObj) {
+                    let error = validatorObj['validators'].validateValue(text)
+                    if (error) {
+                        fieldState.valid = false;
+                        fieldState.errors = error;
+                        result = false;
+                        continue;
+                    }    
+                }
+                fieldState.valid = true;
+                fieldState.errors = undefined;
+                this.detail[validatorObj.fieldName] = content;
+            }
+        }
+        return result;
+    }
+    onEdtiorPreview(editorName:string) {
+        if (this.textEditors)
+            this.textEditors.forEach( (editor) => {
+                if (editor.name == editorName) editor.preview();
+            });
     }
 }
