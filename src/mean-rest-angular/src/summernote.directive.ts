@@ -19,14 +19,14 @@ var fullscreenCss = `
     background-color: #fff;
 }
 
-.action-buttons {
+.editor-action-buttons {
     width: 100%;
     float:right; 
     text-align: right;
     margin-bottom: 1.25rem;
     margin-top: 2.5rem;
 }
-.action-buttons .btn {
+.editor-action-buttons .btn {
     display: inline-block;
     margin-left: 2.5rem;
 }
@@ -39,7 +39,7 @@ var fullscreenHtml = `
 <div class="container">
   <div class="row">
     <div class="col">
-      <div class="action-buttons">
+      <div class="editor-action-buttons">
             <button id="mraeditorfullscreenClose" class="btn btn-outline-success">Close</button>
       </div>
     </div>

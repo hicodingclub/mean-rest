@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, EventEmitter, Output, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
+import { MraCommonService } from 'mean-rest-angular';
 
 import { <%-SchemaName%>DetailComponent } from './<%-schemaName%>-detail.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
@@ -17,11 +18,12 @@ export class <%-SchemaName%>DetailSelComponent extends <%-SchemaName%>DetailComp
     done = new EventEmitter<boolean>();
     
     constructor(
+        protected <%-schemaName%>Service: <%-SchemaName%>Service,
+        protected commonService: MraCommonService,
         protected router: Router,
         protected route: ActivatedRoute,
-       protected location: Location,
-       protected <%-schemaName%>Service: <%-SchemaName%>Service) {
-            super(<%if (schemaHasRef) {%>null,<%}%>router, route, location, <%-schemaName%>Service);
+       protected location: Location) {
+            super(<%if (schemaHasRef) {%>null, <%}%><%-schemaName%>Service, commonService, router, route, location);
             this.majorUi = false;
     }
 

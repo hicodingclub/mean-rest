@@ -16,4 +16,16 @@
 		</div>
 	  </div>
 	</div>
+<% if (referred) {%>
+	<br/>
+	<hr/>	
+	
+	<ul class="nav nav-tabs">
+	  <% for (let ref of referredBy) {%>
+	  <li class="nav-item">
+	    <a [routerLink]="['./<%-ref[0]%>/list']"
+	        class="nav-link" routerLinkActive="active"><%-ref[0]%></a>
+	  </li><%}%>
+    </ul><%}%>
+    <router-outlet></router-outlet>
 </div>

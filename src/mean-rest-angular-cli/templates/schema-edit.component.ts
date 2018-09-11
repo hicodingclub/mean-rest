@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Directive } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
+import { MraCommonService } from 'mean-rest-angular';
 
 import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
@@ -66,12 +67,13 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
         
     constructor(
       <%if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
+      protected <%-schemaName%>Service: <%-SchemaName%>Service,
+      protected commonService: MraCommonService,
       protected router: Router,
       protected route: ActivatedRoute,
-      protected location: Location,
-      protected <%-schemaName%>Service: <%-SchemaName%>Service) {
+      protected location: Location) {
           super( <%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
-                 <%-schemaName%>Service, router, route, location, ViewType.LIST);
+                 <%-schemaName%>Service, commonService, router, route, location, ViewType.LIST);
 <% let theView = compositeEditView; %><%_ include schema-construct.component.ts %>
 <% for (let field of compositeEditView) { let fn=field.fieldName, Fn=field.FieldName; 
     if (field.type === "SchemaString" && field.editor) { %>

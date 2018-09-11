@@ -6,10 +6,11 @@
           this.stringFields.push('<%-fn%>');<%}}%>
 <%_ let refObjects = [];
     for (let field of theView) { 
-        if (field.type === "ObjectId"){ refObjects.push(field.fieldName);}
+        if (field.type === "ObjectId"){ refObjects.push([field.fieldName, field.ref]);}
     }
     if (refObjects.length > 0) {%>
-          this.referenceFields = [<%for (let fnm of refObjects) {%>'<%-fnm%>',<%}%>];<%}%>
+          this.referenceFields = [<%for (let itm of refObjects) {%>'<%-itm[0]%>',<%}%>];
+          this.referenceFieldsMap = {<%for (let itm of refObjects) {%>'<%-itm[0]%>': '<%-itm[1]%>',<%}%>};<%}%>
 <%_ let dateObjects = [];
     for (let field of theView) { 
         if (field.type === "SchemaDate") dateObjects.push(field.fieldName);

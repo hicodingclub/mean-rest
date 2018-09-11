@@ -8,11 +8,28 @@ import { <%-ModuleName%>Component } from './blogsys.component';
 import { <%-schm.SchemaName%>ListComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list.component';
 import { <%-schm.SchemaName%>DetailComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail.component';
 import { <%-schm.SchemaName%>EditComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-edit/<%-schm.schemaName%>-edit.component';
+    <%if (schm.schemaHasRef) {%>
+import { <%-schm.SchemaName%>ListSubComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-sub.component';
+<%}%>
 <%_ }%>
+
+<%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; if (schm.schemaHasRef) {%>
+const <%-schm.schemaName%>SubPath = [
+    {path: 'list', component: <%-schm.SchemaName%>ListSubComponent},
+    {path: 'detail/:id', component: <%-schm.SchemaName%>DetailComponent}
+];
+<%}} %>
+<%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; if (schm.referred) {%>
+const <%-schm.schemaName%>DetailPath = [
+    <%_for (let item of schm.referredBy) {%>
+    {path: '<%-item[0]%>', children: <%-item[0]%>SubPath, 
+        data: {"level": 2, "item": "<%-item[0]%>"}},<%_ } %>
+];
+<%}} %>
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
 const <%-schm.schemaName%>RoutingPath = [
     {path: 'list', component: <%-schm.SchemaName%>ListComponent},
-    {path: 'detail/:id', component: <%-schm.SchemaName%>DetailComponent},
+    {path: 'detail/:id', component: <%-schm.SchemaName%>DetailComponent<%_if (schm.referred) {%>, children: <%-schm.schemaName%>DetailPath<%}%>},
     {path: 'edit/:id', component: <%-schm.SchemaName%>EditComponent},
     {path: 'new', component: <%-schm.SchemaName%>EditComponent},
     {path: '**', redirectTo: 'list', pathMatch: 'full'}
@@ -24,7 +41,8 @@ const routes: Routes = [
     children: [ 
                 {path: '',  redirectTo: '<%-defaultSchema%>', pathMatch: 'full'},
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
-                {path: "<%-schm.schemaName%>",  children: <%-schm.schemaName%>RoutingPath},<%_
+                {path: "<%-schm.schemaName%>",  children: <%-schm.schemaName%>RoutingPath, 
+                    data: {"level": 1, "item": "<%-schm.schemaName%>"}},<%_
  }%>
     ]
   }

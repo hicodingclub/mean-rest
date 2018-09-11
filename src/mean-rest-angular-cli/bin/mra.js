@@ -63,6 +63,9 @@ var templates = {
 	schemaListComponentCss: ["../templates/schema-list.component.css", "list.component.css", "list component css file"],
 	schemaSelectComponent: ["../templates/schema-select.component.ts", "select.component.ts", "select component file"],
 	schemaSelectComponentHtml: ["../templates/schema-select.component.html", "select.component.html", "select component html file"],
+	schemaListSubComponent: ["../templates/schema-list-sub.component.ts", "list-sub.component.ts", "list-sub component file"],
+	schemaListSubComponentHtml: ["../templates/schema-list-sub.component.html", "list-sub.component.html", "list-sub component html file"],
+	
 	schemaDetailComponent: ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file"],
 	schemaDetailComponentHtml: ["../templates/schema-detail.component.html", "detail.component.html", "detail component html file"],
 	schemaDetailComponentCss: ["../templates/schema-detail.component.css", "detail.component.css", "detail component css file"],
@@ -421,6 +424,7 @@ function main() {
   let schemaMap = {};
   let validatorFields = [];
   let referenceFields = [];
+  let referenceMap = [];
   let defaultSchema;
   let hasDate = false;
   let hasRef = false;
@@ -504,6 +508,13 @@ function main() {
 		}
 		if (x.ref) {
 			referenceFields.push(x.ref);
+			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref]))
+		}
+	});
+	detailView.forEach(function(x){
+		if (x.ref) {
+			referenceFields.push(x.ref);
+			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref]))
 		}
 	});
 	
@@ -540,6 +551,12 @@ function main() {
   let referenceObjFields = referenceFields.map((value) => { 
 	    return {ref: value, Ref: capitalizeFirst(value)};
 	  });
+  referenceMap = referenceMap.filter((value, index, self) => { 
+	    return self.indexOf(value) === index;
+	  });//de-duplicate
+  referenceMap = referenceMap.map((value) => { 
+	    return JSON.parse(value); //restore the array: [schemaName, SchemaName, x.fieldName, x.ref, x.Ref]
+	  });
 
   let renderObj = {
 	moduleName: moduleName,
@@ -556,6 +573,15 @@ function main() {
   //console.log(renderObj.validatorFields);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
 
+  for (let key in schemaMap) {
+	let schemaObj = renderObj.schemaMap[key];
+	let schemaName = schemaObj.schemaName;
+	
+	if (referenceFields.indexOf(schemaName) != -1) schemaObj.referred = true;
+	else schemaObj.referred = false;
+	schemaObj.referredBy = referenceMap.filter(x=>x[3]==schemaName);//Each item has [who, Who, which field, refer to me, Me] format
+  }
+  
   generateSourceFile(moduleName, templates.mainModule, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainComponent, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainComponentHtml, renderObj, outputDir);
@@ -567,10 +593,7 @@ function main() {
 	let schemaObj = renderObj.schemaMap[key];
 	let componentDir = schemaObj.componentDir;
 	let schemaName = schemaObj.schemaName;
-	if (referenceFields.indexOf(schemaName) != -1) schemaObj.referred = true;
-	else schemaObj.referred = false;
-	//schemaObj.schemaMap = schemaMap;
-
+		
 	generateSourceFile(schemaName, templates.schemaBaseService, schemaObj, componentDir);
 	generateSourceFile(schemaName, templates.schemaService, schemaObj, componentDir);
 	generateSourceFile(schemaName, templates.schemaComponent, schemaObj, componentDir);
@@ -583,6 +606,10 @@ function main() {
 		generateSourceFile(schemaName, templates.schemaSelectComponent, schemaObj, subComponentDir);
 		generateSourceFile(schemaName, templates.schemaSelectComponentHtml, schemaObj, subComponentDir);
     }
+	if (schemaObj.schemaHasRef) {
+		generateSourceFile(schemaName, templates.schemaListSubComponent, schemaObj, subComponentDir);
+		generateSourceFile(schemaName, templates.schemaListSubComponentHtml, schemaObj, subComponentDir);
+	}
 	
 	subComponentDir = path.join(componentDir, schemaName+'-detail');
 	generateSourceFile(schemaName, templates.schemaDetailComponent, schemaObj, subComponentDir);

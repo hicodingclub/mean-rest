@@ -1,6 +1,7 @@
 export { ViewType, BaseComponent } from './base.component';
 export { BaseComponentInterface } from './base.interface';
 export { ServiceError, BaseService } from './base.service';
+export { MraCommonService } from './common.service';
 
 export { MraModule } from './mra.module';
 export { MaxNumber, MinNumber } from './common.directives';

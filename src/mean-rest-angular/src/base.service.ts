@@ -37,7 +37,7 @@ export class BaseService {
         err
       );
     }
-    
+
     protected formatDetail(detail:any): any {
         return detail;
     }

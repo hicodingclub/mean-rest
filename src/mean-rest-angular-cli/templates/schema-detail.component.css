@@ -30,6 +30,14 @@
 	margin-left: 1rem;
 }
 
+
+.referred-by-links {
+	text-align: left;
+}
+.referred-by-links a {
+	margin-left: 1rem;
+}
+
 .select-model {
     display: block; 
     position: fixed; 

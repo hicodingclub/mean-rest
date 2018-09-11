@@ -9,8 +9,8 @@ import { SnackBarConfig, SnackBar} from './util.snackbar';
 import { ErrorToastConfig, ErrorToast} from './util.errortoast';
 
 import { BaseService, ServiceError } from './base.service';
+import { MraCommonService } from './common.service';
 import { BaseComponentInterface } from './base.interface';
-
 
 function equalTwoSearchContextArrays (arr1, arr2) {
     if (!arr1) arr1 = [];
@@ -104,23 +104,62 @@ export class BaseComponent implements BaseComponentInterface {
     protected enums:any = {};
     protected stringFields = [];
     protected referenceFields = [];
+    protected referenceFieldsMap = {};
     protected dateFields = [];
     protected indexFields = [];
     protected dateFormat = "MM/DD/YYYY";
 
     protected ItemName: string;
+    //protected itemName: string; //defined in constuctor
+    protected parentItem: string;
 
     constructor(
         protected service: BaseService,
+        protected commonService: MraCommonService,      
         protected router: Router,
         protected route: ActivatedRoute,
         protected location: Location,
         protected view: ViewType,
         protected itemName: string) {
         this.ItemName = itemName.charAt(0).toUpperCase() + itemName.substr(1);
-        localStorage.removeItem("ngbDateformate");
+        this.parentItem = this.getParentRouteItem();
+        
     }
     
+    protected getParentRouteItem():string {
+        let routeSnapshot = this.route.snapshot;
+        let parentItem;
+        do {
+              if (routeSnapshot.data && routeSnapshot.data.level == 1 ) {
+                parentItem = routeSnapshot.data.item;
+                break;
+              }
+              routeSnapshot = routeSnapshot.parent;
+        } while (routeSnapshot)
+        return parentItem;
+    }
+
+    protected getParentRouteItemId():string {
+        let routeSnapshot = this.route.snapshot;
+        let parentItemId;
+        do {
+              if (routeSnapshot.data && routeSnapshot.data.level == 1 && ('id' in routeSnapshot.params)) {
+                parentItemId = routeSnapshot.params.id;
+                break;
+              }
+              routeSnapshot = routeSnapshot.parent;
+        } while (routeSnapshot)
+        return parentItemId;
+    }
+    protected getParentRouteRefField():string {
+        let mp = this.referenceFieldsMap;
+        for (let prop in mp) {
+            if (mp.hasOwnProperty(prop) && mp[prop] == this.parentItem) {
+                return prop;
+            }
+        }
+    }
+
     protected onServiceError(error:ServiceError):void {
         let errMsg:string;
         let more:string;
@@ -183,18 +222,20 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     private getKey(key:string):string {
-        return this.itemName+this.view+key;
+        let url = this.router.url.split(';')[0].split('?')[0];
+        return url+ ":" + key;
     }
     private putToStorage(key:string, value:any):void {
         if (this.majorUi) {
-            this.service.putToStorage(this.getKey(key), value);
+            //only major UI we want to cache and recover when user comes back
+            this.commonService.putToStorage(this.getKey(key), value);
         } else {
             this.storage[key] = value;
         }
     }
     private getFromStorage(key:string):any {
         if (this.majorUi) {
-            return this.service.getFromStorage(this.getKey(key));
+            return this.commonService.getFromStorage(this.getKey(key));
         } else {
             return this.storage[key];
         }
@@ -242,15 +283,22 @@ export class BaseComponent implements BaseComponentInterface {
         let id, value;
         for (let fnm of this.referenceFields) {
             if (typeof detail[fnm] == 'string') {
-                id = detail[fnm];
-                detail[fnm] = {'_id': id, 'value': fnm};
-            } else if (detail[fnm] && (typeof detail[fnm] == 'object') ) {
+                //assume this is the "_id", let see we have the cached details for this ref from service
+                let refDetail = this.commonService.getFromStorage(detail[fnm]);
+                if (refDetail && (typeof refDetail == 'object')) detail[fnm] = refDetail;
+                else {
+                    id = detail[fnm];
+                    detail[fnm] = {'_id': id};
+                }
+            }
+            if (detail[fnm] && (typeof detail[fnm] == 'object') ) {
                 id = detail[fnm]['_id'];
                 let referIndex = '';
                 for (let k in  detail[fnm]) {
                     if (k != '_id') referIndex += " " + detail[fnm][k];
                 }
-                referIndex = referIndex.replace(/^\s+|\s+$/g, '')
+                referIndex = referIndex.replace(/^\s+|\s+$/g, '');
+                if (referIndex.length >= 20) referIndex = referIndex.substring(0, 20) + "...";
                 detail[fnm] = {'_id': id, 'value': referIndex? referIndex: fnm};
             } else {//not defined
                 detail[fnm] = {'_id': id, 'value': value};
@@ -363,15 +411,17 @@ export class BaseComponent implements BaseComponentInterface {
     
     protected populateDetail(id:string):void {
       this.service.getDetail(this.id).subscribe(
-        detail => { 
+        detail => {
+            let originalDetail = clone(detail);
+            if (detail["_id"]) this.commonService.putToStorage(detail["_id"], originalDetail);//cache it
+            
             this.detail = this.formatDetail(detail);
             this.extraFieldsUnload();//unload data to text editors, etc
         },
         this.onServiceError
       );
     }
-    
-    protected searchList():void {
+    protected processSearchContext() {
         this.moreSearchOpened = false;
         let d = this.detail;
         for (let s of this.stringFields) {
@@ -427,7 +477,9 @@ export class BaseComponent implements BaseComponentInterface {
         this.putToStorage("page", null);//start from 1st page
         this.putToStorage("searchMoreDetail", this.searchMoreDetail);
         this.putToStorage("detail", this.detail);
-
+    }
+    protected searchList():void {
+        this.processSearchContext();
         if (this.majorUi) {
             //update the URL
             let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
@@ -448,6 +500,20 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     protected populateList():void {
+        /*
+        let queryParamMap = this.route.snapshot.queryParamMap;
+        
+        //first let check if there are other search parameters in the url other than page
+        let paramKeys:string[] = queryParamMap.keys;
+        if (paramKeys.length > 0) {//reconstruct the detail, which has the search context
+            let d = {};
+            for (let k of paramKeys) d[k] = queryParamMap.get(k);
+            this.detail = this.formatDetail(d);
+            this.processSearchContext();//reset search to what is provided here            
+        }
+        */
+        
+        //now let's handle page
         let new_page;
         let searchContext, searchText;
         if (this.majorUi) {
