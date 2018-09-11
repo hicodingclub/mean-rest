@@ -13,7 +13,7 @@
 	display: inline-block;
 	margin-left: 2.5rem;
 }
-.action-buttons .fa-angle-double-left {
+.action-buttons .fa-angle-double-left, .fa-list {
 	float: left;
 	display: inline-block;
 	margin-left: 2.5rem;
