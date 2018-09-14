@@ -126,40 +126,6 @@ export class BaseComponent implements BaseComponentInterface {
         
     }
     
-    protected getParentRouteItem():string {
-        let routeSnapshot = this.route.snapshot;
-        let parentItem;
-        do {
-              if (routeSnapshot.data && routeSnapshot.data.level == 1 ) {
-                parentItem = routeSnapshot.data.item;
-                break;
-              }
-              routeSnapshot = routeSnapshot.parent;
-        } while (routeSnapshot)
-        return parentItem;
-    }
-
-    protected getParentRouteItemId():string {
-        let routeSnapshot = this.route.snapshot;
-        let parentItemId;
-        do {
-              if (routeSnapshot.data && routeSnapshot.data.level == 1 && ('id' in routeSnapshot.params)) {
-                parentItemId = routeSnapshot.params.id;
-                break;
-              }
-              routeSnapshot = routeSnapshot.parent;
-        } while (routeSnapshot)
-        return parentItemId;
-    }
-    protected getParentRouteRefField():string {
-        let mp = this.referenceFieldsMap;
-        for (let prop in mp) {
-            if (mp.hasOwnProperty(prop) && mp[prop] == this.parentItem) {
-                return prop;
-            }
-        }
-    }
-
     protected onServiceError(error:ServiceError):void {
         let errMsg:string;
         let more:string;
@@ -550,6 +516,8 @@ export class BaseComponent implements BaseComponentInterface {
         );
     }
     
+    
+    /*UI operations hanlers*/
     public onCheckAllChange():void {
         this.checkedItem = 
              Array.apply(null, Array(this.list.length)).
@@ -682,6 +650,17 @@ export class BaseComponent implements BaseComponentInterface {
       }
     }
     
+    public onDisplayRefClicked(fn:string, detail:any):void {
+        let ref = this.getRefFromField(fn);
+        let d = detail;
+        
+        if (d && d['_id']) this.router.navigate([ref, 'detail', d['_id']], {relativeTo: this.getParentActivatedRouter() });
+    }
+    
+    protected getRefFromField(fn:string):string {
+        return this.referenceFieldsMap[fn];
+    }
+
     public clearValueFromDetail(field:string):void {
         if (!this.detail.hasOwnProperty(field)) return;
         if (typeof this.detail[field] == 'undefined') return;
@@ -838,7 +817,6 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     //Search more in the list view
-        //Search
     protected searchText: string;
     protected searchMoreDetail: any;
     public moreSearchOpened:boolean = false;
@@ -856,7 +834,7 @@ export class BaseComponent implements BaseComponentInterface {
         this.searchList();
     }
     
-    //This is for editor
+    /* This is for editor related */
     protected textEditors:any; //type of QueryList<T>
     protected textEditorMap:any = {};
     
@@ -928,4 +906,53 @@ export class BaseComponent implements BaseComponentInterface {
                 if (editor.name == editorName) editor.preview();
             });
     }
+    
+    /*Parent router related*/
+    protected getParentRouteItem():string {
+        let routeSnapshot = this.route.snapshot;
+        let parentItem;
+        do {
+              if (routeSnapshot.data && routeSnapshot.data.mraLevel == 1 ) {
+                parentItem = routeSnapshot.data.item;
+                break;
+              }
+              routeSnapshot = routeSnapshot.parent;
+        } while (routeSnapshot)
+        return parentItem;
+    }
+
+    protected getParentRouteItemId():string {
+        let routeSnapshot = this.route.snapshot;
+        let parentItemId;
+        do {
+              if (routeSnapshot.data && routeSnapshot.data.mraLevel == 1 && ('id' in routeSnapshot.params)) {
+                parentItemId = routeSnapshot.params.id;
+                break;
+              }
+              routeSnapshot = routeSnapshot.parent;
+        } while (routeSnapshot)
+        return parentItemId;
+    }
+        
+    protected getParentRouteRefField():string {
+        let mp = this.referenceFieldsMap;
+        for (let prop in mp) {
+            if (mp.hasOwnProperty(prop) && mp[prop] == this.parentItem) {
+                return prop;
+            }
+        }
+    }
+
+    protected getParentActivatedRouter():ActivatedRoute {
+        let route = this.route;
+        do {
+            let data = route.snapshot.data;
+            //all route inside the mra system will have mraLevel data item
+            if (!data.mraLevel) return route;
+            route = route.parent;
+        } while (route)
+        return this.route.root;
+    }
+    
+    
 }

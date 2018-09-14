@@ -23,7 +23,7 @@ const <%-schm.schemaName%>SubPath = [
 const <%-schm.schemaName%>DetailPath = [
     <%_for (let item of schm.referredBy) {%>
     {path: '<%-item[0]%>', children: <%-item[0]%>SubPath, 
-        data: {"level": 2, "item": "<%-item[0]%>"}},<%_ } %>
+        data: {"mraLevel": 2, "item": "<%-item[0]%>"}},<%_ } %>
 ];
 <%}} %>
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
@@ -42,7 +42,7 @@ const routes: Routes = [
                 {path: '',  redirectTo: '<%-defaultSchema%>', pathMatch: 'full'},
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
                 {path: "<%-schm.schemaName%>",  children: <%-schm.schemaName%>RoutingPath, 
-                    data: {"level": 1, "item": "<%-schm.schemaName%>"}},<%_
+                    data: {"mraLevel": 1, "item": "<%-schm.schemaName%>"}},<%_
  }%>
     ]
   }
