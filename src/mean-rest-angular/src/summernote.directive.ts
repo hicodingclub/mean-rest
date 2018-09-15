@@ -120,8 +120,13 @@ export class MraRichTextSelectDirective {
     
     setContent(content:string) {
         this.content = content;
-        if (this.content) $("#richtext"+this.id).html(this.content);
-        $("#richtext"+this.id).summernote(summerNoteConfig);
+        if (this.content) {
+            $("#richtext"+this.id).each(function( index ) {
+              $(this).summernote('destroy');
+            });            
+            $("#richtext"+this.id).html(this.content);
+            $("#richtext"+this.id).summernote(summerNoteConfig);
+        }
     }
     
     getContent():string[] {
