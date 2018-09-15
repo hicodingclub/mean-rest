@@ -419,7 +419,7 @@ export class BaseComponent implements BaseComponentInterface {
                 } else if (d[prop]['_id']) { //Refer Object
                     valueToShow = d[prop]['value'];
                 }
-                this.searchMoreDetail.push(prop + ": " + valueToShow);
+                this.searchMoreDetail.push([prop, valueToShow]);
             }
         }
 
@@ -690,6 +690,11 @@ export class BaseComponent implements BaseComponentInterface {
             if ('_id' in d[field] && typeof d[field]['_id'] == 'string') return true;
         }
         return false;
+    }
+
+    public clearValueFromDetailAndSearchList(field:string):void {
+        this.clearValueFromDetail(field);
+        this.searchList();
     }
     
     //**** For parent component of modal UI

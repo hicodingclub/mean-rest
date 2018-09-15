@@ -56,6 +56,11 @@ position: relative;
 margin-left: -25px;
 }
 
+.icon-clear-badge {
+cursor: pointer;
+margin-left: 20px;
+}
+
 .pointer {
   cursor: pointer;
 }
