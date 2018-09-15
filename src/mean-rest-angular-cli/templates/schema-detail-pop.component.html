@@ -16,10 +16,10 @@
 	<div class="action-buttons">
 	</div>
 	
-	<div class="card" style="text-align: left;">
+	<div class="card text-left">
 	  <div class="card-body">
 		<div class="card-text">
-<%_ let view='detail'; for (let field of detailView){ let fn = field.fieldName, ft = field.type; let ref_link = "../../../"%>
+<%_ let view='detail'; for (let field of detailView){ let fn = field.fieldName, ft = field.type; let ref_link = true;%>
 			<label><b><%-fn%>:</b></label>
 			<span><% include schema-display.field.html %>
 			</span><br><%_}%>

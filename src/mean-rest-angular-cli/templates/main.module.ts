@@ -24,7 +24,8 @@ import { <%-Ref%>SelectComponent } from './<%-ref%>/<%-ref%>-list/<%-ref%>-selec
 import { <%-Ref%>DetailPopComponent } from './<%-ref%>/<%-ref%>-detail/<%-ref%>-detail-pop.component';
 import { <%-Ref%>DetailSelComponent } from './<%-ref%>/<%-ref%>-detail/<%-ref%>-detail-sel.component'; <%_ }); %>
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let sn = schm.schemaName; if (schm.schemaHasRef) { %>
-import { <%-schm.SchemaName%>ListSubComponent } from './<%-sn%>/<%-sn%>-list/<%-sn%>-list-sub.component'; <%_ }}%>
+import { <%-schm.SchemaName%>ListSubComponent } from './<%-sn%>/<%-sn%>-list/<%-sn%>-list-sub.component';
+import { <%-schm.SchemaName%>DetailSubComponent } from './<%-sn%>/<%-sn%>-detail/<%-sn%>-detail-sub.component'; <%_ }}%>
 <%_ validatorFields.forEach(function(validator){ %>     
 import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validator.schemaName%>-edit/<%-validator.schemaName%>-edit.component'; <%_ }); %>
   
@@ -51,7 +52,8 @@ import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validat
     <%-Ref%>DetailPopComponent,
     <%-Ref%>DetailSelComponent, <%_ }); %>
   <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; if (schm.schemaHasRef) { %>
-    <%-schm.SchemaName%>ListSubComponent,<%_ }}%>
+    <%-schm.SchemaName%>ListSubComponent,
+    <%-schm.SchemaName%>DetailSubComponent,<%_ }}%>
   <%_ validatorFields.forEach(function(validator){ %>     
     <%-validator.Directive%>,<%_ }); %>
   ],
@@ -66,7 +68,8 @@ import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validat
     <%-Ref%>DetailPopComponent,
     <%-Ref%>DetailSelComponent, <%_ }); %>
   <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; if (schm.schemaHasRef) { %>
-    <%-schm.SchemaName%>ListSubComponent,<%_ }}%>
+    <%-schm.SchemaName%>ListSubComponent,
+    <%-schm.SchemaName%>DetailSubComponent,<%_ }}%>
   ],
   providers: [
   <%_ if (hasDate) {%>    

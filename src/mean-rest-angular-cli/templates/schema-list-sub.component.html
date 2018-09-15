@@ -10,19 +10,35 @@
 	    	<tr>
 		        <th scope="col">#</th>
 <%_ for (let field of briefView){ %>
-		        <th <%_if (field.ref) {%> [hidden]="referenceFieldsMap['<%-field.fieldName%>'] == parentItem" <%}%> scope="col">
+		        <th <%_if (field.ref) {%> *ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem" <%}%> scope="col">
 		        	<%-field.FieldName%>
 		        </th><%_ } %>		        
+		        <th scope="col" style="width:2rem;"></th>
+		        <th scope="col" style="width:2rem;">
+		        </th>
 	        </tr>
 	    </thead>
 	    <tbody>
-	        <tr *ngFor="let detail of list;  let i = index">
-	            <td scope="row"><a [routerLink]="['../detail', detail['_id'] ]">{{(page-1)*per_page+i+1}}</a></td>
-<%_ let view = 'list'; for (let field of briefView){ let fn = field.fieldName, ft = field.type; let ref_link = "../../"; %>
-	            <td <%_if (field.ref) {%> [hidden]="referenceFieldsMap['<%-fn%>'] == parentItem" <%}%> >
+	      <ng-template ngFor let-detail [ngForOf]="list" let-i="index">
+	        <tr> <!-- *ngFor="let detail of list;  let i = index" -->
+	            <td scope="row">{{(page-1)*per_page+i+1}}</td>
+<%_ let view = 'list'; for (let field of briefView){ let fn = field.fieldName, ft = field.type; let ref_link = true; %>
+	            <td <%_if (field.ref) {%> *ngIf="referenceFieldsMap['<%-fn%>'] != parentItem" <%}%> >
 	            	<% include schema-display.field.html %>
 	            </td><%_ } %>
+	            <td>
+	            	<a routerLink="." (click)="onDetailLinkClicked(detail['_id'])"><i class="fas fa-external-link-square-alt" title="View Details"></i></a>
+	            </td>
+	            <td>
+			        <span class="pointer" (click)="toggleCheckedItem(i)">
+			            <i *ngIf="!checkedItem[i]" class="fas fa-caret-down" title="More"></i>
+			            <i *ngIf="checkedItem[i]" class="fas fa-caret-up" title="Less"></i>
+			        </span>
+	            </td>
 	        </tr>
+	        <%_ let colspan = briefView.length %>
+	        <tr *ngIf="checkedItem[i]" > <td colspan="<%-colspan%>"> <app-<%-schemaName%>-detail-sub [inputData]="detail['_id']"></app-<%-schemaName%>-detail-sub></td></tr>
+	      </ng-template>
 	    </tbody>
 	</table>
 	

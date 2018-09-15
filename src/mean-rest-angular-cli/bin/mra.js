@@ -3,7 +3,6 @@
  * Script to create angular UI and service code based on Mongoose schema. This is the command line
  * interface for mean-rest-angular package
  * 
- * The cli part code is based on the "express" cli. 
  */
 
 const FIELD_NUMBER_FOR_SELECT_VIEW = 4;
@@ -74,6 +73,8 @@ var templates = {
 	schemaDetailSelComponentHtml: ["../templates/schema-detail-sel.component.html", "detail-sel.component.html", "detail select component html file"],
 	schemaDetailPopComponent: ["../templates/schema-detail-pop.component.ts", "detail-pop.component.ts", "detail pop component file"],
 	schemaDetailPopComponentHtml: ["../templates/schema-detail-pop.component.html", "detail-pop.component.html", "detail pop component html file"],
+	schemaDetailSubComponent: ["../templates/schema-detail-sub.component.ts", "detail-sub.component.ts", "detail sub component file"],
+	schemaDetailSubComponentHtml: ["../templates/schema-detail-sub.component.html", "detail-sub.component.html", "detail sub component html file"],
 	
 	schemaEditComponent: ["../templates/schema-edit.component.ts", "edit.component.ts", "edit component file"],
 	schemaEditComponentHtml: ["../templates/schema-edit.component.html", "edit.component.html", "edit component html file"],
@@ -476,7 +477,7 @@ function main() {
 		}
 		
 	});
-	//briefView, detailView, CreateView, EditView, SearchView, indexView]
+	//briefView, detailView, CreateView, EditView, SearchView, indexView]		
 	let [briefView, hasDate1, hasRef1] = generateViewPicture(views[0], mongooseSchema, validators);
 	let [detailView, hasDate2, hasRef2] = generateViewPicture(views[1], mongooseSchema, validators);
 	let [createView, hasDate3, hasRef3, hasEditor3] = generateViewPicture(views[2], mongooseSchema, validators);
@@ -489,6 +490,16 @@ function main() {
 	if (schemaHasDate) hasDate = true;
 	if (schemaHasRef) hasRef = true;
 	if (schemaHasEditor) hasEditor = true;
+	
+	let detailFields = views[1].match(/\S+/g) || [];
+	let briefFields = views[0].match(/\S+/g) || [];
+	let detailSubFields = [];
+	for (let i of detailFields) {
+		if (!briefFields.includes(i)) detailSubFields.push(i);
+	}
+	let detailSubViewStr = detailSubFields.join(' ');
+	let [detailSubView, hasDate7, hasRef7] = generateViewPicture(detailSubViewStr, mongooseSchema, validators);
+	
 	
 	let compositeEditView = editView.slice();
 	let editFields = editView.map( x=> x.fieldName);
@@ -530,6 +541,7 @@ function main() {
 		editView: editView,
 		searchView: searchView,
 		indexView: indexView,
+		detailSubView: detailSubView,
 		compositeEditView: compositeEditView,
 		componentDir: componentDir,
 		dateFormat: dateFormat,
@@ -621,6 +633,11 @@ function main() {
 		generateSourceFile(schemaName, templates.schemaDetailPopComponent, schemaObj, subComponentDir);
 		generateSourceFile(schemaName, templates.schemaDetailPopComponentHtml, schemaObj, subComponentDir);
     }
+	if (schemaObj.schemaHasRef) {
+		(schemaName, templates.schemaListSubComponent, schemaObj, subComponentDir);
+		generateSourceFile(schemaName, templates.schemaDetailSubComponent, schemaObj, subComponentDir);
+		generateSourceFile(schemaName, templates.schemaDetailSubComponentHtml, schemaObj, subComponentDir);
+	}
 	
 	subComponentDir = path.join(componentDir, schemaName+'-edit');
 	generateSourceFile(schemaName, templates.schemaEditComponent, schemaObj, subComponentDir);
@@ -630,7 +647,6 @@ function main() {
   }
 
   return;
-
 
   // Generate application
   emptyDirectory(destinationPath, function (empty) {

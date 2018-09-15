@@ -94,6 +94,7 @@ export class BaseComponent implements BaseComponentInterface {
     protected right_more:boolean = false;
 
     protected checkAll = false;
+    //used to mark deleted items, or items that will show sub-detail, etc.
     protected checkedItem:boolean[] = [];
     
     //For edit and view details
@@ -656,6 +657,10 @@ export class BaseComponent implements BaseComponentInterface {
         
         if (d && d['_id']) this.router.navigate([ref, 'detail', d['_id']], {relativeTo: this.getParentActivatedRouter() });
     }
+
+    public onDetailLinkClicked(id:string):void {
+        this.router.navigate([this.itemName, 'detail', id], {relativeTo: this.getParentActivatedRouter() });
+    }
     
     protected getRefFromField(fn:string):string {
         return this.referenceFieldsMap[fn];
@@ -954,5 +959,8 @@ export class BaseComponent implements BaseComponentInterface {
         return this.route.root;
     }
     
-    
+    /*Sub detail show flag*/
+    public toggleCheckedItem(i:number):void {
+        this.checkedItem[i] = !this.checkedItem[i];
+    }
 }

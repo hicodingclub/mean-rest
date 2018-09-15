@@ -4,11 +4,9 @@
 		<div class="row">
 			<div class="col-8">
 			    <%_ include schema-search.bar.html %>
-		        <span class="icon-search " [hidden]="moreSearchOpened" (click)="toggleMoreSearch()">
-		            <i  class="fas fa-caret-down" title="More"></i>
-		        </span>
-		        <span class="icon-search " [hidden]="!moreSearchOpened" (click)="toggleMoreSearch()">
-		            <i  class="fas fa-caret-up" title="Less"></i>
+		        <span class="icon-search " (click)="toggleMoreSearch()">
+		            <i *ngIf="!moreSearchOpened"  class="fas fa-caret-down" title="More"></i>
+		            <i *ngIf="moreSearchOpened" class="fas fa-caret-up" title="Less"></i>
 		        </span>
 		    </div>
 			<div class="col-1">
@@ -70,11 +68,11 @@
 	    <tbody>
 	        <tr *ngFor="let detail of list;  let i = index">
 	            <td scope="row"><a [routerLink]="['../detail', detail['_id'] ]">{{(page-1)*per_page+i+1}}</a></td>
-<%_ let view = 'list'; for (let field of briefView){ let fn = field.fieldName, ft = field.type; let ref_link = "../../"; %>
+<%_ let view = 'list'; for (let field of briefView){ let fn = field.fieldName, ft = field.type; let ref_link = true; %>
 	            <td><% include schema-display.field.html %>
 	            </td><%_ } %>
 	            <td>
-	            	<a [routerLink]="['../detail', detail['_id'] ]"><i class="fas fa-book-open" title="View Details"></i></a>
+	            	<a routerLink="." (click)="onDetailLinkClicked(detail['_id'])"><i class="fas fa-external-link-square-alt" title="View Details"></i></a>
 	            	<a [routerLink]="['../edit', detail['_id'] ]"><i class="fas fa-edit" title="Edit"></i></a>
 	            	<a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a>
 	            </td>

@@ -38,10 +38,10 @@ td a i.fa-trash-alt:hover {
     padding: 5px 10px 5px 10px;
     border: 1px solid #ddd; /* Add a grey border */
     color: #333;
-border-radius: 100px;
-background-color: #fafafa;
-margin-left: 8px;
--webkit-appearance: none;
+	border-radius: 100px;
+	background-color: #fafafa;
+	margin-left: 8px;
+	-webkit-appearance: none;
 }
 
 ::-ms-clear {

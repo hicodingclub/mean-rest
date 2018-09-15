@@ -1,0 +1,13 @@
+
+<div *ngIf="detail">
+	<div class="card text-left">
+	  <div class="card-body">
+		<div class="card-text">
+<%_ let view='detail'; for (let field of detailSubView){ let fn = field.fieldName, ft = field.type; let ref_link = true;%>
+			<label><b><%-fn%>:</b></label>
+			<span><% include schema-display.field.html %>
+			</span><br><%_}%>
+		</div>
+	  </div>
+	</div>
+</div>

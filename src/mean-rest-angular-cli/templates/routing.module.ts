@@ -15,8 +15,7 @@ import { <%-schm.SchemaName%>ListSubComponent } from './<%-schm.schemaName%>/<%-
 
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; if (schm.schemaHasRef) {%>
 const <%-schm.schemaName%>SubPath = [
-    {path: 'list', component: <%-schm.SchemaName%>ListSubComponent},
-    {path: 'detail/:id', component: <%-schm.SchemaName%>DetailComponent}
+    {path: 'list', component: <%-schm.SchemaName%>ListSubComponent}
 ];
 <%}} %>
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; if (schm.referred) {%>
