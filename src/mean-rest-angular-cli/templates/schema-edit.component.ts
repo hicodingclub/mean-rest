@@ -57,6 +57,8 @@ import { MraRichTextSelectDirective } from 'mean-rest-angular';<%}%>
 export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component implements OnInit {        
     @Input() 
     protected id:string;
+    @Input()
+    protected cid:string;//copy id
     private action:string;
 <%if (schemaHasEditor) {%>
     @ViewChildren(MraRichTextSelectDirective) textEditors: QueryList<MraRichTextSelectDirective>;
@@ -98,11 +100,16 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
         }
         else {
             this.action="Create";
-            let detail = {
-                <% createView.forEach( (field) => { let fn = field.fieldName;
-                if ( typeof(field.defaultValue) !== 'undefined') {%><%-fn%>: <%-field.defaultValue%>,  <%_}}); %>
+            if (!this.cid) this.cid = this.route.snapshot.queryParamMap.get('cid');
+            if (this.cid) {
+                this.populateDetailFromCopy(this.cid);
+            } else {
+                let detail = {
+                    <% createView.forEach( (field) => { let fn = field.fieldName;
+                    if ( typeof(field.defaultValue) !== 'undefined') {%><%-fn%>: <%-field.defaultValue%>,  <%_}}); %>
+                }
+                this.detail = this.formatDetail(detail);
             }
-            this.detail = this.formatDetail(detail);
         }
     }
 

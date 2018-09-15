@@ -2,6 +2,7 @@
 	<div class="action-buttons">
         <a [routerLink]="['../../list']"><i class="fas fa-list" title="List"></i></a>
 		<a [routerLink]="['../../edit', detail['_id'] ]" class="btn btn-outline-primary">Edit</a>
+		<a [routerLink]="['../../new']" [queryParams]="{cid: detail['_id']}" class="btn btn-outline-primary">New</a>
 		<a routerLink="." class="btn btn-outline-primary" (click)="onDelete(detail['_id'], null)">Delete</a>
 	</div>
 	

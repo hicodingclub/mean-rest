@@ -377,7 +377,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     protected populateDetail(id:string):void {
-      this.service.getDetail(this.id).subscribe(
+      this.service.getDetail(id).subscribe(
         detail => {
             let originalDetail = clone(detail);
             if (detail["_id"]) this.commonService.putToStorage(detail["_id"], originalDetail);//cache it
@@ -388,6 +388,19 @@ export class BaseComponent implements BaseComponentInterface {
         this.onServiceError
       );
     }
+    
+    protected populateDetailFromCopy(copy_id:string):void {
+      this.service.getDetail(copy_id).subscribe(
+        detail => {            
+            this.detail = this.formatDetail(detail);
+            delete this.detail["_id"];
+            this.extraFieldsUnload();//unload data to text editors, etc
+        },
+        this.onServiceError
+      );
+    }
+    
+    
     protected processSearchContext() {
         this.moreSearchOpened = false;
         let d = this.detail;
