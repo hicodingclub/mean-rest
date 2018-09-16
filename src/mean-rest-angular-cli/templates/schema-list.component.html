@@ -4,9 +4,10 @@
 		<div class="row">
 			<div class="col-8">
 			    <%_ include schema-search.bar.html %>
+			    <%_ let hasStringFields = false; for (let field of briefView){ if(field.type == 'SchemaString') {hasStringFields = true; break;} }%>
 		        <span class="icon-search " (click)="toggleMoreSearch()">
-		            <i *ngIf="!moreSearchOpened"  class="fas fa-caret-down" title="More"></i>
-		            <i *ngIf="moreSearchOpened" class="fas fa-caret-up" title="Less"></i>
+		            <i *ngIf="!moreSearchOpened"  <%if (hasStringFields) {%>class="fas fa-caret-down"<%} else {%>class="fas fa-search-plus"<%}%> title="More"></i>
+		            <i *ngIf="moreSearchOpened" <%if (hasStringFields) {%>class="fas fa-caret-up"<%} else {%>class="fas fa-search-minus"<%}%>  title="Less"></i>
 		        </span>
 		    </div>
 			<div class="col-1">
