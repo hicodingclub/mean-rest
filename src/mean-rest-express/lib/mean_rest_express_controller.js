@@ -38,7 +38,14 @@ var checkAndSetValue = function(obj, schema) {
 		if (item in schema.paths) {
 			let type = schema.paths[item].constructor.name;
 			if (type == 'SchemaDate') {
-				obj[item] = new Date(obj[item]);
+				let dt = new Date(obj[item]);
+				let y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate();
+				let d1 = new Date(y, m, d);
+				let d2 = new Date(y, m, d);
+				
+				d2.setDate(d2.getDate() + 1);
+				
+				obj[item] = {"$gte": d1,"$lt": d2};
 			}
 		}
 	}
@@ -126,7 +133,7 @@ RestController.searchAll = function(req, res, next, searchContext) {
 	
 	let count = 0;
 	if (searchContext) {
-		console.log("searchContext is ....", searchContext);
+		//console.log("searchContext is ....", searchContext);
         // searchContext ={'$and', [{'$or', []},{'$and', []}]}
 		if (searchContext['$and']) {
 		  for (let subContext of searchContext['$and']) {
