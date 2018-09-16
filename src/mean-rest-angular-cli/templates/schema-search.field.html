@@ -49,7 +49,7 @@
 	        <div class="input-group">
 		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="<%-dateFormat%>"
 		             [(ngModel)]="detail['<%-fn%>']['date']" name="<%-sn%>Edit<%-Fn%>"
-		             ngbDatepicker #<%-sn%>Edit<%-Fn%>Date="ngbDatepicker" #<%-sn%>Edit<%-Fn%>="ngModel">
+		             ngbDatepicker [minDate]="minDate" #<%-sn%>Edit<%-Fn%>Date="ngbDatepicker" #<%-sn%>Edit<%-Fn%>="ngModel">
 		      <div class="input-group-append">
 		        <button class="btn btn-outline-secondary" (click)="<%-sn%>Edit<%-Fn%>Date.toggle()" type="button">
 		          <i class="fas fa-calendar-alt"></i>

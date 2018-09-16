@@ -15,6 +15,9 @@ import { ComponentFactoryResolver } from '@angular/core';<%}%>
   styleUrls: ['./<%-schemaName%>-list.component.css']
 })
 export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component implements OnInit {
+  <%_ if (schemaHasDate) { %>
+  private  minDate = {year: (new Date()).getFullYear()-100, month: 1, day: 1}; <%}%>
+
   constructor(
       <%if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
       protected <%-schemaName%>Service: <%-SchemaName%>Service,
