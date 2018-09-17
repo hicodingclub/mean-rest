@@ -48,14 +48,33 @@
     <%_ } else if (field.type === "SchemaDate") { %> 
 	        <div class="input-group">
 		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="<%-dateFormat%>"
-		             [(ngModel)]="detail['<%-fn%>']['date']" name="<%-sn%>Edit<%-Fn%>"
-		             ngbDatepicker [minDate]="minDate" #<%-sn%>Edit<%-Fn%>Date="ngbDatepicker" #<%-sn%>Edit<%-Fn%>="ngModel">
+		             [(ngModel)]="detail['<%-fn%>']['from']" name="<%-sn%>Edit<%-Fn%>"
+		             ngbDatepicker #<%-sn%>Edit<%-Fn%>="ngModel">
+		      <span>&nbsp; ~ &nbsp;</span>
+		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="<%-dateFormat%>"
+		             [(ngModel)]="detail['<%-fn%>']['to']" name="<%-sn%>Edit<%-Fn%>"
+		             ngbDatepicker #<%-sn%>Edit<%-Fn%>="ngModel">
+
 		      <div class="input-group-append">
-		        <button class="btn btn-outline-secondary" (click)="<%-sn%>Edit<%-Fn%>Date.toggle()" type="button">
+		        <button class="btn btn-outline-secondary" (click)="onDateSelectionToggle('<%-fn%>')" type="button">
 		          <i class="fas fa-calendar-alt"></i>
 		        </button>
 		      </div>
-		    </div><!-- input group -->         
+		    </div><!-- input group --> 
+		    <div class="date-selection-pop" *ngIf="detail['<%-fn%>']['pop']">
+			    <ngb-datepicker #dp [minDate]="minDate" (select)="onDateSelection('<%-fn%>', $event)" [displayMonths]="2" [dayTemplate]="<%-sn%>Edit<%-Fn%>T">
+				</ngb-datepicker>
+				<ng-template #<%-sn%>Edit<%-Fn%>T let-<%-sn%>Edit<%-Fn%>Date="date" let-<%-sn%>Edit<%-Fn%>Focused="focused">
+				  <span class="custom-day"
+				        [class.focused]="<%-sn%>Edit<%-Fn%>Focused"
+				        [class.range]="isRange('<%-fn%>', <%-sn%>Edit<%-Fn%>Date)"
+				        [class.faded]="isHovered('<%-fn%>', <%-sn%>Edit<%-Fn%>Date) || isInside('<%-fn%>', <%-sn%>Edit<%-Fn%>Date)"
+				        (mouseenter)="hoveredDate = <%-sn%>Edit<%-Fn%>Date"
+				        (mouseleave)="hoveredDate = null">
+				    {{ <%-sn%>Edit<%-Fn%>Date.day }}
+				  </span>
+				</ng-template>
+		    </div>      
     <%_ } else if (field.type === "ObjectId") { %>
 		    <div class="input-group">
 		      <a (click)="detail['<%-fn%>']['_id']&&onRefShow('<%-field.fieldName%>', 'pop', detail['<%-fn%>']['_id'])">

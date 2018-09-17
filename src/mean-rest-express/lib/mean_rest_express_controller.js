@@ -38,14 +38,33 @@ var checkAndSetValue = function(obj, schema) {
 		if (item in schema.paths) {
 			let type = schema.paths[item].constructor.name;
 			if (type == 'SchemaDate') {
-				let dt = new Date(obj[item]);
-				let y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate();
-				let d1 = new Date(y, m, d);
-				let d2 = new Date(y, m, d);
-				
-				d2.setDate(d2.getDate() + 1);
-				
-				obj[item] = {"$gte": d1,"$lt": d2};
+				if (typeof obj[item] == 'string') { //exact data provided:
+					let dt = new Date(obj[item]);
+					let y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate();
+					let d1 = new Date(y, m, d);
+					let d2 = new Date(y, m, d);
+					
+					d2.setDate(d2.getDate() + 1);
+					
+					obj[item] = {"$gte": d1,"$lt": d2};
+				} else if (typeof obj[item] == 'object') { //data range
+					let o = {};
+					if (obj[item]['from']) {
+						let dt = new Date(obj[item]['from']);
+						let y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate();
+						let d1 = new Date(y, m, d);
+						o["$gte"] = d1;
+					}
+					if (obj[item]['to']) {
+						let dt = new Date(obj[item]['to']);
+						let y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate();
+						let d2 = new Date(y, m, d);
+						d2.setDate(d2.getDate() + 1);
+						
+						o["$lt"] = d2;
+					}
+					obj[item] = o;
+				}
 			}
 		}
 	}

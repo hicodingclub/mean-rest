@@ -320,15 +320,17 @@ export class BaseComponent implements BaseComponentInterface {
                 
                 we add h, m, s here
                 */
-                return {'date':{ day: d, month: M, year: yyyy}, 'value': value}
+                //"from" and "to" used for search context. pop: show the selection popup
+                return {'date':{ day: d, month: M, year: yyyy}, 'value': value, 'from': undefined, 'to': undefined, 'pop':false}
 
     }
+    
     protected formatDate(detail:any ):any {
         for (let fnm of this.dateFields) {
             let value, date;
             if (typeof detail[fnm] !== 'string') { //not defined
-                //important: let date values undefined
-                detail[fnm] = {'date':date, 'value': value};
+                //important: let date values undefined. "from" and "to" used for search context. pop: show the selection popup
+                detail[fnm] = {'date':undefined, 'value': undefined, 'from': undefined, 'to': undefined, 'pop':false};
             }
             else {
                 detail[fnm] = this.formatDateField(detail[fnm]);
@@ -336,9 +338,23 @@ export class BaseComponent implements BaseComponentInterface {
         }
         return detail;
     }
+    
+    protected deFormatDateField(date:any):string {
+        let d, M, yyyy, h, m, s;
+        
+        yyyy = date.year;
+        M = date.month - 1;
+        d = date.day;
+        
+        if (typeof yyyy !== 'number' || typeof M !== 'number' || typeof d !== 'number') return null;
+        else {
+            let dt = new Date(yyyy, M, d, 0, 0, 0, 0);
+            return dt.toISOString();
+        }
+    }
+    
     protected deFormatDate(detail:any ):any {
         for (let fnm of this.dateFields) {
-            let d, M, yyyy, h, m, s;
             let value;
             if (typeof detail[fnm] !== 'object') { //not defined
                 //let date values undefined
@@ -347,16 +363,9 @@ export class BaseComponent implements BaseComponentInterface {
             else {
                 if (! detail[fnm].date) delete detail[fnm];
                 else {
-                    yyyy = detail[fnm].date.year;
-                    M = detail[fnm].date.month - 1;
-                    d = detail[fnm].date.day;
-                    
-                    if (typeof yyyy !== 'number' || typeof M !== 'number' || typeof d !== 'number') delete detail[fnm];
-                    
-                    else {
-                        let dt = new Date(yyyy, M, d, 0, 0, 0, 0);
-                        detail[fnm] = dt.toISOString();
-                    }
+                    let dateStr = this.deFormatDateField(detail[fnm].date);
+                    if (!dateStr) delete detail[fnm];
+                    else detail[fnm] = dateStr;
                 }
             }
         }
@@ -419,21 +428,47 @@ export class BaseComponent implements BaseComponentInterface {
         this.searchMoreDetail = []
         let d2 = this.deFormatDetail(d);
         for (let prop in d2) {
-            if (this.stringFields.indexOf(prop) == -1) {
+            if (this.stringFields.indexOf(prop) == -1) {//string fields already put to orSearchContext
                 let o = {}
-                o[prop] = d2[prop];
-                andSearchContext.push(o);
-                
                 let valueToShow;
-                if(typeof d[prop] != 'object') valueToShow = d[prop];
-                else if (d[prop]['date']) { //Date fields
+
+                o[prop] = d2[prop];
+                if(typeof d[prop] != 'object') { //number, string, boolean...
+                    valueToShow = d[prop];
+                }
+                else if (d[prop]['date']) { //Date fields. search based on exact date                        
                     let dt = this.formatDateField(d2[prop])
                     valueToShow = dt.value;
                 } else if (d[prop]['_id']) { //Refer Object
                     valueToShow = d[prop]['value'];
                 }
                 this.searchMoreDetail.push([prop, valueToShow]);
+                andSearchContext.push(o);
             }
+        }
+        //Handle date range selection
+        for (let prop of this.dateFields) {
+            let o = {};
+            let valueToShow = "";
+            
+            o[prop] = {};
+            if (typeof d[prop] !== 'object') { //not defined
+                continue;
+            }
+            if (!d[prop]['from'] && !d[prop]['to']) { //not range
+                continue;
+            }
+            if (d[prop]['from']) {
+                o[prop]['from'] = this.deFormatDateField(d[prop]['from']);
+                valueToShow += this.formatDateField(o[prop]['from']).value;
+            }
+            valueToShow += " ~ ";
+            if (d[prop]['to']) {
+                o[prop]['to'] = this.deFormatDateField(d[prop]['to']);
+                valueToShow += this.formatDateField(o[prop]['to']).value;
+            }
+            this.searchMoreDetail.push([prop, valueToShow]);
+            andSearchContext.push(o);
         }
 
         let searchContext = {'$and': [{'$or': orSearchContext},{'$and': andSearchContext}]};
@@ -699,7 +734,11 @@ export class BaseComponent implements BaseComponentInterface {
             || typeof d[field] == 'string'
             || typeof d[field] == 'boolean') return true;
         if (typeof d[field] == 'object') {
-            if ('date' in d[field] && typeof d[field]['date'] == 'object') return true;
+            if ('date' in d[field]) {
+                 if (typeof d[field]['date'] == 'object') return true;
+                 if (typeof d[field]['from'] == 'object') return true;
+                 if (typeof d[field]['to'] == 'object') return true;
+            }
             if ('_id' in d[field] && typeof d[field]['_id'] == 'string') return true;
         }
         return false;
@@ -980,5 +1019,36 @@ export class BaseComponent implements BaseComponentInterface {
     /*Sub detail show flag*/
     public toggleCheckedItem(i:number):void {
         this.checkedItem[i] = !this.checkedItem[i];
+    }
+    
+    /*Date Range Selection */
+    hoveredDate: any;
+
+    onDateSelectionToggle(fn:string) {
+        this.detail[fn]['pop'] = !this.detail[fn]['pop'];
+    }
+    
+    onDateSelection(fn:string, date: any) {
+        if (!this.detail[fn]['from'] && !this.detail[fn]['to']) {
+          this.detail[fn]['from'] = date;
+        } else if (this.detail[fn]['from'] && !this.detail[fn]['to'] && date.after(this.detail[fn]['from'])) {
+          this.detail[fn]['to'] = date;
+          this.detail[fn]['pop'] = false; //Finished. hide the selection 
+        } else {
+          this.detail[fn]['to'] = null;
+          this.detail[fn]['from'] = date;
+        }
+    }
+
+    isHovered(fn:string, date: any) {
+        return this.detail[fn]['from'] && !this.detail[fn]['to'] && this.hoveredDate && date.after(this.detail[fn]['from']) && date.before(this.hoveredDate);
+    }
+
+    isInside(fn:string, date: any) {
+        return date.after(this.detail[fn]['from']) && date.before(this.detail[fn]['to']);
+    }
+
+    isRange(fn:string, date: any) {
+        return date.equals(this.detail[fn]['from']) || date.equals(this.detail[fn]['to']) || this.isInside(fn, date) || this.isHovered(fn, date);
     }
 }
