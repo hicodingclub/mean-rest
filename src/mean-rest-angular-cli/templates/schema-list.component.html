@@ -2,16 +2,9 @@
 
 	<div class="container search">
 		<div class="row">
-			<div class="col-8">
+			<div class="col-9">
 			    <%_ include schema-search.bar.html %>
-			    <%_ let hasStringFields = false; for (let field of briefView){ if(field.type == 'SchemaString') {hasStringFields = true; break;} }%>
-		        <span class="icon-search " (click)="toggleMoreSearch()">
-		            <i *ngIf="!moreSearchOpened"  <%if (hasStringFields) {%>class="fas fa-caret-down"<%} else {%>class="fas fa-search-plus"<%}%> title="More"></i>
-		            <i *ngIf="moreSearchOpened" <%if (hasStringFields) {%>class="fas fa-caret-up"<%} else {%>class="fas fa-search-minus"<%}%>  title="Less"></i>
-		        </span>
 		    </div>
-			<div class="col-1">
-			</div>
 			<div class="col-3">
 		        <div class="action-buttons">
 					<a [routerLink]="['../new' ]" class="btn btn-outline-primary">Create</a>
@@ -20,35 +13,6 @@
 				</div>
 			</div>
 		</div>
-
-		<div class="row"  *ngIf="!moreSearchOpened">
-	       	<div class="col-1"></div> <!-- indent -->
-			<div class="col-8" style="text-align: left;">
-				<span class="badge badge-pill badge-secondary" *ngFor="let value of searchMoreDetail">
-				    <a (click)="toggleMoreSearch()" class="pointer"> {{value[0]}}: {{value[1]}}</a>
-				    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromDetailAndSearchList(value[0])" title="Clear"></i>
-				</span>
-			</div>
-		</div>
-		
-	    <div class="row"  *ngIf="moreSearchOpened">
-	       	<div class="col-1"></div> <!-- indent -->
-	       	<div class="col-8">
-				<div class="card">
-				  <div class="card-body">
-<%_ briefView.forEach( (field) => { let fn=field.fieldName, Fn=field.FieldName, sn=schemaName;
-	if (field.type != 'SchemaString') {%> <%_ include schema-search.field.html %> 
-<%_ }}) %>
-				  	<div class="action-buttons" style="margin-top: 10px;">
-						<button type="button" class="btn btn-outline-success" (click)="onSearchClear()">Reset</button>
-						<button type="button" class="btn btn-success" (click)="searchList()">Search</button>
-				    </div>
-				  </div>
-				</div>
-		    </div>
-	       	<div class="col-1"><!-- search button -->
-	       	</div> 
-        </div>	
 
 
 		<hr/>

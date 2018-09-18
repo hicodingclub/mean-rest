@@ -1,7 +1,7 @@
-			<%_ let hasStringFields = false; let stringFields = [];
+  			<%_ let hasStringFields = false; let stringFields = [];
 			    for (let field of briefView){ if(field.type == 'SchemaString') {hasStringFields = true; stringFields.push(field.fieldName);} }%>
 			<%_ if (hasStringFields) { %>
-				<input type="search" id="<%-schemaName%>TextSearch" class="search-control" 
+<!--				<input type="search" id="<%-schemaName%>TextSearch" class="search-control" 
 					#<%-schemaName%>TextSearch [(ngModel)]="searchText"
 					(keyup.enter)="searchList()"
 				    placeholder="Search for <%for (let [idx,nm] of stringFields.entries()){%><%if (idx!=0) {%>, <%}%><%-nm%><%}%>">
@@ -12,4 +12,48 @@
 				<span class="icon-search">
 				    <i class="fas fa-search" (click)="searchList()" title="Search"></i>
 				</span>
+-->
+
+			    <div class="input-group">
+	              <input type="search" class="form-control border border-secondary" id="<%-schemaName%>TextSearch" 
+						#<%-schemaName%>TextSearch [(ngModel)]="searchText"
+						(keyup.enter)="$event.target.blur();searchList();false"
+					    placeholder="Search for <%for (let [idx,nm] of stringFields.entries()){%><%if (idx!=0) {%>, <%}%><%-nm%><%}%>"> 
+				  <div *ngIf="searchText" class="input-group-append icon-clear-inside">
+					<span >
+					    <i class="fas fa-times-circle" (click)="onSearchTextClear()" title="Clear"></i>
+				    </span>
+				  </div>
+				  <div class="input-group-append">
+				    <button type="button" class="btn btn-outline-secondary" (click)="searchList()"><i class="fas fa-search"></i></button>
+				  </div>
+				</div>
 			<%}%>
+			<%_ if (typeof noMoreSearchArea == 'undefined' || !noMoreSearchArea) { %>
+				<div>
+					<span class="icon-search " (click)="toggleMoreSearch()">
+			            <i *ngIf="!moreSearchOpened"  <%if (hasStringFields) {%>class="fas fa-caret-down"<%} else {%>class="fas fa-search-plus"<%}%> title="More"></i>
+			            <i *ngIf="moreSearchOpened" <%if (hasStringFields) {%>class="fas fa-caret-up"<%} else {%>class="fas fa-search-minus"<%}%>  title="Less"></i>
+				    </span>
+				</div>
+			    <div class="shadow" *ngIf="moreSearchOpened">
+					<div class="card">
+						<div class="card-body">
+						<%_ briefView.forEach( (field) => { let fn=field.fieldName, Fn=field.FieldName, sn=schemaName;
+							if (field.type != 'SchemaString') {%> <%_ include schema-search.field.html %> 
+						<%_ }}) %>
+						  <div class="action-buttons" style="margin-top: 10px;">
+								<button type="button" class="btn btn-outline-success" (click)="onSearchClear()">Reset</button>
+								<button type="button" class="btn btn-success" (click)="searchList()">Search</button>
+						  </div>
+						</div>
+					</div>
+		        </div>
+		        <div *ngIf="!moreSearchOpened" style="text-align: left;">
+					<span class="badge badge-pill badge-secondary" *ngFor="let value of searchMoreDetail">
+					    <a (click)="toggleMoreSearch()" class="pointer"> {{value[0]}}: {{value[1]}}</a>
+					    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromDetailAndSearchList(value[0])" title="Clear"></i>
+					</span>
+				</div>
+		    <%}%>
+			

@@ -49,11 +49,13 @@ td a i.fa-trash-alt:hover {
 }
 
 .icon-clear-inside {
-z-index: 1;
-vertical-align: middle;
-cursor: pointer;
-position: relative;
-margin-left: -25px;
+    z-index: 1;
+    vertical-align: middle;
+    padding: 0.5rem 0.5rem 0rem 0.5rem;
+    cursor: pointer;
+    position: relative;
+    margin-left: -2rem;   /* text 1 + left 0.5 + right 0.5 = 2 rem*/
+    border: 0;
 }
 
 .icon-clear-badge {
