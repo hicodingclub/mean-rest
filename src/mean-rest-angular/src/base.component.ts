@@ -793,6 +793,7 @@ export class BaseComponent implements BaseComponentInterface {
             }
         });
     }
+    
     public onRefShow(fieldName:string, action:string, id:string) {
         if (!id && this.detail[fieldName]) id = this.detail[fieldName]['_id'];
         let viewContainerRef = this.refSelectDirective.viewContainerRef;
@@ -828,6 +829,18 @@ export class BaseComponent implements BaseComponentInterface {
             }
         });
     }
+    
+    //Following havn't been used yet
+    /*
+    private typingTimer;
+    public onKeyUp(fieldName:string, value:string):void {
+        clearTimeout(this.typingTimer);
+    
+        this.typingTimer = setTimeout(function () {
+            console.log('Input Value:', value);
+        }, 1000);
+    }
+    */
     //**** For child component of modal UI
     public inputData;
     public outputData;

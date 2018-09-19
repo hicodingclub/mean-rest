@@ -79,17 +79,24 @@ fieldset > .form-control, .input-group, .form-check {
   z-index: 1;
   pointer-events: auto;
   cursor: pointer;
+  
+  margin-left: 1rem;
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 .input-group > span {
 margin-left: 0.5rem;
 }
 
-.icon-clear-control {
-z-index: 1;
-vertical-align: middle;
-cursor: pointer;
-position: relative;
-margin-top: 0.6rem;
-margin-left: 0.5rem;
+.icon-clear-inside {
+    z-index: 5;
+    vertical-align: middle;
+    padding: 0.75rem 0.5rem 0rem 0.5rem;
+    cursor: pointer;
+    position: relative;
+    margin-left: -2rem;   /* text 1 + left 0.5 + right 0.5 = 2 rem*/
+    border: 0;
 }

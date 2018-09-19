@@ -77,24 +77,22 @@
 		    </div>      
     <%_ } else if (field.type === "ObjectId") { %>
 		    <div class="input-group">
-		      <a (click)="detail['<%-fn%>']['_id']&&onRefShow('<%-field.fieldName%>', 'pop', detail['<%-fn%>']['_id'])">
-		        <input class="form-control ref-badge" id="<%-sn%>Edit<%-Fn%>" [attr.disabled]="true"
-		             [ngClass]="{'pointer': detail['<%-fn%>']['_id']}"
+		        <input class="form-control rounded" id="<%-sn%>Edit<%-Fn%>" 
+		             [ngClass]="{'pointer ref-badge': detail['<%-fn%>']['_id']}"
+		             (focus)="detail['<%-fn%>']['_id']?onRefShow('<%-field.fieldName%>', 'select', detail['<%-fn%>']['_id']):onRefSelect('<%-fn%>')"
+	                 <%if (field.required) {%>required<%}%>
+		        	 <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
 		             [ngModel]="detail['<%-fn%>']['value']" name="<%-sn%>Edit<%-Fn%>"
-		             #<%-sn%>Edit<%-Fn%>="ngModel"> </a>
-	          <div class="input-group-append">
-	          	<span  class="icon-search" (click)="onRefSelect('<%-fn%>')">
-		          	<i class="fas fa-search" title="Search"></i></span>
-		      </div>		             
+		             #<%-sn%>Edit<%-Fn%>="ngModel"> 
 			</div>
     <%_ } %>
     
 	      </div>
 	      
 	      <div class="col-1">
-		    <span class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')"
+		    <div class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')"
 		        *ngIf="checkValueDefinedFromDetail(['<%-fn%>'])"
-		        ><i class="fas fa-times-circle" title="Clear"></i></span>
+		        ><i class="fas fa-times-circle" title="Clear"></i></div>
 	      </div>
 	    </div>
       </div>

@@ -1,19 +1,6 @@
   			<%_ let hasStringFields = false; let stringFields = [];
 			    for (let field of briefView){ if(field.type == 'SchemaString') {hasStringFields = true; stringFields.push(field.fieldName);} }%>
 			<%_ if (hasStringFields) { %>
-<!--				<input type="search" id="<%-schemaName%>TextSearch" class="search-control" 
-					#<%-schemaName%>TextSearch [(ngModel)]="searchText"
-					(keyup.enter)="searchList()"
-				    placeholder="Search for <%for (let [idx,nm] of stringFields.entries()){%><%if (idx!=0) {%>, <%}%><%-nm%><%}%>">
-				<span class="icon-clear-inside" >
-				    <i *ngIf="searchText" class="fas fa-times-circle" (click)="onSearchTextClear()" title="Clear"></i>
-				    <i *ngIf="!searchText">&nbsp;&nbsp;</i>
-				</span>
-				<span class="icon-search">
-				    <i class="fas fa-search" (click)="searchList()" title="Search"></i>
-				</span>
--->
-
 			    <div class="input-group">
 	              <input type="search" class="form-control border border-secondary" id="<%-schemaName%>TextSearch" 
 						#<%-schemaName%>TextSearch [(ngModel)]="searchText"
@@ -31,7 +18,7 @@
 			<%}%>
 			<%_ if (typeof noMoreSearchArea == 'undefined' || !noMoreSearchArea) { %>
 				<div>
-					<span class="icon-search " (click)="toggleMoreSearch()">
+					<span class="pointer" (click)="toggleMoreSearch()">
 			            <i *ngIf="!moreSearchOpened"  <%if (hasStringFields) {%>class="fas fa-caret-down"<%} else {%>class="fas fa-search-plus"<%}%> title="More"></i>
 			            <i *ngIf="moreSearchOpened" <%if (hasStringFields) {%>class="fas fa-caret-up"<%} else {%>class="fas fa-search-minus"<%}%>  title="Less"></i>
 				    </span>

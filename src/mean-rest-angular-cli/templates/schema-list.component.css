@@ -21,7 +21,7 @@ td a i.fa-trash-alt:hover {
 }
 .action-buttons .btn {
 	display: inline-block;
-	margin-left: 10px;
+	margin-left: 1rem;
 }
 
 
@@ -32,24 +32,17 @@ td a i.fa-trash-alt:hover {
 	padding-top: 0.8rem;
 }
 
-.search-control {
-	width: 85%;
-    font-size: 0.9rem;
-    padding: 5px 10px 5px 10px;
-    border: 1px solid #ddd; /* Add a grey border */
-    color: #333;
-	border-radius: 100px;
-	background-color: #fafafa;
-	margin-left: 8px;
-	-webkit-appearance: none;
-}
-
 ::-ms-clear {
   display: none;
 }
 
+.icon-clear {
+cursor: pointer;
+margin-top: 0.5rem;
+}
+
 .icon-clear-inside {
-    z-index: 1;
+    z-index: 5;
     vertical-align: middle;
     padding: 0.5rem 0.5rem 0rem 0.5rem;
     cursor: pointer;
@@ -60,19 +53,16 @@ td a i.fa-trash-alt:hover {
 
 .icon-clear-badge {
 cursor: pointer;
-margin-left: 20px;
+margin-left: 1rem;
 }
 
 .pointer {
   cursor: pointer;
 }
-.icon-search {
-	
-  z-index: 1;
-  pointer-events: auto;
-  cursor: pointer;
-  margin-left: 20px;
-  padding-top: 10px;
+
+.ref-badge {
+  border: 1px solid #eceff3; /*rgba(0,0,0,.125); */
+  background-color: #eceff3;
 }
 
 .select-model {

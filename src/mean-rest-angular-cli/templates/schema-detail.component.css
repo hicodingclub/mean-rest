@@ -11,7 +11,7 @@
 }
 .action-buttons .btn {
 	display: inline-block;
-	margin-left: 2.5rem;
+	margin-left: 1rem;
 }
 .action-buttons .fa-angle-double-left, .fa-list {
 	float: left;
@@ -29,7 +29,6 @@
 .card span {
 	margin-left: 1rem;
 }
-
 
 .referred-by-links {
 	text-align: left;

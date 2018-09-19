@@ -201,19 +201,19 @@
     <%_ } else if (field.type === "ObjectId") { %>
 	      <fieldset class="form-group">
 	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%> </label>
-	        <span  class="icon-search" (click)="onRefSelect('<%-field.fieldName%>')">
-		          <i class="fas fa-search" title="Search"></i></span>
+		    <!-- <a class="icon-search" [routerLink]="['.']" (click)="onRefSelect('<%-field.fieldName%>')"><i class="fas fa-list" title="Search"></i></a>  -->
 		    <div class="input-group">
-		      <a (click)="detail['<%-fn%>']['_id']&&onRefShow('<%-field.fieldName%>', 'pop', detail['<%-fn%>']['_id'])">
-		        <input class="form-control ref-badge" id="<%-sn%>Edit<%-Fn%>" [attr.disabled]="true"
-		             [ngClass]="{'icon-search': detail['<%-fn%>']['_id']}"
+		    	<!--  [attr.disabled]="true" -->
+		        <input class="form-control rounded" id="<%-sn%>Edit<%-Fn%>" 
+		             [ngClass]="{'pointer ref-badge': detail['<%-fn%>']['_id']}"
+		             (focus)="detail['<%-fn%>']['_id']?onRefShow('<%-field.fieldName%>', 'select', detail['<%-fn%>']['_id']):onRefSelect('<%-fn%>')"
 	                 <%if (field.required) {%>required<%}%>
 		        	 <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
 		             [ngModel]="detail['<%-fn%>']['value']" name="<%-sn%>Edit<%-Fn%>"
-		             #<%-sn%>Edit<%-Fn%>="ngModel"> </a>
-		    <% if (!field.required) {%><span *ngIf="detail['<%-fn%>']['value']" 
-		          class="input-group-append icon-clear-control " (click)="clearValueFromDetail('<%-fn%>')">
-		          <i class="fas fa-times-circle" title="Clear"></i></span> <%}%>
+		             #<%-sn%>Edit<%-Fn%>="ngModel"> 
+		    <div *ngIf="detail['<%-fn%>']['value']" 
+		          class="input-group-append icon-clear-inside " (click)="clearValueFromDetail('<%-fn%>')">
+		          <i class="fas fa-times-circle" title="Clear"></i></div>
 			</div>
 	        <div [hidden]="<%-sn%>Edit<%-Fn%>.valid || <%-sn%>Edit<%-Fn%>.pristine"
 	             class="alert alert-danger">
