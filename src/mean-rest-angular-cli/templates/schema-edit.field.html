@@ -206,7 +206,7 @@
 		    	<!--  [attr.disabled]="true" -->
 		        <input class="form-control rounded" id="<%-sn%>Edit<%-Fn%>" 
 		             [ngClass]="{'pointer ref-badge': detail['<%-fn%>']['_id']}"
-		             (focus)="detail['<%-fn%>']['_id']?onRefShow('<%-field.fieldName%>', 'select', detail['<%-fn%>']['_id']):onRefSelect('<%-fn%>')"
+		             (focus)="onRefSelect('<%-fn%>')"
 	                 <%if (field.required) {%>required<%}%>
 		        	 <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
 		             [ngModel]="detail['<%-fn%>']['value']" name="<%-sn%>Edit<%-Fn%>"

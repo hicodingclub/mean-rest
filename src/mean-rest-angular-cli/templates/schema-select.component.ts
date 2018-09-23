@@ -29,6 +29,7 @@ export class <%-SchemaName%>SelectComponent extends <%-SchemaName%>ListComponent
     }
 
     ngOnInit() {
+        this.selectedId = this.inputData;
         this.populateList();
     }
 }

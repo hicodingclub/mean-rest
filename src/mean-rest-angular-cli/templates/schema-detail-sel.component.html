@@ -2,7 +2,7 @@
   <div class="select-model-content">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Select {{ItemName}}</h5>
+        <h5 class="modal-title">Selected {{ItemName}}</h5>
         <button type="button" class="close" aria-label="Close" (click)="uiCloseModal()">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -15,7 +15,7 @@
 
 <div class="detail" *ngIf="detail">
 	<div class="action-buttons">
-        <a routerLink="." (click)="detailSelBack()"><i class="fas fa-list" title="Back to list"></i></a>
+        <a routerLink="." (click)="detailSelBack()"><i class="fas fa-angle-double-left" title="Back to list">&nbsp; {{ItemName}} List</i></a>
 		<a routerLink="." class="btn btn-outline-primary" (click)="detailSelSelected()">Select</a>
 	</div>
 	

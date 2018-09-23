@@ -75,7 +75,7 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
       protected route: ActivatedRoute,
       protected location: Location) {
           super( <%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
-                 <%-schemaName%>Service, commonService, router, route, location, ViewType.LIST);
+                 <%-schemaName%>Service, commonService, router, route, location, ViewType.EDIT);
 <% let theView = compositeEditView; %><%_ include schema-construct.component.ts %>
 <% for (let field of compositeEditView) { let fn=field.fieldName, Fn=field.FieldName; 
     if (field.type === "SchemaString" && field.editor) { %>

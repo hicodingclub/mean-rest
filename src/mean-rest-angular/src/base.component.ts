@@ -78,8 +78,7 @@ export class BaseComponent implements BaseComponentInterface {
 
     //For list and pagination
     protected list:any[] = [];
-    protected currentNumInList;
-    
+        
     protected majorUi = true;
     
     protected page: number = 1;
@@ -209,11 +208,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
     private routeToPage(page:number):void {
         this.putToStorage("page", page);
-        if (this.majorUi) {
-            this.router.navigate(['.', { page: page }], {relativeTo: this.route, });
-        } else if (page != this.page) {
-            this.populateList();
-        }
+        this.populateList();
     }
     
     protected onNextPage():void {
@@ -233,7 +228,12 @@ export class BaseComponent implements BaseComponentInterface {
     
     protected goBack() {
         // window.history.back();
-        this.location.back();
+        if (this.view != ViewType.EDIT)
+            this.location.back();
+        else {
+            let url = this.location.path(); //in EDIT view, the current url is skipped. So get the "previous" one from path.
+            this.router.navigateByUrl(url);
+        }
     }
     
     protected stringify(detail:any):string {
@@ -489,22 +489,16 @@ export class BaseComponent implements BaseComponentInterface {
                 
         this.putToStorage("searchContext", searchContext);
         this.putToStorage("searchText", this.searchText);
-        this.putToStorage("page", null);//start from 1st page
+        this.putToStorage("page", 1);//start from 1st page
         this.putToStorage("searchMoreDetail", this.searchMoreDetail);
         this.putToStorage("detail", this.detail);
     }
     protected searchList():void {
         this.processSearchContext();
-        if (this.majorUi) {
-            //update the URL
-            let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
-            if (url_page) this.router.navigate(['.', {}], {relativeTo: this.route});//start from 1st page
-            //re-populate directly
-            else this.populateList();
-        } else {
-            //re-populate directly
-            this.populateList();
-        }
+        //update the URL
+        this.router.navigate(['.', {}], {relativeTo: this.route});//start from 1st page
+        this.putToStorage("page", 1);//start from 1st page
+        this.populateList();
     }
     protected loadUIFromCache():void {
         //Now let's reload the search condition to UI
@@ -515,36 +509,23 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     protected populateList():void {
-        /*
-        let queryParamMap = this.route.snapshot.queryParamMap;
-        
-        //first let check if there are other search parameters in the url other than page
-        let paramKeys:string[] = queryParamMap.keys;
-        if (paramKeys.length > 0) {//reconstruct the detail, which has the search context
-            let d = {};
-            for (let k of paramKeys) d[k] = queryParamMap.get(k);
-            this.detail = this.formatDetail(d);
-            this.processSearchContext();//reset search to what is provided here            
-        }
-        */
-        
-        //now let's handle page
+        //First let's handle page
         let new_page;
         let searchContext, searchText;
-        if (this.majorUi) {
-          let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
-          let cached_page = parseInt(this.getFromStorage("page"));
-          if (!url_page && cached_page && cached_page > 1) {
-              //reflect page on the url
-              this.router.navigate(['.', { page: cached_page }], {relativeTo: this.route});
-              return;
-          }
-          new_page = url_page? url_page: 1;
+
+        let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
+        let cached_page = parseInt(this.getFromStorage("page"));
+            
+        if (cached_page) { 
+            new_page = cached_page;
+            if (cached_page == 1)
+                this.router.navigate(['.', {}], {relativeTo: this.route, });//update the url
+            else
+                this.router.navigate(['.', {page: cached_page}], {relativeTo: this.route, });//update the url
         }
-        else {
-          new_page = this.getFromStorage("page");
-          if (!new_page) new_page = 1;
-        }
+        else if (url_page) new_page = url_page;
+        else new_page = 1;
+
         searchContext = this.getFromStorage("searchContext");
         this.loadUIFromCache();      
 
@@ -566,7 +547,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     
-    /*UI operations hanlers*/
+    /*UI operations handlers*/
     public onCheckAllChange():void {
         this.checkedItem = 
              Array.apply(null, Array(this.list.length)).
@@ -699,14 +680,24 @@ export class BaseComponent implements BaseComponentInterface {
       }
     }
     
-    public onDisplayRefClicked(fn:string, detail:any):void {
+    protected clickedId = null;
+    public onDisplayRefClicked(fn:string, detail:any, event:any):void {
         let ref = this.getRefFromField(fn);
         let d = detail;
         
-        if (d && d['_id']) this.router.navigate([ref, 'detail', d['_id']], {relativeTo: this.getParentActivatedRouter() });
+        if (d && d['_id']) {
+            if (this.list) {
+                for (let item of this.list){
+                    if (item[fn] == d) this.clickedId = item['_id'];
+                }
+            }
+            this.router.navigate([ref, 'detail', d['_id']], {relativeTo: this.getParentActivatedRouter() });
+        }
+        if (event) event.stopPropagation();
     }
 
     public onDetailLinkClicked(id:string):void {
+        this.clickedId = id; 
         this.router.navigate([this.itemName, 'detail', id], {relativeTo: this.getParentActivatedRouter() });
     }
     
@@ -771,7 +762,11 @@ export class BaseComponent implements BaseComponentInterface {
         }
         
         let componentInstance = <BaseComponentInterface>componentRef.instance;
+        if (this.detail[fieldName]) {
+            componentInstance.inputData = this.detail[fieldName]['_id'];
+        }
         componentInstance.setFocus();
+        
  
         this.componentSubscription = componentInstance.done.subscribe( (val) => {
             if (val) {
@@ -858,9 +853,11 @@ export class BaseComponent implements BaseComponentInterface {
         this.uiCloseModal();
     }
 
+    protected selectedId = null;
     selectItemSelected(num:number) {
-        this.currentNumInList = num;
         let detail = this.list[num];
+        this.selectedId = detail['_id'];
+        this.clickedId = detail['_id'];
         this.outputData = {action: "selected", 
                             value: {"_id": detail["_id"], "value": this.stringify(detail)}
                           };
@@ -876,8 +873,8 @@ export class BaseComponent implements BaseComponentInterface {
     }
 
     selectViewDetail(num:number) {
-        this.currentNumInList = num;
         let detail = this.list[num];
+        this.clickedId = detail['_id'];
         this.outputData = {action: "view", 
                             value: detail["_id"]
                           };

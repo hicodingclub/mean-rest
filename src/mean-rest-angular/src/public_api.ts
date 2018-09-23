@@ -12,3 +12,4 @@ export { ModalConfig, Modal } from './util.modal';
 export { SnackBarConfig, SnackBar } from './util.snackbar';
 export { stringToDateStructure, dateStructureToString } from './ngb-date-formatter';
 
+export { MraRouteReuseStrategy } from './route-reuse-strategy';

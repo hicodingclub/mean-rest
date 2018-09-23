@@ -27,6 +27,6 @@ export class <%-SchemaName%>ListSubComponent extends <%-SchemaName%>ListComponen
       this.detail = {};
       this.detail[ref] = {'_id': id }; //make this as the search context
       this.processSearchContext();
-      this.route.url.subscribe(url =>{this.populateList();});
+      this.populateList();
   }
 }

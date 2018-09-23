@@ -100,9 +100,11 @@ table {
     word-wrap: break-word;
 }
 
-.highlighted-row {
-	
-background-color: rgba(0, 0, 0, .05)
+.clicked-row {
+background-color: #dcdfe0;
+}
+.selected-row {
+background-color: #c9f5eb;
 }
 
 

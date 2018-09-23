@@ -1,7 +1,10 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { RouteReuseStrategy } from '@angular/router'
 
-import { <%-ModuleName%>Component } from './blogsys.component';
+import { MraRouteReuseStrategy } from 'mean-rest-angular';
+
+import { <%-ModuleName%>Component } from './<%-moduleName%>.component';
 
 //Import components for each schema
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
@@ -49,6 +52,10 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
+  providers: [//only use these providers in component scope
+    { provide: RouteReuseStrategy, useClass: MraRouteReuseStrategy }, 
+  ],
+
 })
 export class <%-ModuleName%>RoutingModule { }

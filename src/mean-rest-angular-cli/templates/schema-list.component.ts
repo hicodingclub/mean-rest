@@ -34,6 +34,6 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
   }
 
   ngOnInit() {
-      this.route.url.subscribe(url =>{this.populateList();});
+      this.populateList();
   }
 }

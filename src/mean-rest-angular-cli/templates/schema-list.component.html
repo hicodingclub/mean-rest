@@ -7,7 +7,7 @@
 		    </div>
 			<div class="col-3">
 		        <div class="action-buttons">
-					<a [routerLink]="['../new' ]" class="btn btn-outline-primary">Create</a>
+					<a [routerLink]="['../new' ]" [skipLocationChange]="true" class="btn btn-outline-primary">Create</a>
 					<a routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
 						[ngClass]="{'disabled': !isItemSelected()}">Delete</a>
 				</div>
@@ -33,14 +33,13 @@
 	        </tr>
 	    </thead>
 	    <tbody>
-	        <tr *ngFor="let detail of list;  let i = index">
-	            <td scope="row"><a [routerLink]="['../detail', detail['_id'] ]">{{(page-1)*per_page+i+1}}</a></td>
+	        <tr *ngFor="let detail of list;  let i = index" [ngClass]="{'clicked-row': clickedId==detail['_id']}">
+	            <td scope="row" (click)="onDetailLinkClicked(detail['_id'])"  class="pointer">{{(page-1)*per_page+i+1}}</td>
 <%_ let view = 'list'; for (let field of briefView){ let fn = field.fieldName, ft = field.type; let ref_link = true; %>
-	            <td><% include schema-display.field.html %>
+	            <td (click)="onDetailLinkClicked(detail['_id'])"  class="pointer"><% include schema-display.field.html %>
 	            </td><%_ } %>
 	            <td>
-	            	<a routerLink="." (click)="onDetailLinkClicked(detail['_id'])"><i class="fas fa-external-link-square-alt" title="View Details"></i></a>
-	            	<a [routerLink]="['../edit', detail['_id'] ]"><i class="fas fa-edit" title="Edit"></i></a>
+	            	<a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="true"><i class="fas fa-edit" title="Edit"></i></a>
 	            	<a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a>
 	            </td>
 	            <td>      
