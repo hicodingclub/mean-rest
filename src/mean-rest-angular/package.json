@@ -27,16 +27,15 @@
     "url": "https://github.com/LuckyBang/mean-rest/issues"
   },
   "homepage": "https://github.com/LuckyBang/mean-rest#readme",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@angular/common": "^6.0.3",
-    "@angular/core": "^6.0.3",
-    "@angular/forms": "^6.0.3",
-    "@angular/platform-browser": "^6.0.3",
-    "@angular/router": "^6.0.3",
+    "@angular/common": "^6.1.8",
     "@angular/compiler": "^6.1.4",
     "@angular/compiler-cli": "^6.1.4",
+    "@angular/core": "^6.1.8",
+    "@angular/forms": "^6.1.8",
+    "@angular/platform-browser": "^6.1.8",
+    "@angular/router": "^6.1.8",
     "ng-packagr": "^4.1.1",
     "rxjs": "^6.0.0",
     "typescript": "^2.9.2",
