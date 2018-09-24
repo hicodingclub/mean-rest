@@ -1,42 +1,50 @@
 import { ActivatedRouteSnapshot, DetachedRouteHandle, RouteReuseStrategy } from '@angular/router'
 
+const COMPONENT_CACHE_DURATION = 30 * 1000;
 export class MraRouteReuseStrategy implements RouteReuseStrategy {
 
-    detachedRouteHandles: { [key: string]: DetachedRouteHandle } = {}
+    detachedRouteHandles: { [key: string]: any[] } = {};
+    editItems = {};
 
     /** Determines if this route (and its subtree) should be detached to be reused later */
     public shouldDetach(route: ActivatedRouteSnapshot): boolean {
-        var date = new Date();
-        console.log("==shouldDetach: ", date.getTime(), route, route['_routerState']);
         return route.routeConfig.path === 'list';
     }
 
     /** Stores the detached route */
     public store(route: ActivatedRouteSnapshot, handle: DetachedRouteHandle): void {
-        var date = new Date();
-        console.log("==store: ", date.getTime(), route, route['_routerState']);
+        let date = new Date();
         let key = route['_routerState'].url;
         if (!handle) return;
-        this.detachedRouteHandles[key] = handle
+        this.detachedRouteHandles[key] = [handle, date.getTime()]
     }
 
     /** Determines if this route (and its subtree) should be reattached */
     public shouldAttach(route: ActivatedRouteSnapshot): boolean {
-        var date = new Date();
-        console.log("==shouldAttach: ", date.getTime(), route, route['_routerState']);
+        let date = new Date();
         let key = route['_routerState'].url;
-        return route.routeConfig.path === 'list' && !!this.detachedRouteHandles[key];
+        if (route.routeConfig && (route.routeConfig.path === 'new' || route.routeConfig.path === 'edit/:id')) {
+            if (route.data && route.data.item) this.editItems[route.data.item] = true;
+        }
+        if (!route.routeConfig || route.routeConfig.path !== 'list') return false;
+        if (!this.detachedRouteHandles[key]) return false;
+        if (date.getTime() - this.detachedRouteHandles[key][1]  > COMPONENT_CACHE_DURATION)  return false;
+        return true;
     }
 
     /** Retrieves the previously stored route */
     public retrieve(route: ActivatedRouteSnapshot): DetachedRouteHandle {
-        var date = new Date();
-        console.log("==retrieve: ", date.getTime(), route, route['_routerState']);
-        if (!route.routeConfig || route.routeConfig.path !== 'list') {
-            return null
-        }
+        let date = new Date();
         let key = route['_routerState'].url;
-        return this.detachedRouteHandles[key]
+        if (!route.routeConfig || route.routeConfig.path !== 'list') return null;
+        if (route.data.item && (route.data.item in this.editItems)) {
+            delete this.editItems[route.data.item];
+            delete this.detachedRouteHandles[key];
+            return null;
+        }
+        if (!this.detachedRouteHandles[key]) return null;
+        if (date.getTime() - this.detachedRouteHandles[key][1]  > COMPONENT_CACHE_DURATION) return null;
+        return this.detachedRouteHandles[key][0];
     }
 
     /** Determines if a route should be reused */
