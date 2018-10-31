@@ -1,4 +1,5 @@
 var express = require('express');
+
 var RestController = require('./mean_rest_express_controller')
 
 function RestRouter(name) {
@@ -12,7 +13,6 @@ function RestRouter(name) {
 	router.delete('/:' + idParam, RestController.HardDeleteById);
 
 	router.post('/', RestController.PostActions);
-
 	return router;
 }
 
