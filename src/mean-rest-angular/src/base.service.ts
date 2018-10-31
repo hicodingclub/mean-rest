@@ -50,6 +50,7 @@ export class BaseService {
         let httpOptions = {
             params: new HttpParams().set('__page', page.toString())
                                     .set('__per_page', per_page.toString()),
+            headers: new HttpHeaders({ 'Accept': 'application/json' }),
         };
         
         if (!searchContext) {
@@ -59,7 +60,6 @@ export class BaseService {
                     catchError(this.errorResponseHandler)
                 );
         }
-        httpOptions["headers"] = new HttpHeaders({ 'Content-Type': 'application/json' });
         httpOptions.params = httpOptions.params.set('action', "Search");
         return this.http.post<any>(this.serviceUrl, searchContext, httpOptions)
             .pipe(
@@ -71,6 +71,7 @@ export class BaseService {
         let httpOptions = {
             params: new HttpParams().set('__page', page.toString())
                                     .set('__per_page', per_page.toString()),
+            headers: new HttpHeaders({ 'Accept': 'application/json' }),
         };
 
         return this.http.get<any>(this.serviceUrl, httpOptions)
@@ -81,7 +82,10 @@ export class BaseService {
     }
 
     getDetail(id:string) {
-        return this.http.get<any>(this.serviceUrl + id)
+        let httpOptions = {
+            headers: new HttpHeaders({ 'Accept': 'application/json' }),
+        };
+        return this.http.get<any>(this.serviceUrl + id, httpOptions)
             .pipe(
                 map(this.formatDetail),
                 catchError(this.errorResponseHandler)
