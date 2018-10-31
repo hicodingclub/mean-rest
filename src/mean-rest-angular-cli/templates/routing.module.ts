@@ -5,7 +5,7 @@ import { RouteReuseStrategy } from '@angular/router'
 import { MraRouteReuseStrategy } from 'mean-rest-angular';
 
 import { <%-ModuleName%>Component } from './<%-moduleName%>.component';
-
+import { <%-ModuleName%>Routes } from '../<%-moduleName%>.conf';
 //Import components for each schema
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
 import { <%-schm.SchemaName%>ListComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list.component';
@@ -37,21 +37,9 @@ const <%-schm.schemaName%>RoutingPath = [
     {path: '**', redirectTo: 'list', pathMatch: 'full'}
 ];
 <%_ }%>
-const routes: Routes = [
-  { path: '<%-moduleName%>', 
-    component: <%-ModuleName%>Component,
-    children: [ 
-                {path: '',  redirectTo: '<%-defaultSchema%>', pathMatch: 'full'},
-<%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
-                {path: "<%-schm.schemaName%>",  children: <%-schm.schemaName%>RoutingPath, 
-                    data: {"mraLevel": 1, "item": "<%-schm.schemaName%>"}},<%_
- }%>
-    ]
-  }
-];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
+  imports: [RouterModule.forChild(<%-ModuleName%>Routes)],
   exports: [RouterModule],
   providers: [//only use these providers in component scope
     { provide: RouteReuseStrategy, useClass: MraRouteReuseStrategy }, 

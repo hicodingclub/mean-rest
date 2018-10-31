@@ -47,39 +47,46 @@ var capitalizeFirst = function(str) {
 }
 
 var templates = {
-	//key:[template_file, output_file_suffix, description]
-	mainModule: ["../templates/main.module.ts", ".module.ts", "main module file"],
-	mainComponent: ["../templates/main.component.ts", ".component.ts", "main component file"],
-	mainComponentHtml: ["../templates/main.component.html", ".component.html", "main component html file"],
-	mainComponentCss: ["../templates/main.component.css", ".component.css", "main component css file"],
-	mainDirective: ["../templates/main.directive.ts", ".directive.ts", "main directive file"],
-	routingModule: ["../templates/routing.module.ts", "routing.module.ts", "routing module file"],
-	schemaBaseService: ["../templates/schema.base.service.ts", ".base.service.ts", "base service file"],
-	schemaService: ["../templates/schema.service.ts", ".service.ts", "service file"],
-	schemaComponent: ["../templates/schema.component.ts", ".component.ts", "component file"],
-	schemaListComponent: ["../templates/schema-list.component.ts", "list.component.ts", "list component file"],
-	schemaListComponentHtml: ["../templates/schema-list.component.html", "list.component.html", "list component html file"],
-	schemaListComponentCss: ["../templates/schema-list.component.css", "list.component.css", "list component css file"],
-	schemaSelectComponent: ["../templates/schema-select.component.ts", "select.component.ts", "select component file"],
-	schemaSelectComponentHtml: ["../templates/schema-select.component.html", "select.component.html", "select component html file"],
-	schemaListSubComponent: ["../templates/schema-list-sub.component.ts", "list-sub.component.ts", "list-sub component file"],
-	schemaListSubComponentHtml: ["../templates/schema-list-sub.component.html", "list-sub.component.html", "list-sub component html file"],
+	//key:[template_file, output_file_suffix, description, write_options]
+  //write_options: W: write, A: append
+  conf: ["../templates/conf.ts", ".conf.ts", "module conf file", 'A'],
+        
+  mainModule: ["../templates/main.module.ts", ".module.ts", "main module file", 'W'],
+	mainComponent: ["../templates/main.component.ts", ".component.ts", "main component file", 'W'],
+	mainComponentHtml: ["../templates/main.component.html", ".component.html", "main component html file", 'W'],
+	mainComponentCss: ["../templates/main.component.css", ".component.css", "main component css file", 'W'],
+	mainDirective: ["../templates/main.directive.ts", ".directive.ts", "main directive file", 'W'],
 	
-	schemaDetailComponent: ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file"],
-	schemaDetailComponentHtml: ["../templates/schema-detail.component.html", "detail.component.html", "detail component html file"],
-	schemaDetailComponentCss: ["../templates/schema-detail.component.css", "detail.component.css", "detail component css file"],
+  routingModule: ["../templates/routing.module.ts", "routing.module.ts", "routing module file", 'W'],
+  routingPath: ["../templates/routing.path.ts", "routing.path.ts", "routing path file", 'W'],
+	
+	
+	schemaBaseService: ["../templates/schema.base.service.ts", ".base.service.ts", "base service file", 'W'],
+	schemaService: ["../templates/schema.service.ts", ".service.ts", "service file", 'W'],
+	schemaComponent: ["../templates/schema.component.ts", ".component.ts", "component file", 'W'],
+	schemaListComponent: ["../templates/schema-list.component.ts", "list.component.ts", "list component file", 'W'],
+	schemaListComponentHtml: ["../templates/schema-list.component.html", "list.component.html", "list component html file", 'W'],
+	schemaListComponentCss: ["../templates/schema-list.component.css", "list.component.css", "list component css file", 'W'],
+	schemaSelectComponent: ["../templates/schema-select.component.ts", "select.component.ts", "select component file", 'W'],
+	schemaSelectComponentHtml: ["../templates/schema-select.component.html", "select.component.html", "select component html file", 'W'],
+	schemaListSubComponent: ["../templates/schema-list-sub.component.ts", "list-sub.component.ts", "list-sub component file", 'W'],
+	schemaListSubComponentHtml: ["../templates/schema-list-sub.component.html", "list-sub.component.html", "list-sub component html file", 'W'],
+	
+	schemaDetailComponent: ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
+	schemaDetailComponentHtml: ["../templates/schema-detail.component.html", "detail.component.html", "detail component html file", 'W'],
+	schemaDetailComponentCss: ["../templates/schema-detail.component.css", "detail.component.css", "detail component css file", 'W'],
 
-	schemaDetailSelComponent: ["../templates/schema-detail-sel.component.ts", "detail-sel.component.ts", "detail select component file"],
-	schemaDetailSelComponentHtml: ["../templates/schema-detail-sel.component.html", "detail-sel.component.html", "detail select component html file"],
-	schemaDetailPopComponent: ["../templates/schema-detail-pop.component.ts", "detail-pop.component.ts", "detail pop component file"],
-	schemaDetailPopComponentHtml: ["../templates/schema-detail-pop.component.html", "detail-pop.component.html", "detail pop component html file"],
-	schemaDetailSubComponent: ["../templates/schema-detail-sub.component.ts", "detail-sub.component.ts", "detail sub component file"],
-	schemaDetailSubComponentHtml: ["../templates/schema-detail-sub.component.html", "detail-sub.component.html", "detail sub component html file"],
+	schemaDetailSelComponent: ["../templates/schema-detail-sel.component.ts", "detail-sel.component.ts", "detail select component file", 'W'],
+	schemaDetailSelComponentHtml: ["../templates/schema-detail-sel.component.html", "detail-sel.component.html", "detail select component html file", 'W'],
+	schemaDetailPopComponent: ["../templates/schema-detail-pop.component.ts", "detail-pop.component.ts", "detail pop component file", 'W'],
+	schemaDetailPopComponentHtml: ["../templates/schema-detail-pop.component.html", "detail-pop.component.html", "detail pop component html file", 'W'],
+	schemaDetailSubComponent: ["../templates/schema-detail-sub.component.ts", "detail-sub.component.ts", "detail sub component file", 'W'],
+	schemaDetailSubComponentHtml: ["../templates/schema-detail-sub.component.html", "detail-sub.component.html", "detail sub component html file", 'W'],
 	
-	schemaEditComponent: ["../templates/schema-edit.component.ts", "edit.component.ts", "edit component file"],
-	schemaEditComponentHtml: ["../templates/schema-edit.component.html", "edit.component.html", "edit component html file"],
-	schemaEditComponentCss: ["../templates/schema-edit.component.css", "edit.component.css", "edit component css file"],
-	mraCss: ["../templates/mean-express-angular.css", "mean-express-angular.css", "mean-rest-angular css file"],
+	schemaEditComponent: ["../templates/schema-edit.component.ts", "edit.component.ts", "edit component file", 'W'],
+	schemaEditComponentHtml: ["../templates/schema-edit.component.html", "edit.component.html", "edit component html file", 'W'],
+	schemaEditComponentCss: ["../templates/schema-edit.component.css", "edit.component.css", "edit component css file", 'W'],
+	mraCss: ["../templates/mean-express-angular.css", "mean-express-angular.css", "mean-rest-angular css file", 'W'],
 }
 
 var generateSourceFile = function(keyname, template, renderObj, outputDir) {
@@ -87,14 +94,18 @@ var generateSourceFile = function(keyname, template, renderObj, outputDir) {
 	let templateFile = basedirFile(template[0]);
 	let output = generatedFile(outputDir, keyname, template[1]);
 	let description = template[2];
+	let options = template[3];
 
 	//console.info('Generating %s for "%s"...', description, keyname);
   	ejs.renderFile(templateFile, renderObj, renderOptions, (err, str) => {
 		if (err) {
 			console.error("ERROR! Error happens when generating %s for %s: %s", description, keyname, err);
+			return
 		}
-		else {
+		if (options == 'W') {
 			write(output, str);
+		} else if (options == 'A') {
+		  append(output, str);
 		}
 	});
 }
@@ -214,7 +225,7 @@ program
   .version(VERSION, '    --version')
   .usage('[options] input')
   .option('-m, --module <module_name>', 'module name generated for the given schemas. Default is schema file name.')
-  .option('-a, --api <api_base>', 'api base that will be used for rest calls. Default is "<module_name>-rest".')
+  .option('-a, --api <api_base>', 'api base that will be used for rest calls. Default is "/api/<module_name>".')
   .option('-o, --output <output_dir>', 'output directory of generated files')
   .option('-f, --force', 'force to overwrite existing files')
   .parse(process.argv)
@@ -391,7 +402,7 @@ function main() {
 
   let apiBase;
   if (!program.api) {
-	  apiBase = moduleName + '-rest';
+	  apiBase = "api/" + moduleName;
 	  console.info('NOTE: REST API base is not provided. Use "%s" as api base...', apiBase);
   } else {
 	  apiBase = program.api;
@@ -571,16 +582,16 @@ function main() {
 	  });
 
   let renderObj = {
-	moduleName: moduleName,
-	ModuleName: ModuleName,
-	schemaMap: schemaMap,
-	defaultSchema: defaultSchema,
-	validatorFields: validatorFields,
-	referenceFields: referenceObjFields,
-	hasDate: hasDate,
-	hasRef: hasRef,
-	hasEditor: hasEditor,
-	dateFormat: dateFormat,
+  	moduleName: moduleName,
+  	ModuleName: ModuleName,
+  	schemaMap: schemaMap,
+  	defaultSchema: defaultSchema,
+  	validatorFields: validatorFields,
+  	referenceFields: referenceObjFields,
+  	hasDate: hasDate,
+  	hasRef: hasRef,
+  	hasEditor: hasEditor,
+  	dateFormat: dateFormat,
   }
   //console.log(renderObj.validatorFields);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
@@ -594,11 +605,17 @@ function main() {
 	schemaObj.referredBy = referenceMap.filter(x=>x[3]==schemaName);//Each item has [who, Who, which field, refer to me, Me] format
   }
   
+  generateSourceFile(moduleName, templates.conf, renderObj, parentOutputDir);
+  
   generateSourceFile(moduleName, templates.mainModule, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainComponent, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainComponentHtml, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainComponentCss, renderObj, outputDir);
+  
   generateSourceFile(moduleName, templates.routingModule, renderObj, outputDir);
+  generateSourceFile(moduleName, templates.routingPath, renderObj, outputDir);
+  
+  
   if (hasDate)   generateSourceFile(moduleName, templates.mainDirective, renderObj, outputDir);
   
   for (let key in schemaMap) {
@@ -718,4 +735,36 @@ function warning (message) {
 function write (file, str, mode) {
   fs.writeFileSync(file, str, { mode: mode || MODE_0666 })
   console.log('   \x1b[36mcreate\x1b[0m : ' + file)
+}
+/**
+ * echo str >> file.
+ *
+ * @param {String} file
+ * @param {String} str
+ */
+
+function append (file, str, mode) {
+  let fileMode = { mode: mode || MODE_0666 };
+  let date = new Date();
+  
+  if(!fs.existsSync(file)) {
+    fs.appendFileSync(file, str, fileMode)
+    console.log('   \x1b[36mcreate\x1b[0m : ' + file)
+  } else {
+    let result = "";
+    console.log('   \x1b[36mappend to\x1b[0m : ' + file)
+    console.log('      IMPORTANT! Please check content and merge if necessary.')
+    fs.readFile(file, 'utf8', function(err, data) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      result = data.replace(/\/\*>>>(.*\n)+.*<<<\*\/\n/g, '');
+      fs.writeFileSync(file, result, fileMode)
+      fs.appendFileSync(file, "/*>>> Please check this recent updates and merge with existing ones***\n", fileMode)
+      fs.appendFileSync(file, "**Date: " + date + "\n\n", fileMode)
+      fs.appendFileSync(file, str, fileMode)
+      fs.appendFileSync(file, "**** End of recent updates.<<<*/\n", fileMode)
+    })
+  }
 }
