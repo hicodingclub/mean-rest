@@ -26,6 +26,8 @@
   },
   "homepage": "https://github.com/LuckyBang/mean-rest#readme",
   "dependencies": {
+  },
+  "devDependencies": {
     "express": "^4.16.3",
     "mongoose": "^5.2.6"
   }
