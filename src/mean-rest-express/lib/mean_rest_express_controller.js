@@ -5,16 +5,20 @@ var views_collection = {}; //views in [briefView, detailView, CreateView, EditVi
 var model_collection = {};
 var populate_collection = {};
 
+var loadContextVarsByName = function(name) {
+  let schema = schema_collection[name];
+  let model = model_collection[name];
+  let views = views_collection[name];
+  let populates = populate_collection[name];
+  if (!schema || !model || !views || !populates) throw(createError(500, "Cannot load context from name " + name))
+  return {name: name, schema: schema, model: model, views: views, populates: populates};
+}
+
 var loadContextVars = function(url) {
 	let arr = url.split('/');
 	if (arr.length < 2) throw(createError(500, "Cannot identify context name from routing path: " + url))
 	let name = arr[arr.length-2].toLowerCase();
-	let schema = schema_collection[name];
-	let model = model_collection[name];
-	let views = views_collection[name];
-	let populates = populate_collection[name];
-	if (!schema || !model || !views || !populates) throw(createError(500, "Cannot load context from routing path " + url))
-	return {name: name, schema: schema, model: model, views: views, populates: populates};
+	return loadContextVarsByName(name);
 }
 
 var createRegex = function(obj) {
@@ -200,7 +204,7 @@ RestController.searchAll = function(req, res, next, searchContext) {
                 	per_page: __per_page,
                 	items: result
                 }
-                res.send(output);
+                return res.send(output);
             })        
     })
 };
@@ -230,7 +234,7 @@ RestController.getDetailsById = function(req, res, next) {
 	}
 	dbExec.exec(function (err, result) {
 		if (err) { return next(err); }
-		res.send(result);
+		return res.send(result);
 	});
 };
 	
@@ -241,7 +245,7 @@ RestController.HardDeleteById = function(req, res, next) {
 	let id = req.params[idParam];
 	model.findByIdAndDelete(id).exec(function (err, result) {
 		if (err) { return next(err); }
-		res.send();
+		return res.send();
 	});
 };
 
@@ -256,7 +260,7 @@ RestController.PostActions = function(req, res, next) {
 	    try {
 	        body = JSON.parse(body);
 	    } catch(e) {
-	    	next(createError(404, "Bad " + name + " document."));
+	    	return next(createError(404, "Bad " + name + " document."));
 	    }
 	}
 
@@ -280,7 +284,7 @@ RestController.deleteManyByIds = function(req, res, next, ids) {
 	model.deleteMany({"_id": {$in: ids}})
 		.exec(function (err, result) {
 		if (err) { return next(err); }
-		res.send();
+		return res.send();
 	});
 };
 
@@ -292,13 +296,13 @@ RestController.Create = function(req, res, next) {
 	    try {
 	        body = JSON.parse(body);
 	    } catch(e) {
-	    	next(createError(404, "Bad " + name + " document."));
+	    	return next(createError(404, "Bad " + name + " document."));
 	    }
 	}
 
 	model.create(body, function (err, result) {
 		if (err) { return next(err); }
-		res.send(result);
+		return res.send(result);
 	});	
 };
 
@@ -310,7 +314,7 @@ RestController.Update = function(req, res, next) {
         try {
             body = JSON.parse(body);
         } catch(e) {
-            next(createError(404, "Bad " + name + " document."));
+            return next(createError(404, "Bad " + name + " document."));
         }
     }
 
@@ -318,8 +322,118 @@ RestController.Update = function(req, res, next) {
 	let id = req.params[idParam];
 	model.replaceOne({_id: id}, body, function (err, result) {
             if (err) { return next(err); }
-            res.send();
+            return res.send();
     });
 };
+
+
+
+RestController.ModelExecute = function(modelName, apiName, callBack, ...queryParams) {
+  let model = model_collection[modelName];
+  if (!model[apiName]) {
+    let err = new Error("API doesn't exit in model: " + apiName);
+    callBack(err, null);
+  }
+  model[apiName].apply(model, queryParams)
+    .exec(function (err, result) {
+      callBack(err, result);
+    });
+}
+
+RestController.authLogin = function(req, res, next, authSchemaName, authUserNames, authPassword) {
+  let {name: name, schema: schema, model: model, views: views} = loadContextVarsByName(authSchemaName);
+  
+  let body = req.body;
+  if (typeof body === "string") {
+      try {
+          body = JSON.parse(body);
+      } catch(e) {
+        return next(createError(400, "Bad request body."));
+      }
+  }
+  
+  let userName;
+  let fieldName;
+  let userNames = authUserNames.split(' ');
+  for (let n of userNames) {
+    if (body[n]) {
+      fieldName = n;
+      userName = body[n];
+      break;
+    }
+  }
+  
+  let password;
+  if (body[authPassword]) {
+      password = body[authPassword];
+  }
+
+  if (!userName || !password) {
+    return next(createError(400, "Bad login request: missing info."));
+  }
+
+  let query = {};
+  query[fieldName] = userName;
+  model.findOne(query, function(err, user) {
+    if (err) {
+      return next(err); 
+    }
+    if (!user) {
+      return next(createError(403, "Bad login request: User Name"));
+    }
+    
+    // test a matching password
+    user.comparePassword(password, function(err, isMatch) {
+        if (err || !isMatch) return next(createError(403, "Bad login request: Password."));
+        return res.send();
+    });
+  });
+}
+
+RestController.authRegister = function(req, res, next, authSchemaName, authUserNames, authPassword) {
+  let {name: name, schema: schema, model: model, views: views} = loadContextVarsByName(authSchemaName);
+  
+  let body = req.body;
+  if (typeof body === "string") {
+      try {
+          body = JSON.parse(body);
+      } catch(e) {
+        return next(createError(400, "Bad request body."));
+      }
+  }
+  
+  let userName;
+  let fieldName;
+  let userNames = authUserNames.split(' ');
+  for (let n of userNames) {
+    if (body[n]) {
+      fieldName = n;
+      userName = body[n];
+      break;
+    }
+  }
+  
+  let password;
+  if (body[authPassword]) {
+      password = body[authPassword];
+  }
+
+  if (!userName || !password) {
+    return next(createError(400, "Bad register request: missing info."));
+  }
+
+  model.create(body, function (err, result) {
+    if (err) {
+      if (err.name === 'MongoError' && err.code === 11000) {
+        // Duplicate 
+        return next(createError(400, "Bad request body. User already exists."));
+      }
+
+      return next(err);
+    }
+    return res.send();
+  }); 
+}
+
 
 module.exports = RestController;
