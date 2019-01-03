@@ -440,10 +440,12 @@ function main() {
   let defaultSchema;
   let hasDate = false;
   let hasRef = false;
+  let hasEditor = false;
   let dateFormat = "MM/DD/YYYY";
   if (config && config.dateFormat) dateFormat = config.dateFormat;
   let timeFormat = "hh:mm:ss";
-
+  if (config && config.timeFormat) timeFormat = config.timeFormat;
+  
   for (let name in schemas) {
 	let schemaDef = schemas[name];
 
@@ -556,6 +558,7 @@ function main() {
 		compositeEditView: compositeEditView,
 		componentDir: componentDir,
 		dateFormat: dateFormat,
+		timeFormat: timeFormat,
 		schemaHasDate: schemaHasDate,
 		schemaHasRef: schemaHasRef,
 		schemaHasEditor: schemaHasEditor,
@@ -592,6 +595,7 @@ function main() {
   	hasRef: hasRef,
   	hasEditor: hasEditor,
   	dateFormat: dateFormat,
+  	timeFormat: timeFormat,
   }
   //console.log(renderObj.validatorFields);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);

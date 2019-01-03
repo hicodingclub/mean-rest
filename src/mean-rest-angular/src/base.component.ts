@@ -11,59 +11,7 @@ import { ErrorToastConfig, ErrorToast} from './util.errortoast';
 import { BaseService, ServiceError } from './base.service';
 import { MraCommonService } from './common.service';
 import { BaseComponentInterface } from './base.interface';
-
-function equalTwoSearchContextArrays (arr1, arr2) {
-    if (!arr1) arr1 = [];
-    if (!arr2) arr2 = [];
-    if (arr1.length == 0 && arr2.length == 0) return true;
-    //all object in array has format of {'field': 'value'} format
-    function compareObj(a, b) {
-        let a_s = JSON.stringify(a), b_s = JSON.stringify(b)
-        if (a_s < b_s)
-            return -1;
-        if (a_s > b_s)
-            return 1;
-        return 0;
-    }
-    arr1 = arr1.sort(compareObj);
-    arr2 = arr2.sort(compareObj);
-    if (JSON.stringify(arr1) == JSON.stringify(arr2)) return true;
-    return false;
-}
-
-function clone(obj:any):any {
-    let copy;
-
-    // Handle the 3 simple types, and null or undefined
-    if (null == obj || "object" != typeof obj) return obj;
-
-    // Handle Date
-    if (obj instanceof Date) {
-        copy = new Date();
-        copy.setTime(obj.getTime());
-        return copy;
-    }
-
-    // Handle Array
-    if (obj instanceof Array) {
-        copy = [];
-        for (var i = 0, len = obj.length; i < len; i++) {
-            copy[i] = clone(obj[i]);
-        }
-        return copy;
-    }
-
-    // Handle Object
-    if (obj instanceof Object) {
-        copy = {};
-        for (var attr in obj) {
-            if (obj.hasOwnProperty(attr)) copy[attr] = clone(obj[attr]);
-        }
-        return copy;
-    }
-
-    throw new Error("Unable to copy obj! Its type isn't supported.");
-}
+import { Util } from './util.tools';
 
 export enum ViewType {
     LIST,
@@ -108,6 +56,7 @@ export class BaseComponent implements BaseComponentInterface {
     protected dateFields = [];
     protected indexFields = [];
     protected dateFormat = "MM/DD/YYYY";
+    protected timeFormat = "hh:mm:ss";
 
     protected ItemName: string;
     //protected itemName: string; //defined in constuctor
@@ -287,41 +236,44 @@ export class BaseComponent implements BaseComponentInterface {
         return detail;
     }
     protected formatDateField(field:string):any {
-            let fmt = this.dateFormat;
-            let d, M, yyyy, h, m, s;
+        let fmt = this.dateFormat;
+        let t_fmt = this.timeFormat;
+        let d, M, yyyy, h, m, s;
 
-                let dt = new Date(field);
-                
-                let dd, MM, hh, mm, ss;
-                d = dt.getDate();
-                M = dt.getMonth()+1; 
-                yyyy = dt.getFullYear();
-                
-                let yy = yyyy.toString().slice(2);
-                h = dt.getHours();
-                m = dt.getMinutes();
-                s = dt.getSeconds();
-                
-                dd= d<10? '0'+d: d.toString();
-                MM= M<10? '0'+M: M.toString();
-                hh= h<10? '0'+h: h.toString();
-                mm= m<10? '0'+m: m.toString();
-                ss= s<10? '0'+s: s.toString();
-                
-                let value = fmt.replace(/yyyy/ig, yyyy.toString()).
-                               replace(/yy/ig, yy.toString()).
-                               replace(/MM/g, MM.toString()).
-                               replace(/dd/ig, dd.toString()).
-                               replace(/hh/ig, hh.toString()).
-                               replace(/mm/g, mm.toString()).
-                               replace(/ss/ig, ss.toString());
-                /*Datepicker uses NgbDateStruct as a model and not the native Date object. 
-                It's a simple data structure with 3 fields. Also note that months start with 1 (as in ISO 8601).
-                
-                we add h, m, s here
-                */
-                //"from" and "to" used for search context. pop: show the selection popup
-                return {'date':{ day: d, month: M, year: yyyy}, 'value': value, 'from': undefined, 'to': undefined, 'pop':false}
+        let dt = new Date(field);
+        
+        let dd, MM, hh, mm, ss;
+        d = dt.getDate();
+        M = dt.getMonth()+1; 
+        yyyy = dt.getFullYear();
+        
+        let yy = yyyy.toString().slice(2);
+        h = dt.getHours();
+        m = dt.getMinutes();
+        s = dt.getSeconds();
+        
+        dd= d<10? '0'+d: d.toString();
+        MM= M<10? '0'+M: M.toString();
+        hh= h<10? '0'+h: h.toString();
+        mm= m<10? '0'+m: m.toString();
+        ss= s<10? '0'+s: s.toString();
+        
+        let value = fmt.replace(/yyyy/ig, yyyy.toString()).
+                       replace(/yy/ig, yy.toString()).
+                       replace(/MM/g, MM.toString()).
+                       replace(/dd/ig, dd.toString());
+      
+        let t_value = t_fmt.replace(/hh/ig, hh.toString()).
+                       replace(/mm/g, mm.toString()).
+                       replace(/ss/ig, ss.toString());
+        /*Datepicker uses NgbDateStruct as a model and not the native Date object. 
+        It's a simple data structure with 3 fields. Also note that months start with 1 (as in ISO 8601).
+        
+        we add h, m, s here
+        */
+        //"from" and "to" used for search context. pop: show the selection popup
+        return {'date':{ day: d, month: M, year: yyyy}, 'value': value, 'from': undefined, 'to': undefined, 'pop':false,
+                'time':{ hour: h, minute: m, second: s}, 't_value': value, 't_from': undefined, 't_to': undefined, 't_pop':false}
 
     }
     
@@ -378,7 +330,7 @@ export class BaseComponent implements BaseComponentInterface {
     }    
     
     protected deFormatDetail(detail:any ):any {
-        let cpy = clone(detail);
+        let cpy = Util.clone(detail);
         
         cpy = this.deFormatReference(cpy);
         cpy = this.deFormatDate(cpy);
@@ -388,7 +340,7 @@ export class BaseComponent implements BaseComponentInterface {
     protected populateDetail(id:string):void {
       this.service.getDetail(id).subscribe(
         detail => {
-            let originalDetail = clone(detail);
+            let originalDetail = Util.clone(detail);
             if (detail["_id"]) this.commonService.putToStorage(detail["_id"], originalDetail);//cache it
             
             this.detail = this.formatDetail(detail);
@@ -409,7 +361,25 @@ export class BaseComponent implements BaseComponentInterface {
       );
     }
     
-    
+    private equalTwoSearchContextArrays (arr1, arr2) {
+      if (!arr1) arr1 = [];
+      if (!arr2) arr2 = [];
+      if (arr1.length == 0 && arr2.length == 0) return true;
+      //all object in array has format of {'field': 'value'} format
+      function compareObj(a, b) {
+          let a_s = JSON.stringify(a), b_s = JSON.stringify(b)
+          if (a_s < b_s)
+              return -1;
+          if (a_s > b_s)
+              return 1;
+          return 0;
+      }
+      arr1 = arr1.sort(compareObj);
+      arr2 = arr2.sort(compareObj);
+      if (JSON.stringify(arr1) == JSON.stringify(arr2)) return true;
+      return false;
+    }
+
     protected processSearchContext() {
         this.moreSearchOpened = false;
         let d = this.detail;
@@ -481,12 +451,13 @@ export class BaseComponent implements BaseComponentInterface {
                 if ('$and' in sub) cachedAnd = sub['$and'];
                 else if ('$or' in sub) cachedOr = sub['$or'];
             }
-            if (equalTwoSearchContextArrays(cachedOr, orSearchContext) 
-                && equalTwoSearchContextArrays(cachedAnd, andSearchContext)) {
+            if (this.equalTwoSearchContextArrays(cachedOr, orSearchContext) 
+                && this.equalTwoSearchContextArrays(cachedAnd, andSearchContext)) {
                 return;
             }
         } 
-                
+        
+        if (orSearchContext.length == 0 && andSearchContext.length == 0) searchContext = null;
         this.putToStorage("searchContext", searchContext);
         this.putToStorage("searchText", this.searchText);
         this.putToStorage("page", 1);//start from 1st page

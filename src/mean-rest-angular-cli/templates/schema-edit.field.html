@@ -167,9 +167,9 @@
 	      </fieldset>
     <%_ } else if (field.type === "SchemaDate") { %>
 	      <fieldset class="form-group">
-	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%> </label> <span> (<%-dateFormat%>)</span>
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%> </label> <span> ({{dateFormat}})</span>
 	        <div class="input-group">
-		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="<%-dateFormat%>"
+		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
 	                 <%if (field.required) {%>required<%}%>
 		        	 <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
 		             [(ngModel)]="detail['<%-fn%>']['date']" name="<%-sn%>Edit<%-Fn%>"
@@ -194,7 +194,7 @@
 	        <div [hidden]="<%-sn%>Edit<%-Fn%>.valid || <%-sn%>Edit<%-Fn%>.untouched || !(<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.ngbDate)"
      			class="alert alert-danger">
 	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.ngbDate">
-    	        <%-Fn%> must be in <%-dateFormat%> format.
+    	        <%-Fn%> must be in {{dateFormat}} format.
   	          </div>
 	        </div>
 	      </fieldset>

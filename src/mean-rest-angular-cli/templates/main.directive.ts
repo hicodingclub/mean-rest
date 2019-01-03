@@ -4,7 +4,7 @@ import { dateStructureToString, stringToDateStructure } from 'mean-rest-angular'
 
 export class MraNgbDateFormatterService extends NgbDateParserFormatter {
     private dateFormat:string = "<%-dateFormat%>";
-    private timeFormat:string = "hh:mm:ss";
+    private timeFormat:string = "<%-timeFormat%>";
     
     // from input -> internal model
     parse(value: string): NgbDateStruct {

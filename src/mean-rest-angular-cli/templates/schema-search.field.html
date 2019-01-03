@@ -47,11 +47,11 @@
 	                #<%-sn%>Edit<%-Fn%>="ngModel">
     <%_ } else if (field.type === "SchemaDate") { %> 
 	        <div class="input-group">
-		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="<%-dateFormat%>"
+		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
 		             [(ngModel)]="detail['<%-fn%>']['from']" name="<%-sn%>Edit<%-Fn%>"
 		             ngbDatepicker #<%-sn%>Edit<%-Fn%>="ngModel">
 		      <span>&nbsp; ~ &nbsp;</span>
-		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="<%-dateFormat%>"
+		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
 		             [(ngModel)]="detail['<%-fn%>']['to']" name="<%-sn%>Edit<%-Fn%>"
 		             ngbDatepicker #<%-sn%>Edit<%-Fn%>="ngModel">
 

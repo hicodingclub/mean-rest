@@ -47,7 +47,8 @@ export class <%-SchemaName%>Component extends BaseComponent {
       protected location: Location,
       protected view: ViewType ) {
         super(<%-schemaName%>Service, commonService, router, route, location, view, itemName);
-        <% if (schemaHasDate)  {%>this.dateFormat = "<%-dateFormat%>";<%}%>
+        <% if (schemaHasDate)  {%>this.dateFormat = "<%-dateFormat%>";
+        this.timeFormat = "<%-timeFormat%>";<%}%>
         this.indexFields = [<%for (let field of indexView) {%>'<%-field.fieldName%>',<%}%>];
     }
 }
