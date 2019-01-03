@@ -43,7 +43,7 @@ function meanRestExpressRouter(sysDef) {
     
     restRouter = RestRouter(name);
     expressRouter.use("/" + name, restRouter)
-    sub_routes.push(name + "/");
+    sub_routes.push(name);
   }
   
   if (!!authSchemaName) {

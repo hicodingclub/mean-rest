@@ -2,18 +2,27 @@ var express = require('express');
 
 var RestController = require('./mean_rest_express_controller')
 
+function _setRouterName(name) {
+  return function(req, res, next) {
+    req.meanRestRouteName = name;
+    next();
+  }
+}
+
 function RestRouter(name) {
-	var router = express.Router();
+  var router = express.Router();
 
-	router.get('/', RestController.getAll);
-	let idParam = name + "Id";
-	router.get('/:' + idParam, RestController.getDetailsById);
-	router.put('/', RestController.Create);
-	router.post('/:' + idParam, RestController.Update);
-	router.delete('/:' + idParam, RestController.HardDeleteById);
+  var middlewareFunc = _setRouterName(name);
 
-	router.post('/', RestController.PostActions);
-	return router;
+  router.get('/', middlewareFunc, RestController.getAll);
+  let idParam = name + "Id";
+  router.get('/:' + idParam, middlewareFunc, RestController.getDetailsById);
+  router.put('/', middlewareFunc, RestController.Create);
+  router.post('/:' + idParam, middlewareFunc, RestController.Update);
+  router.delete('/:' + idParam, middlewareFunc, RestController.HardDeleteById);
+
+  router.post('/', middlewareFunc, RestController.PostActions);
+  return router;
 }
 
 module.exports = RestRouter

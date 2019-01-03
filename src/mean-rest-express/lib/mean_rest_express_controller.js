@@ -14,10 +14,12 @@ var loadContextVarsByName = function(name) {
   return {name: name, schema: schema, model: model, views: views, populates: populates};
 }
 
-var loadContextVars = function(url) {
-	let arr = url.split('/');
-	if (arr.length < 2) throw(createError(500, "Cannot identify context name from routing path: " + url))
-	let name = arr[arr.length-2].toLowerCase();
+var loadContextVars = function(req) {
+	//let url = req.originalUrl;
+	//let arr = url.split('/');
+	//if (arr.length < 2) throw(createError(500, "Cannot identify context name from routing path: " + url))
+	//let name = arr[arr.length-2].toLowerCase();
+	let name = req.meanRestRouteName;
 	return loadContextVarsByName(name);
 }
 
@@ -126,7 +128,7 @@ RestController.getAll = function(req, res, next) {
 
 RestController.searchAll = function(req, res, next, searchContext) {
 	let {name: name, schema: schema, model: model, views: views, populates:populates} 
-		= loadContextVars(req.originalUrl);
+		= loadContextVars(req);
 	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 	let briefView = views[0];
 	
@@ -211,7 +213,7 @@ RestController.searchAll = function(req, res, next, searchContext) {
 	
 RestController.getDetailsById = function(req, res, next) {
 	let {name: name, schema: schema, model: model, views: views, populates:populates} 
-			= loadContextVars(req.originalUrl);
+			= loadContextVars(req);
 	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 	let detailView = views[1];
 
@@ -239,7 +241,7 @@ RestController.getDetailsById = function(req, res, next) {
 };
 	
 RestController.HardDeleteById = function(req, res, next) {
-	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req.originalUrl);
+	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req);
 	
 	let idParam = name + "Id";
 	let id = req.params[idParam];
@@ -279,7 +281,7 @@ RestController.PostActions = function(req, res, next) {
 }
 
 RestController.deleteManyByIds = function(req, res, next, ids) {
-	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req.originalUrl);
+	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req);
 
 	model.deleteMany({"_id": {$in: ids}})
 		.exec(function (err, result) {
@@ -289,7 +291,7 @@ RestController.deleteManyByIds = function(req, res, next, ids) {
 };
 
 RestController.Create = function(req, res, next) {
-	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req.originalUrl);
+	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req);
 	
 	let body = req.body;
 	if (typeof body === "string") {
@@ -307,7 +309,7 @@ RestController.Create = function(req, res, next) {
 };
 
 RestController.Update = function(req, res, next) {
-	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req.originalUrl);
+	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req);
 
     let body = req.body;
     if (typeof body === "string") {
