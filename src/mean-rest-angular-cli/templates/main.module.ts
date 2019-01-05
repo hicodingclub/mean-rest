@@ -12,6 +12,9 @@ import { <%-ModuleName%>RoutingModule } from './<%-moduleName%>-routing.module';
 import { <%-ModuleName%>Component } from './<%-moduleName%>.component';
 <% if (hasRef) {%>import { <%-ModuleName%>RefSelectDirective } from './<%-moduleName%>.component';<%}%>
 
+import { <%-ModuleName%>_SERVER_ROOT_URI } from './<%-moduleName%>.tokens';
+import { <%-moduleName%>_server_root_uri } from '../<%-moduleName%>.conf';
+
 //Import components for each schema
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
 import { <%-schm.SchemaName%>ListComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list.component';
@@ -72,6 +75,7 @@ import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validat
     <%-schm.SchemaName%>DetailSubComponent,<%_ }}%>
   ],
   providers: [
+    { provide: <%-ModuleName%>_SERVER_ROOT_URI, useValue: <%-moduleName%>_server_root_uri },
   <%_ if (hasDate) {%>    
     {provide: NgbDateParserFormatter, useClass: MraNgbDateFormatterService},<%}%>
   <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>

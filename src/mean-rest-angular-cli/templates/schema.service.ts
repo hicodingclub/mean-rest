@@ -1,12 +1,14 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, Inject, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { <%-SchemaName%>BaseService } from './<%-schemaName%>.base.service';
- 
-@Injectable(
-)
+import { <%-ModuleName%>_SERVER_ROOT_URI } from '../<%-moduleName%>.tokens';
+
+@Injectable()
 export class <%-SchemaName%>Service extends <%-SchemaName%>BaseService implements OnDestroy {    
-    constructor(http: HttpClient) {
-        super(http);
+    constructor(
+        http: HttpClient,
+        @Inject(<%-ModuleName%>_SERVER_ROOT_URI) private <%-moduleName%>ServerRootUri: string) {
+        super(http, <%-moduleName%>ServerRootUri);
     }
     ngOnDestroy() { }
 }

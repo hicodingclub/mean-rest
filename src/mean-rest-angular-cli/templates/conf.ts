@@ -11,9 +11,13 @@ export const <%-ModuleName%>Routes: Routes = [
     children: [ 
       {path: '',  redirectTo: '<%-defaultSchema%>', pathMatch: 'full'},
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
-      {path: "<%-schm.schemaName%>",  children: <%-schm.schemaName%>RoutingPath, 
-         data: {"mraLevel": 1, "item": "<%-schm.schemaName%>"}},<%_
+      { path: "<%-schm.schemaName%>",
+        children: <%-schm.schemaName%>RoutingPath, 
+        data: {"mraLevel": 1, "item": "<%-schm.schemaName%>"}
+      },<%_
  }%>
     ]
   }
 ];
+
+export const <%-moduleName%>_server_root_uri:string = "/<%-apiBase%>";

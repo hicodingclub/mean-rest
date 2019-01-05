@@ -52,41 +52,42 @@ var templates = {
   conf: ["../templates/conf.ts", ".conf.ts", "module conf file", 'A'],
         
   mainModule: ["../templates/main.module.ts", ".module.ts", "main module file", 'W'],
-	mainComponent: ["../templates/main.component.ts", ".component.ts", "main component file", 'W'],
-	mainComponentHtml: ["../templates/main.component.html", ".component.html", "main component html file", 'W'],
-	mainComponentCss: ["../templates/main.component.css", ".component.css", "main component css file", 'W'],
-	mainDirective: ["../templates/main.directive.ts", ".directive.ts", "main directive file", 'W'],
+  mainComponent: ["../templates/main.component.ts", ".component.ts", "main component file", 'W'],
+  mainComponentHtml: ["../templates/main.component.html", ".component.html", "main component html file", 'W'],
+  mainComponentCss: ["../templates/main.component.css", ".component.css", "main component css file", 'W'],
+  mainDirective: ["../templates/main.directive.ts", ".directive.ts", "main directive file", 'W'],
+  tokens: ["../templates/tokens.ts", ".tokens.ts", "module token file", 'W'],
 	
   routingModule: ["../templates/routing.module.ts", "routing.module.ts", "routing module file", 'W'],
   routingPath: ["../templates/routing.path.ts", "routing.path.ts", "routing path file", 'W'],
 	
 	
-	schemaBaseService: ["../templates/schema.base.service.ts", ".base.service.ts", "base service file", 'W'],
-	schemaService: ["../templates/schema.service.ts", ".service.ts", "service file", 'W'],
-	schemaComponent: ["../templates/schema.component.ts", ".component.ts", "component file", 'W'],
-	schemaListComponent: ["../templates/schema-list.component.ts", "list.component.ts", "list component file", 'W'],
-	schemaListComponentHtml: ["../templates/schema-list.component.html", "list.component.html", "list component html file", 'W'],
-	schemaListComponentCss: ["../templates/schema-list.component.css", "list.component.css", "list component css file", 'W'],
-	schemaSelectComponent: ["../templates/schema-select.component.ts", "select.component.ts", "select component file", 'W'],
-	schemaSelectComponentHtml: ["../templates/schema-select.component.html", "select.component.html", "select component html file", 'W'],
-	schemaListSubComponent: ["../templates/schema-list-sub.component.ts", "list-sub.component.ts", "list-sub component file", 'W'],
-	schemaListSubComponentHtml: ["../templates/schema-list-sub.component.html", "list-sub.component.html", "list-sub component html file", 'W'],
+  schemaBaseService: ["../templates/schema.base.service.ts", ".base.service.ts", "base service file", 'W'],
+  schemaService: ["../templates/schema.service.ts", ".service.ts", "service file", 'W'],
+  schemaComponent: ["../templates/schema.component.ts", ".component.ts", "component file", 'W'],
+  schemaListComponent: ["../templates/schema-list.component.ts", "list.component.ts", "list component file", 'W'],
+  schemaListComponentHtml: ["../templates/schema-list.component.html", "list.component.html", "list component html file", 'W'],
+  schemaListComponentCss: ["../templates/schema-list.component.css", "list.component.css", "list component css file", 'W'],
+  schemaSelectComponent: ["../templates/schema-select.component.ts", "select.component.ts", "select component file", 'W'],
+  schemaSelectComponentHtml: ["../templates/schema-select.component.html", "select.component.html", "select component html file", 'W'],
+  schemaListSubComponent: ["../templates/schema-list-sub.component.ts", "list-sub.component.ts", "list-sub component file", 'W'],
+  schemaListSubComponentHtml: ["../templates/schema-list-sub.component.html", "list-sub.component.html", "list-sub component html file", 'W'],
 	
-	schemaDetailComponent: ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
-	schemaDetailComponentHtml: ["../templates/schema-detail.component.html", "detail.component.html", "detail component html file", 'W'],
-	schemaDetailComponentCss: ["../templates/schema-detail.component.css", "detail.component.css", "detail component css file", 'W'],
+  schemaDetailComponent: ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
+  schemaDetailComponentHtml: ["../templates/schema-detail.component.html", "detail.component.html", "detail component html file", 'W'],
+  schemaDetailComponentCss: ["../templates/schema-detail.component.css", "detail.component.css", "detail component css file", 'W'],
 
-	schemaDetailSelComponent: ["../templates/schema-detail-sel.component.ts", "detail-sel.component.ts", "detail select component file", 'W'],
-	schemaDetailSelComponentHtml: ["../templates/schema-detail-sel.component.html", "detail-sel.component.html", "detail select component html file", 'W'],
-	schemaDetailPopComponent: ["../templates/schema-detail-pop.component.ts", "detail-pop.component.ts", "detail pop component file", 'W'],
-	schemaDetailPopComponentHtml: ["../templates/schema-detail-pop.component.html", "detail-pop.component.html", "detail pop component html file", 'W'],
-	schemaDetailSubComponent: ["../templates/schema-detail-sub.component.ts", "detail-sub.component.ts", "detail sub component file", 'W'],
-	schemaDetailSubComponentHtml: ["../templates/schema-detail-sub.component.html", "detail-sub.component.html", "detail sub component html file", 'W'],
+  schemaDetailSelComponent: ["../templates/schema-detail-sel.component.ts", "detail-sel.component.ts", "detail select component file", 'W'],
+  schemaDetailSelComponentHtml: ["../templates/schema-detail-sel.component.html", "detail-sel.component.html", "detail select component html file", 'W'],
+  schemaDetailPopComponent: ["../templates/schema-detail-pop.component.ts", "detail-pop.component.ts", "detail pop component file", 'W'],
+  schemaDetailPopComponentHtml: ["../templates/schema-detail-pop.component.html", "detail-pop.component.html", "detail pop component html file", 'W'],
+  schemaDetailSubComponent: ["../templates/schema-detail-sub.component.ts", "detail-sub.component.ts", "detail sub component file", 'W'],
+  schemaDetailSubComponentHtml: ["../templates/schema-detail-sub.component.html", "detail-sub.component.html", "detail sub component html file", 'W'],
 	
-	schemaEditComponent: ["../templates/schema-edit.component.ts", "edit.component.ts", "edit component file", 'W'],
-	schemaEditComponentHtml: ["../templates/schema-edit.component.html", "edit.component.html", "edit component html file", 'W'],
-	schemaEditComponentCss: ["../templates/schema-edit.component.css", "edit.component.css", "edit component css file", 'W'],
-	mraCss: ["../templates/mean-express-angular.css", "mean-express-angular.css", "mean-rest-angular css file", 'W'],
+  schemaEditComponent: ["../templates/schema-edit.component.ts", "edit.component.ts", "edit component file", 'W'],
+  schemaEditComponentHtml: ["../templates/schema-edit.component.html", "edit.component.html", "edit component html file", 'W'],
+  schemaEditComponentCss: ["../templates/schema-edit.component.css", "edit.component.css", "edit component css file", 'W'],
+  mraCss: ["../templates/mean-express-angular.css", "mean-express-angular.css", "mean-rest-angular css file", 'W'],
 }
 
 var generateSourceFile = function(keyname, template, renderObj, outputDir) {
@@ -587,6 +588,7 @@ function main() {
   let renderObj = {
   	moduleName: moduleName,
   	ModuleName: ModuleName,
+        apiBase: apiBase,
   	schemaMap: schemaMap,
   	defaultSchema: defaultSchema,
   	validatorFields: validatorFields,
@@ -615,6 +617,7 @@ function main() {
   generateSourceFile(moduleName, templates.mainComponent, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainComponentHtml, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainComponentCss, renderObj, outputDir);
+  generateSourceFile(moduleName, templates.tokens, renderObj, outputDir);
   
   generateSourceFile(moduleName, templates.routingModule, renderObj, outputDir);
   generateSourceFile(moduleName, templates.routingPath, renderObj, outputDir);
