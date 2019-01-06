@@ -97,7 +97,7 @@ AuthnController.verifyToken = function(req, res, next) {
   } 
   
   if (!token) {
-    return next();
+    return next(createError(401, "Unauthorized."));
   }
 
   jwt.verify(token, 'server secret random', function(err, decoded) {
