@@ -2,7 +2,7 @@ var bcrypt = require('bcrypt');
 
 var SALT_WORK_FACTOR = 10;
 
-var authorize = function(schema, authPassword) {
+var addPasswordHandlers = function(schema, authPassword) {
   schema.pre('save', function(next) {
     var user = this;
 
@@ -34,4 +34,4 @@ var authorize = function(schema, authPassword) {
   return schema;
 }
 
-module.exports = authorize; 
+module.exports = addPasswordHandlers; 

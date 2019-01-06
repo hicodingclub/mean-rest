@@ -5,6 +5,8 @@ var views_collection = {}; //views in [briefView, detailView, CreateView, EditVi
 var model_collection = {};
 var populate_collection = {};
 
+var auth = {};
+
 var loadContextVarsByName = function(name) {
   let schema = schema_collection[name];
   let model = model_collection[name];
@@ -15,69 +17,72 @@ var loadContextVarsByName = function(name) {
 }
 
 var loadContextVars = function(req) {
-	//let url = req.originalUrl;
-	//let arr = url.split('/');
-	//if (arr.length < 2) throw(createError(500, "Cannot identify context name from routing path: " + url))
-	//let name = arr[arr.length-2].toLowerCase();
-	let name = req.meanRestRouteName;
-	return loadContextVarsByName(name);
+  //let url = req.originalUrl
+  //let arr = url.split('/');
+  //if (arr.length < 2) throw(createError(500, "Cannot identify context name from routing path: " + url))
+  //let name = arr[arr.length-2].toLowerCase();
+
+  let name = req.meanRestRouteName;
+  return loadContextVarsByName(name);
 }
 
 var createRegex = function(obj) {
-	//obj in {key: string} format
-	for (let prop in obj) {
-		let userInput = obj[prop];
-		obj[prop] = new RegExp(
-			    // Escape all special characters except *
-			    userInput.replace(/([.+?^=!:${}()|\[\]\/\\])/g, "\\$1")
-			      // Allow the use of * as a wildcard like % in SQL.
-			      .replace(/\*/g, ".*"),
-			    'i'
-			  );
-	}
-	return obj;
+  //obj in {key: string} format
+  for (let prop in obj) {
+    let userInput = obj[prop];
+    obj[prop] = new RegExp(
+      // Escape all special characters except *
+      userInput.replace(/([.+?^=!:${}()|\[\]\/\\])/g, "\\$1")
+          .replace(/\*/g, ".*"), // Allow the use of * as a wildcard like % in SQL.
+      'i');
+  }
+  return obj;
 }
 
 var checkAndSetValue = function(obj, schema) {
-	//obj in {item: value} format
-	for (let item in obj) {
-		if (item in schema.paths) {
-			let type = schema.paths[item].constructor.name;
-			if (type == 'SchemaDate') {
-				if (typeof obj[item] == 'string') { //exact data provided:
-					let dt = new Date(obj[item]);
-					let y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate();
-					let d1 = new Date(y, m, d);
-					let d2 = new Date(y, m, d);
-					
-					d2.setDate(d2.getDate() + 1);
-					
-					obj[item] = {"$gte": d1,"$lt": d2};
-				} else if (typeof obj[item] == 'object') { //data range
-					let o = {};
-					if (obj[item]['from']) {
-						let dt = new Date(obj[item]['from']);
-						let y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate();
-						let d1 = new Date(y, m, d);
-						o["$gte"] = d1;
-					}
-					if (obj[item]['to']) {
-						let dt = new Date(obj[item]['to']);
-						let y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate();
-						let d2 = new Date(y, m, d);
-						d2.setDate(d2.getDate() + 1);
-						
-						o["$lt"] = d2;
-					}
-					obj[item] = o;
-				}
-			}
-		}
-	}
-	return obj;
-}
+  //obj in {item: value} format
+  for (let item in obj) {
+    if (item in schema.paths) {
+      let type = schema.paths[item].constructor.name;
+      if (type == 'SchemaDate') {
+        if (typeof obj[item] == 'string') { //exact data provided:
+          let dt = new Date(obj[item]);
+          let y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate();
+          let d1 = new Date(y, m, d);
+          let d2 = new Date(y, m, d);
+          
+          d2.setDate(d2.getDate() + 1);
+                   
+          obj[item] = {"$gte": d1,"$lt": d2};
+        } else if (typeof obj[item] == 'object') { //data range
+          let o = {};
+          if (obj[item]['from']) {
+            let dt = new Date(obj[item]['from']);
+            //let y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate();
+            //let d1 = new Date(y, m, d);
+            o["$gte"] = dt;
+          }
+          if (obj[item]['to']) {
+          let dt = new Date(obj[item]['to']);
+            //let y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate();
+            //let d2 = new Date(y, m, d);
+            //d2.setDate(d2.getDate() + 1);
+          
+            o["$lt"] = dt;
+          }
+          obj[item] = o;
+        }
+      } else if (type == 'SchemaString') {
+        let userInput = obj[item];
 
-var RestController = function() {
+        obj[item] = new RegExp(
+          // Escape all special characters 
+          userInput.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"),
+          'i');
+      }
+    }
+  }
+  return obj;
 }
 
 var getViewPopulates = function(schema, viewStr) {
@@ -108,6 +113,11 @@ var getPopulatesRefFields = function(ref) {
 	return views[5]; //indexView
 }
 
+
+var RestController = function() {
+}
+RestController.loadContextVarsByName = loadContextVarsByName;
+
 RestController.register = function(name, schema, views, model) {
 	schema_collection[name.toLowerCase()] = schema;
 	views_collection[name.toLowerCase()] = views;
@@ -127,38 +137,38 @@ RestController.getAll = function(req, res, next) {
 }
 
 RestController.searchAll = function(req, res, next, searchContext) {
-	let {name: name, schema: schema, model: model, views: views, populates:populates} 
+  let {name: name, schema: schema, model: model, views: views, populates:populates} 
 		= loadContextVars(req);
-	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-	let briefView = views[0];
+  //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+  let briefView = views[0];
 	
-	let populateArray = [];
-	populates.briefView.forEach( (p)=> {
+  let populateArray = [];
+  populates.briefView.forEach( (p)=> {
 		//an array, with [field, ref]
 		let fields = getPopulatesRefFields(p[1]);
 		if (fields != null) //only push when the ref schema is found
 			populateArray.push({ path: p[0], select: fields });
-	});
-	let query = {};
+  });
+  let query = {};
 
-	//get the query parameters ?a=b&c=d, but filter out unknown ones
+  //get the query parameters ?a=b&c=d, but filter out unknown ones
 	
-	const PER_PAGE = 25, MAX_PER_PAGE = 1000;
+  const PER_PAGE = 25, MAX_PER_PAGE = 1000;
 	
-	let __page = 1;
-	let __per_page = PER_PAGE;
+  let __page = 1;
+  let __per_page = PER_PAGE;
 	
-	for (var prop in req.query) {
+  for (var prop in req.query) {
 		if (prop === "__page") __page = parseInt(req.query[prop]);
 		else if (prop === "__per_page") __per_page = parseInt(req.query[prop]);
 		else if (prop in schema.paths) {
 			query[prop] = req.query[prop];
 		}
-	}
+  }
 	
-	let count = 0;
-	if (searchContext) {
-		//console.log("searchContext is ....", searchContext);
+  let count = 0;
+  if (searchContext) {
+        //console.log("searchContext is ....", searchContext);
         // searchContext ={'$and', [{'$or', []},{'$and', []}]}
 		if (searchContext['$and']) {
 		  for (let subContext of searchContext['$and']) {
@@ -173,14 +183,14 @@ RestController.searchAll = function(req, res, next, searchContext) {
 		}
 		query = searchContext;
 		//console.log("query is ....", query['$and'][0]['$or'], query['$and'][1]['$and']);
-	}
+  }
 
-	model.countDocuments(query).exec(function(err, cnt) {
+  model.countDocuments(query).exec(function(err, cnt) {
         if (err) { return next(err); }
         count = cnt;
         
-    	if (isNaN(__per_page) || __per_page <= 0) __per_page = PER_PAGE;
-    	else if (__per_page > MAX_PER_PAGE) __per_page = MAX_PER_PAGE;
+        if (isNaN(__per_page) || __per_page <= 0) __per_page = PER_PAGE;
+        else if (__per_page > MAX_PER_PAGE) __per_page = MAX_PER_PAGE;
 
     	let maxPageNum = Math.ceil(count/(__per_page*1.0));
 
@@ -208,7 +218,7 @@ RestController.searchAll = function(req, res, next, searchContext) {
                 }
                 return res.send(output);
             })        
-    })
+  })
 };
 	
 RestController.getDetailsById = function(req, res, next) {
@@ -340,101 +350,6 @@ RestController.ModelExecute = function(modelName, apiName, callBack, ...queryPar
     .exec(function (err, result) {
       callBack(err, result);
     });
-}
-
-RestController.authLogin = function(req, res, next, authSchemaName, authUserNames, authPassword) {
-  let {name: name, schema: schema, model: model, views: views} = loadContextVarsByName(authSchemaName);
-  
-  let body = req.body;
-  if (typeof body === "string") {
-      try {
-          body = JSON.parse(body);
-      } catch(e) {
-        return next(createError(400, "Bad request body."));
-      }
-  }
-  
-  let userName;
-  let fieldName;
-  let userNames = authUserNames.split(' ');
-  for (let n of userNames) {
-    if (body[n]) {
-      fieldName = n;
-      userName = body[n];
-      break;
-    }
-  }
-  
-  let password;
-  if (body[authPassword]) {
-      password = body[authPassword];
-  }
-
-  if (!userName || !password) {
-    return next(createError(400, "Bad login request: missing info."));
-  }
-
-  let query = {};
-  query[fieldName] = userName;
-  model.findOne(query, function(err, user) {
-    if (err) {
-      return next(err); 
-    }
-    if (!user) {
-      return next(createError(403, "Bad login request: User Name"));
-    }
-    
-    // test a matching password
-    user.comparePassword(password, function(err, isMatch) {
-        if (err || !isMatch) return next(createError(403, "Bad login request: Password."));
-        return res.send();
-    });
-  });
-}
-
-RestController.authRegister = function(req, res, next, authSchemaName, authUserNames, authPassword) {
-  let {name: name, schema: schema, model: model, views: views} = loadContextVarsByName(authSchemaName);
-  
-  let body = req.body;
-  if (typeof body === "string") {
-      try {
-          body = JSON.parse(body);
-      } catch(e) {
-        return next(createError(400, "Bad request body."));
-      }
-  }
-  
-  let userName;
-  let fieldName;
-  let userNames = authUserNames.split(' ');
-  for (let n of userNames) {
-    if (body[n]) {
-      fieldName = n;
-      userName = body[n];
-      break;
-    }
-  }
-  
-  let password;
-  if (body[authPassword]) {
-      password = body[authPassword];
-  }
-
-  if (!userName || !password) {
-    return next(createError(400, "Bad register request: missing info."));
-  }
-
-  model.create(body, function (err, result) {
-    if (err) {
-      if (err.name === 'MongoError' && err.code === 11000) {
-        // Duplicate 
-        return next(createError(400, "Bad request body. User already exists."));
-      }
-
-      return next(err);
-    }
-    return res.send();
-  }); 
 }
 
 

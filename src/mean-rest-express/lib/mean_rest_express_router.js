@@ -2,27 +2,29 @@ let mongoose = require('mongoose');
 let express = require('express');
 let createError = require('http-errors');
 
+let addPasswordHandlers = require('../authn/password_handler');
 let RestController = require('./mean_rest_express_controller')
+let AuthnController = require('../authn/authn_controller')
 let RestRouter = require('./mean_rest_express_sub_router')
 
 function meanRestExpressRouter(sysDef) {
   let expressRouter = express.Router();
   let schemas = sysDef.schemas;
   
+  let authUserFields = "username";
+  if ("authUserFields" in sysDef.config) {
+    authUserFields = sysDef.config["authUserFields"];
+  }
+  let authPasswordField = "password";
+  if ("authPasswordField" in sysDef.config) {
+    authPasswordField = sysDef.config["authPasswordField"];
+  }
   let authSchemaName;
   if ("authUserSchema" in sysDef.config) {
     authSchemaName = sysDef.config["authUserSchema"];
-  }
-  let authUserNames = "username";
-  if ("authUserNames" in sysDef.config) {
-    authUserNames = sysDef.config["authUserNames"];
-  }
-  let authPassword = "password";
-  if ("authPassword" in sysDef.config) {
-    authPassword = sysDef.config["authPassword"];
+    AuthnController.registerAuth(authSchemaName, authUserFields, authPasswordField);
   }
 
-      
   let sub_routes = [];
   for (let schemaName in schemas) {
     var schemaDef = schemas[schemaName];
@@ -32,26 +34,34 @@ function meanRestExpressRouter(sysDef) {
     
     let schm = schemaDef.schema;
 
-    if (name == authSchemaName) {
-      let authorize = require('../auth/authorize');
-      schm = authorize(schm, authPassword);
+    if (schemaName == authSchemaName) {
+      schm = addPasswordHandlers(schm, authPasswordField);
     }
-    
+
     let model = mongoose.model(schemaName, schm, );//model uses given name
-    
     RestController.register(name, schemaDef.schema, schemaDef.views, model);
     
     restRouter = RestRouter(name);
     expressRouter.use("/" + name, restRouter)
-    sub_routes.push(name);
+    sub_routes.push("/" + name);
   }
   
   if (!!authSchemaName) {
-    expressRouter.post("/login", (req, res, next) => {
-      RestController.authLogin(req, res, next, authSchemaName, authUserNames, authPassword);
-    });    
+    sub_routes.push("/login");
+    sub_routes.push("/register");
+
+    expressRouter.post(
+      "/login", 
+      (req, res, next) => {
+        AuthnController.authLogin(req, res, next);
+      },
+      (req, res, next) => {
+        AuthnController.generateToken(req, res, next);
+      }
+    );
+
     expressRouter.post("/register", (req, res, next) => {
-      RestController.authRegister(req, res, next, authSchemaName, authUserNames, authPassword);
+      AuthnController.authRegister(req, res, next);
     });    
   }
   
