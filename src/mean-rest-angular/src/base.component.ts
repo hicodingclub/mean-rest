@@ -82,6 +82,7 @@ export class BaseComponent implements BaseComponentInterface {
             errMsg = error.clientErrorMsg;
         }
         else if (error.serverError) {
+            if (error.status == 401)  return; //Don't show unauthorized error
             if (typeof error.serverError === 'object') {
                 errMsg = error.status + ": " + JSON.stringify(error.serverError);
             } else {
