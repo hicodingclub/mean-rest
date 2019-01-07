@@ -26,6 +26,8 @@ AuthnController.authLogin = function(req, res, next) {
         return next(createError(400, "Bad request body."));
       }
   }
+  if (!body || typeof body !== "object") return next(createError(400, "Bad request body."));
+
   
   let userName;
   let fieldName;
@@ -69,22 +71,86 @@ AuthnController.authLogin = function(req, res, next) {
 }
 
 AuthnController.generateToken = function(req, res, next) {
-  let token = jwt.sign(
+  let accessToken = jwt.sign(
     req.muser, 
     'server secret random', 
     {expiresIn: 60*60}
   );
+
+  let refreshToken = jwt.sign(
+    req.muser, 
+    'server refresh secret random', 
+    {expiresIn: 60*60*12}
+  );
+
   let r = {
-    "accessToken": token,
+    "accessToken": accessToken,
+    "refreshToken": refreshToken,
     "userName": req.muser.userName,
     "fieldName": req.muser.fieldName
   }
   return res.send(r);
 }
 
+AuthnController.verifyRefreshToken = function(req, res, next) {
+  let {name: name, schema: schema, model: model, views: views} = loadContextVarsByName(auth.schemaName.toLowerCase());
+  
+  let body = req.body;
+  if (typeof body === "string") {
+      try {
+          body = JSON.parse(body);
+      } catch(e) {
+        return next(createError(400, "Bad request body."));
+      }
+  }
+
+  if (!body || typeof body !== "object") return next(createError(400, "Bad request body."));
+
+  let token;
+  let queryKey = "refreshToken";
+  if (body[queryKey]) {
+      token = body[queryKey];
+  }
+
+  if (!token) {
+    return next(createError(400, "Bad request token."));
+  }
+
+  jwt.verify(token, 'server refresh secret random', function(err, decoded) {
+    if (err) {
+      //return next();
+      return next(createError(400, "Bad request token."));
+    }
+    if (!decoded) return next(createError(400, "Bad request token."));
+    req.muser = decoded;
+    return next(); //call authRefresh to check user in DB.
+  });  
+}
+
+AuthnController.authRefresh = function(req, res, next) {
+  let {name: name, schema: schema, model: model, views: views} = loadContextVarsByName(auth.schemaName.toLowerCase());
+  
+  let { _id, userName, fieldName} = req.muser;
+  let query = {};
+  query["_id"] = _id;
+  model.findOne(query, function(err, user) {
+    if (err) {
+      return next(err); 
+    }
+    if (!user) {
+      return next(createError(403, "Bad user."));
+    }
+    req.muser = {"_id": user["_id"], 
+          "userName": userName,
+          "fieldName": fieldName
+        };
+    return next(); //don't send response. need generate Token.
+  });
+}
+
 AuthnController.verifyToken = function(req, res, next) {
   let token;
-  let queryKey = "access_token";
+  let queryKey = "accessToken";
   if (req.query && req.query[queryKey]) {
       token = req.query[queryKey];
   }
@@ -105,7 +171,7 @@ AuthnController.verifyToken = function(req, res, next) {
       //return next();
       return next(createError(401, "Unauthorized."));
     }
-    if (!decoded) return next();
+    if (!decoded) return next(createError(401, "Unauthorized."));
     req.muser = decoded;
     return next();
   });

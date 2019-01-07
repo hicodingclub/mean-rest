@@ -49,11 +49,25 @@ function meanRestExpressRouter(sysDef) {
   if (!!authSchemaName) {
     sub_routes.push("/login");
     sub_routes.push("/register");
+    sub_routes.push("/refresh");
 
     expressRouter.post(
       "/login", 
       (req, res, next) => {
         AuthnController.authLogin(req, res, next);
+      },
+      (req, res, next) => {
+        AuthnController.generateToken(req, res, next);
+      }
+    );
+
+    expressRouter.post(
+      "/refresh", 
+      (req, res, next) => {
+        AuthnController.verifyRefreshToken(req, res, next);
+      },
+      (req, res, next) => {
+        AuthnController.authRefresh(req, res, next);
       },
       (req, res, next) => {
         AuthnController.generateToken(req, res, next);
