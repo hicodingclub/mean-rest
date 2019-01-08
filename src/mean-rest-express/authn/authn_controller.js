@@ -9,6 +9,9 @@ var AuthnController = function() {
   ;
 }
 
+const REFRESH_SECRETE = 'server refresh secret random';
+const ACCESS_SECRETE = 'server secret random';
+
 AuthnController.registerAuth = function(schemaName, userFields, passwordField) {
   auth.schemaName = schemaName;
   auth.userFields = userFields;
@@ -73,13 +76,13 @@ AuthnController.authLogin = function(req, res, next) {
 AuthnController.generateToken = function(req, res, next) {
   let accessToken = jwt.sign(
     req.muser, 
-    'server secret random', 
+    ACCESS_SECRETE, 
     {expiresIn: 60*60}
   );
 
   let refreshToken = jwt.sign(
     req.muser, 
-    'server refresh secret random', 
+    REFRESH_SECRETE, 
     {expiresIn: 60*60*12}
   );
 
@@ -116,7 +119,7 @@ AuthnController.verifyRefreshToken = function(req, res, next) {
     return next(createError(400, "Bad request token."));
   }
 
-  jwt.verify(token, 'server refresh secret random', function(err, decoded) {
+  jwt.verify(token, REFRESH_SECRETE, function(err, decoded) {
     if (err) {
       //return next();
       return next(createError(400, "Bad request token."));
@@ -166,7 +169,7 @@ AuthnController.verifyToken = function(req, res, next) {
     return next(createError(401, "Unauthorized."));
   }
 
-  jwt.verify(token, 'server secret random', function(err, decoded) {
+  jwt.verify(token, ACCESS_SECRETE, function(err, decoded) {
     if (err) {
       //return next();
       return next(createError(401, "Unauthorized."));

@@ -41,6 +41,7 @@ var userIndex = "username";
 
 
 var dateFormat = "MM-DD-YYYY";
+var timeFormat = "hh:mm:ss";
 
 var schemas = {
   "muser": {
@@ -50,10 +51,21 @@ var schemas = {
 };
 var config = {
   dateFormat: dateFormat,
+  timeFormat: timeFormat,
   
   authUserSchema: "muser",
   authUserFields: "username email phone",
   authPasswordField: "password"
 }
 
-module.exports = {schemas: schemas, config: config}
+var authn = {
+  authUserSchema: "muser",
+  authUserFields: "username email phone",
+  authPasswordField: "password"
+}
+
+var authz = {
+  authRoleSchema: "mrole"
+}
+
+module.exports = {schemas: schemas, config: config, authn: authn, authz: authz}
