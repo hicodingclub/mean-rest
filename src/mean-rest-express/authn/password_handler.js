@@ -1,10 +1,10 @@
-var bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 
-var SALT_WORK_FACTOR = 10;
+const SALT_WORK_FACTOR = 10;
 
-var addPasswordHandlers = function(schema, authPassword) {
+const addPasswordHandlers = function(schema, authPassword) {
   schema.pre('save', function(next) {
-    var user = this;
+    let user = this;
 
     // only hash the password if it has been modified (or is new)
     if (!user.isModified(authPassword)) return next();

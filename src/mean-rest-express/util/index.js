@@ -1,4 +1,4 @@
-//Re-order an express router stack: move "num" layer from tail to head
+//Re-order the router stack of an express router: move "num" layers in the stask from tail to head
 const moveRouterStackTailToHead = function(router, num) {
   if(!router || !router.stack) return router;
   let len = router.stack.length;

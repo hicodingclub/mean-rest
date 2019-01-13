@@ -1,18 +1,18 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
-var validateEmail = function(email) {
+const validateEmail = function(email) {
   var re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
   return re.test(email)
 }
 
-var validatePhone = function(phone) {
+const validatePhone = function(phone) {
   var re = /^(\d+-?)+\d+$/;
   return re.test(phone)
 }
 
-var userSchema = new Schema({
+const userSchema = new Schema({
   username: { type: String, required: true, index: { unique: true, sparse: true } },
   email: {
     type: String,
@@ -32,24 +32,24 @@ var userSchema = new Schema({
   password: { type: String, required: true }
 });
 
-var userBrief = "username email phone";
-var userDetail = "username email phone";
-var userCreat = "username email phone password";
-var userEdit = "username email phone password";
-var userTextSearch = "username email phone";
-var userIndex = "username";
+const userBrief = "username email phone";
+const userDetail = "username email phone";
+const userCreat = "username email phone password";
+const userEdit = "username email phone password";
+const userTextSearch = "username email phone";
+const userIndex = "username";
 
 
-var dateFormat = "MM-DD-YYYY";
-var timeFormat = "hh:mm:ss";
+const dateFormat = "MM-DD-YYYY";
+const timeFormat = "hh:mm:ss";
 
-var schemas = {
+const schemas = {
   "muser": {
     schema: userSchema,
     views: [userBrief, userDetail, userCreat, userEdit, userTextSearch, userIndex],
   }
 };
-var config = {
+const config = {
   dateFormat: dateFormat,
   timeFormat: timeFormat,
   
@@ -58,13 +58,13 @@ var config = {
   authPasswordField: "password"
 }
 
-var authn = {
+const authn = {
   authUserSchema: "muser",
   authUserFields: "username email phone",
   authPasswordField: "password"
 }
 
-var authz = {
+const authz = {
   authRoleSchema: "mrole"
 }
 

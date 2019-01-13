@@ -1,13 +1,13 @@
-var createError = require('http-errors');
+const createError = require('http-errors');
 
-var schema_collection = {};
-var views_collection = {}; //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-var model_collection = {};
-var populate_collection = {};
+const schema_collection = {};
+const views_collection = {}; //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+const model_collection = {};
+const populate_collection = {};
 
-var auth = {};
+const auth = {};
 
-var loadContextVarsByName = function(name) {
+const loadContextVarsByName = function(name) {
   let schema = schema_collection[name];
   let model = model_collection[name];
   let views = views_collection[name];
@@ -16,7 +16,7 @@ var loadContextVarsByName = function(name) {
   return {name: name, schema: schema, model: model, views: views, populates: populates};
 }
 
-var loadContextVars = function(req) {
+const loadContextVars = function(req) {
   //let url = req.originalUrl
   //let arr = url.split('/');
   //if (arr.length < 2) throw(createError(500, "Cannot identify context name from routing path: " + url))
@@ -26,7 +26,7 @@ var loadContextVars = function(req) {
   return loadContextVarsByName(name);
 }
 
-var createRegex = function(obj) {
+const createRegex = function(obj) {
   //obj in {key: string} format
   for (let prop in obj) {
     let userInput = obj[prop];
@@ -39,7 +39,7 @@ var createRegex = function(obj) {
   return obj;
 }
 
-var checkAndSetValue = function(obj, schema) {
+const checkAndSetValue = function(obj, schema) {
   //obj in {item: value} format
   for (let item in obj) {
     if (item in schema.paths) {
@@ -85,7 +85,7 @@ var checkAndSetValue = function(obj, schema) {
   return obj;
 }
 
-var getViewPopulates = function(schema, viewStr) {
+const getViewPopulates = function(schema, viewStr) {
 	
 	let populates = [];
 	let viewFields = viewStr.match(/\S+/g) || [];
@@ -106,7 +106,7 @@ var getViewPopulates = function(schema, viewStr) {
 	return populates;
 }
 
-var getPopulatesRefFields = function(ref) {
+const getPopulatesRefFields = function(ref) {
 	let views = views_collection[ref.toLowerCase()]; //view registered with lowerCase
 	if (!views) return null;
 	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
@@ -114,7 +114,7 @@ var getPopulatesRefFields = function(ref) {
 }
 
 
-var RestController = function() {
+let RestController = function() {
 }
 RestController.loadContextVarsByName = loadContextVarsByName;
 
@@ -158,7 +158,7 @@ RestController.searchAll = function(req, res, next, searchContext) {
   let __page = 1;
   let __per_page = PER_PAGE;
 	
-  for (var prop in req.query) {
+  for (let prop in req.query) {
 		if (prop === "__page") __page = parseInt(req.query[prop]);
 		else if (prop === "__per_page") __per_page = parseInt(req.query[prop]);
 		else if (prop in schema.paths) {
@@ -263,7 +263,7 @@ RestController.HardDeleteById = function(req, res, next) {
 
 RestController.PostActions = function(req, res, next) {	
 	let action = "";
-	for (var prop in req.query) {
+	for (let prop in req.query) {
 		if (prop === "action") action = req.query[prop];
 	}
 	

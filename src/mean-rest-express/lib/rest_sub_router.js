@@ -1,19 +1,19 @@
-var express = require('express');
+const express = require('express');
 
-var RestController = require('./mean_rest_express_controller')
-var AuthnController = require('../authn/authn_controller')
+const RestController = require('./rest_controller')
+const AuthnController = require('../authn/authn_controller')
 
-function _setRouterName(name) {
+const _setRouterName = function(name) {
   return function(req, res, next) {
     req.meanRestRouteName = name;
     next();
   }
 }
 
-function RestRouter(name) {
-  var router = express.Router();
+const RestRouter = function(name) {
+  let router = express.Router();
 
-  var setRouterName = _setRouterName(name);
+  let setRouterName = _setRouterName(name);
   router.use(setRouterName); 
   router.use(AuthnController.verifyToken); //verifyToken and set user
 

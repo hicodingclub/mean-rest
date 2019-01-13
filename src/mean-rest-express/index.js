@@ -1,4 +1,4 @@
-var meanRestExpressRouter = require('./lib/mean_rest_express_router')
+var meanRestExpressRouter = require('./lib/rest_router')
 
 var AuthRouter = require('./authn/authn_router')
 var authUserDef = require('./authn/user.model')

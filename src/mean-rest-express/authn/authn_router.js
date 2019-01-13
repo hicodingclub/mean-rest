@@ -1,10 +1,10 @@
-const meanRestExpressRouter = require('../lib/mean_rest_express_router')
+const meanRestExpressRouter = require('../lib/rest_router')
 const util = require('../util')
 
-let addPasswordHandlers = require('./password_handler');
-let AuthnController = require('./authn_controller')
+const addPasswordHandlers = require('./password_handler');
+const AuthnController = require('./authn_controller')
 
-function AuthnRouter(sysDef) {  
+const AuthnRouter = function(sysDef) {  
   let authUserFields = "username";
   if ("authUserFields" in sysDef.config) {
     authUserFields = sysDef.config["authUserFields"];
@@ -21,7 +21,7 @@ function AuthnRouter(sysDef) {
 
   let schemas = sysDef.schemas;
   for (let schemaName in schemas) {
-    var schemaDef = schemas[schemaName];
+    let schemaDef = schemas[schemaName];
     //schemaDef.views in [briefView, detailView, CreateView, EditView, SearchView] sequence
 
     if (schemaName == authSchemaName) {

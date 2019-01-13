@@ -1,12 +1,11 @@
 const jwt = require('jsonwebtoken');
-var createError = require('http-errors');
+const createError = require('http-errors');
 
-const RestController = require('../lib/mean_rest_express_controller')
+const RestController = require('../lib/rest_controller')
 const loadContextVarsByName = RestController.loadContextVarsByName
 
-var auth = {}
-var AuthnController = function() {
-  ;
+let auth = {}
+let AuthnController = function() {
 }
 
 const REFRESH_SECRETE = 'server refresh secret random';
@@ -159,7 +158,7 @@ AuthnController.verifyToken = function(req, res, next) {
   }
 
   if (!token && req.headers && req.headers.authorization) {
-    var parts = req.headers.authorization.split(' ');
+    let parts = req.headers.authorization.split(' ');
     if (parts.length === 2 && parts[0] === "Bearer") {
         token = parts[1];
       }
