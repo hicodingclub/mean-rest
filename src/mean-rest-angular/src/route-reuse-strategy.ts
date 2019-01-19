@@ -6,6 +6,44 @@ export class MraRouteReuseStrategy implements RouteReuseStrategy {
     detachedRouteHandles: { [key: string]: any[] } = {}; //key is url, and value is at [handle, timestamp] format
     pageYOffset = {};
     editItems = {};
+    isAuth = false;
+
+    /* Start: The following should use the authService. But let's decouple dependency now */
+    private isAuthorized(): boolean {
+        //Refer to AuthenticationService for this function.
+        const authRecord = JSON.parse(localStorage.getItem('mdds-auth-record'));
+        if (authRecord && authRecord.accessToken ) {return true;}
+        return false;
+    }
+    private getLogoutTime(): number {
+        const authRecord = JSON.parse(localStorage.getItem('mdds-auth-record'));
+        if (authRecord) { 
+            return authRecord.logoutTs;
+        }
+        return 0;
+    }
+    /* End */
+
+    private isLogoutReload(): boolean {
+        if (this.isAuthorized()) { 
+            return false;
+        }
+        const currentTs = Date.now();
+        const logoutTs = this.getLogoutTime();
+        if (currentTs - logoutTs < 1000) { 
+            return true;
+        }
+        return false;
+    }
+
+    private checkAuthentication() {
+        const auth = this.isAuth;
+        this.isAuth = this.isAuthorized();
+        if (this.isAuth != auth) { 
+            // authentication status changed. Not attach;
+            this.detachedRouteHandles = {}; // empty the map
+        }
+    }
 
     /** Determines if this route (and its subtree) should be detached to be reused later */
     public shouldDetach(route: ActivatedRouteSnapshot): boolean {
@@ -19,21 +57,24 @@ export class MraRouteReuseStrategy implements RouteReuseStrategy {
 
     /** Stores the detached route */
     public store(route: ActivatedRouteSnapshot, handle: DetachedRouteHandle): void {
-        let date = new Date();
-        let key = route['_routerState'].url;
+        const date = new Date();
+        const key = route['_routerState'].url;
         if (!handle) return;
         this.detachedRouteHandles[key] = [handle, date.getTime()]
     }
 
     /** Determines if this route (and its subtree) should be reattached */
     public shouldAttach(route: ActivatedRouteSnapshot): boolean {
+        this.checkAuthentication();
         let date = new Date();
         let key = route['_routerState'].url;
         if (route.routeConfig && (route.routeConfig.path === 'new' || route.routeConfig.path === 'edit/:id')) {
-            if (route.data && route.data.item) this.editItems[route.data.item] = true;
+            if (route.data && route.data.item) { 
+                this.editItems[route.data.item] = true;
+            }
         }
-        if (!route.routeConfig || route.routeConfig.path !== 'list') return false;
-        if (!this.detachedRouteHandles[key]) return false;
+        if (!route.routeConfig || route.routeConfig.path !== 'list') {  return false; }
+        if (!this.detachedRouteHandles[key]) { return false; }
         if (date.getTime() - this.detachedRouteHandles[key][1]  > COMPONENT_CACHE_DURATION)  return false;
         return true;
     }
@@ -63,6 +104,9 @@ export class MraRouteReuseStrategy implements RouteReuseStrategy {
     /** Determines if a route should be reused */
     public shouldReuseRoute(future: ActivatedRouteSnapshot, curr: ActivatedRouteSnapshot): boolean {
         // Below is the default implementation;
+        if (this.isLogoutReload()) {
+            return false; // authentication status changed. Don't reuse.
+        }
         return future.routeConfig === curr.routeConfig
     }
 }
