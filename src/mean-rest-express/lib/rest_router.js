@@ -5,10 +5,18 @@ const createError = require('http-errors');
 const RestController = require('./rest_controller')
 const RestRouter = require('./rest_sub_router')
 
-const meanRestExpressRouter = function(sysDef, authnFunc) {
+const meanRestExpressRouter = function(sysDef, authConfig) {
   let expressRouter = express.Router();
   let schemas = sysDef.schemas;
   
+  let authzFuncCreator;
+  if (authConfig) {
+    let authnFunc = authConfig.authnFunc;
+    expressRouter.use(authnFunc);
+
+    authzFuncCreator = authConfig.authzFuncCreator;
+  }
+
   let sub_routes = [];
   for (let schemaName in schemas) {
     var schemaDef = schemas[schemaName];
@@ -18,13 +26,13 @@ const meanRestExpressRouter = function(sysDef, authnFunc) {
     let schm = schemaDef.schema;
     let model = mongoose.model(schemaName, schm );//model uses given name
     RestController.register(name, schemaDef.schema, schemaDef.views, model);
-    
-    let authConf;
-    if (authnFunc) {
-      authConf = {authnFunc: authnFunc};
+
+    let authzFunc;
+    if (sysDef.authz && authzFuncCreator) {
+        authzFunc = authzFuncCreator(schemaName, sysDef.authz);
     }
 
-    restRouter = RestRouter(name, authConf);
+    restRouter = RestRouter(name, authzFunc);
     expressRouter.use("/" + name, restRouter)
     sub_routes.push("/" + name);
   }

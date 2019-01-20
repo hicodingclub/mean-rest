@@ -65,7 +65,8 @@ const authn = {
 }
 
 const authz = {
-  authRoleSchema: "mrole"
+  "module-authz": {"LoginUser": {"others": "", "own": "RU"}, "Anyone": ""},
+  "muser": {"LoginUser": {"others": "", "own": "RU"}, "Anyone": ""}
 }
 
 module.exports = {schemas: schemas, config: config, authn: authn, authz: authz}

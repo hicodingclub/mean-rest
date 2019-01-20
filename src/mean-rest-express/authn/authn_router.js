@@ -4,18 +4,19 @@ const util = require('../util')
 const addPasswordHandlers = require('./password_handler');
 const AuthnController = require('./authn_controller')
 
-const AuthnRouter = function(sysDef) {  
+const AuthnRouter = function(sysDef, authConfig) {
+  const authn = sysDef.authn || {};
   let authUserFields = "username";
-  if ("authUserFields" in sysDef.config) {
-    authUserFields = sysDef.config["authUserFields"];
+  if ("authUserFields" in authn) {
+    authUserFields = authn["authUserFields"];
   }
   let authPasswordField = "password";
-  if ("authPasswordField" in sysDef.config) {
-    authPasswordField = sysDef.config["authPasswordField"];
+  if ("authPasswordField" in authn) {
+    authPasswordField = authn["authPasswordField"];
   }
   let authSchemaName;
-  if ("authUserSchema" in sysDef.config) {
-    authSchemaName = sysDef.config["authUserSchema"];
+  if ("authUserSchema" in authn) {
+    authSchemaName = authn["authUserSchema"];
     AuthnController.registerAuth(authSchemaName, authUserFields, authPasswordField);
   }
 
@@ -31,7 +32,7 @@ const AuthnRouter = function(sysDef) {
     }
   }
   
-  let expressRouter = meanRestExpressRouter(sysDef);
+  let expressRouter = meanRestExpressRouter(sysDef, authConfig);
 
   if (!!authSchemaName) {
     expressRouter.post(

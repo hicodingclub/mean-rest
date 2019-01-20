@@ -150,35 +150,6 @@ AuthnController.authRefresh = function(req, res, next) {
   });
 }
 
-AuthnController.verifyToken = function(req, res, next) {
-  let token;
-  let queryKey = "accessToken";
-  if (req.query && req.query[queryKey]) {
-      token = req.query[queryKey];
-  }
-
-  if (!token && req.headers && req.headers.authorization) {
-    let parts = req.headers.authorization.split(' ');
-    if (parts.length === 2 && parts[0] === "Bearer") {
-        token = parts[1];
-      }
-  } 
-  
-  if (!token) {
-    return next(createError(401, "Unauthorized."));
-  }
-
-  jwt.verify(token, ACCESS_SECRETE, function(err, decoded) {
-    if (err) {
-      //return next();
-      return next(createError(401, "Unauthorized."));
-    }
-    if (!decoded) return next(createError(401, "Unauthorized."));
-    req.muser = decoded;
-    return next();
-  });
-}
-
 AuthnController.authRegister = function(req, res, next) {
   let {name: name, schema: schema, model: model, views: views} = loadContextVarsByName(auth.schemaName.toLowerCase());
   

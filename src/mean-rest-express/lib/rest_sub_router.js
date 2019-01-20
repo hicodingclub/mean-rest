@@ -1,7 +1,6 @@
 const express = require('express');
 
 const RestController = require('./rest_controller')
-const AuthnController = require('../authn/authn_controller')
 
 const _setRouterName = function(name) {
   return function(req, res, next) {
@@ -10,12 +9,12 @@ const _setRouterName = function(name) {
   }
 }
 
-const RestRouter = function(name) {
+const RestRouter = function(name, authzFunc) {
   let router = express.Router();
 
   let setRouterName = _setRouterName(name);
   router.use(setRouterName); 
-  router.use(AuthnController.verifyToken); //verifyToken and set user
+  if (authzFunc) router.use(authzFunc);
 
   router.get('/', RestController.getAll);
   let idParam = name + "Id";
