@@ -4,7 +4,7 @@ import { <%-SchemaName%>BaseService } from './<%-schemaName%>.base.service';
 import { <%-ModuleName%>_SERVER_ROOT_URI } from '../<%-moduleName%>.tokens';
 
 @Injectable()
-export class <%-SchemaName%>Service extends <%-SchemaName%>BaseService implements OnDestroy {    
+export class <%-SchemaName%>Service extends <%-SchemaName%>BaseService implements OnDestroy {
     constructor(
         http: HttpClient,
         @Inject(<%-ModuleName%>_SERVER_ROOT_URI) private <%-moduleName%>ServerRootUri: string) {

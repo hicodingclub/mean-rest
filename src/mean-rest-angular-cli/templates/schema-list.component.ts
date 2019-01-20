@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
-import { Router, ActivatedRoute }    from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MraCommonService } from 'mean-rest-angular';
 
 import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
@@ -16,10 +16,10 @@ import { ComponentFactoryResolver } from '@angular/core';<%}%>
 })
 export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component implements OnInit {
   <%_ if (schemaHasDate) { %>
-  private  minDate = {year: (new Date()).getFullYear()-100, month: 1, day: 1}; <%}%>
+  private  minDate = {year: (new Date()).getFullYear() - 100, month: 1, day: 1};<%}%>
 
   constructor(
-      <%if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
+      <%_ if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
       protected <%-schemaName%>Service: <%-SchemaName%>Service,
       protected commonService: MraCommonService,
       protected router: Router,
@@ -28,8 +28,8 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
                 <%-schemaName%>Service, commonService, router, route, location, ViewType.LIST);
 <% let theView = briefView; %><%_ include schema-construct.component.ts %>
-          //this is to initialize the detail that will be used for search condition selection
-          let detail = {};
+          // this is to initialize the detail that will be used for search condition selection
+          const detail = {};
           this.detail = this.formatDetail(detail);
   }
 
