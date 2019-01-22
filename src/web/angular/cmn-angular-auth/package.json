@@ -1,0 +1,50 @@
+{
+  "name": "mdds-angular-auth",
+  "version": "0.2.0",
+  "description": "Augular Authentication and Authorization Module",
+  "scripts": {
+    "copy": "cp README.md dist;",
+    "package": "./node_modules/.bin/ng-packagr -p package.json && npm run copy",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "Angular",
+    "Authentication",
+    "Authorization"
+  ],
+  "author": "Xibin Liu",
+  "license": "MIT",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "dependencies": {},
+  "devDependencies": {
+    "@angular/common": "^7.2.1",
+    "@angular/compiler": "^7.2.1",
+    "@angular/compiler-cli": "^7.2.1",
+    "@angular/core": "^7.2.1",
+    "@angular/forms": "^7.2.1",
+    "@angular/platform-browser": "^7.2.1",
+    "@angular/router": "^7.2.1",
+    "ng-packagr": "^4.6.0",
+    "rxjs": "^6.3.3",
+    "zone.js": "^0.8.28",
+    "tsickle": "^0.34.0",
+    "typescript": "^3.2.4"
+  },
+  "peerDependencies": {
+    "@angular/common": "^7.2.1",
+    "@angular/core": "^7.2.1",
+    "@angular/forms": "^7.2.1",
+    "@angular/platform-browser": "^7.2.1",
+    "@angular/router": "^7.2.1",
+    "rxjs": "^6.3.3",
+    "zone.js": "^0.8.28",
+    "tsickle": "^0.34.0"
+  }
+}
