@@ -177,6 +177,8 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     protected goBack() {
+        this.location.back();
+        /*
         // window.history.back();
         if (this.view != ViewType.EDIT)
             this.location.back();
@@ -184,6 +186,7 @@ export class BaseComponent implements BaseComponentInterface {
             let url = this.location.path(); //in EDIT view, the current url is skipped. So get the "previous" one from path.
             this.router.navigateByUrl(url);
         }
+        */
     }
     
     protected stringify(detail:any):string {
