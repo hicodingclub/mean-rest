@@ -244,14 +244,14 @@ const getPermission = function(authz, identity, schemaName) {
   } else if (moduleAuthz && identity in moduleAuthz) {
     identityPermission = moduleAuthz[identity];
   }
+
   if (identity == "Anyone") {
     if (typeof identityPermission === 'string' || typeof identityPermission === 'undefined') {
       return identityPermission;
     } else {
       return ""; //not permitted
     }
-  }
-  if (identity == "LoginUser") {
+  } else if (identity == "LoginUser") {
     if (typeof identityPermission === 'string' || typeof identityPermission === 'undefined') {
       return {"others": identityPermission, "own": identityPermission};
     } else if (typeof identityPermission === 'object') {
@@ -260,6 +260,7 @@ const getPermission = function(authz, identity, schemaName) {
       return {"others": '', "own": ''}; //not permitted
     }
   }
+  return identityPermission;
 }
 
 const getSchemaPermission = function(schemaName, authz) {
