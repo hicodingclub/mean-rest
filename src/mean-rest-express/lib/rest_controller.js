@@ -113,9 +113,81 @@ const getPopulatesRefFields = function(ref) {
 	return views[5]; //indexView
 }
 
+const objectReducerForRef = function(obj, populateMap) {
+    if (typeof obj !== 'object' || obj == null) {
+        return obj;
+    }
+    for (let path in populateMap) {
+        let fields = populateMap[path].match(/\S+/g); // \S matches no space characters.
+        if (!fields) continue;
 
-let RestController = function() {
+        let indexField = fields[0];  //always use first one as index
+
+        let refObj = obj[path];
+        if (typeof refObj !== 'object' || refObj == null) continue;
+        let newRefObj = {};
+        if ('_id' in refObj) {
+            newRefObj['_id'] = refObj['_id'];
+        }
+        if (indexField in refObj) {
+            newRefObj[indexField] = refObj[indexField];
+        }
+        //now only "_id" and the indexField will be left.
+        obj[path] = newRefObj;
+    }
+    return obj;
 }
+
+const resultReducerForRef = function (result, populateMap) {
+    if (Object.keys(populateMap).length == 0) {
+        //not ref fields
+        return result;
+    }
+    if (typeof result !== 'object' || result == null) { //array is also object
+        return result;
+    }
+    if (Array.isArray(result)) {
+        result = result.map(obj=>objectReducerForRef(obj, populateMap));
+    } else {
+        result = objectReducerForRef(result, populateMap);
+    }
+    return result;
+}
+
+const objectReducerForView  = function(obj, viewStr) {
+    if (typeof obj !== 'object' || obj == null) {
+        return obj;
+    }
+
+    let fields = viewStr.match(/\S+/g); // \S matches no space characters.
+    if (!fields) return obj;
+
+    let newObj = {};
+    newObj["_id"] = obj["_id"];
+    for (let path of fields) {
+        if (path in obj) newObj[path] = obj[path];
+    }
+    return newObj;
+}
+
+const resultReducerForView = function (result, viewStr) {
+    if (!viewStr) {
+        //not specified. Return everything
+        return result;
+    }
+    if (typeof result !== 'object' || result == null) { //array is also object
+        return result;
+    }
+    if (Array.isArray(result)) {
+        result = result.map(obj=>objectReducerForView(obj, viewStr));
+    } else {
+        result = objectReducerForView(result, viewStr);
+    }
+    return result;
+}
+
+let RestController = function() {}
+
 RestController.loadContextVarsByName = loadContextVarsByName;
 
 RestController.register = function(name, schema, views, model) {
@@ -143,11 +215,14 @@ RestController.searchAll = function(req, res, next, searchContext) {
   let briefView = views[0];
 	
   let populateArray = [];
+  let populateMap = {};
   populates.briefView.forEach( (p)=> {
 		//an array, with [field, ref]
 		let fields = getPopulatesRefFields(p[1]);
-		if (fields != null) //only push when the ref schema is found
+		if (fields != null) {//only push when the ref schema is found
 			populateArray.push({ path: p[0], select: fields });
+            populateMap[p[0]] = fields;
+        }
   });
   let query = {};
 
@@ -200,15 +275,18 @@ RestController.searchAll = function(req, res, next, searchContext) {
     	
     	let skipCount = (__page - 1) * __per_page;
     	
-    	let dbExec = model.find(query, briefView)
+    	//let dbExec = model.find(query, briefView)
+    	let dbExec = model.find(query) //return every thing for the document
             .skip(skipCount)
             .limit(__per_page)
         for (let pi = 0; pi < populateArray.length; pi ++) {
         	let p = populateArray[pi];
-        	dbExec = dbExec.populate(p);
+        	//dbExec = dbExec.populate(p);
+        	dbExec = dbExec.populate(p.path); //only give the reference path. return everything
         }
     	dbExec.exec(function(err, result) {
-                if (err) return next(err)
+                if (err) return next(err);
+
                 let output = {
                 	total_count: count,
                 	total_pages: maxPageNum,
@@ -216,6 +294,9 @@ RestController.searchAll = function(req, res, next, searchContext) {
                 	per_page: __per_page,
                 	items: result
                 }
+                output = JSON.parse(JSON.stringify(output));
+                output.items = resultReducerForRef(output.items, populateMap);
+                output.items = resultReducerForView(output.items, briefView);
                 return res.send(output);
             })        
   })
@@ -228,24 +309,33 @@ RestController.getDetailsById = function(req, res, next) {
 	let detailView = views[1];
 
 	let populateArray = [];
+	let populateMap = {};
 	populates.detailView.forEach( (p)=> {
 		//an array, with [field, ref]
 		let fields = getPopulatesRefFields(p[1]);
-		if (fields != null) //only push when the ref schema is found
+		if (fields != null) {//only push when the ref schema is found
 			populateArray.push({ path: p[0], select: fields });
+            populateMap[p[0]] = fields;
+        }
 	});
 	let query = {};
 
 	let idParam = name + "Id";
 	let id = req.params[idParam];
 	
-	let dbExec = model.findById(id, detailView)
+	//let dbExec = model.findById(id, detailView)
+	let dbExec = model.findById(id) //return every thing for the document
 	for (let pi = 0; pi < populateArray.length; pi ++) {
 		let p = populateArray[pi];
-		dbExec = dbExec.populate(p);
+		//dbExec = dbExec.populate(p);
+        dbExec = dbExec.populate(p.path); //only give the reference path. return everything for reference
 	}
 	dbExec.exec(function (err, result) {
-		if (err) { return next(err); }
+        if (err) { return next(err); }
+        
+        result = JSON.parse(JSON.stringify(result));
+        result = resultReducerForRef(result, populateMap);
+        result = resultReducerForView(result, detailView);
 		return res.send(result);
 	});
 };

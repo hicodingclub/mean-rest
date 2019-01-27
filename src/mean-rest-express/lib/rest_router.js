@@ -12,7 +12,7 @@ const meanRestExpressRouter = function(sysDef, authConfig) {
   let authzFuncCreator;
   if (authConfig) {
     let authnFunc = authConfig.authnFunc;
-    expressRouter.use(authnFunc);
+    if (authnFunc) expressRouter.use(authnFunc);
 
     authzFuncCreator = authConfig.authzFuncCreator;
   }
@@ -24,15 +24,20 @@ const meanRestExpressRouter = function(sysDef, authConfig) {
     
     let name = schemaName.toLowerCase();
     let schm = schemaDef.schema;
+    schm.set('toObject', {getters: false, virtuals: true});
+    schm.set('toJSON', {getters: false, virtuals: true});
     let model = mongoose.model(schemaName, schm );//model uses given name
     RestController.register(name, schemaDef.schema, schemaDef.views, model);
+  }
 
+  for (let schemaName in schemas) {
+    let name = schemaName.toLowerCase();
     let authzFunc;
     if (sysDef.authz && authzFuncCreator) {
         authzFunc = authzFuncCreator(schemaName, sysDef.authz);
     }
-
     restRouter = RestRouter(name, authzFunc);
+
     expressRouter.use("/" + name, restRouter)
     sub_routes.push("/" + name);
   }

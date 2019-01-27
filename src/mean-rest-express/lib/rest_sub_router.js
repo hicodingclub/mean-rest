@@ -17,8 +17,10 @@ const RestRouter = function(name, authzFunc) {
   if (authzFunc) router.use(authzFunc);
 
   router.get('/', RestController.getAll);
+
   let idParam = name + "Id";
   router.get('/:' + idParam, RestController.getDetailsById);
+
   router.put('/', RestController.Create);
   router.post('/:' + idParam, RestController.Update);
   router.delete('/:' + idParam, RestController.HardDeleteById);
