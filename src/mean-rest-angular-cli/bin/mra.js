@@ -111,27 +111,34 @@ var generateSourceFile = function(keyname, template, renderObj, outputDir) {
 	});
 }
 
-var generateViewPicture = function(viewStr, schema, validators) {
+var generateViewPicture = function(schemaName, viewStr, schema, validators) {
 	let viewDef = viewStr.match(/\S+/g) || [];
 	let view = [];
 	let hasDate = false;
 	let hasRef = false;
-	let hasEditor = false;
-	viewDef.forEach((item) => {
+    let hasEditor = false;
+	for (let item of viewDef) {
+        let validatorArray;
+        if (validators && Array.isArray(validators[item])) {
+            validatorArray = validators[item];
+        }
+        
+        let type;
+        let jstype;
+        let defaultValue;
+        let numberMin, numberMax;
+        let maxlength, minlength;
+        let enumValues;
+        let ref, Ref;
+        let editor = false;
+        let requiredField = false;
+
 		if (item in schema.paths) {
-			let validatorArray;
-			if (validators && Array.isArray(validators[item])) {
-				validatorArray = validators[item];
-			}
-			
-			let type = schema.paths[item].constructor.name;
-			let jstype;
-			let defaultValue = schema.paths[item].defaultValue;
-			let numberMin, numberMax;
-			let maxlength, minlength;
-			let enumValues;
-			let ref, Ref;
-			let editor = false;
+			type = schema.paths[item].constructor.name;
+            defaultValue = schema.paths[item].defaultValue;
+            //TODO: required could be a function
+            requiredField = schema.paths[item].originalRequiredValue === true? true:false;
+
 			switch(type) {
 				case "SchemaString":
 					jstype = "string";
@@ -175,29 +182,105 @@ var generateViewPicture = function(viewStr, schema, validators) {
 				default:
 					;
 			}
-			view.push(
-					{fieldName: item,
-					 FieldName: capitalizeFirst(item),
-					 type: type,
-					 jstype: jstype,
-					 ref: ref,
-					 Ref: Ref,
-					 editor: editor,
-					 //TODO: required could be a function
-					 required: schema.paths[item].originalRequiredValue === true? true:false,
-					 defaultValue: defaultValue,
-					 numberMin: numberMin,
-					 numberMax: numberMax,
-					 maxlength: maxlength,
-					 minlength: minlength,
-					 enumValues: enumValues,
-					 validators: validatorArray,
-					}
-			);
-		}
-	});
+		} else if (item in schema.virtuals) {
+            //Handle as a string
+            type = 'SchemaString';
+            jstype = 'string';
+
+        } else {
+            console.warn("Warning: Field", item, "is not defined in schema", schemaName + ". Skipped...");
+            continue;
+        }
+        view.push(
+                {fieldName: item,
+                    FieldName: capitalizeFirst(item),
+                    type: type,
+                    jstype: jstype,
+                    ref: ref,
+                    Ref: Ref,
+                    editor: editor,
+                    //TODO: required could be a function
+                    required: requiredField,
+                    defaultValue: defaultValue,
+                    numberMin: numberMin,
+                    numberMax: numberMax,
+                    maxlength: maxlength,
+                    minlength: minlength,
+                    enumValues: enumValues,
+                    validators: validatorArray,
+                }
+        );
+	}
 	return [view, hasDate, hasRef, hasEditor];
 }
+
+const getLoginUserPermission = function(permission) {
+  let othersPermisson = permission['others'];
+  if (typeof othersPermission !== 'string') {
+    othersPermission = ''; //not permitted
+  }
+  let ownPermisson = permission['own'];
+  if (typeof ownPermisson !== 'string') {
+    ownPermisson = ''; //not permitted
+  }
+  return {"others": othersPermission, "own": ownPermisson}
+}
+
+const getPermission = function(authz, identity, schemaName) {
+  let schemaAuthz; 
+  if (schemaName in authz) {
+    //use the permission definition for the schema
+    schemaAuthz = authz[schemaName];
+  } 
+  let moduleAuthz; 
+  if ("module-authz" in authz) {
+    //use the permission definition for the module
+    moduleAuthz = authz["module-authz"];
+  }
+  
+  let identityPermission;
+  if (schemaAuthz && identity in schemaAuthz) {
+    identityPermission = schemaAuthz[identity];
+  } else if (moduleAuthz && identity in moduleAuthz) {
+    identityPermission = moduleAuthz[identity];
+  }
+  if (identity == "Anyone") {
+    if (typeof identityPermission === 'string' || typeof identityPermission === 'undefined') {
+      return identityPermission;
+    } else {
+      return ""; //not permitted
+    }
+  }
+  if (identity == "LoginUser") {
+    if (typeof identityPermission === 'string' || typeof identityPermission === 'undefined') {
+      return {"others": identityPermission, "own": identityPermission};
+    } else if (typeof identityPermission === 'object') {
+      return getLoginUserPermission(identityPermission); 
+    } else {
+      return {"others": '', "own": ''}; //not permitted
+    }
+  }
+}
+
+const getSchemaPermission = function(schemaName, authz) {
+
+    let anyonePermission = getPermission(authz, 'Anyone', schemaName);
+    let loginPermission = getPermission(authz, "LoginUser", schemaName);
+
+    let permission = "";
+    if (typeof anyonePermission === 'undefined' &&
+            typeof loginPermission.others == 'undefined' &&
+            typeof loginPermission.own === 'undefined') {
+      //permitted
+      permission = "CURD";
+    } else if (typeof anyonePermission == 'undefined') {
+      permission = ""; //not permitted
+    } else {
+      permission = anyonePermission;
+    }
+    return permission;
+}
+  
 
 // CLI
 around(program, 'optionMissingArgument', function (fn, args) {
@@ -433,6 +516,7 @@ function main() {
   let sysDef = require(inputFileModule);
   let schemas = sysDef.schemas;
   let config = sysDef.config;
+  let authz = sysDef.authz;
   
   let schemaMap = {};
   let validatorFields = [];
@@ -442,13 +526,22 @@ function main() {
   let hasDate = false;
   let hasRef = false;
   let hasEditor = false;
-  let dateFormat = "MM/DD/YYYY";
+  let dateFormat = 'MM/DD/YYYY';
   if (config && config.dateFormat) dateFormat = config.dateFormat;
-  let timeFormat = "hh:mm:ss";
+  let timeFormat = 'hh:mm:ss';
   if (config && config.timeFormat) timeFormat = config.timeFormat;
+  let authRequired = false;
   
   for (let name in schemas) {
-	let schemaDef = schemas[name];
+    let schemaDef = schemas[name];
+    
+    let schemaAnyonePermission = "CRUD";
+    if (authz) {
+      schemaAnyonePermission = getSchemaPermission(name, authz);
+    }
+    if (["C", "R", "U", "D"].some(e=>!schemaAnyonePermission.includes(e))) { //not crud
+      authRequired = true;
+    }
 
 	if (typeof schemaDef !== 'object') {
 		console.error("Error: input file must export an object defining an object for each schema.");
@@ -458,7 +551,7 @@ function main() {
 	let views = schemaDef.views
 	let validators = schemaDef.validators;
 	let mongooseSchema = schemaDef.schema;
-	//console.log(mongooseSchema);
+//	console.log(mongooseSchema);
 //	if (mongooseSchema.paths.author) {
 //		console.log("===author: ", mongooseSchema.paths.author.options);
 //	}
@@ -492,12 +585,12 @@ function main() {
 		
 	});
 	//briefView, detailView, CreateView, EditView, SearchView, indexView]		
-	let [briefView, hasDate1, hasRef1] = generateViewPicture(views[0], mongooseSchema, validators);
-	let [detailView, hasDate2, hasRef2] = generateViewPicture(views[1], mongooseSchema, validators);
-	let [createView, hasDate3, hasRef3, hasEditor3] = generateViewPicture(views[2], mongooseSchema, validators);
-	let [editView, hasDate4, hasRef4, hasEditor4] = generateViewPicture(views[3], mongooseSchema, validators);
-	let [searchView, hasDate5, hasRef5] = generateViewPicture(views[4], mongooseSchema, validators);
-	let [indexView, hasDate6, hasRef6] = generateViewPicture(views[5], mongooseSchema, validators);
+	let [briefView, hasDate1, hasRef1] = generateViewPicture(name, views[0], mongooseSchema, validators);
+	let [detailView, hasDate2, hasRef2] = generateViewPicture(name, views[1], mongooseSchema, validators);
+	let [createView, hasDate3, hasRef3, hasEditor3] = generateViewPicture(name, views[2], mongooseSchema, validators);
+	let [editView, hasDate4, hasRef4, hasEditor4] = generateViewPicture(name, views[3], mongooseSchema, validators);
+	let [searchView, hasDate5, hasRef5] = generateViewPicture(name, views[4], mongooseSchema, validators);
+	let [indexView, hasDate6, hasRef6] = generateViewPicture(name, views[5], mongooseSchema, validators);
 	let schemaHasDate = hasDate1 || hasDate2 || hasDate3 || hasDate4 || hasDate5 || hasDate6;
 	let schemaHasRef = hasRef1 || hasRef3 || hasRef4;
 	let schemaHasEditor = hasEditor3 || hasEditor4;
@@ -512,7 +605,7 @@ function main() {
 		if (!briefFields.includes(i)) detailSubFields.push(i);
 	}
 	let detailSubViewStr = detailSubFields.join(' ');
-	let [detailSubView, hasDate7, hasRef7] = generateViewPicture(detailSubViewStr, mongooseSchema, validators);
+	let [detailSubView, hasDate7, hasRef7] = generateViewPicture(name, detailSubViewStr, mongooseSchema, validators);
 	
 	
 	let compositeEditView = editView.slice();
@@ -563,7 +656,8 @@ function main() {
 		schemaHasDate: schemaHasDate,
 		schemaHasRef: schemaHasRef,
 		schemaHasEditor: schemaHasEditor,
-		schemaHasValidator: schemaHasValidator,
+        schemaHasValidator: schemaHasValidator,
+        permission: schemaAnyonePermission,
 		
 		FIELD_NUMBER_FOR_SELECT_VIEW: FIELD_NUMBER_FOR_SELECT_VIEW
 	}
@@ -597,7 +691,8 @@ function main() {
   	hasRef: hasRef,
   	hasEditor: hasEditor,
   	dateFormat: dateFormat,
-  	timeFormat: timeFormat,
+    timeFormat: timeFormat,
+    authRequired: authRequired
   }
   //console.log(renderObj.validatorFields);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);

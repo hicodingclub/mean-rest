@@ -1,8 +1,8 @@
 <div class="detail" *ngIf="detail">
 	<div class="action-buttons">
         <a href="javascript:void(0)" (click)="goBack()"><i class="fas fa-angle-double-left" title="Back"></i></a>
-		<a [routerLink]="['../../edit', detail['_id'] ]" [skipLocationChange]="true" class="btn btn-outline-primary">Edit</a>
-		<a [routerLink]="['../../new']" [queryParams]="{cid: detail['_id']}" [skipLocationChange]="true" class="btn btn-outline-primary">New</a>
+		<a [routerLink]="['../../edit', detail['_id'] ]" [skipLocationChange]="false" class="btn btn-outline-primary">Edit</a>
+		<a [routerLink]="['../../new']" [queryParams]="{cid: detail['_id']}" [skipLocationChange]="false" class="btn btn-outline-primary">New</a>
 		<a routerLink="." class="btn btn-outline-primary" (click)="onDelete(detail['_id'], null)">Delete</a>
 	</div>
 	

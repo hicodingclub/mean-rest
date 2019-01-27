@@ -7,7 +7,9 @@ import { <%-schm.SchemaName%>EditComponent } from './<%-schm.schemaName%>/<%-sch
 import { <%-schm.SchemaName%>ListSubComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-sub.component';
 <%}%>
 <%_ }%>
-
+<%_ if (authRequired) {%>
+import { AuthGuard } from 'mdds-angular-auth';
+<%}%>
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; if (schm.schemaHasRef) {%>
 const <%-schm.schemaName%>SubPath = [
     {path: 'list', component: <%-schm.SchemaName%>ListSubComponent}
@@ -22,10 +24,15 @@ const <%-schm.schemaName%>DetailPath = [
 <%}} %>
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
 export const <%-schm.schemaName%>RoutingPath = [
-    {path: 'list', component: <%-schm.SchemaName%>ListComponent},
-    {path: 'detail/:id', component: <%-schm.SchemaName%>DetailComponent<%_if (schm.referred) {%>, children: <%-schm.schemaName%>DetailPath<%}%>},
-    {path: 'edit/:id', component: <%-schm.SchemaName%>EditComponent},
-    {path: 'new', component: <%-schm.SchemaName%>EditComponent},
+    {path: 'list', component: <%-schm.SchemaName%>ListComponent<%
+     if (!schm.permission.includes('R')) {%>, canActivate: [AuthGuard]<%}%>},
+    {path: 'detail/:id', component: <%-schm.SchemaName%>DetailComponent<%
+     if (schm.referred) {%>, children: <%-schm.schemaName%>DetailPath<%}%><%
+     if (!schm.permission.includes('R')) {%>, canActivate: [AuthGuard]<%}%>},
+    {path: 'edit/:id', component: <%-schm.SchemaName%>EditComponent<%
+     if (!schm.permission.includes('U')) {%>, canActivate: [AuthGuard]<%}%>},
+    {path: 'new', component: <%-schm.SchemaName%>EditComponent<%
+     if (!schm.permission.includes('C')) {%>, canActivate: [AuthGuard]<%}%>},
     {path: '**', redirectTo: 'list', pathMatch: 'full'}
 ];
 <%_ }%>
