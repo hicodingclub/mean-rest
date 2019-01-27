@@ -225,7 +225,7 @@ const verifyPermissionFuncCreator = function(schemaName, authz) {
       //permission object for logged in user.
       if (permission.others.includes(operation) && permission.own.includes(operation)) {
         permitted = true;
-      } else if (!permission.others.includes(operation) && !permission.own.includes(operation) {
+      } else if (!permission.others.includes(operation) && !permission.own.includes(operation)) {
         permitted = false;
       } else {
         req.loginPermission = permission;
