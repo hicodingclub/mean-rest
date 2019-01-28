@@ -58,8 +58,8 @@ export class BaseComponent implements BaseComponentInterface {
     protected dateFormat = "MM/DD/YYYY";
     protected timeFormat = "hh:mm:ss";
 
-    protected ItemName: string;
-    //protected itemName: string; //defined in constuctor
+    protected ItemCamelName: string;
+    protected itemName: string;
     protected parentItem: string;
 
     constructor(
@@ -69,8 +69,9 @@ export class BaseComponent implements BaseComponentInterface {
         protected route: ActivatedRoute,
         protected location: Location,
         protected view: ViewType,
-        protected itemName: string) {
-        this.ItemName = itemName.charAt(0).toUpperCase() + itemName.substr(1);
+        protected itemCamelName: string) {
+        this.ItemCamelName = itemCamelName.charAt(0).toUpperCase() + itemCamelName.substr(1);
+        this.itemName = itemCamelName.toLowerCase();
         this.parentItem = this.getParentRouteItem();
         
     }
@@ -553,7 +554,7 @@ export class BaseComponent implements BaseComponentInterface {
                 this.service.deleteManyByIds(deletedItem).subscribe(
                     result => {
                         let snackBarConfig: SnackBarConfig = {
-                            content: this.ItemName + " deleted"
+                            content: this.ItemCamelName + " deleted"
                         }
                         let snackBar = new SnackBar(snackBarConfig);
                         snackBar.show();
@@ -585,7 +586,7 @@ export class BaseComponent implements BaseComponentInterface {
     public onDelete(id:string, idx: number):void {      
       let modalConfig: ModalConfig = {
         title: "Delete Confirmation",
-        content: "Are you sure you want to delete this " + this.itemName + " from the system?",
+        content: "Are you sure you want to delete this " + this.itemCamelName + " from the system?",
         //list of button text
         buttons: ['Delete', 'Cancel'],
         //list of button returns when clicked
@@ -595,7 +596,7 @@ export class BaseComponent implements BaseComponentInterface {
                 this.service.deleteOne(id).subscribe(
                     result => {
                         let snackBarConfig: SnackBarConfig = {
-                            content: this.ItemName + " deleted"
+                            content: this.ItemCamelName + " deleted"
                         }
                         let snackBar = new SnackBar(snackBarConfig);
                         snackBar.show();
@@ -626,7 +627,7 @@ export class BaseComponent implements BaseComponentInterface {
           this.service.updateOne(this.id, this._detail).subscribe(
             result => {
                 var snackBarConfig: SnackBarConfig = {
-                    content: this.ItemName + " updated."
+                    content: this.ItemCamelName + " updated."
                 }
                 var snackBar = new SnackBar(snackBarConfig);
                 snackBar.show();
@@ -640,7 +641,7 @@ export class BaseComponent implements BaseComponentInterface {
           this.service.createOne(this._detail).subscribe(
             result => {
                 var snackBarConfig: SnackBarConfig = {
-                    content: this.ItemName + " created."
+                    content: this.ItemCamelName + " created."
                 }
                 var snackBar = new SnackBar(snackBarConfig);
                 snackBar.show();
