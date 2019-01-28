@@ -4,7 +4,7 @@ import { BaseComponent, ViewType } from 'mean-rest-angular';
 import { MraCommonService } from 'mean-rest-angular';
 import { <%-SchemaName%>Service } from './<%-schemaName%>.service';
 
-const itemName = '<%-schemaName%>';
+const itemCamelName = '<%-schemaCamelName%>';
 
 export { ViewType };
 
@@ -46,7 +46,7 @@ export class <%-SchemaName%>Component extends BaseComponent {
       protected route: ActivatedRoute,
       protected location: Location,
       protected view: ViewType ) {
-        super(<%-schemaName%>Service, commonService, router, route, location, view, itemName);
+        super(<%-schemaName%>Service, commonService, router, route, location, view, itemCamelName);
         <% if (schemaHasDate)  {%>this.dateFormat = '<%-dateFormat%>';
         this.timeFormat = '<%-timeFormat%>';<%}%>
         this.indexFields = [<%for (let field of indexView) {%>'<%-field.fieldName%>',<%}%> ];

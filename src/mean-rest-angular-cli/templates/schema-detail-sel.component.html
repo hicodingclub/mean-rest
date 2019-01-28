@@ -2,7 +2,7 @@
   <div class="select-model-content">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Selected {{ItemName}}</h5>
+        <h5 class="modal-title">Selected {{ItemCamelName}}</h5>
         <button type="button" class="close" aria-label="Close" (click)="uiCloseModal()">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -15,13 +15,13 @@
 
 <div class="detail" *ngIf="detail">
 	<div class="action-buttons">
-        <a routerLink="." (click)="detailSelBack()"><i class="fas fa-angle-double-left" title="Back to list">&nbsp; {{ItemName}} List</i></a>
+        <a routerLink="." (click)="detailSelBack()"><i class="fas fa-angle-double-left" title="Back to list">&nbsp; {{ItemCamelName}} List</i></a>
 		<a routerLink="." class="btn btn-outline-primary" (click)="detailSelSelected()">Select</a>
 	</div>
 	
 	<div class="card text-left">
 	  <div class="card-body">
-	    <h4 class="card-title">{{ItemName}} Detail</h4>    
+	    <h4 class="card-title">{{ItemCamelName}} Detail</h4>    
 		<div class="card-text">
 <%_ let view = 'detail'; for (let field of detailView){ let fn = field.fieldName, ft = field.type; let ref_link = false;%>
 			<label><b><%-fn%>:</b></label>

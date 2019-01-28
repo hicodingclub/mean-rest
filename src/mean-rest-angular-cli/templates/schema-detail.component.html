@@ -8,7 +8,7 @@
 	
 	<div class="card text-left">
 	  <div class="card-body">
-	    <h4 class="card-title">{{ItemName}} Detail</h4>    
+	    <h4 class="card-title">{{ItemCamelName}} Detail</h4>    
 		<div class="card-text">
 <%_ let view = "detail"; for (let field of detailView){ let fn = field.fieldName, ft = field.type; let ref_link = true;%>
 			<label><b><%-fn%>:</b></label>
@@ -25,7 +25,7 @@
 	  <% for (let ref of referredBy) {%>
 	  <li class="nav-item">
 	    <a [routerLink]="['./<%-ref[0]%>/list']"
-	        class="nav-link" routerLinkActive="active"><%-ref[0]%></a>
+	        class="nav-link" routerLinkActive="active"><%-ref[5]%></a>
 	  </li><%}%>
     </ul><%}%>
     <router-outlet></router-outlet>

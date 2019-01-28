@@ -6,7 +6,7 @@
 			  <nav class="nav nav-pills">
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
 			    <a class="nav-item nav-link" routerLink="./<%-schm.schemaName%>" 
-			    	routerLinkActive="active"><%-schm.SchemaName%></a>
+			    	routerLinkActive="active"><%-schm.SchemaCamelName%></a>
 <%_ } %>
 			  </nav>
 		  </div>

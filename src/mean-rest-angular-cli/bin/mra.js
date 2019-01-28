@@ -45,6 +45,9 @@ var generatedFile = function(outputDir, prefix, outputFile) {
 var capitalizeFirst = function(str) {
 	return str.charAt(0).toUpperCase() + str.substr(1);
 }
+var lowerFirst = function(str) {
+	return str.charAt(0).toLowerCase() + str.substr(1);
+}
 
 var templates = {
 	//key:[template_file, output_file_suffix, description, write_options]
@@ -129,7 +132,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
         let numberMin, numberMax;
         let maxlength, minlength;
         let enumValues;
-        let ref, Ref;
+        let ref, Ref, RefCamel;
         let editor = false;
         let requiredField = false;
 
@@ -170,6 +173,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
 				case "ObjectId":
 					jstype = "string";
 					if (schema.paths[item].options.ref) {
+                        RefCamel = capitalizeFirst(schema.paths[item].options.ref)
 						ref = schema.paths[item].options.ref.toLowerCase();
 						Ref = capitalizeFirst(ref);
 						hasRef = true;
@@ -198,6 +202,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
                     jstype: jstype,
                     ref: ref,
                     Ref: Ref,
+                    RefCamel: RefCamel,
                     editor: editor,
                     //TODO: required could be a function
                     required: requiredField,
@@ -616,6 +621,8 @@ function main() {
 	});
 	
 	let SchemaName = capitalizeFirst(schemaName);
+	let SchemaCamelName = capitalizeFirst(name);
+	let schemaCamelName = lowerFirst(name);
 	let schemaHasValidator = false;
 	compositeEditView.forEach(function(x){
 		if (x.validators) {
@@ -627,13 +634,13 @@ function main() {
 		}
 		if (x.ref) {
 			referenceFields.push(x.ref);
-			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref]))
+			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel]))
 		}
 	});
 	detailView.forEach(function(x){
 		if (x.ref) {
 			referenceFields.push(x.ref);
-			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref]))
+			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel]))
 		}
 	});
 	
@@ -641,7 +648,9 @@ function main() {
 		moduleName: moduleName,
 		ModuleName: ModuleName,
 		schemaName: schemaName,
-		SchemaName: SchemaName,
+        SchemaName: SchemaName,
+        SchemaCamelName: SchemaCamelName,
+        schemaCamelName: schemaCamelName,
 		apiBase: apiBase,
 		briefView: briefView,
 		detailView: detailView,
@@ -677,7 +686,7 @@ function main() {
 	    return self.indexOf(value) === index;
 	  });//de-duplicate
   referenceMap = referenceMap.map((value) => { 
-	    return JSON.parse(value); //restore the array: [schemaName, SchemaName, x.fieldName, x.ref, x.Ref]
+	    return JSON.parse(value); //restore the array: [schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel]
 	  });
 
   let renderObj = {
@@ -704,7 +713,7 @@ function main() {
 	
 	if (referenceFields.indexOf(schemaName) != -1) schemaObj.referred = true;
 	else schemaObj.referred = false;
-	schemaObj.referredBy = referenceMap.filter(x=>x[3]==schemaName);//Each item has [who, Who, which field, refer to me, Me] format
+	schemaObj.referredBy = referenceMap.filter(x=>x[3]==schemaName);//Each item has [who, Who, which field, refer to me, Me, WhoCamel, MeCamel] format
   }
   
   generateSourceFile(moduleName, templates.conf, renderObj, parentOutputDir);

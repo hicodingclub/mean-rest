@@ -5,7 +5,7 @@
 	
 	<div class="card" style="text-align: left;">
 	  <div class="card-body">
-	    <h4 class="card-title">{{action}} <%-SchemaName%></h4>    
+	    <h4 class="card-title">{{action}} <%-SchemaCamelName%></h4>    
 	    <form (ngSubmit)="onSubmit()" #editForm="ngForm">
 	    
 	     <div *ngIf="action == 'Edit'">
