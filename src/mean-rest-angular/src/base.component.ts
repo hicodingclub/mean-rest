@@ -48,6 +48,7 @@ export class BaseComponent implements BaseComponentInterface {
     protected detail:any = {};
     private _detail:any = {}; //a clone and used to send/receive from next work
     protected id:string;
+    protected subEdit = false; //a edit-sub component
     //for fields with enum values
     protected enums:any = {};
     protected stringFields = [];
@@ -55,8 +56,11 @@ export class BaseComponent implements BaseComponentInterface {
     protected referenceFieldsMap = {};
     protected dateFields = [];
     protected indexFields = [];
+    protected multiSelectionFields = [];
     protected dateFormat = "MM/DD/YYYY";
     protected timeFormat = "hh:mm:ss";
+
+    protected hiddenFields = []; //fields hide from view. Currrently used by "Add" view of edit-sub
 
     protected ItemCamelName: string;
     protected itemName: string;
@@ -190,13 +194,21 @@ export class BaseComponent implements BaseComponentInterface {
         */
     }
     
-    protected stringify(detail:any):string {
+    protected stringify(detail:any): string {
         let str = "";
         for (let fnm of this.indexFields) {
-            if (detail[fnm] && typeof detail[fnm] != 'object') str += " " + detail[fnm]
+            if (detail[fnm] && typeof detail[fnm] != 'object') str += " " + detail[fnm];
+        }
+        if (!str)  {
+            for (let prop in detail) {
+                if (prop !== '_id' && detail[prop] && typeof detail[prop] != 'object') {
+                    str += " " + detail[prop];
+                }
+            }
         }
         if (!str) str = detail["_id"]?detail["_id"]:"..."
         str = str.replace(/^\s+|\s+$/g, '')
+        if (str.length > 30) str = str.substr(0, 27) + '...';
         return str;
     }
 
@@ -240,6 +252,19 @@ export class BaseComponent implements BaseComponentInterface {
         }
         return detail;
     }
+    
+    protected clearFieldReference(field:any ):any {
+        for (let prop in field) {
+            field[prop] = undefined;
+        }
+        return field;
+    }
+
+    protected isDefinedFieldReference(field:any ):any {
+        if ('_id' in field && typeof field['_id'] == 'string') return true;
+        return false;
+    }
+    
     protected formatDateField(field:string):any {
         let fmt = this.dateFormat;
         let t_fmt = this.timeFormat;
@@ -328,9 +353,89 @@ export class BaseComponent implements BaseComponentInterface {
         }
         return detail;
     }
+    protected clearFieldDate(field:any ):any {
+        for (let prop in field) {
+            field[prop] = undefined;
+        }
+        return field;
+    }
+    protected isDefinedFieldDate(field:any ):any {
+        if (typeof field === 'object') {
+                if (typeof field['date'] == 'object') return true;
+                if (typeof field['from'] == 'object') return true;
+                if (typeof field['to'] == 'object') return true;
+        }
+        return false;
+    }
+
+    protected formatArrayMultiSelectionField(field: any, enums: any): any {
+        let selectObj = {};
+        let value = "";
+        for (let e of enums) {
+            selectObj[e] = false; //not exist
+        }
+        if (Array.isArray(field)) { //not defined
+            for (let e of field) {
+                selectObj[e] = true;  //exist.
+            }
+            value = field.join(" | ")
+        }
+        return {'selection': selectObj, value: value};
+
+    }
+    protected formatArrayMultiSelection(detail:any ):any {
+        for (let fnm of this.multiSelectionFields) {
+            detail[fnm] = this.formatArrayMultiSelectionField(detail[fnm], this.enums[fnm]);
+        }
+        return detail;
+    }
+    
+    protected deFormatArrayMultiSelection(detail:any ):any {
+        for (let fnm of this.multiSelectionFields) {
+            if (typeof detail[fnm] !== 'object') { //not defined
+                delete detail[fnm];
+            }
+            else {
+                if (! detail[fnm].selection) delete detail[fnm];
+                else {
+                    let selectArray = [];
+                    for (let e of this.enums[fnm]) {
+                        if (detail[fnm].selection[e]) selectArray.push(e);
+                    }
+
+                    if (selectArray.length > 0) detail[fnm] = selectArray;
+                    else delete detail[fnm];
+                }
+            }
+        }
+        return detail;
+    }
+    protected clearFieldArrayMultiSelection(field:any ):any {
+        if (!field['selection']) return field;
+        for (let prop in field['selection']) {
+            field['selection'][prop] = false; //not exist
+        }
+        return field;
+    }
+
+    protected isDefinedFieldArrayMultiSelection(field:any ):any {
+        if ('selection' in field && typeof field['selection'] == 'object') {
+            let keys = Object.keys(field['selection']);
+            return keys.some(e=>{return field['selection'][e]});
+        }
+        return false;
+    }
+    protected multiselectionSelected(field) {
+        if (!this.detail[field] || typeof this.detail[field]['selection'] != 'object') {
+            return false;
+        }
+        return this.isDefinedFieldArrayMultiSelection(this.detail[field]);
+    }
+    
     protected formatDetail(detail:any ):any {
         detail = this.formatReference(detail);
         detail = this.formatDate(detail);
+        detail = this.formatArrayMultiSelection(detail);
         return detail;
     }    
     
@@ -339,6 +444,7 @@ export class BaseComponent implements BaseComponentInterface {
         
         cpy = this.deFormatReference(cpy);
         cpy = this.deFormatDate(cpy);
+        cpy = this.deFormatArrayMultiSelection(cpy);
         return cpy;
     }
     
@@ -365,7 +471,7 @@ export class BaseComponent implements BaseComponentInterface {
         this.onServiceError
       );
     }
-    
+
     private equalTwoSearchContextArrays (arr1, arr2) {
       if (!arr1) arr1 = [];
       if (!arr2) arr2 = [];
@@ -392,36 +498,42 @@ export class BaseComponent implements BaseComponentInterface {
             d[s] = this.searchText;
         }
         let orSearchContext = [], andSearchContext = [];
-        for (let prop in d) {
-            if (typeof d[prop] == 'string') {
+        for (let field in d) {
+            if (typeof d[field] == 'string') {
                 let o = {}
-                o[prop] = d[prop];
+                o[field] = d[field];
                 orSearchContext.push(o);
             }
         }
         
         this.searchMoreDetail = []
-        let d2 = this.deFormatDetail(d);
-        for (let prop in d2) {
-            if (this.stringFields.indexOf(prop) == -1) {//string fields already put to orSearchContext
+        let d2 = this.deFormatDetail(d);//undefined field is deleted after this step
+        for (let field in d2) {
+            if (this.stringFields.indexOf(field) == -1) {//string fields already put to orSearchContext
                 let o = {}
                 let valueToShow;
 
-                o[prop] = d2[prop];
-                if(typeof d[prop] != 'object') { //number, string, boolean...
-                    valueToShow = d[prop];
+                o[field] = d2[field];
+
+                if (this.multiSelectionFields.includes(field)) {
+                    o[field] = {$in: d2[field]}; //use $in for or, and $all for and
+
+                    let t = this.formatArrayMultiSelectionField(d2[field], this.enums[field]);
+                    valueToShow = t.value;
+                } else if (this.dateFields.includes(field)) {
+                    let t = this.formatDateField(d2[field]);
+                    valueToShow = t.value;
+                } else if (this.referenceFields.includes(field)) {
+                    valueToShow = valueToShow = d[field]['value'];
+                } else {
+                    valueToShow = d[field];//take directoy from what we get 
                 }
-                else if (d[prop]['date']) { //Date fields. search based on exact date                        
-                    let dt = this.formatDateField(d2[prop])
-                    valueToShow = dt.value;
-                } else if (d[prop]['_id']) { //Refer Object
-                    valueToShow = d[prop]['value'];
-                }
-                this.searchMoreDetail.push([prop, valueToShow]);
+
+                this.searchMoreDetail.push([field, valueToShow]);
                 andSearchContext.push(o);
             }
         }
-        //Handle date range selection
+        //Handle date range selection. These fields are not in d2, because field.date is undefined.
         for (let prop of this.dateFields) {
             let o = {};
             let valueToShow = "";
@@ -640,22 +752,36 @@ export class BaseComponent implements BaseComponentInterface {
       else {
           this.service.createOne(this._detail).subscribe(
             result => {
+                let action = this.subEdit? " added":" created.";
+
                 var snackBarConfig: SnackBarConfig = {
-                    content: this.ItemCamelName + " created."
+                    content: this.ItemCamelName + action
                 }
                 var snackBar = new SnackBar(snackBarConfig);
                 snackBar.show();
                 
                 this.id = result["_id"];
                 this._detail = result;
-                
-                this.router.navigate(['../detail', this.id], {relativeTo: this.route});
+
+                if (this.subEdit) {
+                    this.done.emit(true);
+                } else {
+                    this.router.navigate(['../detail', this.id], {relativeTo: this.route});
+                } 
             },
             this.onServiceError
           );
       }
     }
     
+    public editCancel(): void {
+        if (this.subEdit) {
+            this.done.emit(false);
+        } else {
+            this.goBack();
+        } 
+    }
+
     protected clickedId = null;
     public onDisplayRefClicked(fn:string, detail:any, event:any):void {
         let ref = this.getRefFromField(fn);
@@ -685,8 +811,12 @@ export class BaseComponent implements BaseComponentInterface {
         if (!this.detail.hasOwnProperty(field)) return;
         if (typeof this.detail[field] == 'undefined') return;
         if (typeof this.detail[field] == 'object') {//reference field or date
-            for (let prop in this.detail[field]) {
-                this.detail[field][prop] = undefined;
+            if (this.multiSelectionFields.includes(field)) {
+                this.detail[field] = this.clearFieldArrayMultiSelection(this.detail[field]);
+            } else if (this.dateFields.includes(field)) {
+                this.detail[field] = this.clearFieldDate(this.detail[field]);
+            } else if (this.referenceFields.includes(field)) {
+                this.detail[field] = this.clearFieldReference(this.detail[field]);
             }
         } else {
             delete this.detail[field];
@@ -701,12 +831,13 @@ export class BaseComponent implements BaseComponentInterface {
             || typeof d[field] == 'string'
             || typeof d[field] == 'boolean') return true;
         if (typeof d[field] == 'object') {
-            if ('date' in d[field]) {
-                 if (typeof d[field]['date'] == 'object') return true;
-                 if (typeof d[field]['from'] == 'object') return true;
-                 if (typeof d[field]['to'] == 'object') return true;
+            if (this.multiSelectionFields.includes(field)) {
+                return this.isDefinedFieldArrayMultiSelection(d[field]);
+            } else if (this.dateFields.includes(field)) {
+                return this.isDefinedFieldDate(d[field]);
+            } else if (this.referenceFields.includes(field)) {
+                return this.isDefinedFieldReference(d[field]);
             }
-            if ('_id' in d[field] && typeof d[field]['_id'] == 'string') return true;
         }
         return false;
     }
@@ -1005,6 +1136,20 @@ export class BaseComponent implements BaseComponentInterface {
     /*Sub detail show flag*/
     public toggleCheckedItem(i:number):void {
         this.checkedItem[i] = !this.checkedItem[i];
+    }
+
+    /*** Sub List View - add new item in embedded Edit View*/
+    protected isAdding: boolean = false;
+    public onAdd() {
+        this.isAdding = true;
+    }
+    public onAddDone(result: boolean) {
+        this.isAdding = false;
+        if (result) { //add successful. Re-populate the current list
+            this.populateList();
+        } else {
+            ; //do nothing
+        }
     }
     
     /*Date Range Selection */
