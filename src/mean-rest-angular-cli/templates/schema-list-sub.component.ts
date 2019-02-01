@@ -12,6 +12,7 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
   styleUrls: ['./<%-schemaName%>-list.component.css']
 })
 export class <%-SchemaName%>ListSubComponent extends <%-SchemaName%>ListComponent implements OnInit {
+  private parentData = {};
   constructor(
       protected <%-schemaName%>Service: <%-SchemaName%>Service,
       protected commonService: MraCommonService,
@@ -24,6 +25,7 @@ export class <%-SchemaName%>ListSubComponent extends <%-SchemaName%>ListComponen
   ngOnInit() {
       let ref = this.getParentRouteRefField();
       let id = this.getParentRouteItemId();
+      this.parentData[ref] = {'_id': id };
       this.detail = {};
       this.detail[ref] = {'_id': id }; //make this as the search context
       this.processSearchContext();

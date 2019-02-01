@@ -80,18 +80,36 @@
 		        <input class="form-control rounded" id="<%-sn%>Edit<%-Fn%>" 
 		             [ngClass]="{'pointer ref-badge': detail['<%-fn%>']['_id']}"
 		             (focus)="detail['<%-fn%>']['_id']?onRefShow('<%-field.fieldName%>', 'select', detail['<%-fn%>']['_id']):onRefSelect('<%-fn%>')"
-	                 <%if (field.required) {%>required<%}%>
 		        	 <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
 		             [ngModel]="detail['<%-fn%>']['value']" name="<%-sn%>Edit<%-Fn%>"
 		             #<%-sn%>Edit<%-Fn%>="ngModel"> 
 			</div>
+    <%_ } else if (field.type === "SchemaArray") { %>
+	  <%_ if (field.elementType === "SchemaString") { %>
+        <%_ if (field.enumValues && field.elementUnique) { %>
+            <div class="form-check"
+		        >
+	          <%_ field.enumValues.forEach( (f, index) => { %>
+	          <div class="form-check-inline">
+		        <input type="checkbox" name="<%-sn%>Edit<%-Fn%><%-f%>" 
+		        	class="form-check-input"
+		        	id="<%-sn%>Edit<%-Fn%><%-f%>"
+		        	[(ngModel)]="detail['<%-fn%>']['selection']['<%-f%>']"
+		        	#<%-sn%>Edit<%-Fn%><%-f%>="ngModel">
+		      	<label class="form-check-label"><%-f%></label>
+		      </div>
+		      <%_ }) %>
+		    </div>
+        <%_ } else { %>
+	        <div>Not supported yet.</div>
+        <%_ } %>
+      <%_ } %> 
     <%_ } %>
-    
 	      </div>
 	      
 	      <div class="col-1">
 		    <div class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')"
-		        *ngIf="checkValueDefinedFromDetail(['<%-fn%>'])"
+		        *ngIf="checkValueDefinedFromDetail('<%-fn%>')"
 		        ><i class="fas fa-times-circle" title="Clear"></i></div>
 	      </div>
 	    </div>

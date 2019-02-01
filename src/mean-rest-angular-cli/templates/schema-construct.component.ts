@@ -17,3 +17,9 @@
     }
     if (dateObjects.length > 0) {%>
           this.dateFields = [<%for (let fnm of dateObjects) {%>'<%-fnm%>', <%}%>];<%}%>
+<%_ let multiSelectionFields = [];
+    for (let field of theView) { 
+        if (field.type === "SchemaArray" && field.enumValues && field.elementUnique) multiSelectionFields.push(field.fieldName);
+    }
+    if (multiSelectionFields.length > 0) {%>
+          this.multiSelectionFields = [<%for (let fnm of multiSelectionFields) {%>'<%-fnm%>', <%}%>];<%}%>

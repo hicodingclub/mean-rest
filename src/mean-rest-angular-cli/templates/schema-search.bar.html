@@ -17,11 +17,14 @@
 				</div>
 			<%}%>
 			<%_ if (typeof noMoreSearchArea == 'undefined' || !noMoreSearchArea) { %>
-				<div>
-					<span class="pointer" (click)="toggleMoreSearch()">
-			            <i *ngIf="!moreSearchOpened"  <%if (hasStringFields) {%>class="fas fa-caret-down"<%} else {%>class="fas fa-search-plus"<%}%> title="More"></i>
-			            <i *ngIf="moreSearchOpened" <%if (hasStringFields) {%>class="fas fa-caret-up"<%} else {%>class="fas fa-search-minus"<%}%>  title="Less"></i>
-				    </span>
+				<div class="text-center">
+                    <span  class="pointer" (click)="toggleMoreSearch()">
+                        <span class="refine-search-text">Refine Search &nbsp;</span>
+                        <span>
+                            <i *ngIf="!moreSearchOpened"  class="fas fa-plus-circle" title="More"></i>
+                            <i *ngIf="moreSearchOpened" class="fas fa-minus-circle"  title="Less"></i>
+                        </span>
+                    </span>
 				</div>
 			    <div class="shadow" *ngIf="moreSearchOpened">
 					<div class="card">
@@ -37,7 +40,7 @@
 					</div>
 		        </div>
 		        <div *ngIf="!moreSearchOpened" style="text-align: left;">
-					<span class="badge badge-pill badge-secondary" *ngFor="let value of searchMoreDetail">
+					<span class="badge badge-pill badge-info" *ngFor="let value of searchMoreDetail">
 					    <a (click)="toggleMoreSearch()" class="pointer"> {{value[0]}}: {{value[1]}}</a>
 					    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromDetailAndSearchList(value[0])" title="Clear"></i>
 					</span>

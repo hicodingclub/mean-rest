@@ -1,5 +1,10 @@
 <div>
-
+    <% if (embeddedViewOnly) {%><div class="add-area">
+        <a href="javascript:void(0)" (click)="onAdd()"><i class="fas fa-plus-square" title="Add"></i></a>
+        <div *ngIf="isAdding">
+            <app-<%-schemaName%>-edit [initData]="parentData" (done)="onAddDone($event)"></app-<%-schemaName%>-edit>
+        </div>
+    </div><%}%>
 	<div class="container search">
 		<div class="row"><% include schema-list.pagination.html %>
 		</div>
@@ -13,9 +18,8 @@
 		        <th <%_if (field.ref) {%> *ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem" <%}%> scope="col">
 		        	<%-field.FieldName%>
 		        </th><%_ } %>		        
+                <th scope="col" style="width:2rem;"></th>
 		        <th scope="col" style="width:2rem;"></th>
-		        <th scope="col" style="width:2rem;">
-		        </th>
 	        </tr>
 	    </thead>
 	    <tbody>
@@ -25,16 +29,21 @@
 <%_ let view = 'list'; for (let field of briefView){ let fn = field.fieldName, ft = field.type; let ref_link = true; %>
 	            <td <%_if (field.ref) {%> *ngIf="referenceFieldsMap['<%-fn%>'] != parentItem" <%}%> >
 	            	<% include schema-display.field.html %>
-	            </td><%_ } %>
+                </td><%_ } %>
 	            <td>
+                    <%_ if (detailSubView.length != 0) {%>
 			        <span class="pointer" (click)="toggleCheckedItem(i)">
 			            <i *ngIf="!checkedItem[i]" class="fas fa-caret-down" title="More"></i>
 			            <i *ngIf="checkedItem[i]" class="fas fa-caret-up" title="Less"></i>
-			        </span>
-	            </td>
+			        </span><%}%>
+                </td>
 	            <td>
+                <%_ if (!embeddedViewOnly) {%>
 	            	<a routerLink="." (click)="onDetailLinkClicked(detail['_id'])"><i class="fas fa-external-link-square-alt" title="View Details"></i></a>
-	            </td>
+                <%} else {%>
+	            	<a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a>
+                <%}%> 
+                </td>   
 	        </tr>
 	        <%_ let colspan = briefView.length %>
 	        <tr *ngIf="checkedItem[i]" > <td colspan="<%-colspan%>"> <app-<%-schemaName%>-detail-sub [inputData]="detail['_id']"></app-<%-schemaName%>-detail-sub></td></tr>

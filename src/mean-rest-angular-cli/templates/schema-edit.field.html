@@ -1,3 +1,4 @@
+<div *ngIf="!hiddenFields.includes('<%-fn%>')">
     <%_ if (field.type === "SchemaString" && !field.editor) { %>
 	      <fieldset class="form-group">
 	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%></label>
@@ -227,4 +228,46 @@
   	          </div><%}%> 
 	        </div>
 	      </fieldset>
+    <%_ } else if (field.type === "SchemaArray") { %>
+	  <%_ if (field.elementType === "SchemaString") { %>
+          <fieldset class="form-group">
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%></label>
+        <%_ if (field.enumValues && field.elementUnique) { %>
+            <div class="form-check"
+                ngModelGroup="<%-sn%>Edit<%-Fn%>"
+                <%if (field.required) {%><%-schemaName%>Directive<%-field.FieldName%>Required<%}%>
+                <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%>
+                #<%-sn%>Edit<%-Fn%>="ngModelGroup" 
+		        >
+	          <%_ field.enumValues.forEach( (f, index) => { %>
+	          <div class="form-check-inline">
+		        <input type="checkbox" name="<%-sn%>Edit<%-Fn%><%-f%>" 
+		        	class="form-check-input"
+		        	id="<%-sn%>Edit<%-Fn%><%-f%>"
+		        	[(ngModel)]="detail['<%-fn%>']['selection']['<%-f%>']"
+		        	#<%-sn%>Edit<%-Fn%><%-f%>="ngModel">
+		      	<label class="form-check-label"><%-f%></label>
+		      </div>
+		      <%_ }) %>
+		      <span *ngIf="multiselectionSelected('<%-fn%>')" 
+		          class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
+		          <i class="fas fa-times-circle" title="Clear"></i></span>
+		    </div>
+        <%_ } else { %>
+	        <div>Not supported yet.</div>
+        <%_ } %>
+	        <div [hidden]="<%-sn%>Edit<%-Fn%>.valid || <%-sn%>Edit<%-Fn%>.pristine"
+     			class="alert alert-danger">
+	          <%_if (field.required) {%>
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.required">
+    	        <%-Fn%> is required.
+  	          </div><%}%>
+		      <%_if (field.validators) {%>
+	          <div *ngIf="<%-sn%>Edit<%-Fn%>.errors && <%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>">
+                {{<%-sn%>Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>}}
+  	          </div><%}%> 
+	        </div>
+	      </fieldset>
+      <%_ } %> 
     <%_ } %>    
+</div>

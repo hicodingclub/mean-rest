@@ -1,12 +1,12 @@
-import { Component, OnInit, Input, Directive } from '@angular/core';
+import { Component, OnInit, Input, Output, Directive, EventEmitter } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
 import { MraCommonService } from 'mean-rest-angular';
 
 import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
-<%if (schemaHasValidator) {%>
-import { NG_VALIDATORS, Validator, ValidationErrors, AbstractControl } from '@angular/forms';
+<%if (schemaHasValidator || schemaHasRequiredGroup) {%>
+import { NG_VALIDATORS, Validator, ValidationErrors, AbstractControl, FormGroup } from '@angular/forms';
   <%_ compositeEditView.forEach( (field) => {
 if (field.validators) {%>
 @Directive({
@@ -21,6 +21,8 @@ export class <%-SchemaName%>Directive<%-field.FieldName%> implements Validator {
          },<%})%>
   ];
   validate(control: AbstractControl): ValidationErrors | null {
+    //TODO: For validator of NgModelGroup, need to get list of contained controls and do validation on the combined data.
+
     let value = control.value;
     return this.validateValue(value);
   }
@@ -40,8 +42,32 @@ export class <%-SchemaName%>Directive<%-field.FieldName%> implements Validator {
     }
     return null;
   }
+}<%_} else if (field.required && field.type == "SchemaArray") {%>
+@Directive({
+  selector: '[<%-schemaName%>Directive<%-field.FieldName%>Required]',
+  providers: [{provide: NG_VALIDATORS, useExisting: <%-SchemaName%>Directive<%-field.FieldName%>Required, multi: true}]
+})
+export class <%-SchemaName%>Directive<%-field.FieldName%>Required implements Validator {
+  validate(control: AbstractControl): ValidationErrors | null {
+    let selected = false;
+    let controlGroup = control as FormGroup; //cast to FormGroup
+    if(controlGroup) {
+      for(let ctrl in controlGroup.controls) {
+        if(controlGroup.controls[ctrl].value) {
+          selected = true;
+          break;
+        }
+      }
+    }
+
+    if (selected) {
+      return null; //no error
+    } else {
+      return { 'required': true };
+    }
+  }
 }  <%_}}); %>
-<%}%><%#comments: end of: if (schemaHasValidator)%>
+<%}%><%#comments: end of: if (schemaHasValidator || schemaHasRequiredGroup)%>
 
 <%if (schemaHasRef) {%>
 import { ComponentFactoryResolver } from '@angular/core';<%}%>
@@ -56,10 +82,15 @@ import { MraRichTextSelectDirective } from 'mean-rest-angular';<%}%>
 })
 export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component implements OnInit {        
     @Input() 
-    protected id:string;
+    protected id: string;
     @Input()
-    protected cid:string;//copy id
+    protected cid: string;//copy id
+    @Input()
+    protected initData: any; //some fields has data already. eg: {a: b}. Used for add
+    @Output() done = new EventEmitter<boolean>();
+
     private action:string;
+
 <%if (schemaHasEditor) {%>
     @ViewChildren(MraRichTextSelectDirective) textEditors: QueryList<MraRichTextSelectDirective>;
   <% for (let field of compositeEditView) { let fn=field.fieldName, Fn=field.FieldName; 
@@ -103,11 +134,29 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
             if (!this.cid) this.cid = this.route.snapshot.queryParamMap.get('cid');
             if (this.cid) {
                 this.populateDetailFromCopy(this.cid);
+            } else if (this.initData) {
+                this.action="Add";
+                this.subEdit = true;
+                let detail = {
+                    <% createView.forEach( (field) => { 
+                      let fn = field.fieldName;let fdv = field.defaultValue;
+                      if ( typeof(fdv) !== 'undefined') {
+                        %><%-fn%>: <%-JSON.stringify(fdv)%>,<%_}
+                    }); %>
+                };
+                for (let prop in this.initData) {
+                    detail[prop] = this.initData[prop];
+                    this.hiddenFields.push(prop);
+                }
+                this.detail = this.formatDetail(detail);
             } else {
                 let detail = {
-                    <% createView.forEach( (field) => { let fn = field.fieldName;
-                    if ( typeof(field.defaultValue) !== 'undefined') {%><%-fn%>: <%-field.defaultValue%>,  <%_}}); %>
-                }
+                    <% createView.forEach( (field) => { 
+                      let fn = field.fieldName;let fdv = field.defaultValue;
+                      if ( typeof(fdv) !== 'undefined') {
+                        %><%-fn%>: <%-JSON.stringify(fdv)%>,<%_}
+                    }); %>
+                };
                 this.detail = this.formatDetail(detail);
             }
         }

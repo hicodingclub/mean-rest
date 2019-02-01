@@ -4,10 +4,12 @@
 		<div class="card">
 		  <div class="card-header">
 			  <nav class="nav nav-pills">
-<%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
+<%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name];
+    if (!schm.embeddedViewOnly) { %>
 			    <a class="nav-item nav-link" routerLink="./<%-schm.schemaName%>" 
 			    	routerLinkActive="active"><%-schm.SchemaCamelName%></a>
-<%_ } %>
+<%_ }
+} %>
 			  </nav>
 		  </div>
 		  <div class="card-body">

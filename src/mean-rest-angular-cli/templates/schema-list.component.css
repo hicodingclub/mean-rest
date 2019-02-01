@@ -65,6 +65,11 @@ margin-left: 1rem;
   background-color: #eceff3;
 }
 
+.refine-search-text {
+  font-size: 0.8rem; /*rgba(0,0,0,.125); */
+  color: #868181;
+}
+
 .select-model {
     display: block; 
     position: fixed; 
@@ -159,3 +164,7 @@ tr th:first-child{
 		border: 1px solid #dfdfdf;
 		border-radius:.25rem;
     }
+    
+.add-area {
+    margin-left: 0.75rem;
+}

@@ -29,8 +29,10 @@ import { <%-Ref%>DetailSelComponent } from './<%-ref%>/<%-ref%>-detail/<%-ref%>-
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let sn = schm.schemaName; if (schm.schemaHasRef) {%>
 import { <%-schm.SchemaName%>ListSubComponent } from './<%-sn%>/<%-sn%>-list/<%-sn%>-list-sub.component';
 import { <%-schm.SchemaName%>DetailSubComponent } from './<%-sn%>/<%-sn%>-detail/<%-sn%>-detail-sub.component';<%_ }}%>
-<%_ validatorFields.forEach(function(validator){ %>
-import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validator.schemaName%>-edit/<%-validator.schemaName%>-edit.component';<%_ }); %>
+<%_ validatorFields.forEach(function(element){ %>
+import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.schemaName%>-edit/<%-element.schemaName%>-edit.component';<%_ }); %>
+<%_ requiredGroupFields.forEach(function(element){ %>
+import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.schemaName%>-edit/<%-element.schemaName%>-edit.component';<%_ }); %>
 
 @NgModule({
   imports: [
@@ -57,8 +59,10 @@ import { <%-validator.Directive%> } from './<%-validator.schemaName%>/<%-validat
   <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; if (schm.schemaHasRef) { %>
     <%-schm.SchemaName%>ListSubComponent,
     <%-schm.SchemaName%>DetailSubComponent,<%_ }}%>
-  <%_ validatorFields.forEach(function(validator){ %>
-    <%-validator.Directive%>,<%_ }); %>
+  <%_ validatorFields.forEach(function(element){ %>
+    <%-element.Directive%>,<%_ }); %>
+  <%_ requiredGroupFields.forEach(function(element){ %>
+    <%-element.Directive%>,<%_ }); %>
   ],
   exports: [
     <%-ModuleName%>Component,

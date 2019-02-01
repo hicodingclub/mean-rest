@@ -1,18 +1,18 @@
 <div class="edit" *ngIf="detail">
-	<div class="action-buttons">
+	<div *ngIf="!subEdit" class="action-buttons">
         <a href="javascript:void(0)" (click)="goBack()" ><i class="fas fa-angle-double-left" title="Back"></i></a>
 	</div>
 	
 	<div class="card" style="text-align: left;">
 	  <div class="card-body">
-	    <h4 class="card-title">{{action}} <%-SchemaCamelName%></h4>    
+	    <h4 class="card-title" *ngIf="!subEdit">{{action}} <%-SchemaCamelName%></h4>    
 	    <form (ngSubmit)="onSubmit()" #editForm="ngForm">
 	    
 	     <div *ngIf="action == 'Edit'">
 <%_ editView.forEach( (field) => { let fn=field.fieldName, Fn=field.FieldName, sn=schemaName;
 %> <%_ include schema-edit.field.html %> <%_ }) %>
          </div>	
-	     <div *ngIf="action == 'Create'">
+	     <div *ngIf="action == 'Create' || action == 'Add' ">
 <%_ createView.forEach( (field) => { let fn=field.fieldName, Fn=field.FieldName, sn=schemaName;
 %> <%_ include schema-edit.field.html %> <%_ }) %>
          </div>	
@@ -20,6 +20,8 @@
 		<div class="action-buttons-center">
 	     	<button type="submit" class="btn btn-success" 
      			[disabled]="!editForm.form.valid">Submit</button>
+	     	<button class="btn btn-outline-success" 
+     			(click)="editCancel()">Cancel</button>
 		</div>
 	    </form>
 	  </div>

@@ -114,17 +114,87 @@ var generateSourceFile = function(keyname, template, renderObj, outputDir) {
 	});
 }
 
+var getPrimitiveField = function(fieldSchema) {
+    let type;
+    let jstype;
+    let defaultValue;
+    let numberMin, numberMax;
+    let maxlength, minlength;
+    let enumValues;
+    let ref, Ref, RefCamel;
+    let editor = false;
+    let requiredField = false;
+
+    let flagDate = false;
+	let flagRef = false;
+    let flagEditor = false;
+
+
+    type = fieldSchema.constructor.name;
+
+    switch(type) {
+        case "SchemaString":
+            jstype = "string";
+            if ( typeof(defaultValue) !== 'undefined') {
+                defaultValue = "'" + defaultValue + "'";
+            }
+            if (fieldSchema.validators)
+                fieldSchema.validators.forEach((val) => {
+                    if (val.type == 'maxlength' && typeof val.maxlength === 'number') maxlength = val.maxlength;
+                    if (val.type == 'minlength' && typeof val.minlength === 'number') minlength = val.minlength;
+                    if (val.type == 'enum' && Array.isArray(val.enumValues) && val.enumValues.length > 0) enumValues = val.enumValues;
+                });
+            if (fieldSchema.options.editor == true) {
+                editor = true;
+                flagEditor = true;
+            }					
+            break;
+        case "SchemaBoolean":
+            jstype = "boolean";
+            break;
+        case "SchemaNumber":
+            jstype = "number";
+            if (fieldSchema.validators)
+                fieldSchema.validators.forEach((val) => {
+                    if (val.type == 'min' && typeof val.min === 'number') numberMin = val.min;
+                    if (val.type == 'max' && typeof val.max === 'number') numberMax = val.max;
+                });
+            break;
+        case "ObjectId":
+            jstype = "string";
+            if (fieldSchema.options.ref) {
+                RefCamel = capitalizeFirst(fieldSchema.options.ref)
+                ref = fieldSchema.options.ref.toLowerCase();
+                Ref = capitalizeFirst(ref);
+                flagRef = true;
+            }
+            break;
+        case "SchemaDate":
+            jstype = "string";
+            flagDate = true;
+            break;
+		default:
+			;
+    }
+
+    return [type, jstype, numberMin, numberMax, numberMax, minlength,  enumValues, 
+            ref, Ref, RefCamel, editor,
+            flagDate, flagRef, flagEditor]
+}
+
 var generateViewPicture = function(schemaName, viewStr, schema, validators) {
 	let viewDef = viewStr.match(/\S+/g) || [];
 	let view = [];
 	let hasDate = false;
 	let hasRef = false;
     let hasEditor = false;
+    let hasRequiredGroup = false;
 	for (let item of viewDef) {
         let validatorArray;
         if (validators && Array.isArray(validators[item])) {
             validatorArray = validators[item];
         }
+
         
         let type;
         let jstype;
@@ -136,53 +206,61 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
         let editor = false;
         let requiredField = false;
 
+        let flagDate = false;
+        let flagRef = false;
+        let flagEditor = false;
+
+        //for array
+        let elementUnique = false;
+        let elementType;
+
 		if (item in schema.paths) {
-			type = schema.paths[item].constructor.name;
-            defaultValue = schema.paths[item].defaultValue;
+            let fieldSchema = schema.paths[item];
+            type = fieldSchema.constructor.name;
+            requiredField = fieldSchema.originalRequiredValue === true? true:false;
             //TODO: required could be a function
-            requiredField = schema.paths[item].originalRequiredValue === true? true:false;
+            defaultValue = fieldSchema.defaultValue;
 
 			switch(type) {
 				case "SchemaString":
-					jstype = "string";
-					if ( typeof(defaultValue) !== 'undefined') {
-						defaultValue = "'" + defaultValue + "'";
-					}
-					if (schema.paths[item].validators)
-						schema.paths[item].validators.forEach((val) => {
-							if (val.type == 'maxlength' && typeof val.maxlength === 'number') maxlength = val.maxlength;
-							if (val.type == 'minlength' && typeof val.minlength === 'number') minlength = val.minlength;
-							if (val.type == 'enum' && Array.isArray(val.enumValues) && val.enumValues.length > 0) enumValues = val.enumValues;
-						});
-					if (schema.paths[item].options.editor == true) {
-						editor = true;
-						hasEditor = true;
-					}					
-					break;
 				case "SchemaBoolean":
-					jstype = "boolean";
-					break;
 				case "SchemaNumber":
-					jstype = "number";
-					if (schema.paths[item].validators)
-						schema.paths[item].validators.forEach((val) => {
-							if (val.type == 'min' && typeof val.min === 'number') numberMin = val.min;
-							if (val.type == 'max' && typeof val.max === 'number') numberMax = val.max;
-						});
-					break;
 				case "ObjectId":
-					jstype = "string";
-					if (schema.paths[item].options.ref) {
-                        RefCamel = capitalizeFirst(schema.paths[item].options.ref)
-						ref = schema.paths[item].options.ref.toLowerCase();
-						Ref = capitalizeFirst(ref);
-						hasRef = true;
-					}
-					break;
-				case "SchemaDate":
-					jstype = "string";
-					hasDate = true;
-					break;
+                case "SchemaDate":
+                    [type,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
+                    ref, Ref, RefCamel, editor,
+                    flagDate, flagRef, flagEditor]
+                        = getPrimitiveField(fieldSchema);
+                    if (flagDate) hasDate = true;
+                    if (flagRef) hasRef = true;
+                    if (flagEditor) hasEditor = true;
+                    break;
+                case "SchemaArray":
+                    [elementType,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
+                    ref, Ref, RefCamel, editor,
+                    flagDate, flagRef, flagEditor]
+                        = getPrimitiveField(fieldSchema.caster);
+                    //rewrite the default value for array
+                    let defaultInput = fieldSchema.options.default;
+                    if (Array.isArray(defaultInput)) {
+                        defaultValue = defaultInput;
+                    } else {
+                        defaultValue = undefined;
+                    }
+                    if (fieldSchema.options.elementunique) {
+                        elementUnique = true;
+                    }
+                    if (requiredField) {
+                        hasRequiredGroup = true;
+                    }
+
+                    // let fs = fieldSchema;
+                    // console.log(fs);
+                    // console.log("===fieldSchema.options.default:", fieldSchema.options.default);
+                    // console.log("===caster.validators:", fs.caster.validators);
+                    // console.log("===casterConstructor:", fs.casterConstructor);
+                    // console.log("===validators:", fs.validators);
+                    break;
 				default:
 					;
 			}
@@ -195,28 +273,34 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
             console.warn("Warning: Field", item, "is not defined in schema", schemaName + ". Skipped...");
             continue;
         }
-        view.push(
-                {fieldName: item,
-                    FieldName: capitalizeFirst(item),
-                    type: type,
-                    jstype: jstype,
-                    ref: ref,
-                    Ref: Ref,
-                    RefCamel: RefCamel,
-                    editor: editor,
-                    //TODO: required could be a function
-                    required: requiredField,
-                    defaultValue: defaultValue,
-                    numberMin: numberMin,
-                    numberMax: numberMax,
-                    maxlength: maxlength,
-                    minlength: minlength,
-                    enumValues: enumValues,
-                    validators: validatorArray,
-                }
-        );
+        let fieldPicture = {
+            fieldName: item,
+            FieldName: capitalizeFirst(item),
+            type: type,
+            jstype: jstype,
+            ref: ref,
+            Ref: Ref,
+            RefCamel: RefCamel,
+            editor: editor,
+            //TODO: required could be a function
+            required: requiredField,
+            defaultValue: defaultValue,
+            numberMin: numberMin,
+            numberMax: numberMax,
+            maxlength: maxlength,
+            minlength: minlength,
+            enumValues: enumValues,
+            validators: validatorArray,
+
+            //for array
+            elementType: elementType,
+            elementUnique: elementUnique,
+        }
+
+        //if (type == 'SchemaArray') console.log(fieldPicture);
+        view.push(fieldPicture);
 	}
-	return [view, hasDate, hasRef, hasEditor];
+	return [view, hasDate, hasRef, hasEditor, hasRequiredGroup];
 }
 
 const getLoginUserPermission = function(permission) {
@@ -526,12 +610,14 @@ function main() {
   
   let schemaMap = {};
   let validatorFields = [];
+  let requiredGroupFields = [];
   let referenceFields = [];
   let referenceMap = [];
   let defaultSchema;
   let hasDate = false;
   let hasRef = false;
   let hasEditor = false;
+  let hasRequiredGroup = false;
   let dateFormat = 'MM/DD/YYYY';
   if (config && config.dateFormat) dateFormat = config.dateFormat;
   let timeFormat = 'hh:mm:ss';
@@ -556,7 +642,8 @@ function main() {
 
 	let views = schemaDef.views
 	let validators = schemaDef.validators;
-	let mongooseSchema = schemaDef.schema;
+    let mongooseSchema = schemaDef.schema;
+    let embeddedViewOnly = schemaDef.embeddedViewOnly? true: false;
 //	console.log(mongooseSchema);
 //	if (mongooseSchema.paths.author) {
 //		console.log("===author: ", mongooseSchema.paths.author.options);
@@ -591,19 +678,27 @@ function main() {
 		
 	});
 	//briefView, detailView, CreateView, EditView, SearchView, indexView]		
-	let [briefView, hasDate1, hasRef1] = generateViewPicture(name, views[0], mongooseSchema, validators);
-	let [detailView, hasDate2, hasRef2] = generateViewPicture(name, views[1], mongooseSchema, validators);
-	let [createView, hasDate3, hasRef3, hasEditor3] = generateViewPicture(name, views[2], mongooseSchema, validators);
-	let [editView, hasDate4, hasRef4, hasEditor4] = generateViewPicture(name, views[3], mongooseSchema, validators);
-	let [searchView, hasDate5, hasRef5] = generateViewPicture(name, views[4], mongooseSchema, validators);
-	let [indexView, hasDate6, hasRef6] = generateViewPicture(name, views[5], mongooseSchema, validators);
+    let [briefView, hasDate1, hasRef1, hasEditor1, hasReqGrp1] = 
+            generateViewPicture(name, views[0], mongooseSchema, validators);
+    let [detailView, hasDate2, hasRef2, hasEditor2, hasReqGrp2] = 
+            generateViewPicture(name, views[1], mongooseSchema, validators);
+    let [createView, hasDate3, hasRef3, hasEditor3, hasReqGrp3] = 
+            generateViewPicture(name, views[2], mongooseSchema, validators);
+    let [editView, hasDate4, hasRef4, hasEditor4, hasReqGrp4] = 
+            generateViewPicture(name, views[3], mongooseSchema, validators);
+    let [searchView, hasDate5, hasRef5, hasEditor5, hasReqGrp5] = 
+            generateViewPicture(name, views[4], mongooseSchema, validators);
+    let [indexView, hasDate6, hasRef6, hasEditor6, hasReqGrp6] = 
+            generateViewPicture(name, views[5], mongooseSchema, validators);
 	let schemaHasDate = hasDate1 || hasDate2 || hasDate3 || hasDate4 || hasDate5 || hasDate6;
 	let schemaHasRef = hasRef1 || hasRef3 || hasRef4;
-	let schemaHasEditor = hasEditor3 || hasEditor4;
+    let schemaHasEditor = hasEditor3 || hasEditor4;
+    let schemaHasRequiredGroup = hasReqGrp3 || hasReqGrp4;
 	if (schemaHasDate) hasDate = true;
 	if (schemaHasRef) hasRef = true;
 	if (schemaHasEditor) hasEditor = true;
-	
+	if (schemaHasRequiredGroup) hasRequiredGroup = true;
+
 	let detailFields = views[1].match(/\S+/g) || [];
 	let briefFields = views[0].match(/\S+/g) || [];
 	let detailSubFields = [];
@@ -625,6 +720,12 @@ function main() {
 	let schemaCamelName = lowerFirst(name);
 	let schemaHasValidator = false;
 	compositeEditView.forEach(function(x){
+        if (x.required && x.type == "SchemaArray") {
+            requiredGroupFields.push({
+                Directive: SchemaName+'Directive'+x.FieldName+'Required',
+			    schemaName: schemaName,
+            })
+        }
 		if (x.validators) {
 			schemaHasValidator = true;
 			validatorFields.push( 
@@ -665,9 +766,11 @@ function main() {
 		timeFormat: timeFormat,
 		schemaHasDate: schemaHasDate,
 		schemaHasRef: schemaHasRef,
-		schemaHasEditor: schemaHasEditor,
+        schemaHasEditor: schemaHasEditor,
+        schemaHasRequiredGroup: schemaHasRequiredGroup,
         schemaHasValidator: schemaHasValidator,
         permission: schemaAnyonePermission,
+        embeddedViewOnly: embeddedViewOnly,
 		
 		FIELD_NUMBER_FOR_SELECT_VIEW: FIELD_NUMBER_FOR_SELECT_VIEW
 	}
@@ -692,14 +795,16 @@ function main() {
   let renderObj = {
   	moduleName: moduleName,
   	ModuleName: ModuleName,
-        apiBase: apiBase,
+    apiBase: apiBase,
   	schemaMap: schemaMap,
   	defaultSchema: defaultSchema,
-  	validatorFields: validatorFields,
+    validatorFields: validatorFields,
+    requiredGroupFields: requiredGroupFields,
   	referenceFields: referenceObjFields,
   	hasDate: hasDate,
   	hasRef: hasRef,
-  	hasEditor: hasEditor,
+    hasEditor: hasEditor,
+    hasRequiredGroup: hasRequiredGroup,
   	dateFormat: dateFormat,
     timeFormat: timeFormat,
     authRequired: authRequired
