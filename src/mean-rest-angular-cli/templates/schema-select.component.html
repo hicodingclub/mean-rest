@@ -36,14 +36,14 @@
 	    <tbody>
 	        <tr *ngFor="let detail of list;  let i = index" 
 	        	[ngClass]="{'clicked-row': detail['_id']==clickedId}" >
-	            <td scope="row" (click)="selectViewDetail(i)"  class="pointer">{{(page-1)*per_page+i+1}}</td>
+	            <td scope="row" (click)="selectItemSelected(i)"  class="pointer">{{(page-1)*per_page+i+1}}</td>
 <%_ let view='list'; for (let field of briefView.slice(0,FIELD_NUMBER_FOR_SELECT_VIEW)){ 
 				let fn = field.fieldName, ft = field.type; let ref_link = false; %>
-	            <td (click)="selectViewDetail(i)"  class="pointer"><% include schema-display.field.html %>
+	            <td (click)="selectItemSelected(i)"  class="pointer"><% include schema-display.field.html %>
 	            </td><%_ } %>
 	            <td><a routerLink="." class="btn" 
 	                 [ngClass]="{'btn-primary': detail['_id']==selectedId, 'btn-outline-primary': detail['_id']!==selectedId}"
-	            	 (click)="selectItemSelected(i)">Select</a>
+	            	 (click)="selectViewDetail(i)">View Details</a>
 	            </td>
 	        </tr>
 	    </tbody>
