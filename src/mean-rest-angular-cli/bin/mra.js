@@ -45,8 +45,26 @@ var generatedFile = function(outputDir, prefix, outputFile) {
 var capitalizeFirst = function(str) {
 	return str.charAt(0).toUpperCase() + str.substr(1);
 }
+
 var lowerFirst = function(str) {
 	return str.charAt(0).toLowerCase() + str.substr(1);
+}
+
+var camelToDisplay = function (str) {
+    // insert a space before all caps
+    words = [
+        'At', 'Around', 'By', 'After', 'Along', 'For', 
+        'From', 'Of', 'On', 'To', 'With', 'Without',
+        'And', 'Nor', 'But', 'Or', 'Yet', 'So',
+        'A', 'An', 'The'
+    ];
+    let  arr = str.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').match(/\S+/g);
+    arr = arr.map(x=>{
+        let y = capitalizeFirst(x);
+        if (words.includes(y)) y = lowerFirst(y);
+        return y;
+    });
+    return capitalizeFirst(arr.join(' '));
 }
 
 var templates = {
@@ -183,8 +201,24 @@ var getPrimitiveField = function(fieldSchema) {
 }
 
 var generateViewPicture = function(schemaName, viewStr, schema, validators) {
-	let viewDef = viewStr.match(/\S+/g) || [];
-	let view = [];
+    //process | in viewStr
+    let fieldGroups = [];
+    if (viewStr.indexOf('|') > -1) {
+        let strGroups = viewStr.split('|');
+        for (let str of strGroups) {
+            let arr = str.match(/\S+/g);
+            if (arr) fieldGroups.push(arr);
+        }
+    }
+
+    let viewDef = viewStr.replace(/\|/g, ' ').match(/\S+/g) || [];
+    if (fieldGroups.length == 0) { //no grouping
+        for (let e of viewDef) {
+            fieldGroups.push([e]); //each element as a group
+        }
+    }
+    let view = [];
+    let viewMap = {};
 	let hasDate = false;
 	let hasRef = false;
     let hasEditor = false;
@@ -195,7 +229,6 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
             validatorArray = validators[item];
         }
 
-        
         let type;
         let jstype;
         let defaultValue;
@@ -276,6 +309,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
         let fieldPicture = {
             fieldName: item,
             FieldName: capitalizeFirst(item),
+            displayName: camelToDisplay(item),
             type: type,
             jstype: jstype,
             ref: ref,
@@ -299,8 +333,14 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
 
         //if (type == 'SchemaArray') console.log(fieldPicture);
         view.push(fieldPicture);
-	}
-	return [view, hasDate, hasRef, hasEditor, hasRequiredGroup];
+        viewMap[item] = fieldPicture;
+    }
+    let viewGroups = [];
+    for (let grp of fieldGroups) {
+        let arr = grp.filter(x=>x in viewMap).map(x=>viewMap[x]);
+        if (arr.length > 0) viewGroups.push(arr);
+    }
+	return [viewGroups, view, hasDate, hasRef, hasEditor, hasRequiredGroup];
 }
 
 const getLoginUserPermission = function(permission) {
@@ -678,17 +718,17 @@ function main() {
 		
 	});
 	//briefView, detailView, CreateView, EditView, SearchView, indexView]		
-    let [briefView, hasDate1, hasRef1, hasEditor1, hasReqGrp1] = 
+    let [briefViewGrp, briefView, hasDate1, hasRef1, hasEditor1, hasReqGrp1] = 
             generateViewPicture(name, views[0], mongooseSchema, validators);
-    let [detailView, hasDate2, hasRef2, hasEditor2, hasReqGrp2] = 
+    let [detailViewGrp, detailView, hasDate2, hasRef2, hasEditor2, hasReqGrp2] = 
             generateViewPicture(name, views[1], mongooseSchema, validators);
-    let [createView, hasDate3, hasRef3, hasEditor3, hasReqGrp3] = 
+    let [createViewGrp, createView, hasDate3, hasRef3, hasEditor3, hasReqGrp3] = 
             generateViewPicture(name, views[2], mongooseSchema, validators);
-    let [editView, hasDate4, hasRef4, hasEditor4, hasReqGrp4] = 
+    let [editViewGrp, editView, hasDate4, hasRef4, hasEditor4, hasReqGrp4] = 
             generateViewPicture(name, views[3], mongooseSchema, validators);
-    let [searchView, hasDate5, hasRef5, hasEditor5, hasReqGrp5] = 
+    let [searchViewGrp, searchView, hasDate5, hasRef5, hasEditor5, hasReqGrp5] = 
             generateViewPicture(name, views[4], mongooseSchema, validators);
-    let [indexView, hasDate6, hasRef6, hasEditor6, hasReqGrp6] = 
+    let [indexViewGrp, indexView, hasDate6, hasRef6, hasEditor6, hasReqGrp6] = 
             generateViewPicture(name, views[5], mongooseSchema, validators);
 	let schemaHasDate = hasDate1 || hasDate2 || hasDate3 || hasDate4 || hasDate5 || hasDate6;
 	let schemaHasRef = hasRef1 || hasRef3 || hasRef4;
@@ -699,14 +739,14 @@ function main() {
 	if (schemaHasEditor) hasEditor = true;
 	if (schemaHasRequiredGroup) hasRequiredGroup = true;
 
-	let detailFields = views[1].match(/\S+/g) || [];
-	let briefFields = views[0].match(/\S+/g) || [];
+	let detailFields = views[1].replace(/\|/g, ' ').match(/\S+/g) || [];
+	let briefFields = views[0].replace(/\|/g, ' ').match(/\S+/g) || [];
 	let detailSubFields = [];
 	for (let i of detailFields) {
 		if (!briefFields.includes(i)) detailSubFields.push(i);
 	}
 	let detailSubViewStr = detailSubFields.join(' ');
-	let [detailSubView, hasDate7, hasRef7] = generateViewPicture(name, detailSubViewStr, mongooseSchema, validators);
+	let [detailSubViewGrp, detailSubView, hasDate7, hasRef7, hasEditor7, hasReqGrp7] = generateViewPicture(name, detailSubViewStr, mongooseSchema, validators);
 	
 	
 	let compositeEditView = editView.slice();
@@ -759,7 +799,16 @@ function main() {
 		editView: editView,
 		searchView: searchView,
 		indexView: indexView,
-		detailSubView: detailSubView,
+        detailSubView: detailSubView,
+        
+		briefViewGrp: briefViewGrp,
+		detailViewGrp: detailViewGrp,
+		createViewGrp: createViewGrp,
+		editViewGrp: editViewGrp,
+		searchViewGrp: searchViewGrp,
+		indexViewGrp: indexViewGrp,
+        detailSubViewGrp: detailSubViewGrp,
+        
 		compositeEditView: compositeEditView,
 		componentDir: componentDir,
 		dateFormat: dateFormat,

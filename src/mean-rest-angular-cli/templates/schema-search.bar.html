@@ -29,7 +29,7 @@
 			    <div class="shadow" *ngIf="moreSearchOpened">
 					<div class="card">
 						<div class="card-body">
-						<%_ briefView.forEach( (field) => { let fn=field.fieldName, Fn=field.FieldName, sn=schemaName;
+						<%_ briefView.forEach( (field) => { let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName;
 							if (field.type != 'SchemaString') {%> <%_ include schema-search.field.html %> 
 						<%_ }}) %>
 						  <div class="action-buttons" style="margin-top: 10px;">

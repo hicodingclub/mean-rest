@@ -45,7 +45,8 @@ fieldset > .form-control, .input-group, .form-check {
 }
 
 .form-group > label {
-	font-size: 1.25rem;
+    font-weight: bold;
+	font-size: 1rem;
 }
 
 /*

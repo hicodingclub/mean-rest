@@ -16,7 +16,7 @@
 		        <th scope="col">#</th>
 <%_ for (let field of briefView){ %>
 		        <th <%_if (field.ref) {%> *ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem" <%}%> scope="col">
-		        	<%-field.FieldName%>
+		        	<%-field.displayName%>
 		        </th><%_ } %>		        
                 <th scope="col" style="width:2rem;"></th>
 		        <th scope="col" style="width:2rem;"></th>

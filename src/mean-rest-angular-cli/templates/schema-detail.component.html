@@ -1,7 +1,7 @@
 <div class="detail" *ngIf="detail">
 	<div class="action-buttons">
         <!--<a href="javascript:void(0)" (click)="goBack()"><i class="fas fa-angle-double-left" title="Back"></i></a>-->
-        <a [routerLink]="['../../list' ]"><i class="fas fa-list" title="List">&nbsp;{{ItemCamelName}} List</i></a>
+        <a [routerLink]="['../../list' ]"><i class="fas fa-list" title="List"></i><span>&nbsp;&nbsp;{{ItemCamelName}} List</span></a>
 		<a [routerLink]="['../../edit', detail['_id'] ]" [skipLocationChange]="false" class="btn btn-outline-primary">Edit</a>
 		<a [routerLink]="['../../new']" [queryParams]="{cid: detail['_id']}" [skipLocationChange]="false" class="btn btn-outline-primary">New</a>
 		<a routerLink="." class="btn btn-outline-primary" (click)="onDelete(detail['_id'], null)">Delete</a>
@@ -11,10 +11,22 @@
 	  <div class="card-body">
 	    <h4 class="card-title">{{ItemCamelName}} Detail</h4>    
 		<div class="card-text">
-<%_ let view = "detail"; for (let field of detailView){ let fn = field.fieldName, ft = field.type; let ref_link = true;%>
-			<label><b><%-fn%>:</b></label>
-			<span><% include schema-display.field.html %>
-			</span><br><%_}%>
+<%_ let view = "detail"; 
+    //based on the filed number, split rows into columns: 
+    let columnPlan = [[], [3, 9], [3, 3, 3, 3], [2, 2, 2, 2, 2, 2]]
+    for (let fieldGrp of detailViewGrp){%>
+          <div class="row">
+      <%let filedNum = fieldGrp.length;
+      let columns = columnPlan[filedNum];
+      for (let [idx, field] of fieldGrp.entries()) {
+        let labelColumn = columns[idx * 2], contentColumn = columns[idx * 2 + 1];
+        let fn = field.fieldName; let ft = field.type; let ref_link = true;
+        %>
+			<div class="col-<%-labelColumn%>"><label><%-field.displayName%></label></div>
+			<div class="col-<%-contentColumn%>"><% include schema-display.field.html %></div>
+      <%_}%>
+          </div>
+    <%_}%>
 		</div>
 	  </div>
 	</div>

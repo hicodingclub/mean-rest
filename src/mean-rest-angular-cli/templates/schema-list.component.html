@@ -25,7 +25,7 @@
 	    	<tr>
 		        <th scope="col">#</th>
 <%_ for (let field of briefView){ %>
-		        <th scope="col"><%-field.FieldName%></th><%_ } %>		        
+		        <th scope="col"><%-field.displayName%></th><%_ } %>		        
 		        <th scope="col" style="width:8rem;"></th>
 		        <th scope="col" style="width:2rem;">
 		        	<input type="checkbox" [(ngModel)]="checkAll" (change)="onCheckAllChange()">

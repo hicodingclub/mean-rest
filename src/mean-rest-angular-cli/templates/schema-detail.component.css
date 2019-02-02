@@ -13,18 +13,25 @@
 	display: inline-block;
 	margin-left: 1rem;
 }
-.action-buttons .fa-angle-double-left, .fa-list {
+.action-buttons .fa-angle-double-left, .fa-list, span {
 	float: left;
 	display: inline-block;
 	margin-left: 2.5rem;
 	margin-top:  0.75rem
+}
+.action-buttons span {
+	float: left;
+	display: inline-block;
+	margin-left: 0rem;
+	margin-top:  0.5rem
 }
 
 .card-title {
 	text-align: center;
 }
 .card label {
-	font-size: 1.25rem;
+    font-weight: bold;
+	font-size: 1rem;
 }
 .card span {
 	margin-left: 1rem;

@@ -1,7 +1,7 @@
 <div *ngIf="!hiddenFields.includes('<%-fn%>')">
     <%_ if (field.type === "SchemaString" && !field.editor) { %>
 	      <fieldset class="form-group">
-	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%></label>
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-fD%></label>
         <%_ if (field.enumValues) { %>
 	        <div class="form-check"
 		        <%_ if (field.required) {%>
@@ -60,7 +60,7 @@
 	      </fieldset>
     <%_ } else if (field.type === "SchemaString" && field.editor) { %>
 	      <fieldset class="form-group">
-	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%></label>
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-fD%></label>
     	    <div mra-richtext-select="<%-sn%>Edit<%-Fn%>"></div>
 		  	<div class="action-buttons" style="margin-top: 10px;">
 				<button type="button" class="btn btn-outline-success" (click)="onEdtiorPreview('<%-sn%>Edit<%-Fn%>')">Preview</button>
@@ -89,7 +89,7 @@
 	      </fieldset>
     <%_ } else if (field.type === "SchemaBoolean") { %>
 	      <fieldset class="form-group">
-	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%></label>
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-fD%></label>
 	        <div class="form-check"
 		        <%_ if (field.required) {%>
 		          [ngClass]="{'ng-valid': detail['<%-fn%>'] == true || detail['<%-fn%>'] == false,
@@ -135,7 +135,7 @@
 		  </fieldset>
     <%_ } else if (field.type === "SchemaNumber") { %>
 	      <fieldset class="form-group">
-	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%></label>
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-fD%></label>
 	        <input type="number" class="form-control" id="<%-sn%>Edit<%-Fn%>" 
 	                <%if (typeof field.numberMin === 'number') {%>minnumber="<%-field.numberMin%>" min="<%-field.numberMin%>"<%}%>
 	                <%if (typeof field.numberMax === 'number') {%>maxnumber="<%-field.numberMax%>" max="<%-field.numberMax%>"<%}%>
@@ -168,7 +168,7 @@
 	      </fieldset>
     <%_ } else if (field.type === "SchemaDate") { %>
 	      <fieldset class="form-group">
-	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%> </label> <span> ({{dateFormat}})</span>
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-fD%> </label> <span> ({{dateFormat}})</span>
 	        <div class="input-group">
 		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
 	                 <%if (field.required) {%>required<%}%>
@@ -201,7 +201,7 @@
 	      </fieldset>
     <%_ } else if (field.type === "ObjectId") { %>
 	      <fieldset class="form-group">
-	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%> </label>
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-fD%> </label>
 		    <!-- <a class="icon-search" [routerLink]="['.']" (click)="onRefSelect('<%-field.fieldName%>')"><i class="fas fa-list" title="Search"></i></a>  -->
 		    <div class="input-group">
 		    	<!--  [attr.disabled]="true" -->
@@ -231,7 +231,7 @@
     <%_ } else if (field.type === "SchemaArray") { %>
 	  <%_ if (field.elementType === "SchemaString") { %>
           <fieldset class="form-group">
-	        <label for="<%-sn%>Edit<%-Fn%>"><%-Fn%></label>
+	        <label for="<%-sn%>Edit<%-Fn%>"><%-fD%></label>
         <%_ if (field.enumValues && field.elementUnique) { %>
             <div class="form-check"
                 ngModelGroup="<%-sn%>Edit<%-Fn%>"

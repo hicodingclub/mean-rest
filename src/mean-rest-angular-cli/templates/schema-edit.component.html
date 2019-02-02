@@ -9,11 +9,11 @@
 	    <form (ngSubmit)="onSubmit()" #editForm="ngForm">
 	    
 	     <div *ngIf="action == 'Edit'">
-<%_ editView.forEach( (field) => { let fn=field.fieldName, Fn=field.FieldName, sn=schemaName;
+<%_ editView.forEach( (field) => { let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName;
 %> <%_ include schema-edit.field.html %> <%_ }) %>
          </div>	
 	     <div *ngIf="action == 'Create' || action == 'Add' ">
-<%_ createView.forEach( (field) => { let fn=field.fieldName, Fn=field.FieldName, sn=schemaName;
+<%_ createView.forEach( (field) => { let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName;
 %> <%_ include schema-edit.field.html %> <%_ }) %>
          </div>	
          
@@ -21,7 +21,7 @@
 	     	<button type="submit" class="btn btn-success" 
      			[disabled]="!editForm.form.valid">Submit</button>
 	     	<button class="btn btn-outline-success" 
-     			(click)="editCancel()">Cancel</button>
+     			type="button" (click)="editCancel()">Cancel</button>
 		</div>
 	    </form>
 	  </div>
