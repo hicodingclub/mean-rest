@@ -88,7 +88,7 @@ const checkAndSetValue = function(obj, schema) {
 const getViewPopulates = function(schema, viewStr) {
 	
 	let populates = [];
-	let viewFields = viewStr.match(/\S+/g) || [];
+	let viewFields = viewStr.replace(/\|/g, ' ').match(/\S+/g) || [];
 	viewFields.forEach((item) => {
 		if (item in schema.paths) {
 			let type = schema.paths[item].constructor.name;
@@ -118,7 +118,7 @@ const objectReducerForRef = function(obj, populateMap) {
         return obj;
     }
     for (let path in populateMap) {
-        let fields = populateMap[path].match(/\S+/g); // \S matches no space characters.
+        let fields = populateMap[path].replace(/\|/g, ' ').match(/\S+/g); // \S matches no space characters.
         if (!fields) continue;
 
         let indexField = fields[0];  //always use first one as index
@@ -159,7 +159,7 @@ const objectReducerForView  = function(obj, viewStr) {
         return obj;
     }
 
-    let fields = viewStr.match(/\S+/g); // \S matches no space characters.
+    let fields = viewStr.replace(/\|/g, ' ').match(/\S+/g); // \S matches no space characters.
     if (!fields) return obj;
 
     let newObj = {};
