@@ -1,8 +1,7 @@
-const meanRestExpressRouter = require('../lib/rest_router')
-const util = require('../util')
+const express = require('express');
 
 const addPasswordHandlers = require('./password_handler');
-const AuthnController = require('./authn_controller')
+const AuthnController = require('./controller')
 
 const AuthnRouter = function(sysDef, authConfig) {
   const authn = sysDef.authn || {};
@@ -17,7 +16,6 @@ const AuthnRouter = function(sysDef, authConfig) {
   let authSchemaName;
   if ("authUserSchema" in authn) {
     authSchemaName = authn["authUserSchema"];
-    AuthnController.registerAuth(authSchemaName, authUserFields, authPasswordField);
   }
 
   let schemas = sysDef.schemas;
@@ -28,11 +26,13 @@ const AuthnRouter = function(sysDef, authConfig) {
     if (schemaName == authSchemaName) {
       let schm = schemaDef.schema;
       schemaDef.schema = addPasswordHandlers(schm, authPasswordField);
+      AuthnController.registerAuth(authSchemaName, schemaDef.schema, authUserFields, authPasswordField);
       break;
     }
   }
   
-  let expressRouter = meanRestExpressRouter(sysDef, authConfig);
+  //let expressRouter = meanRestExpressRouter(sysDef, authConfig);
+  let expressRouter = express.Router();
 
   if (!!authSchemaName) {
     expressRouter.post(
@@ -61,7 +61,26 @@ const AuthnRouter = function(sysDef, authConfig) {
     expressRouter.post("/register", (req, res, next) => {
       AuthnController.authRegister(req, res, next);
     });
-    expressRouter = util.moveRouterStackTailToHead(expressRouter, 3);
+    //expressRouter = util.moveRouterStackTailToHead(expressRouter, 3);
+    
+    //not supported api
+    expressRouter.use(function(req, res, next) {
+      next(createError(404));
+    });
+    
+    //error handler
+    expressRouter.use(function(err, req, res, next) {     
+      let e = {"error": err.message,
+        "status": err.status || 500};
+      if (req.app.get('env') === 'development') {
+          e.details = err.stack
+        }
+       
+        // render the error page
+      res.status(err.status || 500);
+      res.json(e);
+    });
+
   }
 
   return expressRouter;

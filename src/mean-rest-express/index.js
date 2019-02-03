@@ -1,9 +1,4 @@
-var meanRestExpressRouter = require('./lib/rest_router')
+const meanRestExpressRouter = require('./lib/rest_router')
 
-var AuthRouter = require('./authn/authn_router')
-var authUserDef = require('./authn/user.model')
-
-
+//function. input is schema definition of the module, return a express router.
 module.exports.RestRouter = meanRestExpressRouter;
-module.exports.AuthRouter = AuthRouter;
-module.exports.authRouter = AuthRouter(authUserDef);

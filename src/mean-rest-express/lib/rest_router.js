@@ -16,6 +16,7 @@ const meanRestExpressRouter = function(sysDef, authConfig) {
 
     authzFuncCreator = authConfig.authzFuncCreator;
   }
+  //console.log("*******sysDef", sysDef)
 
   let sub_routes = [];
   for (let schemaName in schemas) {

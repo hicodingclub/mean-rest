@@ -39,23 +39,19 @@ const userEdit = "username email phone password";
 const userTextSearch = "username email phone";
 const userIndex = "username";
 
-
-const dateFormat = "MM-DD-YYYY";
-const timeFormat = "hh:mm:ss";
-
 const schemas = {
   "muser": {
     schema: userSchema,
     views: [userBrief, userDetail, userCreat, userEdit, userTextSearch, userIndex],
   }
 };
+
+const dateFormat = "MM-DD-YYYY";
+const timeFormat = "hh:mm:ss";
+
 const config = {
   dateFormat: dateFormat,
   timeFormat: timeFormat,
-  
-  authUserSchema: "muser",
-  authUserFields: "username email phone",
-  authPasswordField: "password"
 }
 
 const authn = {

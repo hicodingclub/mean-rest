@@ -1,8 +1,6 @@
 const jwt = require('jsonwebtoken');
 const createError = require('http-errors');
-
-const RestController = require('../lib/rest_controller')
-const loadContextVarsByName = RestController.loadContextVarsByName
+const mongoose = require('mongoose');
 
 let auth = {}
 let AuthnController = function() {
@@ -11,14 +9,18 @@ let AuthnController = function() {
 const REFRESH_SECRETE = 'server refresh secret random';
 const ACCESS_SECRETE = 'server secret random';
 
-AuthnController.registerAuth = function(schemaName, userFields, passwordField) {
+AuthnController.registerAuth = function(schemaName, schema, userFields, passwordField) {
   auth.schemaName = schemaName;
   auth.userFields = userFields;
   auth.passwordField = passwordField;
+  
+  
+  auth.schema = schema;
+  auth.model = mongoose.model(schemaName, schema );//model uses given name
 }
 
 AuthnController.authLogin = function(req, res, next) {
-  let {name: name, schema: schema, model: model, views: views} = loadContextVarsByName(auth.schemaName.toLowerCase());
+  let model = auth.model;
   
   let body = req.body;
   if (typeof body === "string") {
@@ -95,7 +97,7 @@ AuthnController.generateToken = function(req, res, next) {
 }
 
 AuthnController.verifyRefreshToken = function(req, res, next) {
-  let {name: name, schema: schema, model: model, views: views} = loadContextVarsByName(auth.schemaName.toLowerCase());
+  let model = auth.model;
   
   let body = req.body;
   if (typeof body === "string") {
@@ -130,7 +132,7 @@ AuthnController.verifyRefreshToken = function(req, res, next) {
 }
 
 AuthnController.authRefresh = function(req, res, next) {
-  let {name: name, schema: schema, model: model, views: views} = loadContextVarsByName(auth.schemaName.toLowerCase());
+  let model = auth.model;
   
   let { _id, userName, fieldName} = req.muser;
   let query = {};
@@ -151,7 +153,7 @@ AuthnController.authRefresh = function(req, res, next) {
 }
 
 AuthnController.authRegister = function(req, res, next) {
-  let {name: name, schema: schema, model: model, views: views} = loadContextVarsByName(auth.schemaName.toLowerCase());
+  let model = auth.model;
   
   let body = req.body;
   if (typeof body === "string") {
