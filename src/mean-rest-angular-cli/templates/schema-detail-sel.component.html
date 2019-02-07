@@ -23,10 +23,7 @@
 	  <div class="card-body">
 	    <h4 class="card-title">{{ItemCamelName}} Detail</h4>    
 		<div class="card-text">
-<%_ let view = 'detail'; for (let field of detailView){ let fn = field.fieldName, ft = field.type; let ref_link = false;%>
-			<label><b><%-fn%>:</b></label>
-			<span><% include schema-display.field.html %>
-			</span><br><%_}%>
+<%_ let view = "detail"; let viewGrp = detailViewGrp; %><%_ include schema-display.group.html %>
 		</div>
 	  </div>
 	</div>

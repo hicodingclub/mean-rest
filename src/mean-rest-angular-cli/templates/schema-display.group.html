@@ -1,0 +1,15 @@
+    <%_ //based on the filed number, split rows into columns: 
+    let columnPlan = [[], [3, 9], [3, 3, 3, 3], [2, 2, 2, 2, 2, 2]]
+    for (let fieldGrp of viewGrp){%>
+          <div class="row">
+      <%let filedNum = fieldGrp.length;
+      let columns = columnPlan[filedNum];
+      for (let [idx, field] of fieldGrp.entries()) {
+        let labelColumn = columns[idx * 2], contentColumn = columns[idx * 2 + 1];
+        let fn = field.fieldName; let ft = field.type; let ref_link = true;
+        %>
+			<div class="col-<%-labelColumn%>"><label><%-field.displayName%></label></div>
+			<div class="col-<%-contentColumn%>"><% include schema-display.field.html %></div>
+      <%_}%>
+          </div>
+    <%_}%>      

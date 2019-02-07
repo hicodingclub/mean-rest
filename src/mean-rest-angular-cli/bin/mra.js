@@ -200,6 +200,36 @@ var getPrimitiveField = function(fieldSchema) {
             flagDate, flagRef, flagEditor]
 }
 
+var processField = function(x) {
+  let hidden = false;
+  let field = x;
+  let matches = x.match(/\((.*?)\)/);
+  if (matches) {
+    hidden = true;
+    field = matches[1];
+  }
+  return [field, hidden];
+}
+
+var processFieldGroups = function(fieldGroups) {
+  //remove surrounding ()
+  for (let arr of fieldGroups) {
+    arr = arr.map(x=>{
+      let [f, hidden] = processField(x);
+      if (hidden) return '';
+      return f;
+    });
+    arr = arr.filter(x=>{
+      return !!x;  //remove empty fields
+    })
+  }
+  
+  fieldGroups.filter(x=>{
+    return x.length > 0; //remove empty groups
+  })
+  
+  return fieldGroups;
+}
 var generateViewPicture = function(schemaName, viewStr, schema, validators) {
     //process | in viewStr
     let fieldGroups = [];
@@ -207,7 +237,9 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
         let strGroups = viewStr.split('|');
         for (let str of strGroups) {
             let arr = str.match(/\S+/g);
-            if (arr) fieldGroups.push(arr);
+            if (arr) {
+              fieldGroups.push(arr);
+            }
         }
     }
 
@@ -217,130 +249,138 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
             fieldGroups.push([e]); //each element as a group
         }
     }
+    
+    fieldGroups = processFieldGroups(fieldGroups);
+    
     let view = [];
     let viewMap = {};
-	let hasDate = false;
-	let hasRef = false;
+  	let hasDate = false;
+	  let hasRef = false;
     let hasEditor = false;
     let hasRequiredGroup = false;
-	for (let item of viewDef) {
-        let validatorArray;
-        if (validators && Array.isArray(validators[item])) {
-            validatorArray = validators[item];
-        }
 
-        let type;
-        let jstype;
-        let defaultValue;
-        let numberMin, numberMax;
-        let maxlength, minlength;
-        let enumValues;
-        let ref, Ref, RefCamel;
-        let editor = false;
-        let requiredField = false;
+	  for (let item of viewDef) {
+	    let hidden = false;
+	    [item, hidden] = processField(item)
+	    
+      let validatorArray;
+      if (validators && Array.isArray(validators[item])) {
+          validatorArray = validators[item];
+      }
 
-        let flagDate = false;
-        let flagRef = false;
-        let flagEditor = false;
+      let type;
+      let jstype;
+      let defaultValue;
+      let numberMin, numberMax;
+      let maxlength, minlength;
+      let enumValues;
+      let ref, Ref, RefCamel;
+      let editor = false;
+      let requiredField = false;
 
-        //for array
-        let elementUnique = false;
-        let elementType;
+      let flagDate = false;
+      let flagRef = false;
+      let flagEditor = false;
 
-		if (item in schema.paths) {
-            let fieldSchema = schema.paths[item];
-            type = fieldSchema.constructor.name;
-            requiredField = fieldSchema.originalRequiredValue === true? true:false;
-            //TODO: required could be a function
-            defaultValue = fieldSchema.defaultValue;
+      //for array
+      let elementUnique = false;
+      let elementType;
 
-			switch(type) {
-				case "SchemaString":
-				case "SchemaBoolean":
-				case "SchemaNumber":
-				case "ObjectId":
-                case "SchemaDate":
-                    [type,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
-                    ref, Ref, RefCamel, editor,
-                    flagDate, flagRef, flagEditor]
-                        = getPrimitiveField(fieldSchema);
-                    if (flagDate) hasDate = true;
-                    if (flagRef) hasRef = true;
-                    if (flagEditor) hasEditor = true;
-                    break;
-                case "SchemaArray":
-                    [elementType,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
-                    ref, Ref, RefCamel, editor,
-                    flagDate, flagRef, flagEditor]
-                        = getPrimitiveField(fieldSchema.caster);
-                    //rewrite the default value for array
-                    let defaultInput = fieldSchema.options.default;
-                    if (Array.isArray(defaultInput)) {
-                        defaultValue = defaultInput;
-                    } else {
-                        defaultValue = undefined;
-                    }
-                    if (fieldSchema.options.elementunique) {
-                        elementUnique = true;
-                    }
-                    if (requiredField) {
-                        hasRequiredGroup = true;
-                    }
+  		if (item in schema.paths) {
+        let fieldSchema = schema.paths[item];
+        type = fieldSchema.constructor.name;
+        requiredField = fieldSchema.originalRequiredValue === true? true:false;
+        //TODO: required could be a function
+        defaultValue = fieldSchema.defaultValue;
+  
+  			switch(type) {
+  				case "SchemaString":
+  				case "SchemaBoolean":
+  				case "SchemaNumber":
+  				case "ObjectId":
+                  case "SchemaDate":
+                      [type,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
+                      ref, Ref, RefCamel, editor,
+                      flagDate, flagRef, flagEditor]
+                          = getPrimitiveField(fieldSchema);
+                      if (flagDate) hasDate = true;
+                      if (flagRef) hasRef = true;
+                      if (flagEditor) hasEditor = true;
+                      break;
+                  case "SchemaArray":
+                      [elementType,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
+                      ref, Ref, RefCamel, editor,
+                      flagDate, flagRef, flagEditor]
+                          = getPrimitiveField(fieldSchema.caster);
+                      //rewrite the default value for array
+                      let defaultInput = fieldSchema.options.default;
+                      if (Array.isArray(defaultInput)) {
+                          defaultValue = defaultInput;
+                      } else {
+                          defaultValue = undefined;
+                      }
+                      if (fieldSchema.options.elementunique) {
+                          elementUnique = true;
+                      }
+                      if (requiredField) {
+                          hasRequiredGroup = true;
+                      }
+  
+                      // let fs = fieldSchema;
+                      // console.log(fs);
+                      // console.log("===fieldSchema.options.default:", fieldSchema.options.default);
+                      // console.log("===caster.validators:", fs.caster.validators);
+                      // console.log("===casterConstructor:", fs.casterConstructor);
+                      // console.log("===validators:", fs.validators);
+                      break;
+  				default:
+  					;
+  			}
+  		} else if (item in schema.virtuals) {
+              //Handle as a string
+              type = 'SchemaString';
+              jstype = 'string';
+  
+      } else {
+          console.warn("Warning: Field", item, "is not defined in schema", schemaName + ". Skipped...");
+          continue;
+      }
+      let fieldPicture = {
+          fieldName: item,
+          FieldName: capitalizeFirst(item),
+          displayName: camelToDisplay(item),
+          hidden: hidden,
+          type: type,
+          jstype: jstype,
+          ref: ref,
+          Ref: Ref,
+          RefCamel: RefCamel,
+          editor: editor,
+          //TODO: required could be a function
+          required: requiredField,
+          defaultValue: defaultValue,
+          numberMin: numberMin,
+          numberMax: numberMax,
+          maxlength: maxlength,
+          minlength: minlength,
+          enumValues: enumValues,
+          validators: validatorArray,
 
-                    // let fs = fieldSchema;
-                    // console.log(fs);
-                    // console.log("===fieldSchema.options.default:", fieldSchema.options.default);
-                    // console.log("===caster.validators:", fs.caster.validators);
-                    // console.log("===casterConstructor:", fs.casterConstructor);
-                    // console.log("===validators:", fs.validators);
-                    break;
-				default:
-					;
-			}
-		} else if (item in schema.virtuals) {
-            //Handle as a string
-            type = 'SchemaString';
-            jstype = 'string';
+          //for array
+          elementType: elementType,
+          elementUnique: elementUnique,
+      }
 
-        } else {
-            console.warn("Warning: Field", item, "is not defined in schema", schemaName + ". Skipped...");
-            continue;
-        }
-        let fieldPicture = {
-            fieldName: item,
-            FieldName: capitalizeFirst(item),
-            displayName: camelToDisplay(item),
-            type: type,
-            jstype: jstype,
-            ref: ref,
-            Ref: Ref,
-            RefCamel: RefCamel,
-            editor: editor,
-            //TODO: required could be a function
-            required: requiredField,
-            defaultValue: defaultValue,
-            numberMin: numberMin,
-            numberMax: numberMax,
-            maxlength: maxlength,
-            minlength: minlength,
-            enumValues: enumValues,
-            validators: validatorArray,
-
-            //for array
-            elementType: elementType,
-            elementUnique: elementUnique,
-        }
-
-        //if (type == 'SchemaArray') console.log(fieldPicture);
-        view.push(fieldPicture);
-        viewMap[item] = fieldPicture;
+      //if (type == 'SchemaArray') console.log(fieldPicture);
+      view.push(fieldPicture);
+      viewMap[item] = fieldPicture;
     }
     let viewGroups = [];
     for (let grp of fieldGroups) {
         let arr = grp.filter(x=>x in viewMap).map(x=>viewMap[x]);
         if (arr.length > 0) viewGroups.push(arr);
     }
-	return [viewGroups, view, hasDate, hasRef, hasEditor, hasRequiredGroup];
+  	return [viewGroups, view, hasDate, hasRef, hasEditor, hasRequiredGroup];
 }
 
 const getLoginUserPermission = function(permission) {
@@ -739,15 +779,13 @@ function main() {
 	if (schemaHasEditor) hasEditor = true;
 	if (schemaHasRequiredGroup) hasRequiredGroup = true;
 
-	let detailFields = views[1].replace(/\|/g, ' ').match(/\S+/g) || [];
+  //let detailFields = views[1].replace(/\|/g, ' ').match(/\S+/g) || [];
+  let detailSubViewStr = views[1];
 	let briefFields = views[0].replace(/\|/g, ' ').match(/\S+/g) || [];
-	let detailSubFields = [];
-	for (let i of detailFields) {
-		if (!briefFields.includes(i)) detailSubFields.push(i);
+	for (let i of briefFields) {
+	  detailSubViewStr = detailSubViewStr.replace(i, '');
 	}
-	let detailSubViewStr = detailSubFields.join(' ');
 	let [detailSubViewGrp, detailSubView, hasDate7, hasRef7, hasEditor7, hasReqGrp7] = generateViewPicture(name, detailSubViewStr, mongooseSchema, validators);
-	
 	
 	let compositeEditView = editView.slice();
 	let editFields = editView.map( x=> x.fieldName);
@@ -799,7 +837,7 @@ function main() {
 		editView: editView,
 		searchView: searchView,
 		indexView: indexView,
-        detailSubView: detailSubView,
+    detailSubView: detailSubView,
         
 		briefViewGrp: briefViewGrp,
 		detailViewGrp: detailViewGrp,
@@ -807,7 +845,7 @@ function main() {
 		editViewGrp: editViewGrp,
 		searchViewGrp: searchViewGrp,
 		indexViewGrp: indexViewGrp,
-        detailSubViewGrp: detailSubViewGrp,
+    detailSubViewGrp: detailSubViewGrp,
         
 		compositeEditView: compositeEditView,
 		componentDir: componentDir,
@@ -815,11 +853,11 @@ function main() {
 		timeFormat: timeFormat,
 		schemaHasDate: schemaHasDate,
 		schemaHasRef: schemaHasRef,
-        schemaHasEditor: schemaHasEditor,
-        schemaHasRequiredGroup: schemaHasRequiredGroup,
-        schemaHasValidator: schemaHasValidator,
-        permission: schemaAnyonePermission,
-        embeddedViewOnly: embeddedViewOnly,
+    schemaHasEditor: schemaHasEditor,
+    schemaHasRequiredGroup: schemaHasRequiredGroup,
+    schemaHasValidator: schemaHasValidator,
+    permission: schemaAnyonePermission,
+    embeddedViewOnly: embeddedViewOnly,
 		
 		FIELD_NUMBER_FOR_SELECT_VIEW: FIELD_NUMBER_FOR_SELECT_VIEW
 	}
