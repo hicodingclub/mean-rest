@@ -3,11 +3,16 @@
 }
 
 .auth-icon {
+	margin-left: auto;
+	margin-right: auto;
+	
 	background-color: rgb(170, 170, 170);
-    height: 3rem;
-    width: 3rem;
+/*    height: 3rem;
+    width: 3rem; */
+    height: 2.5rem;
+    width: 2.5rem;
+    
     border-radius: 50%;
-    display: inline-block;
     text-align: center;
     cursor: pointer;
 }
@@ -17,7 +22,8 @@
 }
 
 .icon-text {
-    font-size: 1.8rem;
+    /*font-size: 1.8rem;*/
+    font-size: 1.5rem;
     margin-top: 0.5rem;
 }
 
