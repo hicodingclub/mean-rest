@@ -5,6 +5,32 @@ const createError = require('http-errors');
 const RestController = require('./rest_controller')
 const RestRouter = require('./rest_sub_router')
 
+
+const processField = function(x) {
+  let hidden = false;
+  let field = x;
+  let matches = x.match(/\((.*?)\)/);
+  if (matches) {
+    hidden = true;
+    field = matches[1];
+  }
+  return [field, hidden];
+}
+
+var processViewStr = function(viewStr) {
+  //1. remove virtical bar |, and split to array
+  let fields = viewStr.replace(/\|/g, ' ').match(/\S+/g)
+  //2. process each field
+  fields = fields.map(x=>{
+    let [f, hidden] = processField(x);
+    return f;
+  })
+  //3. join to string
+  viewStr = fields.join(" ");
+  
+  return viewStr;
+}
+
 const meanRestExpressRouter = function(sysDef, authConfig) {
   let expressRouter = express.Router();
   let schemas = sysDef.schemas;
@@ -21,14 +47,22 @@ const meanRestExpressRouter = function(sysDef, authConfig) {
   let sub_routes = [];
   for (let schemaName in schemas) {
     var schemaDef = schemas[schemaName];
-    //schemaDef.views in [briefView, detailView, CreateView, EditView, SearchView] sequence
     
     let name = schemaName.toLowerCase();
     let schm = schemaDef.schema;
     schm.set('toObject', {getters: false, virtuals: true});
     schm.set('toJSON', {getters: false, virtuals: true});
     let model = mongoose.model(schemaName, schm );//model uses given name
-    RestController.register(name, schemaDef.schema, schemaDef.views, model);
+    
+    //schemaDef.views in [briefView, detailView, CreateView, EditView, SearchView] sequence
+    let views = [];
+    for (let view of schemaDef.views) {
+      view = processViewStr(view);
+      //console.log("====view", view);
+      views.push(view);
+    }
+    //pass pure view string to register.
+    RestController.register(name, schemaDef.schema, views, model);
   }
 
   for (let schemaName in schemas) {
