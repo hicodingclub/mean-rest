@@ -448,8 +448,13 @@ export class BaseComponent implements BaseComponentInterface {
         return cpy;
     }
     
-    protected populateDetail(id:string):void {
-      this.service.getDetail(id).subscribe(
+    protected populateDetail(id: string):void {
+      this.populateDetailForAction(id, null);
+    }
+
+    protected populateDetailForAction(id: string, action: string):void {
+      //action: eg: action=edit  -> get detail for editing purpose 
+      this.service.getDetailForAction(id, action).subscribe(
         detail => {
             let originalDetail = Util.clone(detail);
             if (detail["_id"]) this.commonService.putToStorage(detail["_id"], originalDetail);//cache it
@@ -461,6 +466,7 @@ export class BaseComponent implements BaseComponentInterface {
       );
     }
     
+
     protected populateDetailFromCopy(copy_id:string):void {
       this.service.getDetail(copy_id).subscribe(
         detail => {            
@@ -1138,15 +1144,20 @@ export class BaseComponent implements BaseComponentInterface {
         this.checkedItem[i] = !this.checkedItem[i];
     }
 
-    /*** Sub List View - add new item in embedded Edit View*/
+    /*** Any View - add new component in the current view*/
     protected isAdding: boolean = false;
     public onAdd() {
         this.isAdding = true;
     }
+    public toggleAdd() {
+        this.isAdding = !this.isAdding;
+    }
     public onAddDone(result: boolean) {
         this.isAdding = false;
         if (result) { //add successful. Re-populate the current list
+          if (this.view == ViewType.LIST) {
             this.populateList();
+          }
         } else {
             ; //do nothing
         }

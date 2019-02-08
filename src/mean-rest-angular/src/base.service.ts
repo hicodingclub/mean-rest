@@ -81,15 +81,21 @@ export class BaseService {
             );
     }
 
-    getDetail(id:string) {
+    getDetailForAction(id: string, action: string) {
         let httpOptions = {
-            headers: new HttpHeaders({ 'Accept': 'application/json' }),
+          headers: new HttpHeaders({ 'Accept': 'application/json' }),
         };
+        if (action) {
+          httpOptions['params'] = new HttpParams().set('action', action);
+        }
         return this.http.get<any>(this.serviceUrl + id, httpOptions)
             .pipe(
                 map(this.formatDetail),
                 catchError(this.errorResponseHandler)
             );
+    }
+    getDetail(id: string) {
+        return this.getDetailForAction(id, null);
     }
     deleteOne(id:string) {
         return this.http.delete<any>(this.serviceUrl + id)
