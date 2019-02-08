@@ -177,14 +177,15 @@ const getPermission = function(authz, identity, schemaName) {
 
 const verifyPermissionFuncCreator = function(schemaName, authz) {
   const verifyPermission = function(req, res, next) {
-    let httpOperation = req.method
+    let httpOperation = req.method;
     let action;
-	for (let prop in req.query) {
-		if (prop === "action") action = req.query[prop];
-	}
+    if (req.query) {
+      action = req.query['action'];
+    }
 
     let operation = "UNKNOWN";
-    if (httpOperation == "GET") operation = 'R';
+    if (httpOperation == "GET" && action == 'edit') operation = 'U';  //get for edit
+    else if (httpOperation == "GET") operation = 'R';
     else if (httpOperation == "PUT") operation = 'C';
     else if (httpOperation == "DELETE") operation = 'D';
     else if (httpOperation == "POST") {
