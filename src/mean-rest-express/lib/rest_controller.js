@@ -309,7 +309,17 @@ RestController.getDetailsById = function(req, res, next) {
 	let {name: name, schema: schema, model: model, views: views, populates:populates} 
 			= loadContextVars(req);
 	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-	let detailView = views[1];
+  let action = "";
+  if (req.query) {
+    action = req.query['action'];
+  }
+  
+  let detailView;
+  if (action == 'edit') {
+    detailView = views[3]; //return based on edit view
+  } else {
+    detailView = views[1];
+  }
 
 	let populateArray = [];
 	let populateMap = {};
@@ -356,8 +366,8 @@ RestController.HardDeleteById = function(req, res, next) {
 
 RestController.PostActions = function(req, res, next) {	
 	let action = "";
-	for (let prop in req.query) {
-		if (prop === "action") action = req.query[prop];
+	if (req.query) {
+		action = req.query['action'];
 	}
 	
 	let body = req.body;
