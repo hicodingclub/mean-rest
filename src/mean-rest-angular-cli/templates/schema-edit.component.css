@@ -3,7 +3,7 @@
 	margin: 0 auto;
 }
 
-fieldset > .form-control, .input-group, .form-check {
+fieldset > .form-control, .input-group, .form-check, .alert {
 	width: 90%
 }
 
