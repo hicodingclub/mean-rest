@@ -24,6 +24,8 @@ const addPasswordHandlers = function(schema, authPassword) {
     });
   });
   
+  schema.options.useSaveInsteadOfUpdate = true; //this is a special indicator to controller use save.
+  
   schema.methods.comparePassword = function(candidatePassword, cb) {
     bcrypt.compare(candidatePassword, this[authPassword], function(err, isMatch) {
       if (err) return cb(err);

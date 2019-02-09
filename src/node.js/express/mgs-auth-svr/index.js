@@ -1,11 +1,17 @@
 const meanRestExpressRouter = require('mean-rest-express')
+const addPasswordHandlers = require('./authn/password_handler');
 
 //authentication
 const GetAuthnRouter = require('./authn/router')  //a function, input is the schema definition, return router
 const authUserDef = require('./authn/model') //default auth user schema definition
+
+//add password handler for the default auth user schema
+let {authUserSchema, authPasswordField} = authUserDef.authn;
+authUserDef.schemas[authUserSchema].schema = addPasswordHandlers(authUserDef.schemas[authUserSchema].schema, authPasswordField);
+
 //authorization
 const GetAuthzDef = require('./authz/model')  //a function, input is the user schema, return authz sys def.
-const authzDef = GetAuthzDef('muser', authUserDef.schemas['muser']); //default authz sys def, with default auth user schema
+const authzDef = GetAuthzDef(authUserSchema, authUserDef.schemas[authUserSchema]); //default authz sys def, with default auth user schema
 
 //authentication
 module.exports.GetAuthnRouter = GetAuthnRouter;

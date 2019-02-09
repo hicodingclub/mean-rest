@@ -35,7 +35,7 @@ const userSchema = new Schema({
 const userBrief = "username email phone";
 const userDetail = "username email phone";
 const userCreat = "username email phone password";
-const userEdit = "username email phone password";
+const userEdit = "username email phone";
 const userTextSearch = "username email phone";
 const userIndex = "username";
 

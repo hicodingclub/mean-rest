@@ -1,9 +1,8 @@
 const express = require('express');
 
-const addPasswordHandlers = require('./password_handler');
 const AuthnController = require('./controller')
 
-const AuthnRouter = function(sysDef, authConfig) {
+const AuthnRouter = function(sysDef) {
   const authn = sysDef.authn || {};
   let authUserFields = "username";
   if ("authUserFields" in authn) {
@@ -25,13 +24,12 @@ const AuthnRouter = function(sysDef, authConfig) {
 
     if (schemaName == authSchemaName) {
       let schm = schemaDef.schema;
-      schemaDef.schema = addPasswordHandlers(schm, authPasswordField);
       AuthnController.registerAuth(authSchemaName, schemaDef.schema, authUserFields, authPasswordField);
       break;
     }
   }
   
-  //let expressRouter = meanRestExpressRouter(sysDef, authConfig);
+  //let expressRouter = meanRestExpressRouter(sysDef);
   let expressRouter = express.Router();
 
   if (!!authSchemaName) {
