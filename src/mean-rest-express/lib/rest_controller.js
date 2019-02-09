@@ -423,6 +423,7 @@ RestController.Create = function(req, res, next) {
 
 RestController.Update = function(req, res, next) {
 	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req);
+  //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 
     let body = req.body;
     if (typeof body === "string") {
@@ -435,10 +436,33 @@ RestController.Update = function(req, res, next) {
 
 	let idParam = name + "Id";
 	let id = req.params[idParam];
-	model.replaceOne({_id: id}, body, function (err, result) {
-            if (err) { return next(err); }
-            return res.send();
-    });
+	let editViewStr = views[3];
+	let viewFields = editViewStr.match(/\S+/g) || [];
+	if (schema.options.useSaveInsteadOfUpdate) {
+	  model.findOne({_id: id}, function (err, result){
+      if (err) { return next(err); }
+	    for (let field in body) {
+	      //all fields from client
+        result[field] = body[field];
+	    }
+      for (let field of viewFields) {
+        if (!field in body) {
+          //not in body means user deleted this field
+          delete body[field]
+        }
+      }
+      result.save(function (err, result) {
+        if (err) { return next(err); }
+        return res.send();
+      });
+	  });
+	} else {
+    //all top-level update keys that are not $atomic operation names are treated as $set operations
+    model.updateOne({_id: id}, body, function (err, result) {
+       if (err) { return next(err); }
+          return res.send();
+      });
+	}
 };
 
 
