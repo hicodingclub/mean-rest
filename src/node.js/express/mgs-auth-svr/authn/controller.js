@@ -62,6 +62,9 @@ AuthnController.authLogin = function(req, res, next) {
     if (!user) {
       return next(createError(403, "Bad login request: User Name"));
     }
+    if (user.status !== 'Enabled') {
+      return next(createError(403, "Bad login request: User not enabled."));
+    }
     // test a matching password
     user.comparePassword(password, function(err, isMatch) {
         if (err || !isMatch) return next(createError(403, "Bad login request: Password."));

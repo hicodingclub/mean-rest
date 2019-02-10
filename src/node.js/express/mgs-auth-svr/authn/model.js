@@ -29,13 +29,15 @@ const userSchema = new Schema({
     index: { unique: true, sparse: true },
     validate: [validatePhone, 'Please fill a valid phone number']
   },
+  status:    {type: String, enum: ['Enabled', 'Disabled', 'Pending'], default: 'Enabled'},
+  since: { type: Date, default: Date.now },
   password: { type: String, required: true }
 });
 
-const userBrief = "username email phone";
-const userDetail = "username email phone";
-const userCreat = "username email phone password";
-const userEdit = "username email phone";
+const userBrief = "username email phone since status";
+const userDetail = "username email phone since status";
+const userCreat = "username email phone status password";
+const userEdit = "username email phone status";
 const userTextSearch = "username email phone";
 const userIndex = "username";
 
@@ -61,8 +63,8 @@ const authn = {
 }
 
 const authz = {
-  "module-authz": {"LoginUser": {"others": "", "own": "RU"}, "Anyone": ""},
-  "muser": {"LoginUser": {"others": "", "own": "RU"}, "Anyone": ""}
+  "module-authz": {"LoginUser": {"others": "CRUD", "own": "CRUD"}, "Anyone": ""},
+  "muser": {"LoginUser": {"others": "CRUD", "own": "CRUD"}, "Anyone": ""}
 }
 
 module.exports = {schemas: schemas, config: config, authn: authn, authz: authz}

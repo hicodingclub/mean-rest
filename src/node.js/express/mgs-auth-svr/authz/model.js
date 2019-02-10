@@ -71,7 +71,7 @@ const config = {
 }
 
 const authz = { //only users with permission can see this module
-  "module-authz": {"LoginUser": {"others": "", "own": ""}, "Anyone": ""},
+  "module-authz": {"LoginUser": {"others": "CRUD", "own": "CURD"}, "Anyone": ""},
 }
 
 const GetAuthzDef = function(userSchemaName, userSchema) {
