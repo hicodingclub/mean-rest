@@ -83,14 +83,14 @@ const GetAuthzDef = function(userSchemaName, userSchema) {
     role: { type: [{type: Schema.Types.ObjectId, ref: 'mrole'}] }, 
   });
   
-  const userRoleBrief = "user, role";
-  const userRoleDetail = "user, role";
-  const userRoleCreat = "user, role";
-  const userRoleEdit = "user, role";
-  const userRoleTextSearch = "user, role";
+  const userRoleBrief = "user role";
+  const userRoleDetail = "user role";
+  const userRoleCreat = "user role";
+  const userRoleEdit = "user role";
+  const userRoleTextSearch = "user role";
   const userRoleIndex = "user"; //let's temporarily put any field here since this schema is not referred.
   
-  schemas['userRole'] = {
+  schemas['muserRole'] = {
     schema: userRoleSchema,
     views: [userRoleBrief, userRoleDetail, userRoleCreat, userRoleEdit, userRoleTextSearch, userRoleIndex],
   }
