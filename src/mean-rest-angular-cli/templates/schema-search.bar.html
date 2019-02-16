@@ -1,5 +1,8 @@
-  			<%_ let hasStringFields = false; let stringFields = [];
-			    for (let field of briefView){ if(field.type == 'SchemaString') {hasStringFields = true; stringFields.push(field.fieldName);} }%>
+  			<%_ let hasStringFields = false; let stringFields = []; let noMoreSearchArea = true;
+			    for (let field of briefView){ 
+			        if(field.type == 'SchemaString') {hasStringFields = true; stringFields.push(field.fieldName);}
+			        else {noMoreSearchArea = false;}
+			    }%>
 			<%_ if (hasStringFields) { %>
 			    <div class="input-group">
 	              <input type="search" class="form-control border border-secondary" id="<%-schemaName%>TextSearch" 

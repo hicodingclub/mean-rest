@@ -229,13 +229,12 @@
 	        </div>
 	      </fieldset>
     <%_ } else if (field.type === "SchemaArray") { %>
-	  <%_ if (field.elementType === "SchemaString") { %>
           <fieldset class="form-group">
 	        <label for="<%-sn%>Edit<%-Fn%>"><%-fD%></label>
-        <%_ if (field.enumValues && field.elementUnique) { %>
+        <%_ if (field.elementType === "SchemaString" && field.enumValues && field.elementUnique) { %>
             <div class="form-check"
                 ngModelGroup="<%-sn%>Edit<%-Fn%>"
-                <%if (field.required) {%><%-schemaName%>Directive<%-field.FieldName%>Required<%}%>
+                <%if (field.required) {%>directiveMultiSelectionRequired<%}%>
                 <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%>
                 #<%-sn%>Edit<%-Fn%>="ngModelGroup" 
 		        >
@@ -250,6 +249,34 @@
 		      </div>
 		      <%_ }) %>
 		      <span *ngIf="multiselectionSelected('<%-fn%>')" 
+		          class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
+		          <i class="fas fa-times-circle" title="Clear"></i></span>
+		    </div>
+        <%_ } else if (field.elementType === 'ObjectId') { %>
+            <div class="form-check"
+                ngModelGroup="<%-sn%>Edit<%-Fn%>"
+                <%if (field.required) {%>directiveArrayRequired<%}%>
+                <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%>
+                #<%-sn%>Edit<%-Fn%>="ngModelGroup" 
+		        >
+	          <div class="form-check-inline">
+                <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+                   	<div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
+                        {{element.value}}
+					    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
+					</div>
+                </div>
+                <span class="pointer" (click)="onRefSelect('<%-fn%>')">
+                	<i class="fas fa-plus-circle" title="Add"></i>
+                </span>
+                <!-- fake hidden input ngModel for directive to check the values-->
+		        <input type="checkbox" name="<%-sn%>Edit<%-Fn%>Selection" 
+		        	 style="display:none"
+		        	 id="<%-sn%>Edit<%-Fn%>Selection"
+		             [(ngModel)]="detail['<%-fn%>']['selection'].length" 
+		             #<%-sn%>Edit<%-Fn%>Selection="ngModel">
+		      </div>
+		      <span *ngIf="arraySelected('<%-fn%>')" 
 		          class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
 		          <i class="fas fa-times-circle" title="Clear"></i></span>
 		    </div>
@@ -268,6 +295,5 @@
   	          </div><%}%> 
 	        </div>
 	      </fieldset>
-      <%_ } %> 
     <%_ } %>    
 </div>

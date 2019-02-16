@@ -4,8 +4,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 <% if (hasDate) {%>
 import { NgbModule, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
-import { MraNgbDateFormatterService } from './<%-moduleName%>.directive';
-<%}%>
+import { MraNgbDateFormatterService } from './<%-moduleName%>.directive'; <%_ }%>
+<%_ if (hasRequiredMultiSelection) {%>
+import { DirectiveMultiSelectionRequired } from './<%-moduleName%>.directive';<%_ } %>
+<%_ if (hasRequiredArray) {%>
+import { DirectiveArrayRequired } from './<%-moduleName%>.directive';<%_ } %>
+
 import { MraModule } from 'mean-rest-angular';
 
 import { <%-ModuleName%>RoutingModule } from './<%-moduleName%>-routing.module';
@@ -30,8 +34,6 @@ import { <%-Ref%>DetailSelComponent } from './<%-ref%>/<%-ref%>-detail/<%-ref%>-
 import { <%-schm.SchemaName%>ListSubComponent } from './<%-sn%>/<%-sn%>-list/<%-sn%>-list-sub.component';
 import { <%-schm.SchemaName%>DetailSubComponent } from './<%-sn%>/<%-sn%>-detail/<%-sn%>-detail-sub.component';<%_ }}%>
 <%_ validatorFields.forEach(function(element){ %>
-import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.schemaName%>-edit/<%-element.schemaName%>-edit.component';<%_ }); %>
-<%_ requiredGroupFields.forEach(function(element){ %>
 import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.schemaName%>-edit/<%-element.schemaName%>-edit.component';<%_ }); %>
 
 @NgModule({
@@ -61,8 +63,10 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     <%-schm.SchemaName%>DetailSubComponent,<%_ }}%>
   <%_ validatorFields.forEach(function(element){ %>
     <%-element.Directive%>,<%_ }); %>
-  <%_ requiredGroupFields.forEach(function(element){ %>
-    <%-element.Directive%>,<%_ }); %>
+  <%_ if (hasRequiredMultiSelection) {%>
+    DirectiveMultiSelectionRequired,<%_ } %>
+  <%_ if (hasRequiredArray) {%>
+    DirectiveArrayRequired,<%_ } %>
   ],
   exports: [
     <%-ModuleName%>Component,

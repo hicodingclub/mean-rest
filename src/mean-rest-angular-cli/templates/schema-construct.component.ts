@@ -23,3 +23,17 @@
     }
     if (multiSelectionFields.length > 0) {%>
           this.multiSelectionFields = [<%for (let fnm of multiSelectionFields) {%>'<%-fnm%>', <%}%>];<%}%>
+<%_ let arrayFields = []; let arrayRefFields = [];
+    for (let field of theView) { 
+        if (field.type === "SchemaArray" && !(field.enumValues && field.elementUnique)) {
+          arrayFields.push([field.fieldName, field.elementType]);
+          if (field.elementType == 'ObjectId') {
+            arrayRefFields.push([field.fieldName, field.ref]);
+          }
+        }
+    }
+    if (arrayFields.length > 0) {%>
+          this.arrayFields = [<%for (let f of arrayFields) {%>['<%-f[0]%>', '<%-f[1]%>'],<%}%>];<%}
+    if (arrayRefFields.length > 0) { 
+        for (let itm of arrayRefFields) {%>
+          this.referenceFieldsMap['<%-itm[0]%>'] = '<%-itm[1]%>';<%}}%>

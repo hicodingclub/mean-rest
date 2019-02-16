@@ -87,22 +87,33 @@
     <%_ } else if (field.type === "SchemaArray") { %>
 	  <%_ if (field.elementType === "SchemaString") { %>
         <%_ if (field.enumValues && field.elementUnique) { %>
-            <div class="form-check"
-		        >
-	          <%_ field.enumValues.forEach( (f, index) => { %>
-	          <div class="form-check-inline">
+	        <%_ field.enumValues.forEach( (f, index) => { %>
+	        <div class="form-check-inline">
 		        <input type="checkbox" name="<%-sn%>Edit<%-Fn%><%-f%>" 
 		        	class="form-check-input"
 		        	id="<%-sn%>Edit<%-Fn%><%-f%>"
 		        	[(ngModel)]="detail['<%-fn%>']['selection']['<%-f%>']"
 		        	#<%-sn%>Edit<%-Fn%><%-f%>="ngModel">
 		      	<label class="form-check-label"><%-f%></label>
-		      </div>
-		      <%_ }) %>
 		    </div>
+		    <%_ }) %>
         <%_ } else { %>
 	        <div>Not supported yet.</div>
         <%_ } %>
+      <%_ } else if (field.elementType === "ObjectId") { %>
+	        <div class="form-check-inline">
+                <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+                   	<div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
+                        {{element.value}}
+					    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
+					</div>
+                </div>
+                <span class="pointer ml-3" (click)="onRefSelect('<%-fn%>')">
+                	<i class="fas fa-plus-circle" title="Add"></i>
+                </span>
+		    </div>
+      <%_ } else { %> 
+	        <div>Not supported yet.</div>
       <%_ } %> 
     <%_ } %>
 	      </div>

@@ -5,7 +5,7 @@ import { MraCommonService } from 'mean-rest-angular';
 
 import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
-<%if (schemaHasValidator || schemaHasRequiredGroup) {%>
+<%if (schemaHasValidator) {%>
 import { NG_VALIDATORS, Validator, ValidationErrors, AbstractControl, FormGroup } from '@angular/forms';
   <%_ compositeEditView.forEach( (field) => {
 if (field.validators) {%>
@@ -42,32 +42,8 @@ export class <%-SchemaName%>Directive<%-field.FieldName%> implements Validator {
     }
     return null;
   }
-}<%_} else if (field.required && field.type == "SchemaArray") {%>
-@Directive({
-  selector: '[<%-schemaName%>Directive<%-field.FieldName%>Required]',
-  providers: [{provide: NG_VALIDATORS, useExisting: <%-SchemaName%>Directive<%-field.FieldName%>Required, multi: true}]
-})
-export class <%-SchemaName%>Directive<%-field.FieldName%>Required implements Validator {
-  validate(control: AbstractControl): ValidationErrors | null {
-    let selected = false;
-    let controlGroup = control as FormGroup; //cast to FormGroup
-    if(controlGroup) {
-      for(let ctrl in controlGroup.controls) {
-        if(controlGroup.controls[ctrl].value) {
-          selected = true;
-          break;
-        }
-      }
-    }
-
-    if (selected) {
-      return null; //no error
-    } else {
-      return { 'required': true };
-    }
-  }
-}  <%_}}); %>
-<%}%><%#comments: end of: if (schemaHasValidator || schemaHasRequiredGroup)%>
+}<%_}}); %><%#comments: end of: forEach %>
+<%}%><%#comments: end of: if (schemaHasValidator%>
 
 <%if (schemaHasRef) {%>
 import { ComponentFactoryResolver } from '@angular/core';<%}%>

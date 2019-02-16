@@ -5,8 +5,19 @@
 	            	} else if (ft === 'SchemaString' && field.editor && view == 'detail') {%> 
 	            	 <div mra-richtext-show="<%-schemaName%>Detail<%-field.FieldName%>"></div>
 	            	{{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}} <%_
-                    } else if (ft === 'SchemaArray'  && field.enumValues && field.elementUnique) {%>
-                    <span class="badge badge-pill badge-secondary" *ngFor="let element of enums['<%-fn%>']">
+                    } else if (ft === 'SchemaArray') {
+                        if (field.enumValues && field.elementUnique) {%>
+                    <div class="badge badge-pill badge-secondary" *ngFor="let element of enums['<%-fn%>']">
                          <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection'][element]">{{element}}</div>
-                    </span><%
+                    </div><%} 
+                        else if (field.elementType === 'ObjectId') {%>
+                    <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+                    	<ng-template ngFor let-element [ngForOf]="detail['<%-fn%>']['selection']" let-idx="index">
+                            <div class="badge-click badge badge-pill badge-secondary" 
+                                (click)="onDisplayRefClicked('<%-fn%>', detail['<%-fn%>']['selection'][idx], $event)">
+                                {{element.value}}
+                            </div>
+						</ng-template>
+                    </div>                    
+                        <%}
 	            	} else {%>  {{detail['<%-fn%>']}}<%}%>

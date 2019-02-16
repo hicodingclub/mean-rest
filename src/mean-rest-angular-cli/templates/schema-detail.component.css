@@ -13,12 +13,13 @@
 	display: inline-block;
 	margin-left: 1rem;
 }
-.action-buttons .fa-angle-double-left, .fa-list, span {
+.action-buttons .fa-angle-double-left, .fa-list {
 	float: left;
 	display: inline-block;
 	margin-left: 2.5rem;
 	margin-top:  0.75rem
 }
+
 .action-buttons span {
 	float: left;
 	display: inline-block;
@@ -33,10 +34,11 @@
     font-weight: bold;
 	font-size: 1rem;
 }
+/*
 .card span {
 	margin-left: 1rem;
 }
-
+*/
 .referred-by-links {
 	text-align: left;
 }
@@ -72,4 +74,16 @@
     border: 1px solid #888;
     width: 60%;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.badge-click {
+  cursor: pointer;
+}
+div.badge-click:hover {
+  background-color: #495057 !important;
+  text-decoration: underline;
 }

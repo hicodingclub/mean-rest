@@ -144,7 +144,7 @@ var getPrimitiveField = function(fieldSchema) {
     let requiredField = false;
 
     let flagDate = false;
-	let flagRef = false;
+    let flagRef = false;
     let flagEditor = false;
 
 
@@ -191,8 +191,9 @@ var getPrimitiveField = function(fieldSchema) {
             jstype = "string";
             flagDate = true;
             break;
-		default:
-			;
+        default:
+            console.warn("Warning: Field type", type, "is not recoganized...");
+            ;
     }
 
     return [type, jstype, numberMin, numberMax, numberMax, minlength,  enumValues, 
@@ -257,7 +258,8 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
   	let hasDate = false;
 	  let hasRef = false;
     let hasEditor = false;
-    let hasRequiredGroup = false;
+    let hasRequiredMultiSelection = false;
+    let hasRequiredArray = false;
 
 	  for (let item of viewDef) {
 	    let hidden = false;
@@ -294,52 +296,56 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
         defaultValue = fieldSchema.defaultValue;
   
   			switch(type) {
-  				case "SchemaString":
-  				case "SchemaBoolean":
-  				case "SchemaNumber":
-  				case "ObjectId":
-                  case "SchemaDate":
-                      [type,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
-                      ref, Ref, RefCamel, editor,
-                      flagDate, flagRef, flagEditor]
-                          = getPrimitiveField(fieldSchema);
-                      if (flagDate) hasDate = true;
-                      if (flagRef) hasRef = true;
-                      if (flagEditor) hasEditor = true;
-                      break;
-                  case "SchemaArray":
-                      [elementType,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
-                      ref, Ref, RefCamel, editor,
-                      flagDate, flagRef, flagEditor]
-                          = getPrimitiveField(fieldSchema.caster);
-                      //rewrite the default value for array
-                      let defaultInput = fieldSchema.options.default;
-                      if (Array.isArray(defaultInput)) {
-                          defaultValue = defaultInput;
-                      } else {
-                          defaultValue = undefined;
-                      }
-                      if (fieldSchema.options.elementunique) {
-                          elementUnique = true;
-                      }
-                      if (requiredField) {
-                          hasRequiredGroup = true;
-                      }
-  
-                      // let fs = fieldSchema;
-                      // console.log(fs);
-                      // console.log("===fieldSchema.options.default:", fieldSchema.options.default);
-                      // console.log("===caster.validators:", fs.caster.validators);
-                      // console.log("===casterConstructor:", fs.casterConstructor);
-                      // console.log("===validators:", fs.validators);
-                      break;
-  				default:
-  					;
+          case "SchemaString":
+          case "SchemaBoolean":
+          case "SchemaNumber":
+          case "ObjectId":
+          case "SchemaDate":
+              [type,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
+              ref, Ref, RefCamel, editor,
+              flagDate, flagRef, flagEditor]
+                  = getPrimitiveField(fieldSchema);
+              if (flagDate) hasDate = true;
+              if (flagRef) hasRef = true;
+              if (flagEditor) hasEditor = true;
+              break;
+          case "SchemaArray":
+              [elementType,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
+              ref, Ref, RefCamel, editor,
+              flagDate, flagRef, flagEditor]
+                  = getPrimitiveField(fieldSchema.caster);
+              //rewrite the default value for array
+              let defaultInput = fieldSchema.options.default;
+              if (Array.isArray(defaultInput)) {
+                defaultValue = defaultInput;
+              } else {
+                defaultValue = undefined;
+              }
+              if (fieldSchema.options.elementunique) {
+                elementUnique = true;
+                if (requiredField) {
+                  hasRequiredMultiSelection = true;
+                }
+              } else {
+                if (requiredField) {
+                  hasRequiredArray = true;
+                }
+              }
+
+              //let fs = fieldSchema;
+              //console.log(fs);
+              //console.log("===fieldSchema.options.default:", fieldSchema.options.default);
+              // console.log("===caster.validators:", fs.caster.validators);
+              // console.log("===casterConstructor:", fs.casterConstructor);
+              // console.log("===validators:", fs.validators);
+              break;
+          default:
+              ;
   			}
   		} else if (item in schema.virtuals) {
-              //Handle as a string
-              type = 'SchemaString';
-              jstype = 'string';
+          //Handle as a string
+          type = 'SchemaString';
+          jstype = 'string';
   
       } else {
           console.warn("Warning: Field", item, "is not defined in schema", schemaName + ". Skipped...");
@@ -380,7 +386,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
         let arr = grp.filter(x=>x in viewMap).map(x=>viewMap[x]);
         if (arr.length > 0) viewGroups.push(arr);
     }
-  	return [viewGroups, view, hasDate, hasRef, hasEditor, hasRequiredGroup];
+  	return [viewGroups, view, hasDate, hasRef, hasEditor, hasRequiredMultiSelection, hasRequiredArray];
 }
 
 const getLoginUserPermission = function(permission) {
@@ -690,14 +696,14 @@ function main() {
   
   let schemaMap = {};
   let validatorFields = [];
-  let requiredGroupFields = [];
   let referenceFields = [];
   let referenceMap = [];
   let defaultSchema;
   let hasDate = false;
   let hasRef = false;
   let hasEditor = false;
-  let hasRequiredGroup = false;
+  let hasRequiredMultiSelection = false;
+  let hasRequiredArray = false;
   let dateFormat = 'MM/DD/YYYY';
   if (config && config.dateFormat) dateFormat = config.dateFormat;
   let timeFormat = 'hh:mm:ss';
@@ -758,26 +764,30 @@ function main() {
 		
 	});
 	//briefView, detailView, CreateView, EditView, SearchView, indexView]		
-    let [briefViewGrp, briefView, hasDate1, hasRef1, hasEditor1, hasReqGrp1] = 
-            generateViewPicture(name, views[0], mongooseSchema, validators);
-    let [detailViewGrp, detailView, hasDate2, hasRef2, hasEditor2, hasReqGrp2] = 
-            generateViewPicture(name, views[1], mongooseSchema, validators);
-    let [createViewGrp, createView, hasDate3, hasRef3, hasEditor3, hasReqGrp3] = 
-            generateViewPicture(name, views[2], mongooseSchema, validators);
-    let [editViewGrp, editView, hasDate4, hasRef4, hasEditor4, hasReqGrp4] = 
-            generateViewPicture(name, views[3], mongooseSchema, validators);
-    let [searchViewGrp, searchView, hasDate5, hasRef5, hasEditor5, hasReqGrp5] = 
-            generateViewPicture(name, views[4], mongooseSchema, validators);
-    let [indexViewGrp, indexView, hasDate6, hasRef6, hasEditor6, hasReqGrp6] = 
-            generateViewPicture(name, views[5], mongooseSchema, validators);
+  let [briefViewGrp, briefView, hasDate1, hasRef1, hasEditor1, hasReqGrp1, hasReqArr1] = 
+          generateViewPicture(name, views[0], mongooseSchema, validators);
+  //console.log("***briefView", briefView);
+  //console.log("***hasRef1", hasRef1);
+  let [detailViewGrp, detailView, hasDate2, hasRef2, hasEditor2, hasReqGrp2, hasReqArr2] = 
+          generateViewPicture(name, views[1], mongooseSchema, validators);
+  let [createViewGrp, createView, hasDate3, hasRef3, hasEditor3, hasReqGrp3, hasReqArr3] = 
+          generateViewPicture(name, views[2], mongooseSchema, validators);
+  let [editViewGrp, editView, hasDate4, hasRef4, hasEditor4, hasReqGrp4, hasReqArr4] = 
+          generateViewPicture(name, views[3], mongooseSchema, validators);
+  let [searchViewGrp, searchView, hasDate5, hasRef5, hasEditor5, hasReqGrp5, hasReqArr5] = 
+          generateViewPicture(name, views[4], mongooseSchema, validators);
+  let [indexViewGrp, indexView, hasDate6, hasRef6, hasEditor6, hasReqGrp6, hasReqArr6] = 
+          generateViewPicture(name, views[5], mongooseSchema, validators);
 	let schemaHasDate = hasDate1 || hasDate2 || hasDate3 || hasDate4 || hasDate5 || hasDate6;
 	let schemaHasRef = hasRef1 || hasRef3 || hasRef4;
-    let schemaHasEditor = hasEditor3 || hasEditor4;
-    let schemaHasRequiredGroup = hasReqGrp3 || hasReqGrp4;
+  let schemaHasEditor = hasEditor3 || hasEditor4;
+  let schemaHasRequiredMultiSelection = hasReqGrp3 || hasReqGrp4;
+  let schemaHasRequiredArray = hasReqArr3 || hasReqArr4;
 	if (schemaHasDate) hasDate = true;
 	if (schemaHasRef) hasRef = true;
 	if (schemaHasEditor) hasEditor = true;
-	if (schemaHasRequiredGroup) hasRequiredGroup = true;
+  if (schemaHasRequiredMultiSelection) hasRequiredMultiSelection = true;
+  if (schemaHasRequiredArray) hasRequiredArray = true;
 
   //let detailFields = views[1].replace(/\|/g, ' ').match(/\S+/g) || [];
   let detailSubViewStr = views[1];
@@ -798,12 +808,6 @@ function main() {
 	let schemaCamelName = lowerFirst(name);
 	let schemaHasValidator = false;
 	compositeEditView.forEach(function(x){
-        if (x.required && x.type == "SchemaArray") {
-            requiredGroupFields.push({
-                Directive: SchemaName+'Directive'+x.FieldName+'Required',
-			    schemaName: schemaName,
-            })
-        }
 		if (x.validators) {
 			schemaHasValidator = true;
 			validatorFields.push( 
@@ -813,13 +817,15 @@ function main() {
 		}
 		if (x.ref) {
 			referenceFields.push(x.ref);
-			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel]))
+			let isArray = x.type == "SchemaArray"? true : false;
+			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel, isArray]))
 		}
 	});
 	detailView.forEach(function(x){
 		if (x.ref) {
 			referenceFields.push(x.ref);
-			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel]))
+      let isArray = x.type == "SchemaArray"? true : false;
+			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel, isArray]))
 		}
 	});
 	
@@ -854,7 +860,8 @@ function main() {
 		schemaHasDate: schemaHasDate,
 		schemaHasRef: schemaHasRef,
     schemaHasEditor: schemaHasEditor,
-    schemaHasRequiredGroup: schemaHasRequiredGroup,
+    schemaHasRequiredMultiSelection: schemaHasRequiredMultiSelection,
+    schemaHasRequiredArray: schemaHasRequiredArray,
     schemaHasValidator: schemaHasValidator,
     permission: schemaAnyonePermission,
     embeddedViewOnly: embeddedViewOnly,
@@ -876,7 +883,7 @@ function main() {
 	    return self.indexOf(value) === index;
 	  });//de-duplicate
   referenceMap = referenceMap.map((value) => { 
-	    return JSON.parse(value); //restore the array: [schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel]
+	    return JSON.parse(value); //restore the array: [schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel, isArray]
 	  });
 
   let renderObj = {
@@ -886,17 +893,17 @@ function main() {
   	schemaMap: schemaMap,
   	defaultSchema: defaultSchema,
     validatorFields: validatorFields,
-    requiredGroupFields: requiredGroupFields,
   	referenceFields: referenceObjFields,
   	hasDate: hasDate,
   	hasRef: hasRef,
     hasEditor: hasEditor,
-    hasRequiredGroup: hasRequiredGroup,
+    hasRequiredMultiSelection: hasRequiredMultiSelection,
+    hasRequiredArray: hasRequiredArray,
   	dateFormat: dateFormat,
     timeFormat: timeFormat,
     authRequired: authRequired
   }
-  //console.log(renderObj.validatorFields);
+  console.log("***renderObj", renderObj);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
 
   for (let key in schemaMap) {
@@ -920,7 +927,9 @@ function main() {
   generateSourceFile(moduleName, templates.routingPath, renderObj, outputDir);
   
   
-  if (hasDate)   generateSourceFile(moduleName, templates.mainDirective, renderObj, outputDir);
+  if (hasDate || hasRequiredMultiSelection || hasRequiredArray) {
+    generateSourceFile(moduleName, templates.mainDirective, renderObj, outputDir);
+  }
   
   for (let key in schemaMap) {
 	let schemaObj = renderObj.schemaMap[key];

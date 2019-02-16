@@ -101,3 +101,8 @@ margin-left: 0.5rem;
     margin-left: -2rem;   /* text 1 + left 0.5 + right 0.5 = 2 rem*/
     border: 0;
 }
+
+.icon-clear-badge {
+	cursor: pointer;
+	margin-left: 1rem;
+}
