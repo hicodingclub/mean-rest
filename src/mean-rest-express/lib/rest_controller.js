@@ -4,6 +4,7 @@ const schema_collection = {};
 const views_collection = {}; //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 const model_collection = {};
 const populate_collection = {};
+const system_modules = {}; //{'moduleName': [resource1, resource2...]}
 
 const auth = {};
 
@@ -93,13 +94,20 @@ const getViewPopulates = function(schema, viewStr) {
 		if (item in schema.paths) {
 			let type = schema.paths[item].constructor.name;
 			switch (type) {
-				case "ObjectId":
-					let ref = schema.paths[item].options.ref;
-					if (ref)
-						populates.push([item, ref]);
-					break;
-				default:
-					;
+        case "SchemaArray":
+          if (schema.paths[item].caster.options.ref) {
+            let ref = schema.paths[item].caster.options.ref;
+            if (ref)
+              populates.push([item, ref]);
+          }
+          break;
+        case "ObjectId":
+          let ref = schema.paths[item].options.ref;
+          if (ref)
+            populates.push([item, ref]);
+          break;
+        default:
+          ;
 			}
 		}
 	});
@@ -113,6 +121,17 @@ const getPopulatesRefFields = function(ref) {
 	return views[5]; //indexView
 }
 
+const fieldReducerForRef = function(refObj, indexField) {
+  let newRefObj = {};
+  if ('_id' in refObj) {
+      newRefObj['_id'] = refObj['_id'];
+  }
+  if (indexField in refObj) {
+      newRefObj[indexField] = refObj[indexField];
+  }
+  return newRefObj;
+}
+
 const objectReducerForRef = function(obj, populateMap) {
     if (typeof obj !== 'object' || obj == null) {
         return obj;
@@ -123,14 +142,13 @@ const objectReducerForRef = function(obj, populateMap) {
 
         let indexField = fields[0];  //always use first one as index
 
+        let newRefObj;
         let refObj = obj[path];
         if (typeof refObj !== 'object' || refObj == null) continue;
-        let newRefObj = {};
-        if ('_id' in refObj) {
-            newRefObj['_id'] = refObj['_id'];
-        }
-        if (indexField in refObj) {
-            newRefObj[indexField] = refObj[indexField];
+        if (Array.isArray(refObj)) { //list of ref objects
+          newRefObj = refObj.map(o=>fieldReducerForRef(o, indexField)); //recursive call
+        } else {
+          newRefObj = fieldReducerForRef(refObj, indexField);
         }
         //now only "_id" and the indexField will be left.
         obj[path] = newRefObj;
@@ -193,7 +211,7 @@ let RestController = function() {}
 
 RestController.loadContextVarsByName = loadContextVarsByName;
 
-RestController.register = function(name, schema, views, model) {
+RestController.register = function(name, schema, views, model, moduleName) {
 	schema_collection[name.toLowerCase()] = schema;
 	views_collection[name.toLowerCase()] = views;
 	model_collection[name.toLowerCase()] = model;
@@ -205,6 +223,16 @@ RestController.register = function(name, schema, views, model) {
 			briefView: getViewPopulates(schema, views[0]),
 			detailView: getViewPopulates(schema, views[1])
 	}
+	if (moduleName) {
+	  if (moduleName in system_modules) {
+	    system_modules[moduleName].push(name);
+	  } else {
+      system_modules[moduleName] = [name];
+	  }
+	}
+};
+RestController.getAllModules = function() {
+  return system_modules;
 };
 
 RestController.getAll = function(req, res, next) {
@@ -467,13 +495,19 @@ RestController.Update = function(req, res, next) {
 
 
 
-RestController.ModelExecute = function(modelName, apiName, callBack, ...queryParams) {
+RestController.ModelExecute = function(modelName, apiName, callBack, ...params) {
   let model = model_collection[modelName];
   if (!model[apiName]) {
     let err = new Error("API doesn't exit in model: " + apiName);
     callBack(err, null);
   }
-  model[apiName].apply(model, queryParams)
+  if (apiName == 'create') {
+    model.create(params, function (err, result) {
+      callBack(err, result);
+    });
+    return;
+  }
+  model[apiName].apply(model, params)
     .exec(function (err, result) {
       callBack(err, result);
     });

@@ -31,7 +31,7 @@ var processViewStr = function(viewStr) {
   return viewStr;
 }
 
-const meanRestExpressRouter = function(sysDef, authConfig) {
+const meanRestExpressRouter = function(sysDef, authConfig, moduleName) {
   let expressRouter = express.Router();
   let schemas = sysDef.schemas;
   
@@ -62,7 +62,7 @@ const meanRestExpressRouter = function(sysDef, authConfig) {
       views.push(view);
     }
     //pass pure view string to register.
-    RestController.register(name, schemaDef.schema, views, model);
+    RestController.register(name, schemaDef.schema, views, model, moduleName);
   }
 
   for (let schemaName in schemas) {
