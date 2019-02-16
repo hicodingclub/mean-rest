@@ -57,6 +57,7 @@ export class BaseComponent implements BaseComponentInterface {
     protected dateFields = [];
     protected indexFields = [];
     protected multiSelectionFields = [];
+    protected arrayFields = []; //element is [fieldName, elementType]
     protected dateFormat = "MM/DD/YYYY";
     protected timeFormat = "hh:mm:ss";
 
@@ -211,31 +212,35 @@ export class BaseComponent implements BaseComponentInterface {
         if (str.length > 30) str = str.substr(0, 27) + '...';
         return str;
     }
-
-    protected formatReference(detail:any ):any {
+  
+    /***Start: handle reference fields***/
+    protected formatReferenceField(field: any, fieldName: string ):any {
         let id, value;
+        if (typeof field == 'string') {
+            //assume this is the "_id", let see we have the cached details for this ref from service
+            let refDetail = this.commonService.getFromStorage(field);
+            if (refDetail && (typeof refDetail == 'object')) field = refDetail;
+            else {
+                id = field;
+                field = {'_id': id};
+            }
+        } else if (field && (typeof field == 'object') ) {
+            id = field['_id'];
+            let referIndex = '';
+            for (let k in  field) {
+                if (k != '_id') referIndex += " " + field[k];
+            }
+            referIndex = referIndex.replace(/^\s+|\s+$/g, '');
+            if (referIndex.length >= 20) referIndex = referIndex.substring(0, 20) + "...";
+            field = {'_id': id, 'value': referIndex? referIndex: fieldName};
+        } else {//not defined
+            field = {'_id': id, 'value': value};
+        }
+        return field;
+    }
+    protected formatReference(detail:any ):any {
         for (let fnm of this.referenceFields) {
-            if (typeof detail[fnm] == 'string') {
-                //assume this is the "_id", let see we have the cached details for this ref from service
-                let refDetail = this.commonService.getFromStorage(detail[fnm]);
-                if (refDetail && (typeof refDetail == 'object')) detail[fnm] = refDetail;
-                else {
-                    id = detail[fnm];
-                    detail[fnm] = {'_id': id};
-                }
-            }
-            if (detail[fnm] && (typeof detail[fnm] == 'object') ) {
-                id = detail[fnm]['_id'];
-                let referIndex = '';
-                for (let k in  detail[fnm]) {
-                    if (k != '_id') referIndex += " " + detail[fnm][k];
-                }
-                referIndex = referIndex.replace(/^\s+|\s+$/g, '');
-                if (referIndex.length >= 20) referIndex = referIndex.substring(0, 20) + "...";
-                detail[fnm] = {'_id': id, 'value': referIndex? referIndex: fnm};
-            } else {//not defined
-                detail[fnm] = {'_id': id, 'value': value};
-            }
+            detail[fnm] = this.formatReferenceField(detail[fnm], fnm);
         }
         return detail;
     }
@@ -264,7 +269,7 @@ export class BaseComponent implements BaseComponentInterface {
         if ('_id' in field && typeof field['_id'] == 'string') return true;
         return false;
     }
-    
+    /***Start: handle date fields***/    
     protected formatDateField(field:string):any {
         let fmt = this.dateFormat;
         let t_fmt = this.timeFormat;
@@ -368,6 +373,7 @@ export class BaseComponent implements BaseComponentInterface {
         return false;
     }
 
+    /***Start: handle array of multi-selection fields***/
     protected formatArrayMultiSelectionField(field: any, enums: any): any {
         let selectObj = {};
         let value = "";
@@ -425,17 +431,92 @@ export class BaseComponent implements BaseComponentInterface {
         }
         return false;
     }
-    protected multiselectionSelected(field) {
-        if (!this.detail[field] || typeof this.detail[field]['selection'] != 'object') {
+    protected multiselectionSelected(fieldName) {
+        if (!this.detail[fieldName] || typeof this.detail[fieldName]['selection'] != 'object') {
             return false;
         }
-        return this.isDefinedFieldArrayMultiSelection(this.detail[field]);
+        return this.isDefinedFieldArrayMultiSelection(this.detail[fieldName]);
     }
-    
+    /***End: handle array of multi-selection fields***/
+    /***Start: handle array fields***/
+    protected formatArrayField(field: any, elementType: string): any {
+        let selectArray = [];
+        let values = [];
+        if (Array.isArray(field)) { //not defined
+            for (let e of field) {
+              if (elementType === 'ObjectId') {
+                let ref = this.formatReferenceField(e, "...");
+                selectArray.push(ref);
+                values.push(ref.value);
+              }
+            }
+        }
+        values = values.filter(x=>!!x);
+        let value = values.join(" | ")
+        return {'selection': selectArray, value: value};
+
+    }
+    protected formatArrayFields(detail:any ):any {
+        for (let f of this.arrayFields) {
+            //[fieldName, elementType]
+            detail[f[0]] = this.formatArrayField(detail[f[0]], f[1]);
+        }
+        return detail;
+    }
+
+    protected deFormatArrayFields(detail:any ):any {
+        for (let f of this.arrayFields) {
+            //[fieldName, elementType]
+            let fnm = f[0];
+            let elementType = f[1];
+          
+            if (typeof detail[fnm] !== 'object') { //not defined
+                delete detail[fnm];
+            }
+            else {
+                if (! detail[fnm].selection) delete detail[fnm];
+                else {
+                    let selectArray = [];
+                    for (let e of detail[fnm].selection) {
+                      if (elementType === 'ObjectId') {
+                        if (e && e['_id'] && typeof e['_id'] === 'string') selectArray.push(e['_id']);
+                      }
+                    }
+
+                    if (selectArray.length > 0) detail[fnm] = selectArray;
+                    else delete detail[fnm];
+                }
+            }
+        }
+        return detail;
+    }
+
+    protected clearFieldArray(field:any ):any {
+        if (!field['selection']) return field;
+        field['selection'] = [];
+        field.value = undefined;
+        return field;
+    }
+
+    protected isDefinedFieldArray(field:any ):any {
+        if ('selection' in field && Array.isArray(field['selection'])) {
+            return field['selection'].length > 0;
+        }
+        return false;
+    }
+    protected arraySelected(fieldName) {
+        if (!this.detail[fieldName] || !Array.isArray(this.detail[fieldName]['selection'])) {
+            return false;
+        }
+        return this.isDefinedFieldArray(this.detail[fieldName]);
+    }
+    /***End: handle array fields***/
+  
     protected formatDetail(detail:any ):any {
         detail = this.formatReference(detail);
         detail = this.formatDate(detail);
         detail = this.formatArrayMultiSelection(detail);
+        detail = this.formatArrayFields(detail);
         return detail;
     }    
     
@@ -445,6 +526,7 @@ export class BaseComponent implements BaseComponentInterface {
         cpy = this.deFormatReference(cpy);
         cpy = this.deFormatDate(cpy);
         cpy = this.deFormatArrayMultiSelection(cpy);
+        cpy = this.deFormatArrayFields(cpy);
         return cpy;
     }
     
@@ -526,6 +608,10 @@ export class BaseComponent implements BaseComponentInterface {
 
                     let t = this.formatArrayMultiSelectionField(d2[field], this.enums[field]);
                     valueToShow = t.value;
+                } else if (this.arrayFields.some(x=>x[0] == field)) {                  
+                    o[field] = {$in: d2[field]}; //use $in for or, and $all for and
+                  
+                    valueToShow = d[field]['value'];
                 } else if (this.dateFields.includes(field)) {
                     let t = this.formatDateField(d2[field]);
                     valueToShow = t.value;
@@ -819,6 +905,8 @@ export class BaseComponent implements BaseComponentInterface {
         if (typeof this.detail[field] == 'object') {//reference field or date
             if (this.multiSelectionFields.includes(field)) {
                 this.detail[field] = this.clearFieldArrayMultiSelection(this.detail[field]);
+            } else if (this.arrayFields.some(x=>x[0] == field)) {
+                this.detail[field] = this.clearFieldArray(this.detail[field]);
             } else if (this.dateFields.includes(field)) {
                 this.detail[field] = this.clearFieldDate(this.detail[field]);
             } else if (this.referenceFields.includes(field)) {
@@ -828,7 +916,12 @@ export class BaseComponent implements BaseComponentInterface {
             delete this.detail[field];
         }
     }
-    
+    public clearValueFromArrayField(field: string, idx: number):void {
+        if (this.detail[field]['selection']) {
+            this.detail[field]['selection'] = this.detail[field]['selection'].filter((x,i)=> i != idx );
+        }
+    }
+  
     public checkValueDefinedFromDetail(field:string):boolean {
         let d = this.detail;
         if (!d.hasOwnProperty(field)) return false;
@@ -839,6 +932,8 @@ export class BaseComponent implements BaseComponentInterface {
         if (typeof d[field] == 'object') {
             if (this.multiSelectionFields.includes(field)) {
                 return this.isDefinedFieldArrayMultiSelection(d[field]);
+            } else if (this.arrayFields.some(x=>x[0] == field)) {
+                return this.isDefinedFieldArray(d[field]);
             } else if (this.dateFields.includes(field)) {
                 return this.isDefinedFieldDate(d[field]);
             } else if (this.referenceFields.includes(field)) {
@@ -876,7 +971,9 @@ export class BaseComponent implements BaseComponentInterface {
         
         let componentInstance = <BaseComponentInterface>componentRef.instance;
         if (this.detail[fieldName]) {
-            componentInstance.inputData = this.detail[fieldName]['_id'];
+            if (this.referenceFields.includes(fieldName)) {
+                componentInstance.inputData = this.detail[fieldName]['_id'];
+            }            
         }
         componentInstance.setFocus();
         
@@ -890,7 +987,16 @@ export class BaseComponent implements BaseComponentInterface {
             if (outputData) {
                 switch (outputData.action){
                     case "selected":
-                        this.detail[fieldName] = outputData.value;
+                        if (this.arrayFields.some(x=>x[0] == fieldName)) {
+                            this.detail[fieldName]['selection'].push( outputData.value);
+                          
+                            let values = this.detail[fieldName]['value'].split(' | ')
+                            values.push(outputData.value.value); //display value
+                            values = values.filter(x=>!!x);
+                            this.detail[fieldName]['value'] = values.join(' | ');
+                        } else if (this.referenceFields.includes(fieldName)) {
+                            this.detail[fieldName] = outputData.value;
+                        }                    
                         break;
                     case "view":
                         this.onRefShow(fieldName, "select", outputData.value);//value is _id
@@ -904,12 +1010,19 @@ export class BaseComponent implements BaseComponentInterface {
     
     public onRefShow(fieldName:string, action:string, id:string) {
         if (!id && this.detail[fieldName]) id = this.detail[fieldName]['_id'];
+        if (!id) {
+          console.error('Show reference but no id is given.');
+          return;
+        }
         let viewContainerRef = this.refSelectDirective.viewContainerRef;
         viewContainerRef.clear();
         
         let detailType = action + "-detail-type"; //eg: select-detail-type, pop-detail-type
         let comType = this.selectComponents[fieldName][detailType]
-        if (!comType) console.error("No component type found for: %s", detailType);
+        if (!comType) {
+          console.error("No component type found for: %s", detailType);
+          return;
+        }
         let componentFactory = this.componentFactoryResolver.resolveComponentFactory(comType);
         let componentRef = viewContainerRef.createComponent(componentFactory);//create and insert in one call
 
@@ -926,7 +1039,16 @@ export class BaseComponent implements BaseComponentInterface {
             if (outputData) {
                 switch (outputData.action){
                     case "selected":
-                        this.detail[fieldName] = outputData.value;
+                        if (this.arrayFields.some(x=>x[0] == fieldName)) {
+                            this.detail[fieldName]['selection'].push( outputData.value);
+                          
+                            let values = this.detail[fieldName]['value'].split(' | ')
+                            values.push(outputData.value.value); //display value
+                            values = values.filter(x=>!!x);
+                            this.detail[fieldName]['value'] = values.join(' | ');
+                        } else if (this.referenceFields.includes(fieldName)) {
+                            this.detail[fieldName] = outputData.value;
+                        }                    
                         break;
                     case "back":
                         this.onRefSelect(fieldName);
