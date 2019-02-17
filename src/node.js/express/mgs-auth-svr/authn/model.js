@@ -45,6 +45,7 @@ const schemas = {
   "muser": {
     schema: userSchema,
     views: [userBrief, userDetail, userCreat, userEdit, userTextSearch, userIndex],
+    name: 'User'
   }
 };
 

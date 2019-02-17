@@ -51,14 +51,17 @@ const schemas = {
   "mrole": {
     schema: roleSchema,
     views: [roleBrief, roleDetail, roleCreat, roleEdit, roleTextSearch, roleIndex],
+    name: 'Role'
   },
   "mmodule": {
     schema: moduleSchema,
     views: [moduleBrief, moduleDetail, moduleCreat, moduleEdit, moduleTextSearch, moduleIndex],
+    name: 'System Module'
   },
   "mpermission": {
     schema: permissionSchema,
     views: [permBrief, permDetail, permCreat, permEdit, permTextSearch, permIndex],
+    name: 'Permission'
   },
 };
 
@@ -93,10 +96,10 @@ const GetAuthzDef = function(userSchemaName, userSchema) {
   schemas['muserRole'] = {
     schema: userRoleSchema,
     views: [userRoleBrief, userRoleDetail, userRoleCreat, userRoleEdit, userRoleTextSearch, userRoleIndex],
+    name: 'User Role'
   }
   
   return {schemas: schemas, config: config, authz: authz};
 }
-
 
 module.exports = GetAuthzDef;
