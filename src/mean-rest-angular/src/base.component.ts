@@ -448,6 +448,9 @@ export class BaseComponent implements BaseComponentInterface {
                 let ref = this.formatReferenceField(e, "...");
                 selectArray.push(ref);
                 values.push(ref.value);
+              } else if (elementType === 'SchemaString') {
+                selectArray.push(e);
+                values.push(e);
               }
             }
         }
@@ -480,6 +483,8 @@ export class BaseComponent implements BaseComponentInterface {
                     for (let e of detail[fnm].selection) {
                       if (elementType === 'ObjectId') {
                         if (e && e['_id'] && typeof e['_id'] === 'string') selectArray.push(e['_id']);
+                      } else if (elementType === 'SchemaString') {
+                        if (e) selectArray.push(e);
                       }
                     }
 
@@ -948,6 +953,23 @@ export class BaseComponent implements BaseComponentInterface {
         this.searchList();
     }
     
+    public onAddArrayItem(fieldName:string) {
+        if (this.arrayFields.some(x=>x[0] == fieldName)) {
+          if (this.detail[fieldName]['new']) { //where new added item is stored
+            let item = this.detail[fieldName]['new'];
+            this.detail[fieldName]['new'] = undefined; //clear it
+            
+            this.detail[fieldName]['selection'].push(item);
+          
+            let values = [];
+            if (this.detail[fieldName]['value']) values = this.detail[fieldName]['value'].split(' | ')
+            values.push(item); //display value
+            values = values.filter(x=>!!x);
+            this.detail[fieldName]['value'] = values.join(' | ');
+          }
+        }                    
+    }
+
     //**** For parent component of modal UI
     protected refSelectDirective:any;
     protected selectComponents:any; //{fieldName: component-type} format
@@ -990,7 +1012,8 @@ export class BaseComponent implements BaseComponentInterface {
                         if (this.arrayFields.some(x=>x[0] == fieldName)) {
                             this.detail[fieldName]['selection'].push( outputData.value);
                           
-                            let values = this.detail[fieldName]['value'].split(' | ')
+                            let values = [];
+                            if (this.detail[fieldName]['value']) values = this.detail[fieldName]['value'].split(' | ')
                             values.push(outputData.value.value); //display value
                             values = values.filter(x=>!!x);
                             this.detail[fieldName]['value'] = values.join(' | ');
@@ -1042,7 +1065,8 @@ export class BaseComponent implements BaseComponentInterface {
                         if (this.arrayFields.some(x=>x[0] == fieldName)) {
                             this.detail[fieldName]['selection'].push( outputData.value);
                           
-                            let values = this.detail[fieldName]['value'].split(' | ')
+                            let values = [];
+                            if (this.detail[fieldName]['value']) values = this.detail[fieldName]['value'].split(' | ')
                             values.push(outputData.value.value); //display value
                             values = values.filter(x=>!!x);
                             this.detail[fieldName]['value'] = values.join(' | ');
