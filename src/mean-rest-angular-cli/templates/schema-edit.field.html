@@ -252,23 +252,62 @@
 		          class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
 		          <i class="fas fa-times-circle" title="Clear"></i></span>
 		    </div>
-        <%_ } else if (field.elementType === 'ObjectId') { %>
+        <%_ } else if (field.elementType === 'SchemaString') { %>
             <div class="form-check"
                 ngModelGroup="<%-sn%>Edit<%-Fn%>"
                 <%if (field.required) {%>directiveArrayRequired<%}%>
-                <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%>
                 #<%-sn%>Edit<%-Fn%>="ngModelGroup" 
 		        >
-	          <div class="form-check-inline">
-                <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+                <ng-template [ngIf]="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+                   	<div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
+                        {{element}}
+					    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
+					</div>
+                </ng-template>
+
+			    <span *ngIf="arraySelected('<%-fn%>')" 
+			          class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
+			          <i class="fas fa-times-circle" title="Clear"></i></span>
+
+                <div class="input-group mt-3">
+	              <input type="search" class="form-control border"
+	              		id="<%-sn%>Edit<%-Fn%>New" #<%-sn%>Edit<%-Fn%>New
+						[(ngModel)]="detail['<%-fn%>']['new']" [ngModelOptions]="{standalone: true}"
+		                <%if (typeof field.minlength === 'number') {%>minlength="<%-field.minlength%>"<%}%>
+		                <%if (typeof field.maxlength === 'number') {%>maxlength="<%-field.maxlength%>"<%}%>
+			        	<%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
+						(keydown.enter)="$event.target.blur();onAddArrayItem('<%-fn%>');false"
+					    > 
+				  <div class="input-group-append">
+				    <button type="button" class="btn btn-outline-secondary" (click)="onAddArrayItem('<%-fn%>')"><i class="fas fa-plus"></i></button>
+				  </div>
+				</div>
+
+                <!-- fake hidden input ngModel for directive to check the values-->
+		        <input type="checkbox" name="<%-sn%>Edit<%-Fn%>Selection" 
+		        	 style="display:none"
+		        	 id="<%-sn%>Edit<%-Fn%>Selection"
+		             [(ngModel)]="detail['<%-fn%>']['selection'].length" 
+		             #<%-sn%>Edit<%-Fn%>Selection="ngModel">
+		    </div>
+         <%_ } else if (field.elementType === 'ObjectId') { %>
+            <div class="form-check"
+                ngModelGroup="<%-sn%>Edit<%-Fn%>"
+                <%if (field.required) {%>directiveArrayRequired<%}%>
+                #<%-sn%>Edit<%-Fn%>="ngModelGroup" 
+		        >
+                <ng-template [ngIf]="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
                    	<div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
                         {{element.value}}
 					    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
 					</div>
-                </div>
-                <span class="pointer" (click)="onRefSelect('<%-fn%>')">
-                	<i class="fas fa-plus-circle" title="Add"></i>
-                </span>
+                </ng-template>
+			    <span *ngIf="arraySelected('<%-fn%>')" 
+			          class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
+			          <i class="fas fa-times-circle" title="Clear"></i></span>
+				<button type="button" class="btn btn-light ml-3" (click)="onRefSelect('<%-fn%>')">
+				    <i class="fas fa-plus"  title="Add"></i>
+				</button>
                 <!-- fake hidden input ngModel for directive to check the values-->
 		        <input type="checkbox" name="<%-sn%>Edit<%-Fn%>Selection" 
 		        	 style="display:none"
@@ -276,10 +315,6 @@
 		             [(ngModel)]="detail['<%-fn%>']['selection'].length" 
 		             #<%-sn%>Edit<%-Fn%>Selection="ngModel">
 		      </div>
-		      <span *ngIf="arraySelected('<%-fn%>')" 
-		          class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
-		          <i class="fas fa-times-circle" title="Clear"></i></span>
-		    </div>
         <%_ } else { %>
 	        <div>Not supported yet.</div>
         <%_ } %>

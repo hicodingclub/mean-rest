@@ -98,20 +98,34 @@
 		    </div>
 		    <%_ }) %>
         <%_ } else { %>
-	        <div>Not supported yet.</div>
+	        <ng-template [ngIf]="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+	            <div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
+	                      {{element}}
+				    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
+				</div>
+	        </ng-template>
+	
+	        <div class="input-group mt-3">
+	             <input type="search" class="form-control border"
+	             		id="<%-sn%>Edit<%-Fn%>New" #<%-sn%>Edit<%-Fn%>New
+					[(ngModel)]="detail['<%-fn%>']['new']" [ngModelOptions]="{standalone: true}"
+					(keydown.enter)="$event.target.blur();onAddArrayItem('<%-fn%>');false"
+				    > 
+			    <div class="input-group-append">
+			        <button type="button" class="btn btn-outline-secondary" (click)="onAddArrayItem('<%-fn%>')"><i class="fas fa-plus"></i></button>
+			    </div>
+			</div>
         <%_ } %>
       <%_ } else if (field.elementType === "ObjectId") { %>
-	        <div class="form-check-inline">
-                <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
-                   	<div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
-                        {{element.value}}
-					    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
-					</div>
-                </div>
-                <span class="pointer ml-3" (click)="onRefSelect('<%-fn%>')">
-                	<i class="fas fa-plus-circle" title="Add"></i>
-                </span>
-		    </div>
+            <ng-template [ngIf]="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+                <div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
+                    {{element.value}}
+				    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
+				</div>
+            </ng-template>
+			<button type="button" class="btn btn-light ml-3" (click)="onRefSelect('<%-fn%>')">
+				<i class="fas fa-plus" title="Add"></i>
+			</button>
       <%_ } else { %> 
 	        <div>Not supported yet.</div>
       <%_ } %> 

@@ -377,7 +377,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
           elementUnique: elementUnique,
       }
 
-      //if (type == 'SchemaArray') console.log(fieldPicture);
+      if (type == 'SchemaArray') console.log(fieldPicture);
       view.push(fieldPicture);
       viewMap[item] = fieldPicture;
     }
@@ -721,15 +721,16 @@ function main() {
       authRequired = true;
     }
 
-	if (typeof schemaDef !== 'object') {
-		console.error("Error: input file must export an object defining an object for each schema.");
-		_exit(1);
-	}
-
-	let views = schemaDef.views
-	let validators = schemaDef.validators;
+  	if (typeof schemaDef !== 'object') {
+  		console.error("Error: input file must export an object defining an object for each schema.");
+  		_exit(1);
+  	}
+  
+  	let views = schemaDef.views
+  	let validators = schemaDef.validators;
     let mongooseSchema = schemaDef.schema;
     let embeddedViewOnly = schemaDef.embeddedViewOnly? true: false;
+    let viewName = schemaDef.name;
 //	console.log(mongooseSchema);
 //	if (mongooseSchema.paths.author) {
 //		console.log("===author: ", mongooseSchema.paths.author.options);
@@ -738,140 +739,140 @@ function main() {
 //		console.log("===person: ", mongooseSchema.paths.person.options);
 //	}
 
-	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-	if (typeof views !== 'object' || !Array.isArray(views)) {
-		console.error("Error: input file must export an object defining an array for each schema.");
-		_exit(1);
-	}
-	let schemaName = name.toLowerCase();
-	//let model = mongoose.model(name, mongooseSchema, ); //model uses given name
-	//console.log("----------------------------");
-	//console.log(model);
-	
-	let componentDir = path.join(outputDir, schemaName);
-	if(!fs.existsSync(componentDir)) {
-		//console.info('Creating component directory "%s"...', componentDir);
-		mkdir(".", componentDir)
-	}
-
-	let subComponentDir;
-	[schemaName+'-list', schemaName+'-detail', schemaName+'-edit'].forEach( (subComponent) => {
-		subComponentDir = path.join(componentDir, subComponent);
-		if(!fs.existsSync(subComponentDir)) {
-			//console.info('Creating sub-component directory "%s"...', subComponentDir);
-			mkdir(".", subComponentDir)
-		}
-		
-	});
-	//briefView, detailView, CreateView, EditView, SearchView, indexView]		
-  let [briefViewGrp, briefView, hasDate1, hasRef1, hasEditor1, hasReqGrp1, hasReqArr1] = 
-          generateViewPicture(name, views[0], mongooseSchema, validators);
-  //console.log("***briefView", briefView);
-  //console.log("***hasRef1", hasRef1);
-  let [detailViewGrp, detailView, hasDate2, hasRef2, hasEditor2, hasReqGrp2, hasReqArr2] = 
-          generateViewPicture(name, views[1], mongooseSchema, validators);
-  let [createViewGrp, createView, hasDate3, hasRef3, hasEditor3, hasReqGrp3, hasReqArr3] = 
-          generateViewPicture(name, views[2], mongooseSchema, validators);
-  let [editViewGrp, editView, hasDate4, hasRef4, hasEditor4, hasReqGrp4, hasReqArr4] = 
-          generateViewPicture(name, views[3], mongooseSchema, validators);
-  let [searchViewGrp, searchView, hasDate5, hasRef5, hasEditor5, hasReqGrp5, hasReqArr5] = 
-          generateViewPicture(name, views[4], mongooseSchema, validators);
-  let [indexViewGrp, indexView, hasDate6, hasRef6, hasEditor6, hasReqGrp6, hasReqArr6] = 
-          generateViewPicture(name, views[5], mongooseSchema, validators);
-	let schemaHasDate = hasDate1 || hasDate2 || hasDate3 || hasDate4 || hasDate5 || hasDate6;
-	let schemaHasRef = hasRef1 || hasRef3 || hasRef4;
-  let schemaHasEditor = hasEditor3 || hasEditor4;
-  let schemaHasRequiredMultiSelection = hasReqGrp3 || hasReqGrp4;
-  let schemaHasRequiredArray = hasReqArr3 || hasReqArr4;
-	if (schemaHasDate) hasDate = true;
-	if (schemaHasRef) hasRef = true;
-	if (schemaHasEditor) hasEditor = true;
-  if (schemaHasRequiredMultiSelection) hasRequiredMultiSelection = true;
-  if (schemaHasRequiredArray) hasRequiredArray = true;
-
-  //let detailFields = views[1].replace(/\|/g, ' ').match(/\S+/g) || [];
-  let detailSubViewStr = views[1];
-	let briefFields = views[0].replace(/\|/g, ' ').match(/\S+/g) || [];
-	for (let i of briefFields) {
-	  detailSubViewStr = detailSubViewStr.replace(i, '');
-	}
-	let [detailSubViewGrp, detailSubView, hasDate7, hasRef7, hasEditor7, hasReqGrp7] = generateViewPicture(name, detailSubViewStr, mongooseSchema, validators);
-	
-	let compositeEditView = editView.slice();
-	let editFields = editView.map( x=> x.fieldName);
-	createView.forEach( function(x) {
-		if (!editFields.includes(x.fieldName)) compositeEditView.push(x);
-	});
-	
-	let SchemaName = capitalizeFirst(schemaName);
-	let SchemaCamelName = capitalizeFirst(name);
-	let schemaCamelName = lowerFirst(name);
-	let schemaHasValidator = false;
-	compositeEditView.forEach(function(x){
-		if (x.validators) {
-			schemaHasValidator = true;
-			validatorFields.push( 
-			{ Directive: SchemaName+'Directive'+x.FieldName,
-			 schemaName: schemaName,
-			})
-		}
-		if (x.ref) {
-			referenceFields.push(x.ref);
-			let isArray = x.type == "SchemaArray"? true : false;
-			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel, isArray]))
-		}
-	});
-	detailView.forEach(function(x){
-		if (x.ref) {
-			referenceFields.push(x.ref);
-      let isArray = x.type == "SchemaArray"? true : false;
-			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel, isArray]))
-		}
-	});
-	
-	let schemaObj = {
-		moduleName: moduleName,
-		ModuleName: ModuleName,
-		schemaName: schemaName,
-        SchemaName: SchemaName,
-        SchemaCamelName: SchemaCamelName,
-        schemaCamelName: schemaCamelName,
-		apiBase: apiBase,
-		briefView: briefView,
-		detailView: detailView,
-		createView: createView,
-		editView: editView,
-		searchView: searchView,
-		indexView: indexView,
-    detailSubView: detailSubView,
-        
-		briefViewGrp: briefViewGrp,
-		detailViewGrp: detailViewGrp,
-		createViewGrp: createViewGrp,
-		editViewGrp: editViewGrp,
-		searchViewGrp: searchViewGrp,
-		indexViewGrp: indexViewGrp,
-    detailSubViewGrp: detailSubViewGrp,
-        
-		compositeEditView: compositeEditView,
-		componentDir: componentDir,
-		dateFormat: dateFormat,
-		timeFormat: timeFormat,
-		schemaHasDate: schemaHasDate,
-		schemaHasRef: schemaHasRef,
-    schemaHasEditor: schemaHasEditor,
-    schemaHasRequiredMultiSelection: schemaHasRequiredMultiSelection,
-    schemaHasRequiredArray: schemaHasRequiredArray,
-    schemaHasValidator: schemaHasValidator,
-    permission: schemaAnyonePermission,
-    embeddedViewOnly: embeddedViewOnly,
-		
-		FIELD_NUMBER_FOR_SELECT_VIEW: FIELD_NUMBER_FOR_SELECT_VIEW
-	}
-	//console.log("======schemaObj", schemaObj);
-	
-	if (!defaultSchema) defaultSchema = schemaName;
-	schemaMap[schemaName] = schemaObj;
+  	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+  	if (typeof views !== 'object' || !Array.isArray(views)) {
+  		console.error("Error: input file must export an object defining an array for each schema.");
+  		_exit(1);
+  	}
+  	let schemaName = name.toLowerCase();
+  	//let model = mongoose.model(name, mongooseSchema, ); //model uses given name
+  	//console.log("----------------------------");
+  	//console.log(model);
+  	
+  	let componentDir = path.join(outputDir, schemaName);
+  	if(!fs.existsSync(componentDir)) {
+  		//console.info('Creating component directory "%s"...', componentDir);
+  		mkdir(".", componentDir)
+  	}
+  
+  	let subComponentDir;
+  	[schemaName+'-list', schemaName+'-detail', schemaName+'-edit'].forEach( (subComponent) => {
+  		subComponentDir = path.join(componentDir, subComponent);
+  		if(!fs.existsSync(subComponentDir)) {
+  			//console.info('Creating sub-component directory "%s"...', subComponentDir);
+  			mkdir(".", subComponentDir)
+  		}
+  		
+  	});
+  	//briefView, detailView, CreateView, EditView, SearchView, indexView]		
+    let [briefViewGrp, briefView, hasDate1, hasRef1, hasEditor1, hasReqGrp1, hasReqArr1] = 
+            generateViewPicture(name, views[0], mongooseSchema, validators);
+    //console.log("***briefView", briefView);
+    //console.log("***hasRef1", hasRef1);
+    let [detailViewGrp, detailView, hasDate2, hasRef2, hasEditor2, hasReqGrp2, hasReqArr2] = 
+            generateViewPicture(name, views[1], mongooseSchema, validators);
+    let [createViewGrp, createView, hasDate3, hasRef3, hasEditor3, hasReqGrp3, hasReqArr3] = 
+            generateViewPicture(name, views[2], mongooseSchema, validators);
+    let [editViewGrp, editView, hasDate4, hasRef4, hasEditor4, hasReqGrp4, hasReqArr4] = 
+            generateViewPicture(name, views[3], mongooseSchema, validators);
+    let [searchViewGrp, searchView, hasDate5, hasRef5, hasEditor5, hasReqGrp5, hasReqArr5] = 
+            generateViewPicture(name, views[4], mongooseSchema, validators);
+    let [indexViewGrp, indexView, hasDate6, hasRef6, hasEditor6, hasReqGrp6, hasReqArr6] = 
+            generateViewPicture(name, views[5], mongooseSchema, validators);
+  	let schemaHasDate = hasDate1 || hasDate2 || hasDate3 || hasDate4 || hasDate5 || hasDate6;
+  	let schemaHasRef = hasRef1 || hasRef3 || hasRef4;
+    let schemaHasEditor = hasEditor3 || hasEditor4;
+    let schemaHasRequiredMultiSelection = hasReqGrp3 || hasReqGrp4;
+    let schemaHasRequiredArray = hasReqArr3 || hasReqArr4;
+  	if (schemaHasDate) hasDate = true;
+  	if (schemaHasRef) hasRef = true;
+  	if (schemaHasEditor) hasEditor = true;
+    if (schemaHasRequiredMultiSelection) hasRequiredMultiSelection = true;
+    if (schemaHasRequiredArray) hasRequiredArray = true;
+  
+    //let detailFields = views[1].replace(/\|/g, ' ').match(/\S+/g) || [];
+    let detailSubViewStr = views[1];
+  	let briefFields = views[0].replace(/\|/g, ' ').match(/\S+/g) || [];
+  	for (let i of briefFields) {
+  	  detailSubViewStr = detailSubViewStr.replace(i, '');
+  	}
+  	let [detailSubViewGrp, detailSubView, hasDate7, hasRef7, hasEditor7, hasReqGrp7] = generateViewPicture(name, detailSubViewStr, mongooseSchema, validators);
+  	
+  	let compositeEditView = editView.slice();
+  	let editFields = editView.map( x=> x.fieldName);
+  	createView.forEach( function(x) {
+  		if (!editFields.includes(x.fieldName)) compositeEditView.push(x);
+  	});
+  	
+  	let SchemaName = capitalizeFirst(schemaName);
+  	let SchemaCamelName = viewName? viewName : capitalizeFirst(name);
+  	let schemaCamelName = lowerFirst(name);
+  	let schemaHasValidator = false;
+  	compositeEditView.forEach(function(x){
+  		if (x.validators) {
+  			schemaHasValidator = true;
+  			validatorFields.push( 
+  			{ Directive: SchemaName+'Directive'+x.FieldName,
+  			 schemaName: schemaName,
+  			})
+  		}
+  		if (x.ref) {
+  			referenceFields.push(x.ref);
+  			let isArray = x.type == "SchemaArray"? true : false;
+  			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel, isArray]))
+  		}
+  	});
+  	detailView.forEach(function(x){
+  		if (x.ref) {
+  			referenceFields.push(x.ref);
+        let isArray = x.type == "SchemaArray"? true : false;
+  			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel, isArray]))
+  		}
+  	});
+  	
+  	let schemaObj = {
+  		moduleName: moduleName,
+  		ModuleName: ModuleName,
+  		schemaName: schemaName,
+      SchemaName: SchemaName,
+      SchemaCamelName: SchemaCamelName,
+      schemaCamelName: schemaCamelName,
+  		apiBase: apiBase,
+  		briefView: briefView,
+  		detailView: detailView,
+  		createView: createView,
+  		editView: editView,
+  		searchView: searchView,
+  		indexView: indexView,
+      detailSubView: detailSubView,
+          
+  		briefViewGrp: briefViewGrp,
+  		detailViewGrp: detailViewGrp,
+  		createViewGrp: createViewGrp,
+  		editViewGrp: editViewGrp,
+  		searchViewGrp: searchViewGrp,
+  		indexViewGrp: indexViewGrp,
+      detailSubViewGrp: detailSubViewGrp,
+          
+  		compositeEditView: compositeEditView,
+  		componentDir: componentDir,
+  		dateFormat: dateFormat,
+  		timeFormat: timeFormat,
+  		schemaHasDate: schemaHasDate,
+  		schemaHasRef: schemaHasRef,
+      schemaHasEditor: schemaHasEditor,
+      schemaHasRequiredMultiSelection: schemaHasRequiredMultiSelection,
+      schemaHasRequiredArray: schemaHasRequiredArray,
+      schemaHasValidator: schemaHasValidator,
+      permission: schemaAnyonePermission,
+      embeddedViewOnly: embeddedViewOnly,
+  		
+  		FIELD_NUMBER_FOR_SELECT_VIEW: FIELD_NUMBER_FOR_SELECT_VIEW
+  	}
+  	//console.log("======schemaObj", schemaObj);
+  	
+  	if (!defaultSchema) defaultSchema = schemaName;
+  	schemaMap[schemaName] = schemaObj;
   }
   referenceFields = referenceFields.filter((value, index, self) => { 
 	    return self.indexOf(value) === index;
@@ -903,16 +904,16 @@ function main() {
     timeFormat: timeFormat,
     authRequired: authRequired
   }
-  console.log("***renderObj", renderObj);
+  //console.log("***renderObj", renderObj);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
 
   for (let key in schemaMap) {
-	let schemaObj = renderObj.schemaMap[key];
-	let schemaName = schemaObj.schemaName;
-	
-	if (referenceFields.indexOf(schemaName) != -1) schemaObj.referred = true;
-	else schemaObj.referred = false;
-	schemaObj.referredBy = referenceMap.filter(x=>x[3]==schemaName);//Each item has [who, Who, which field, refer to me, Me, WhoCamel, MeCamel] format
+  	let schemaObj = renderObj.schemaMap[key];
+  	let schemaName = schemaObj.schemaName;
+  	
+  	if (referenceFields.indexOf(schemaName) != -1) schemaObj.referred = true;
+  	else schemaObj.referred = false;
+  	schemaObj.referredBy = referenceMap.filter(x=>x[3]==schemaName);//Each item has [who, Who, which field, refer to me, Me, WhoCamel, MeCamel] format
   }
   
   generateSourceFile(moduleName, templates.conf, renderObj, parentOutputDir);
@@ -932,41 +933,41 @@ function main() {
   }
   
   for (let key in schemaMap) {
-	let schemaObj = renderObj.schemaMap[key];
-	let componentDir = schemaObj.componentDir;
-	let schemaName = schemaObj.schemaName;
-		
-	generateSourceFile(schemaName, templates.schemaBaseService, schemaObj, componentDir);
-	generateSourceFile(schemaName, templates.schemaService, schemaObj, componentDir);
-	generateSourceFile(schemaName, templates.schemaComponent, schemaObj, componentDir);
-	
-	let subComponentDir = path.join(componentDir, schemaName+'-list');
-	generateSourceFile(schemaName, templates.schemaListComponent, schemaObj, subComponentDir);
-	generateSourceFile(schemaName, templates.schemaListComponentHtml, schemaObj, subComponentDir);
-	generateSourceFile(schemaName, templates.schemaListComponentCss, schemaObj, subComponentDir);
-	if (referenceFields.indexOf(schemaName) != -1) { //referenced by others, provide select component
-		generateSourceFile(schemaName, templates.schemaSelectComponent, schemaObj, subComponentDir);
-		generateSourceFile(schemaName, templates.schemaSelectComponentHtml, schemaObj, subComponentDir);
-    }
-	if (schemaObj.schemaHasRef) {
-		generateSourceFile(schemaName, templates.schemaListSubComponent, schemaObj, subComponentDir);
-		generateSourceFile(schemaName, templates.schemaListSubComponentHtml, schemaObj, subComponentDir);
-	}
-	
-	subComponentDir = path.join(componentDir, schemaName+'-detail');
-	generateSourceFile(schemaName, templates.schemaDetailComponent, schemaObj, subComponentDir);
-	generateSourceFile(schemaName, templates.schemaDetailComponentHtml, schemaObj, subComponentDir);
-	generateSourceFile(schemaName, templates.schemaDetailComponentCss, schemaObj, subComponentDir);
-	if (referenceFields.indexOf(schemaName) != -1) { //referenced by others, provide select component
-		generateSourceFile(schemaName, templates.schemaDetailSelComponent, schemaObj, subComponentDir);
-		generateSourceFile(schemaName, templates.schemaDetailSelComponentHtml, schemaObj, subComponentDir);
-		generateSourceFile(schemaName, templates.schemaDetailPopComponent, schemaObj, subComponentDir);
-		generateSourceFile(schemaName, templates.schemaDetailPopComponentHtml, schemaObj, subComponentDir);
-    }
-	if (schemaObj.schemaHasRef) {
-		(schemaName, templates.schemaListSubComponent, schemaObj, subComponentDir);
-		generateSourceFile(schemaName, templates.schemaDetailSubComponent, schemaObj, subComponentDir);
-		generateSourceFile(schemaName, templates.schemaDetailSubComponentHtml, schemaObj, subComponentDir);
+  	let schemaObj = renderObj.schemaMap[key];
+  	let componentDir = schemaObj.componentDir;
+  	let schemaName = schemaObj.schemaName;
+  		
+  	generateSourceFile(schemaName, templates.schemaBaseService, schemaObj, componentDir);
+  	generateSourceFile(schemaName, templates.schemaService, schemaObj, componentDir);
+  	generateSourceFile(schemaName, templates.schemaComponent, schemaObj, componentDir);
+  	
+  	let subComponentDir = path.join(componentDir, schemaName+'-list');
+  	generateSourceFile(schemaName, templates.schemaListComponent, schemaObj, subComponentDir);
+  	generateSourceFile(schemaName, templates.schemaListComponentHtml, schemaObj, subComponentDir);
+  	generateSourceFile(schemaName, templates.schemaListComponentCss, schemaObj, subComponentDir);
+  	if (referenceFields.indexOf(schemaName) != -1) { //referenced by others, provide select component
+  		generateSourceFile(schemaName, templates.schemaSelectComponent, schemaObj, subComponentDir);
+  		generateSourceFile(schemaName, templates.schemaSelectComponentHtml, schemaObj, subComponentDir);
+      }
+  	if (schemaObj.schemaHasRef) {
+  		generateSourceFile(schemaName, templates.schemaListSubComponent, schemaObj, subComponentDir);
+  		generateSourceFile(schemaName, templates.schemaListSubComponentHtml, schemaObj, subComponentDir);
+  	}
+  	
+  	subComponentDir = path.join(componentDir, schemaName+'-detail');
+  	generateSourceFile(schemaName, templates.schemaDetailComponent, schemaObj, subComponentDir);
+  	generateSourceFile(schemaName, templates.schemaDetailComponentHtml, schemaObj, subComponentDir);
+  	generateSourceFile(schemaName, templates.schemaDetailComponentCss, schemaObj, subComponentDir);
+  	if (referenceFields.indexOf(schemaName) != -1) { //referenced by others, provide select component
+  		generateSourceFile(schemaName, templates.schemaDetailSelComponent, schemaObj, subComponentDir);
+  		generateSourceFile(schemaName, templates.schemaDetailSelComponentHtml, schemaObj, subComponentDir);
+  		generateSourceFile(schemaName, templates.schemaDetailPopComponent, schemaObj, subComponentDir);
+  		generateSourceFile(schemaName, templates.schemaDetailPopComponentHtml, schemaObj, subComponentDir);
+      }
+  	if (schemaObj.schemaHasRef) {
+  		(schemaName, templates.schemaListSubComponent, schemaObj, subComponentDir);
+  		generateSourceFile(schemaName, templates.schemaDetailSubComponent, schemaObj, subComponentDir);
+  		generateSourceFile(schemaName, templates.schemaDetailSubComponentHtml, schemaObj, subComponentDir);
 	}
 	
 	subComponentDir = path.join(componentDir, schemaName+'-edit');

@@ -16,7 +16,7 @@
 .action-buttons .fa-angle-double-left, .fa-list {
 	float: left;
 	display: inline-block;
-	margin-left: 2.5rem;
+	/*margin-left: 2.5rem;*/
 	margin-top:  0.75rem
 }
 
