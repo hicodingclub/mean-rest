@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, EventEmitter, Output, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MraCommonService } from 'mean-rest-angular';
+import { Injector } from '@angular/core';
 
 import { <%-SchemaName%>ListComponent } from './<%-schemaName%>-list.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
@@ -19,12 +19,12 @@ export class <%-SchemaName%>SelectComponent extends <%-SchemaName%>ListComponent
 
     constructor(
         protected <%-schemaName%>Service: <%-SchemaName%>Service,
-        protected commonService: MraCommonService,
+        protected injector: Injector,
         protected router: Router,
         protected route: ActivatedRoute,
         protected location: Location
         ) {
-            super(<%if (schemaHasRef) {%>null,<%}%><%-schemaName%>Service, commonService, router, route, location);
+            super(<%if (schemaHasRef) {%>null,<%}%><%-schemaName%>Service, injector, router, route, location);
             this.majorUi = false;
     }
 

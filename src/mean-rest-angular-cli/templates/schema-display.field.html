@@ -29,4 +29,15 @@
 						</ng-template>
                     </div>                    
                         <%}                        
+                    } else if (ft === 'Map') {
+                        if (field.elementType === 'SchemaString') {%>
+                    <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+                    	<ng-template ngFor let-element [ngForOf]="objectKeys(detail['<%-fn%>']['selection'])" let-idx="index">
+                            <div class="row">
+                                <div class="col-3">{{element}}:</div>
+                                <div class="col-3">{{detail['<%-fn%>']['selection'][element]}}</div>
+                            </div>
+						</ng-template>
+                    </div>                    
+                        <%}
 	            	} else {%>  {{detail['<%-fn%>']}}<%}%>

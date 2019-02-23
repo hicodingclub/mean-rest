@@ -17,6 +17,25 @@
     }
     if (dateObjects.length > 0) {%>
           this.dateFields = [<%for (let fnm of dateObjects) {%>'<%-fnm%>', <%}%>];<%}%>
+<%_ let mapFields = [];
+    for (let field of theView) { 
+        if (field.type === "Map") {
+          let keyType, keyRefName, keyRefService, keyRefSubField;
+          if (field.mapKeyInfo && isEditView) {
+            keyType = field.mapKeyInfo.type;
+            keyRefName = field.mapKeyInfo.refName;
+            if (field.mapKeyInfo.type == 'ObjectId') {
+              keyRefService = field.mapKeyInfo.refService;
+              keyRefSubField = field.mapKeyInfo.refSubField;
+            }
+          }
+          mapFields.push([field.fieldName, field.elementType, keyType, keyRefName, keyRefService, keyRefSubField]);
+        }
+    }
+    if (mapFields.length > 0) {%>
+          this.mapFields = [<%for (let f of mapFields) {%>
+              ['<%-f[0]%>', '<%-f[1]%>', '<%-f[2]%>', '<%-f[3]%>', <%-f[4]%>, '<%-f[5]%>'],<%}%>
+          ];<%}%>
 <%_ let multiSelectionFields = [];
     for (let field of theView) { 
         if (field.type === "SchemaArray" && field.enumValues && field.elementUnique) multiSelectionFields.push(field.fieldName);
@@ -24,7 +43,7 @@
     if (multiSelectionFields.length > 0) {%>
           this.multiSelectionFields = [<%for (let fnm of multiSelectionFields) {%>'<%-fnm%>', <%}%>];<%}%>
 <%_ let arrayFields = []; let arrayRefFields = [];
-    for (let field of theView) { 
+    for (let field of theView) {
         if (field.type === "SchemaArray" && !(field.enumValues && field.elementUnique)) {
           arrayFields.push([field.fieldName, field.elementType]);
           if (field.elementType == 'ObjectId') {

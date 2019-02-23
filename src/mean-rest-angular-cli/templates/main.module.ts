@@ -9,6 +9,8 @@ import { MraNgbDateFormatterService } from './<%-moduleName%>.directive'; <%_ }%
 import { DirectiveMultiSelectionRequired } from './<%-moduleName%>.directive';<%_ } %>
 <%_ if (hasRequiredArray) {%>
 import { DirectiveArrayRequired } from './<%-moduleName%>.directive';<%_ } %>
+<%_ if (hasRequiredMap) {%>
+import { DirectiveMapRequired } from './<%-moduleName%>.directive';<%_ } %>
 
 import { MraModule } from 'mean-rest-angular';
 
@@ -67,6 +69,8 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     DirectiveMultiSelectionRequired,<%_ } %>
   <%_ if (hasRequiredArray) {%>
     DirectiveArrayRequired,<%_ } %>
+  <%_ if (hasRequiredMap) {%>
+    DirectiveMapRequired,<%_ } %>
   ],
   exports: [
     <%-ModuleName%>Component,

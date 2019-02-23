@@ -1,13 +1,12 @@
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BaseComponent, ViewType } from 'mean-rest-angular';
-import { MraCommonService } from 'mean-rest-angular';
+import { Injector } from '@angular/core';
 import { <%-SchemaName%>Service } from './<%-schemaName%>.service';
 
 const itemCamelName = '<%-schemaCamelName%>';
 
 export { ViewType };
-
 <%if (schemaHasRef || referred) {%>
 import { ViewChild } from '@angular/core';<%}%>
 <%if (referred) {%>
@@ -41,12 +40,12 @@ export class <%-SchemaName%>Component extends BaseComponent {
     constructor(
       <%_ if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
       protected <%-schemaName%>Service: <%-SchemaName%>Service,
-      protected commonService: MraCommonService,
+      protected injector: Injector,
       protected router: Router,
       protected route: ActivatedRoute,
       protected location: Location,
       protected view: ViewType ) {
-        super(<%-schemaName%>Service, commonService, router, route, location, view, itemCamelName);
+        super(<%-schemaName%>Service, injector, router, route, location, view, itemCamelName);
         <% if (schemaHasDate)  {%>this.dateFormat = '<%-dateFormat%>';
         this.timeFormat = '<%-timeFormat%>';<%}%>
         this.indexFields = [<%for (let field of indexView) {%>'<%-field.fieldName%>',<%}%> ];

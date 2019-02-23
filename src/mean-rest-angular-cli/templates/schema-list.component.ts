@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MraCommonService } from 'mean-rest-angular';
+import { Injector } from '@angular/core';
 
 import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
@@ -21,12 +21,12 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
   constructor(
       <%_ if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
       protected <%-schemaName%>Service: <%-SchemaName%>Service,
-      protected commonService: MraCommonService,
+      protected injector: Injector,
       protected router: Router,
       protected route: ActivatedRoute,
       protected location: Location) {
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
-                <%-schemaName%>Service, commonService, router, route, location, ViewType.LIST);
+                <%-schemaName%>Service, injector, router, route, location, ViewType.LIST);
 <% let theView = briefView; %><%_ include schema-construct.component.ts %>
           // this is to initialize the detail that will be used for search condition selection
           const detail = {};

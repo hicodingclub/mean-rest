@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
-import { MraCommonService } from 'mean-rest-angular';
+import { Injector } from '@angular/core';
 
 import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
@@ -26,13 +26,13 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
   constructor(
       <%if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
       protected <%-schemaName%>Service: <%-SchemaName%>Service,
-      protected commonService: MraCommonService,
+      protected injector: Injector,
       protected router: Router,
       protected route: ActivatedRoute,
       protected location: Location) {
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
-                <%-schemaName%>Service, commonService, router, route, location, ViewType.DETAIL);
-<% let theView = detailView; %><%_ include schema-construct.component.ts %>
+                <%-schemaName%>Service, injector, router, route, location, ViewType.DETAIL);
+<% let theView = detailView; let isEditView = false;%><%_ include schema-construct.component.ts %>
 <% for (let field of detailView) { let fn=field.fieldName, Fn=field.FieldName; 
     if (field.type === "SchemaString" && field.editor) { %>
           this.textEditorMap['<%-schemaName%>Detail<%-Fn%>'] = {

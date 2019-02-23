@@ -1,10 +1,13 @@
 import { Component, OnInit, Input, Output, Directive, EventEmitter } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
-import { MraCommonService } from 'mean-rest-angular';
+import { Injector } from '@angular/core';
 
 import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
+<%for (let mapField of mapFieldsRef) {%>
+import { <%-mapField[1]%> } from '../../<%-mapField[0]%>/<%-mapField[0]%>.service';<% } %>
+
 <%if (schemaHasValidator) {%>
 import { NG_VALIDATORS, Validator, ValidationErrors, AbstractControl, FormGroup } from '@angular/forms';
   <%_ compositeEditView.forEach( (field) => {
@@ -77,13 +80,13 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
     constructor(
       <%if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
       protected <%-schemaName%>Service: <%-SchemaName%>Service,
-      protected commonService: MraCommonService,
+      protected injector: Injector,
       protected router: Router,
       protected route: ActivatedRoute,
       protected location: Location) {
           super( <%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
-                 <%-schemaName%>Service, commonService, router, route, location, ViewType.EDIT);
-<% let theView = compositeEditView; %><%_ include schema-construct.component.ts %>
+                 <%-schemaName%>Service, injector, router, route, location, ViewType.EDIT);
+<% let theView = compositeEditView; let isEditView = true;%><%_ include schema-construct.component.ts %>
 <% for (let field of compositeEditView) { let fn=field.fieldName, Fn=field.FieldName; 
     if (field.type === "SchemaString" && field.editor) { %>
           this.textEditorMap['<%-schemaName%>Edit<%-Fn%>'] = {

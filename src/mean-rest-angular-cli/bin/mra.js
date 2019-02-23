@@ -156,6 +156,7 @@ var getPrimitiveField = function(fieldSchema) {
             if ( typeof(defaultValue) !== 'undefined') {
                 defaultValue = "'" + defaultValue + "'";
             }
+            //console.log("fieldSchema.validators", fieldSchema.validators)
             if (fieldSchema.validators)
                 fieldSchema.validators.forEach((val) => {
                     if (val.type == 'maxlength' && typeof val.maxlength === 'number') maxlength = val.maxlength;
@@ -196,7 +197,7 @@ var getPrimitiveField = function(fieldSchema) {
             ;
     }
 
-    return [type, jstype, numberMin, numberMax, numberMax, minlength,  enumValues, 
+    return [type, jstype, numberMin, numberMax, maxlength, minlength,  enumValues, 
             ref, Ref, RefCamel, editor,
             flagDate, flagRef, flagEditor]
 }
@@ -231,7 +232,7 @@ var processFieldGroups = function(fieldGroups) {
   
   return fieldGroups;
 }
-var generateViewPicture = function(schemaName, viewStr, schema, validators) {
+var generateViewPicture = function(schemaName, viewStr, schema, validators, editFlag) {
     //process | in viewStr
     let fieldGroups = [];
     if (viewStr.indexOf('|') > -1) {
@@ -260,6 +261,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
     let hasEditor = false;
     let hasRequiredMultiSelection = false;
     let hasRequiredArray = false;
+    let hasRequiredMap = false;
 
 	  for (let item of viewDef) {
 	    let hidden = false;
@@ -279,6 +281,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
       let ref, Ref, RefCamel;
       let editor = false;
       let requiredField = false;
+      let fieldDescription = false;
 
       let flagDate = false;
       let flagRef = false;
@@ -287,6 +290,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
       //for array
       let elementUnique = false;
       let elementType;
+      let mapKey;
 
   		if (item in schema.paths) {
         let fieldSchema = schema.paths[item];
@@ -294,6 +298,9 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
         requiredField = fieldSchema.originalRequiredValue === true? true:false;
         //TODO: required could be a function
         defaultValue = fieldSchema.defaultValue;
+        if (fieldSchema.options.description) {//scope of map key defined
+          fieldDescription = fieldSchema.options.description;
+        }
   
   			switch(type) {
           case "SchemaString":
@@ -339,7 +346,37 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
               // console.log("===casterConstructor:", fs.casterConstructor);
               // console.log("===validators:", fs.validators);
               break;
+          case "Map":
+              [elementType,  jstype,  numberMin,  numberMax,  maxlength,  minlength,  enumValues, 
+              ref, Ref, RefCamel, editor,
+              flagDate, flagRef, flagEditor]
+                  = getPrimitiveField(fieldSchema['$__schemaType']);
+              //console.log("getPrimitiveField", getPrimitiveField(fieldSchema['$__schemaType']));
+              //rewrite the default value for array
+              let defaultMap = fieldSchema.options.default;
+              if (typeof defaultMap == 'object') {
+                defaultValue = defaultMap;
+              } else {
+                defaultValue = undefined;
+              }
+
+              if (requiredField) {
+                hasRequiredMap = true;
+              }
+              
+              if (fieldSchema.options.key) {//scope of map key defined
+                mapKey = fieldSchema.options.key;
+              }
+              //let fs = fieldSchema;
+              //console.log(fieldSchema);
+              //console.log("===fieldSchema['$__schemaType']:", fieldSchema['$__schemaType']);
+              // console.log("===caster.validators:", fs.caster.validators);
+              // console.log("===casterConstructor:", fs.casterConstructor);
+              // console.log("===validators:", fs.validators);
+              //console.log("***schema map: ", fieldSchema)
+              break;
           default:
+              console.warn("Warning: Field type", type, "is not recoganized...");
               ;
   			}
   		} else if (item in schema.virtuals) {
@@ -365,6 +402,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
           //TODO: required could be a function
           required: requiredField,
           defaultValue: defaultValue,
+          description: fieldDescription,
           numberMin: numberMin,
           numberMax: numberMax,
           maxlength: maxlength,
@@ -372,21 +410,62 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
           enumValues: enumValues,
           validators: validatorArray,
 
-          //for array
+          //for array and map
           elementType: elementType,
           elementUnique: elementUnique,
+          //for map
+          mapKey: mapKey,
       }
 
-      if (type == 'SchemaArray') console.log(fieldPicture);
+      if (type == 'Map') {
+        //console.log("***schema", schema);
+        //console.log("***Map", fieldPicture);
+      }
       view.push(fieldPicture);
       viewMap[item] = fieldPicture;
     }
+    for (let f of view) { //handle Map Key
+      if (f.mapKey) {
+        //example: this.<anotherfield>.<subfield>
+        fInfo = f.mapKey.split('.');
+        if (fInfo.length <= 1) {
+          console.log("  -- mapKey for", f.fieldName, "is not in correct format.");
+          continue;
+        }
+        if (fInfo[0] != 'this') {
+          console.log("  -- mapKey for", f.fieldName, "doesn't refer to same schema field.");
+          continue;
+        }
+        let refField = fInfo[1];
+        if (refField in viewMap && viewMap[refField].type == 'ObjectId') {
+          if (fInfo.length <= 2) {
+            console.log("  -- mapKey for", f.fieldName, "refers to a reference but no sub field given.");
+            continue;
+          }
+          f.mapKeyInfo = {
+                  type: 'ObjectId', 
+                  refSchema: viewMap[refField].ref, 
+                  refName: refField, 
+                  refService: viewMap[refField].Ref + 'Service', 
+                  refSubField: fInfo[2]
+          };
+          continue;
+        }
+        if (refField in viewMap && viewMap[refField].type == 'SchemaArray') {
+          f.mapKeyInfo = {type: 'SchemaArray',  name: refField};
+          continue;
+        }
+        //console.log("   -- mapKey for", f.fieldName, ". No idea how to get the key from: ", refField);
+      }
+    }
+
     let viewGroups = [];
     for (let grp of fieldGroups) {
         let arr = grp.filter(x=>x in viewMap).map(x=>viewMap[x]);
         if (arr.length > 0) viewGroups.push(arr);
     }
-  	return [viewGroups, view, hasDate, hasRef, hasEditor, hasRequiredMultiSelection, hasRequiredArray];
+  	return [viewGroups, view, hasDate, hasRef, hasEditor, 
+  	        hasRequiredMultiSelection, hasRequiredArray, hasRequiredMap];
 }
 
 const getLoginUserPermission = function(permission) {
@@ -704,6 +783,7 @@ function main() {
   let hasEditor = false;
   let hasRequiredMultiSelection = false;
   let hasRequiredArray = false;
+  let hasRequiredMap = false;
   let dateFormat = 'MM/DD/YYYY';
   if (config && config.dateFormat) dateFormat = config.dateFormat;
   let timeFormat = 'hh:mm:ss';
@@ -765,30 +845,38 @@ function main() {
   		
   	});
   	//briefView, detailView, CreateView, EditView, SearchView, indexView]		
-    let [briefViewGrp, briefView, hasDate1, hasRef1, hasEditor1, hasReqGrp1, hasReqArr1] = 
-            generateViewPicture(name, views[0], mongooseSchema, validators);
+    let [briefViewGrp, briefView, hasDate1, hasRef1, hasEditor1, 
+          hasReqGrp1, hasReqArr1, hasReqMap1] = 
+            generateViewPicture(name, views[0], mongooseSchema, validators, false);
     //console.log("***briefView", briefView);
     //console.log("***hasRef1", hasRef1);
-    let [detailViewGrp, detailView, hasDate2, hasRef2, hasEditor2, hasReqGrp2, hasReqArr2] = 
-            generateViewPicture(name, views[1], mongooseSchema, validators);
-    let [createViewGrp, createView, hasDate3, hasRef3, hasEditor3, hasReqGrp3, hasReqArr3] = 
-            generateViewPicture(name, views[2], mongooseSchema, validators);
-    let [editViewGrp, editView, hasDate4, hasRef4, hasEditor4, hasReqGrp4, hasReqArr4] = 
-            generateViewPicture(name, views[3], mongooseSchema, validators);
-    let [searchViewGrp, searchView, hasDate5, hasRef5, hasEditor5, hasReqGrp5, hasReqArr5] = 
-            generateViewPicture(name, views[4], mongooseSchema, validators);
-    let [indexViewGrp, indexView, hasDate6, hasRef6, hasEditor6, hasReqGrp6, hasReqArr6] = 
-            generateViewPicture(name, views[5], mongooseSchema, validators);
+    let [detailViewGrp, detailView, hasDate2, hasRef2, hasEditor2, 
+          hasReqGrp2, hasReqArr2, hasReqMap2] = 
+            generateViewPicture(name, views[1], mongooseSchema, validators, false);
+    let [createViewGrp, createView, hasDate3, hasRef3, hasEditor3, 
+          hasReqGrp3, hasReqArr3, hasReqMap3] = 
+            generateViewPicture(name, views[2], mongooseSchema, validators, true); //editFlag
+    let [editViewGrp, editView, hasDate4, hasRef4, hasEditor4, 
+          hasReqGrp4, hasReqArr4, hasReqMap4] = 
+            generateViewPicture(name, views[3], mongooseSchema, validators, true); //editFlag
+    let [searchViewGrp, searchView, hasDate5, hasRef5, hasEditor5, 
+          hasReqGrp5, hasReqArr5, hasReqMap5] = 
+            generateViewPicture(name, views[4], mongooseSchema, validators, false);
+    let [indexViewGrp, indexView, hasDate6, hasRef6, hasEditor6, 
+          hasReqGrp6, hasReqArr6, hasReqMap6] = 
+            generateViewPicture(name, views[5], mongooseSchema, validators, false);
   	let schemaHasDate = hasDate1 || hasDate2 || hasDate3 || hasDate4 || hasDate5 || hasDate6;
   	let schemaHasRef = hasRef1 || hasRef3 || hasRef4;
     let schemaHasEditor = hasEditor3 || hasEditor4;
     let schemaHasRequiredMultiSelection = hasReqGrp3 || hasReqGrp4;
     let schemaHasRequiredArray = hasReqArr3 || hasReqArr4;
+    let schemaHasRequiredMap = hasReqMap3 || hasReqMap4;
   	if (schemaHasDate) hasDate = true;
   	if (schemaHasRef) hasRef = true;
   	if (schemaHasEditor) hasEditor = true;
     if (schemaHasRequiredMultiSelection) hasRequiredMultiSelection = true;
     if (schemaHasRequiredArray) hasRequiredArray = true;
+    if (schemaHasRequiredMap) hasRequiredMap = true;
   
     //let detailFields = views[1].replace(/\|/g, ' ').match(/\S+/g) || [];
     let detailSubViewStr = views[1];
@@ -796,7 +884,8 @@ function main() {
   	for (let i of briefFields) {
   	  detailSubViewStr = detailSubViewStr.replace(i, '');
   	}
-  	let [detailSubViewGrp, detailSubView, hasDate7, hasRef7, hasEditor7, hasReqGrp7] = generateViewPicture(name, detailSubViewStr, mongooseSchema, validators);
+  	let [detailSubViewGrp, detailSubView, hasDate7, hasRef7, 
+  	      hasEditor7, hasReqGrp7, hasReqMap7] = generateViewPicture(name, detailSubViewStr, mongooseSchema, validators);
   	
   	let compositeEditView = editView.slice();
   	let editFields = editView.map( x=> x.fieldName);
@@ -808,6 +897,8 @@ function main() {
   	let SchemaCamelName = viewName? viewName : capitalizeFirst(name);
   	let schemaCamelName = lowerFirst(name);
   	let schemaHasValidator = false;
+  	
+  	let mapFieldsRef = [];
   	compositeEditView.forEach(function(x){
   		if (x.validators) {
   			schemaHasValidator = true;
@@ -820,6 +911,9 @@ function main() {
   			referenceFields.push(x.ref);
   			let isArray = x.type == "SchemaArray"? true : false;
   			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel, isArray]))
+  		}
+  		if (x.mapKeyInfo && x.mapKeyInfo.type == 'ObjectId') {
+  		  mapFieldsRef.push([x.mapKeyInfo.refSchema, x.mapKeyInfo.refService]);
   		}
   	});
   	detailView.forEach(function(x){
@@ -855,6 +949,8 @@ function main() {
       detailSubViewGrp: detailSubViewGrp,
           
   		compositeEditView: compositeEditView,
+  		mapFieldsRef: mapFieldsRef,
+  		
   		componentDir: componentDir,
   		dateFormat: dateFormat,
   		timeFormat: timeFormat,
@@ -863,6 +959,7 @@ function main() {
       schemaHasEditor: schemaHasEditor,
       schemaHasRequiredMultiSelection: schemaHasRequiredMultiSelection,
       schemaHasRequiredArray: schemaHasRequiredArray,
+      schemaHasRequiredMap: schemaHasRequiredMap,
       schemaHasValidator: schemaHasValidator,
       permission: schemaAnyonePermission,
       embeddedViewOnly: embeddedViewOnly,
@@ -900,6 +997,7 @@ function main() {
     hasEditor: hasEditor,
     hasRequiredMultiSelection: hasRequiredMultiSelection,
     hasRequiredArray: hasRequiredArray,
+    hasRequiredMap: hasRequiredMap,
   	dateFormat: dateFormat,
     timeFormat: timeFormat,
     authRequired: authRequired
@@ -928,7 +1026,7 @@ function main() {
   generateSourceFile(moduleName, templates.routingPath, renderObj, outputDir);
   
   
-  if (hasDate || hasRequiredMultiSelection || hasRequiredArray) {
+  if (hasDate || hasRequiredMultiSelection || hasRequiredArray || hasRequiredMap) {
     generateSourceFile(moduleName, templates.mainDirective, renderObj, outputDir);
   }
   

@@ -1,4 +1,4 @@
-<%_if (hasRequiredArray || hasRequiredMultiSelection) {%>
+<%_if (hasRequiredArray || hasRequiredMultiSelection || hasRequiredMap) {%>
 import { Directive } from '@angular/core';
 import { NG_VALIDATORS, Validator, ValidationErrors, AbstractControl, FormGroup } from '@angular/forms';<%_} %>
 <%_if (hasDate) {%>
@@ -28,7 +28,7 @@ export class DirectiveMultiSelectionRequired implements Validator {
     let controlGroup = control as FormGroup; //cast to FormGroup
     if(controlGroup) {
       for(let ctrl in controlGroup.controls) {
-        if(controlGroup.controls[ctrl].value) {
+        if(controlGroup.controls[ctrl].value) { //true or false of the selected item
           selected = true;
           break;
         }
@@ -52,7 +52,31 @@ export class DirectiveArrayRequired implements Validator {
     let controlGroup = control as FormGroup; //cast to FormGroup
     if(controlGroup) {
       for(let ctrl in controlGroup.controls) {
-        if(controlGroup.controls[ctrl].value) {
+        if(controlGroup.controls[ctrl].value) { //length of array
+          selected = true;
+          break;
+        }
+      }
+    }
+
+    if (selected) {
+      return null; //no error
+    } else {
+      return { 'required': true };
+    }
+  }
+}  <%_} %><%_if (hasRequiredMap) {%>
+@Directive({
+  selector: '[directiveMapRequired]',
+  providers: [{provide: NG_VALIDATORS, useExisting: DirectiveMapRequired, multi: true}]
+})
+export class DirectiveMapRequired implements Validator {
+  validate(control: AbstractControl): ValidationErrors | null {
+    let selected = false;
+    let controlGroup = control as FormGroup; //cast to FormGroup
+    if(controlGroup) {
+      for(let ctrl in controlGroup.controls) {
+        if(controlGroup.controls[ctrl].value) {//value of each map key is set
           selected = true;
           break;
         }
