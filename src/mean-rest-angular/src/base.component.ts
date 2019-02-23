@@ -1,4 +1,5 @@
-import { Router, ActivatedRoute, ParamMap }    from '@angular/router';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { Injector } from '@angular/core';
 import { Location } from '@angular/common';
 
 import { Observable } from 'rxjs';
@@ -22,6 +23,8 @@ export enum ViewType {
 export {ServiceError};
 
 export class BaseComponent implements BaseComponentInterface {
+    protected objectKeys = Object.keys;
+  
     private storage:any = {};
 
     //For list and pagination
@@ -47,6 +50,7 @@ export class BaseComponent implements BaseComponentInterface {
     //For edit and view details
     protected detail:any = {};
     private _detail:any = {}; //a clone and used to send/receive from next work
+    private _extra:any = {}; //extra info.
     protected id:string;
     protected subEdit = false; //a edit-sub component
     //for fields with enum values
@@ -58,6 +62,7 @@ export class BaseComponent implements BaseComponentInterface {
     protected indexFields = [];
     protected multiSelectionFields = [];
     protected arrayFields = []; //element is [fieldName, elementType]
+    protected mapFields = []; //element is [fieldName, elementType, mapKey]
     protected dateFormat = "MM/DD/YYYY";
     protected timeFormat = "hh:mm:ss";
 
@@ -66,18 +71,22 @@ export class BaseComponent implements BaseComponentInterface {
     protected ItemCamelName: string;
     protected itemName: string;
     protected parentItem: string;
+  
+    protected commonService: MraCommonService;
 
     constructor(
         protected service: BaseService,
-        protected commonService: MraCommonService,      
+        protected injector: Injector,
         protected router: Router,
         protected route: ActivatedRoute,
         protected location: Location,
         protected view: ViewType,
         protected itemCamelName: string) {
+      
         this.ItemCamelName = itemCamelName.charAt(0).toUpperCase() + itemCamelName.substr(1);
         this.itemName = itemCamelName.toLowerCase();
         this.parentItem = this.getParentRouteItem();
+        this.commonService = injector.get(MraCommonService);
         
     }
     
@@ -438,6 +447,78 @@ export class BaseComponent implements BaseComponentInterface {
         return this.isDefinedFieldArrayMultiSelection(this.detail[fieldName]);
     }
     /***End: handle array of multi-selection fields***/
+    /***Start: handle map fields***/
+    protected formatMapField(field: any, elementType: string): any {
+        let selectObj = {};
+        let values = [];
+        if (typeof field == 'object') {
+            selectObj = field;
+            for (let e in field) {
+              if (elementType === 'SchemaString') {
+                values.push(e + "(" + field[e] + ")");
+              }
+            }
+        }
+        values = values.filter(x=>!!x);
+        let value = values.join(" | ")
+        return {'selection': selectObj, value: value, keys: []};
+
+    }
+    protected formatMapFields(detail:any ):any {
+        for (let f of this.mapFields) {
+            //[fieldName, elementType]
+            detail[f[0]] = this.formatMapField(detail[f[0]], f[1]);
+        }
+        return detail;
+    }
+
+    protected deFormatMapFields(detail:any ):any {
+        for (let f of this.mapFields) {
+            //[fieldName, elementType]
+            let fnm = f[0];
+            let elementType = f[1];
+          
+            if (typeof detail[fnm] !== 'object') { //not defined
+                delete detail[fnm];
+            }
+            else {
+                if (! detail[fnm].selection) delete detail[fnm];
+                else {
+                    let selectMap = detail[fnm].selection;
+                    for (let e in detail[fnm].selection) {
+                      if (elementType === 'SchemaString') {
+                        ;
+                      }
+                    }
+
+                    if (Object.keys(selectMap).length > 0) detail[fnm] = selectMap;
+                    else delete detail[fnm];
+                }
+            }
+        }
+        return detail;
+    }
+
+    protected clearFieldMap(field:any ):any {
+        if (!field['selection']) return field;
+        field['selection'] = {};
+        field.value = undefined;
+        return field;
+    }
+
+    protected isDefinedFieldMap(field:any ):any {
+        if ('selection' in field && typeof field['selection'] == 'object') {
+            return Object.keys(field['selection']).length > 0;
+        }
+        return false;
+    }
+    protected mapSelected(fieldName) {
+        if (!this.detail[fieldName] || typeof this.detail[fieldName]['selection'] != 'object') {
+            return false;
+        }
+        return this.isDefinedFieldMap(this.detail[fieldName]);
+    }
+    /***End: handle map fields***/
     /***Start: handle array fields***/
     protected formatArrayField(field: any, elementType: string): any {
         let selectArray = [];
@@ -522,6 +603,7 @@ export class BaseComponent implements BaseComponentInterface {
         detail = this.formatDate(detail);
         detail = this.formatArrayMultiSelection(detail);
         detail = this.formatArrayFields(detail);
+        detail = this.formatMapFields(detail);
         return detail;
     }    
     
@@ -532,6 +614,7 @@ export class BaseComponent implements BaseComponentInterface {
         cpy = this.deFormatDate(cpy);
         cpy = this.deFormatArrayMultiSelection(cpy);
         cpy = this.deFormatArrayFields(cpy);
+        cpy = this.deFormatMapFields(cpy);
         return cpy;
     }
     
@@ -548,6 +631,9 @@ export class BaseComponent implements BaseComponentInterface {
             
             this.detail = this.formatDetail(detail);
             this.extraFieldsUnload();//unload data to text editors, etc
+            if (action == 'edit') {
+              this.extraInfoPopulate();//collect other info required for edit view
+            }
         },
         this.onServiceError
       );
@@ -560,11 +646,46 @@ export class BaseComponent implements BaseComponentInterface {
             this.detail = this.formatDetail(detail);
             delete this.detail["_id"];
             this.extraFieldsUnload();//unload data to text editors, etc
+            this.extraInfoPopulate();//collect other info required for create view
         },
         this.onServiceError
       );
     }
 
+    protected extraInfoPopulate() {
+        for (let fieldDef of this.mapFields) { 
+          //fieldDef: [field.fieldName, field.elementType, keyType, keyRefName, keyRefService, keyRefSubField]
+          let fieldName = fieldDef[0]; //this.<keyRefName>.<keyRefSubField>
+          let mapKeyType = fieldDef[2]; //this.<keyRefName>.<keyRefSubField>
+          let keyArray = [];
+          if (mapKeyType == "ObjectId") {
+            let keyRefName = fieldDef[3];
+            let recordKey = 'key-id-' + keyRefName;
+            let refService = this.injector.get(fieldDef[4]);
+            let id = this.detail[keyRefName]?this.detail[keyRefName]['_id'] : undefined;
+            if (!id) continue;
+            let mapField = this.detail[fieldName];
+            if (mapField[recordKey] == id) continue; //already populated for the same id
+            
+            refService.getDetail(id).subscribe(
+              detail => {
+                if (Array.isArray(detail[fieldDef[5]])) {
+                  keyArray = detail[fieldDef[5]];
+                  mapField['keys'] = keyArray;
+                  mapField[recordKey] = id; //record that keys is populated from this object
+                  if (mapField['selection']) {
+                    for (let k of keyArray) {
+                      if (!(k in mapField['selection'])) mapField['selection'][k] = "";
+                    }
+                  }
+                }
+              },
+              this.onServiceError
+            );
+          }          
+        }
+    }
+  
     private equalTwoSearchContextArrays (arr1, arr2) {
       if (!arr1) arr1 = [];
       if (!arr2) arr2 = [];
@@ -912,11 +1033,15 @@ export class BaseComponent implements BaseComponentInterface {
                 this.detail[field] = this.clearFieldArrayMultiSelection(this.detail[field]);
             } else if (this.arrayFields.some(x=>x[0] == field)) {
                 this.detail[field] = this.clearFieldArray(this.detail[field]);
+            } else if (this.mapFields.some(x=>x[0] == field)) {
+                this.detail[field] = this.clearFieldMap(this.detail[field]);
             } else if (this.dateFields.includes(field)) {
                 this.detail[field] = this.clearFieldDate(this.detail[field]);
             } else if (this.referenceFields.includes(field)) {
                 this.detail[field] = this.clearFieldReference(this.detail[field]);
             }
+            //check if any info needs to change after clear certain values;
+            this.extraInfoPopulate();
         } else {
             delete this.detail[field];
         }
@@ -924,6 +1049,22 @@ export class BaseComponent implements BaseComponentInterface {
     public clearValueFromArrayField(field: string, idx: number):void {
         if (this.detail[field]['selection']) {
             this.detail[field]['selection'] = this.detail[field]['selection'].filter((x,i)=> i != idx );
+            //check if any info needs to change after clear certain values;
+            this.extraInfoPopulate();
+        }
+    }
+    public clearValueFromMapField(field: string, key: string):void {
+        if (this.detail[field]['selection']) {
+            delete this.detail[field]['selection'][key];
+            //check if any info needs to change after clear certain values;
+            this.extraInfoPopulate();
+        }
+    }
+    public clearValueFromMapKey(field: string, key: string):void {
+        if (this.detail[field]['selection']) {
+            this.detail[field]['selection'][key] = undefined;
+            //check if any info needs to change after clear certain values;
+            this.extraInfoPopulate();
         }
     }
   
@@ -939,6 +1080,8 @@ export class BaseComponent implements BaseComponentInterface {
                 return this.isDefinedFieldArrayMultiSelection(d[field]);
             } else if (this.arrayFields.some(x=>x[0] == field)) {
                 return this.isDefinedFieldArray(d[field]);
+            } else if (this.mapFields.some(x=>x[0] == field)) {
+                return this.isDefinedFieldMap(d[field]);
             } else if (this.dateFields.includes(field)) {
                 return this.isDefinedFieldDate(d[field]);
             } else if (this.referenceFields.includes(field)) {
@@ -966,14 +1109,31 @@ export class BaseComponent implements BaseComponentInterface {
             values.push(item); //display value
             values = values.filter(x=>!!x);
             this.detail[fieldName]['value'] = values.join(' | ');
+            
+            //see if related info needs to change after the change of this value
+            this.extraInfoPopulate();
           }
         }                    
     }
-
+    public onAddMapItem(fieldName:string) {
+        if (this.mapFields.some(x=>x[0] == fieldName)) {
+          if (this.detail[fieldName]['new']) { //where new added item is stored
+            let item = this.detail[fieldName]['new'];
+            this.detail[fieldName]['new'] = undefined; //clear it
+            
+            this.detail[fieldName]['selection'][item] = undefined; //move to selection object
+            
+            //TODO: this.detail[fieldName]['value'] change
+            
+            //see if related info needs to change after the change of this value
+            this.extraInfoPopulate();
+          }
+        }                    
+    }
     //**** For parent component of modal UI
     protected refSelectDirective:any;
     protected selectComponents:any; //{fieldName: component-type} format
-    protected componentFactoryResolver:any;
+    protected componentFactoryResolver: any; //injected by extended class, if needed.
     private componentSubscription
     public onRefSelect(fieldName:string) {
         let viewContainerRef = this.refSelectDirective.viewContainerRef;
@@ -1020,6 +1180,8 @@ export class BaseComponent implements BaseComponentInterface {
                         } else if (this.referenceFields.includes(fieldName)) {
                             this.detail[fieldName] = outputData.value;
                         }                    
+                        //trigger extraInfo populate, once reference changed.
+                        this.extraInfoPopulate();
                         break;
                     case "view":
                         this.onRefShow(fieldName, "select", outputData.value);//value is _id
@@ -1073,6 +1235,8 @@ export class BaseComponent implements BaseComponentInterface {
                         } else if (this.referenceFields.includes(fieldName)) {
                             this.detail[fieldName] = outputData.value;
                         }                    
+                        //trigger extraInfo populate, once reference changed.
+                        this.extraInfoPopulate();
                         break;
                     case "back":
                         this.onRefSelect(fieldName);
@@ -1118,7 +1282,8 @@ export class BaseComponent implements BaseComponentInterface {
         this.selectedId = detail['_id'];
         this.clickedId = detail['_id'];
         this.outputData = {action: "selected", 
-                            value: {"_id": detail["_id"], "value": this.stringify(detail)}
+                            value: {"_id": detail["_id"], "value": this.stringify(detail)},
+                            detail: detail
                           };
         this.done.emit(true);
     }
@@ -1126,7 +1291,8 @@ export class BaseComponent implements BaseComponentInterface {
     detailSelSelected() {
         let detail = this.detail;
         this.outputData = {action: "selected", 
-                            value: {"_id": detail["_id"], "value": this.stringify(detail)}
+                            value: {"_id": detail["_id"], "value": this.stringify(detail)},
+                            detail: detail
                           };
         this.done.emit(true);
     }
