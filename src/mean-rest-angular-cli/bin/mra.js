@@ -520,15 +520,9 @@ const getPermission = function(authz, identity, schemaName) {
 const getSchemaPermission = function(schemaName, authz) {
 
     let anyonePermission = getPermission(authz, 'Anyone', schemaName);
-    let loginPermission = getPermission(authz, "LoginUser", schemaName);
-
     let permission = "";
-    if (typeof anyonePermission === 'undefined' &&
-            typeof loginPermission.others == 'undefined' &&
-            typeof loginPermission.own === 'undefined') {
-      //permitted
-      permission = "CURD";
-    } else if (typeof anyonePermission == 'undefined') {
+
+    if (typeof anyonePermission == 'undefined') {
       permission = ""; //not permitted
     } else {
       permission = anyonePermission;
