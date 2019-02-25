@@ -22,49 +22,134 @@ module.exports.GetDefaultAuthnRouter = function() {
 }
 //used to manage the user profiles
 module.exports.GetDefaultUserRouter = function(authAppConfig) {
-  return meanRestExpress.RestRouter(authUserDef, authAppConfig, "Users");
+  return meanRestExpress.RestRouter(authUserDef, 'Users', authAppConfig);
 }
 //used to manage the user authorizations
-module.exports.GetDefaultAuthzRouter = function(authAppConfig) {
-  const authzRouter =  meanRestExpress.RestRouter(authzDef, authAppConfig, "Roles");
+module.exports.GetDefaultAuthzRouter =  function(authAppConfig) {
+  const authzRouter =  meanRestExpress.RestRouter(authzDef, 'Roles', authAppConfig);
   
-  function modelExecuteCallback(taskStr) {
-    function callBack(err, result) {
-      if (err) {
-        console.warn(" --- model excecute failed: ", taskStr, err.errmsg);
-      } else {
-        console.log(" --- model excecute succeeded: ", taskStr);
-      }
+  function modelExecuteSuccess(taskStr) {
+    function doSomething(result) {
+      console.log(" --- auth server: model excecute succeeded: ", taskStr);
     }
-    return callBack;
+    return doSomething;
+  }
+  function modelExecuteError(taskStr) {
+    function doSomething(err) {
+      if (err.code === 11000) console.log(" --- auth server: model excecute already exist: ", taskStr);
+      else if (err.errmsg) console.warn(" --- auth server: model excecute failed: ", taskStr, err.errmsg);
+      else console.warn(" --- auth server: model excecute failed: ", taskStr, err.message);
+    }
+    return doSomething;
   }
   
-  //admin user
-  restController.ModelExecute(
-          "muser",
-          "create",
-          modelExecuteCallback("create admin user with initial password 'adminPassword'..."),
-          {username: 'admin', password: 'adminPassword'} //document
-      );
-  
-  //admin role
-  restController.ModelExecute(
-          "mrole",
-          "create",
-          modelExecuteCallback("create admin role..."),
-          {role: 'admin', description: 'Administrator roles with full permissions.'} //document
-      );
-  let modules = restController.getAllModules();
-  for (let m in modules) { //{'moduleName': [resource1, resource2...]}
-    restController.ModelExecute(
+  async function runDB() {
+    let taskInfo;
+    
+    //pre-configured data:
+    //admin user:
+    //1. "Administrator" user role
+    //2. "All Modules" system module
+    //3. "Administrator" role permission to "All Modules"
+    //4. "admin" user
+    //5. "admin" user with "Administrator" role.
+    
+    takInfo = 'create "Administrator" role with full permissions...';
+    await restController.ModelExecute(
+            "mrole",
+            "create",
+            {role: 'Administrator', description: 'Administrator roles with full permissions.'} //document
+        ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
+
+    takInfo = 'insert system modules "All Modules" ...';
+    await restController.ModelExecute(
             "mmodule",
-            "update",
-            modelExecuteCallback("insert modules " + m + " with resources: " + modules[m]),
-            {module: m}, //search criteria
-            {module: m, resources: modules[m]}, //document
-            {upsert: true, setDefaultsOnInsert: true} //options update or insert
-        );
+            "create",
+            {module: "All Modules", resources: "All resources in the system."} //document
+        ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
+    
+    takInfo = 'get "Administrator" role infomation...';
+    let adminRoleId;
+    await restController.ModelExecute(
+            "mrole",
+            "findOne",
+            {role: 'Administrator'}//search criteria
+        ).then(function(result) {
+            if (result) adminRoleId = result['_id'];
+          }, 
+          modelExecuteError(takInfo));
+    takInfo = 'get "All Modules" module infomation...';
+    let allModuleId;
+    await restController.ModelExecute(
+            "mmodule",
+            "findOne",
+            {module: "All Modules"}//search criteria
+        ).then(function(result) {
+            if (result) allModuleId = result['_id'];
+          }, 
+          modelExecuteError(takInfo));
+    if (adminRoleId && allModuleId) {
+      takInfo = 'insert permission for "Administrator" role for "All Modules"...';
+      restController.ModelExecute(
+              "mpermission",
+              "create",
+              //{role: adminRoleId, module: allModuleId}, //search criteria
+              {role: adminRoleId, module: allModuleId, modulePermission: "CRUD"}//document
+          ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
+    }    
+    takInfo = 'create "admin" user with initial password "adminPassword"...';
+    await restController.ModelExecute(
+            "muser",
+            "create",
+            {username: 'admin', password: 'adminPassword'} //document
+        ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
+    let adminUserId;
+    takInfo = 'get "admin" user information...';
+    await restController.ModelExecute(
+            "muser",
+            "findOne",
+            {username: "admin"}//search criteria
+        ).then(function(result) {
+            if (result) adminUserId = result['_id'];
+          }, 
+          modelExecuteError(takInfo));
+    if (adminRoleId && adminUserId) {
+      takInfo = 'insert "admin" user with "Administrator" role...';
+      restController.ModelExecute(
+              "muserrole",
+              "create",
+              {user: adminUserId, role: [adminRoleId] } //document
+          ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
+    }    
+
+    
+    //Other user roles:
+    //1. "Anyone" user role
+    //2. "LoginUserOwn" user role
+    //3. "LoginUserOthers" user role    
+    takInfo = 'create "Anyone" role ...';
+    await restController.ModelExecute(
+            "mrole",
+            "create",
+            {role: 'Anyone', description: 'Any one, login or not.'} //document
+        ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
+    takInfo = 'create "LoginUserOwn" role ...';
+    await restController.ModelExecute(
+            "mrole",
+            "create",
+            {role: 'LoginUserOwn', description: 'Any login user, when trying to manage its own resource'} //document
+        ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
+    takInfo = 'create "LoginUserOthers" role ...';
+    await restController.ModelExecute(
+            "mrole",
+            "create",
+            {role: 'LoginUserOthers', description: 'Any login user, when trying to manage other user\'s resource'} //document
+        ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
+        
   }
+  
+  runDB();
+  //admin role
   return authzRouter;
 }
 
