@@ -2,18 +2,19 @@ const express = require('express');
 
 const RestController = require('./rest_controller')
 
-const _setRouterName = function(name) {
+const _setSchemaName = function(name) {
   return function(req, res, next) {
-    req.meanRestRouteName = name;
+    req.meanRestSchemaName = name;
     next();
   }
 }
 
-const RestRouter = function(name, authzFunc) {
+const RestRouter = function(schemaName, authzFunc) {
   let router = express.Router();
 
-  let setRouterName = _setRouterName(name);
-  router.use(setRouterName); 
+  let setSchemaName = _setSchemaName(schemaName);
+  let name = schemaName.toLowerCase();
+  router.use(setSchemaName); 
   if (authzFunc) router.use(authzFunc);
 
   router.get('/', RestController.getAll);

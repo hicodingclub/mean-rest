@@ -1,11 +1,12 @@
 const createError = require('http-errors');
+const getPermissionFromAuthz = require('./authz_util')
 
 const schema_collection = {};
 const views_collection = {}; //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 const model_collection = {};
 const populate_collection = {};
 const system_modules = {}; //{'moduleName': [resource1, resource2...]}
-
+const permission_collection = {}; //{'moduleName': {"module-authz": {"LoginUser": {"others": "CRUD", "own": "CURD"}, "Anyone": ""}}}
 const auth = {};
 
 const loadContextVarsByName = function(name) {
@@ -23,7 +24,7 @@ const loadContextVars = function(req) {
   //if (arr.length < 2) throw(createError(500, "Cannot identify context name from routing path: " + url))
   //let name = arr[arr.length-2].toLowerCase();
 
-  let name = req.meanRestRouteName;
+  let name = req.meanRestSchemaName.toLowerCase();
   return loadContextVarsByName(name);
 }
 
@@ -211,13 +212,14 @@ let RestController = function() {}
 
 RestController.loadContextVarsByName = loadContextVarsByName;
 
-RestController.register = function(name, schema, views, model, moduleName) {
-	schema_collection[name.toLowerCase()] = schema;
-	views_collection[name.toLowerCase()] = views;
-	model_collection[name.toLowerCase()] = model;
+RestController.register = function(schemaName, schema, views, model, moduleName) {
+  let name = schemaName.toLowerCase();
+	schema_collection[name] = schema;
+	views_collection[name] = views;
+	model_collection[name] = model;
 
 	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format	
-	populate_collection[name.toLowerCase()] = {
+	populate_collection[name] = {
 			//populates in a array, each populate is an array, too, with [field, ref]
 			//eg: [["person", "Person"], ["comments", "Comments"]]
 			briefView: getViewPopulates(schema, views[0]),
@@ -225,15 +227,30 @@ RestController.register = function(name, schema, views, model, moduleName) {
 	}
 	if (moduleName) {
 	  if (moduleName in system_modules) {
-	    system_modules[moduleName].push(name);
+	    system_modules[moduleName].push(schemaName);
 	  } else {
-      system_modules[moduleName] = [name];
+      system_modules[moduleName] = [schemaName];
 	  }
 	}
 };
+
 RestController.getAllModules = function() {
   return system_modules;
 };
+
+RestController.registerAuthz = function(moduleName, authz) {
+  permission_collection[moduleName] = getPermissionFromAuthz(authz);
+};
+
+RestController.getPermission = function(moduleName) {
+  return permission_collection[moduleName];
+};
+
+RestController.setPermissions = function(modulePermissions) {
+  for (let moduleName in modulePermissions) {
+    permission_collection[moduleName] = modulePermissions[moduleName];
+  }
+}
 
 RestController.getAll = function(req, res, next) {
 	return RestController.searchAll(req, res, next, {});
@@ -494,24 +511,46 @@ RestController.Update = function(req, res, next) {
 };
 
 
-
-RestController.ModelExecute = function(modelName, apiName, callBack, ...params) {
+//Return a promise.
+RestController.ModelExecute = function(modelName, apiName, ...params) {
   let model = model_collection[modelName];
-  if (!model[apiName]) {
-    let err = new Error("API doesn't exit in model: " + apiName);
-    callBack(err, null);
+  if (!model || !model[apiName]) {
+    let err = new Error(`model ${modelName} or mode API ${apiName} doesn't exit`);
+    return new Promise(function(resolve, reject) {
+      reject(err);
+    });
   }
   if (apiName == 'create') {
-    model.create(params, function (err, result) {
-      callBack(err, result);
-    });
-    return;
+    return model.create(params);
+    
   }
-  model[apiName].apply(model, params)
-    .exec(function (err, result) {
-      callBack(err, result);
-    });
+  let dbExe = model[apiName].apply(model, params);
+  
+  return dbExe.exec();
 }
 
+RestController.ModelExecute2 = function(modelName, apis) {
+  let model = model_collection[modelName];
+  if (!model) {
+    let err = new Error(`model ${modelName} or mode API ${apiName} doesn't exit`);
+    return new Promise(function(resolve, reject) {
+      reject(err);
+    });
+  }
+
+  let dbExe;
+  for (let apiName in apis) {
+    try {
+      if (!dbExe) dbExe = model[apiName].apply(model, apis[apiName]);
+      else dbExe = dbExe[apiName].apply(dbExe, apis[apiName]);
+    } catch (err) {
+      return new Promise(function(resolve, reject) {
+        reject(err);
+      });
+    }
+  }
+  
+  return dbExe.exec();
+}
 
 module.exports = RestController;

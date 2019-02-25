@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const createError = require('http-errors');
 
+const util = require('../util')
 const RestController = require('./rest_controller')
 const RestRouter = require('./rest_sub_router')
 
@@ -31,16 +32,32 @@ var processViewStr = function(viewStr) {
   return viewStr;
 }
 
-const meanRestExpressRouter = function(sysDef, authConfig, moduleName) {
+
+const _setModuleAuthz = function(moduleName) {
+  return function(req, res, next) {
+    req.mddsPermission = RestController.getPermission(moduleName);
+    next();
+  }
+}
+const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
   let expressRouter = express.Router();
+  if (!moduleName) moduleName = randomString(10);
+
+  if (!sysDef.authz) sysDef.authz = {};
+  RestController.registerAuthz(moduleName, sysDef.authz);
+  
+  let setModuleAuthz = _setModuleAuthz(moduleName);
+  expressRouter.use(setModuleAuthz); 
+  
+
   let schemas = sysDef.schemas;
   
-  let authzFuncCreator;
+  let authzFunc;
   if (authConfig) {
     let authnFunc = authConfig.authnFunc;
     if (authnFunc) expressRouter.use(authnFunc);
 
-    authzFuncCreator = authConfig.authzFuncCreator;
+    authzFunc = authConfig.authzFunc;
   }
   //console.log("*******sysDef", sysDef)
 
@@ -62,16 +79,13 @@ const meanRestExpressRouter = function(sysDef, authConfig, moduleName) {
       views.push(view);
     }
     //pass pure view string to register.
-    RestController.register(name, schemaDef.schema, views, model, moduleName);
+    RestController.register(schemaName, schemaDef.schema, views, model, moduleName);
   }
-
+  
   for (let schemaName in schemas) {
     let name = schemaName.toLowerCase();
-    let authzFunc;
-    if (sysDef.authz && authzFuncCreator) {
-        authzFunc = authzFuncCreator(schemaName, sysDef.authz);
-    }
-    restRouter = RestRouter(name, authzFunc);
+
+    restRouter = RestRouter(schemaName, authzFunc);
 
     expressRouter.use("/" + name, restRouter)
     sub_routes.push("/" + name);
