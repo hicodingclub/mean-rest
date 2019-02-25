@@ -8,7 +8,7 @@ var errorCss = `
     top: 20%;
     transform: translate(-50%, 0);
     position: fixed; 
-    z-index: 1; 
+    z-index: 10; 
 }
 .meanExpressAngularError.show {
     visibility: visible; 
