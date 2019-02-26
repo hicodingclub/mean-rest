@@ -134,10 +134,22 @@ const getPermission = function(permissions, identity, schemaName) {
   }
   if (!perm) return undefined; //not defined
   
-  if (perm['resourcePermission'][schemaName]) {
+  let resourcePermission = {};
+  if (perm['resourcePermission'] instanceof Map) {
+    //convert Map to object.
+    for(let [key,val] of perm['resourcePermission'].entries()){
+      resourcePermission[key]= val;
+    }
+    perm['resourcePermission'] = resourcePermission; //set back. So no conversion next time. Hopefully.
+  } else if (typeof perm['resourcePermission'] == 'object') { //object
+    resourcePermission = perm['resourcePermission'];
+  }
+  
+  if (resourcePermission[schemaName]) {
     //use the permission definition for the schema
-    return perm['resourcePermission'][schemaName];
+    return resourcePermission[schemaName];
   } 
+  
   if (perm['modulePermission']) {
     //use module permission
     return perm['modulePermission'];
@@ -146,6 +158,8 @@ const getPermission = function(permissions, identity, schemaName) {
 }
 
 const verifyPermission = function(req, res, next) {
+  const loggedIn = !!req.muser
+
   let schemaName = req.meanRestSchemaName;
 
   let httpOperation = req.method;
@@ -171,7 +185,6 @@ const verifyPermission = function(req, res, next) {
   let loginOwnPermission = getPermission(mddsPermissions, "LoginUserOwn", schemaName);
   let loginOthersPermission = getPermission(mddsPermissions, "LoginUserOthers", schemaName);
   
-  const loggedIn = !!req.muser
   let permission = "N";
 
   if (typeof anyonePermission === 'undefined' &&
@@ -203,17 +216,18 @@ const verifyPermission = function(req, res, next) {
     }
   }
 
-  let role;
-  if (req.muser) role = req.muser.role;
-
   if (permitted) {
     return next();
-  } else {
-    if (!loggedIn) {
-      return next(createError(401, "Not Authorized.")); //ask for login
-    }
-    return next(createError(403, "Forbidden.")); 
+  } 
+  if (!loggedIn) {
+    return next(createError(401, "Not Authorized.")); //ask for login
   }
+  let role;
+  if (req.muser) {
+    role = req.muser.role; //[] array, list of role Ids.
+  }
+
+  return next(createError(403, "Forbidden.")); 
 }
 
 module.exports = verifyPermission;
