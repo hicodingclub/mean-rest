@@ -539,10 +539,12 @@ RestController.ModelExecute2 = function(modelName, apis) {
   }
 
   let dbExe;
-  for (let apiName in apis) {
+  for (let item of apis) {
+    let apiName = item[0];
+    let apiArgs = item[1];
     try {
-      if (!dbExe) dbExe = model[apiName].apply(model, apis[apiName]);
-      else dbExe = dbExe[apiName].apply(dbExe, apis[apiName]);
+      if (!dbExe) dbExe = model[apiName].apply(model, apiArgs);
+      else dbExe = dbExe[apiName].apply(dbExe, apiArgs);
     } catch (err) {
       return new Promise(function(resolve, reject) {
         reject(err);
