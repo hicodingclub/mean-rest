@@ -2,7 +2,6 @@
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
-
 import { AuthenticationService } from '../auth.service';
 
 @Component(
@@ -16,13 +15,12 @@ export class LoginComponent implements OnInit {
     servererror = false;
     serverText = '';
     returnUrl: string;
-
+  
     constructor(
         private formBuilder: FormBuilder,
         private route: ActivatedRoute,
         private router: Router,
-        private authenticationService: AuthenticationService
-        ) {}
+        private authenticationService: AuthenticationService) { }
 
     ngOnInit() {
         this.loginForm = this.formBuilder.group({
@@ -38,9 +36,7 @@ export class LoginComponent implements OnInit {
     }
 
     // convenience getter for easy access to form fields
-    get f() { 
-        return this.loginForm.controls;
-    }
+    get f() { return this.loginForm.controls; }
 
     onSubmit() {
         this.submitted = true;

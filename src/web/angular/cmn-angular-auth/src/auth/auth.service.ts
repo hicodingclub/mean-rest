@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, filter, retry } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { Router, NavigationEnd  } from '@angular/router';
@@ -15,6 +15,8 @@ export class AuthenticationService {
   private previousUrl: string;
   private currentUrl: string;
   private navigateEndTime: number;
+  
+  private adminInterface: boolean = false;
 
   constructor(
             @Inject(AUTHTICATION_SERVER_ROOT_URI) private authServerRootUri: string,
@@ -33,6 +35,8 @@ export class AuthenticationService {
         }
       }
     });
+    
+    this.adminInterface = JSON.parse(localStorage.getItem('adminInterface'));
   }
 
   isAuthorized(): boolean {
@@ -130,8 +134,11 @@ export class AuthenticationService {
     };
     localStorage.setItem('mdds-auth-record', JSON.stringify(authRecord));
 
+    const options = this.adminInterface ?
+       { params: new HttpParams().set('type', 'admin') } : {};
+    
     return this.http.post<any>(this.authServerRootUri + '/login',
-        { username: userName, password: password }
+        { username: userName, password: password }, options
       ).pipe(map(this.loggedIn));
   }
 
@@ -144,7 +151,11 @@ export class AuthenticationService {
       displayName: userInfo.displayName
     };
     localStorage.setItem('mdds-auth-record', JSON.stringify(authRecord));
-    return this.http.post<any>(this.authServerRootUri + '/register', userInfo);
+    
+    const options = this.adminInterface ?
+       { params: new HttpParams().set('type', 'admin') } : {};
+
+    return this.http.post<any>(this.authServerRootUri + '/register', userInfo, options);
   }
 
   loggedIn(user) {
@@ -180,5 +191,15 @@ export class AuthenticationService {
     authRecord.accessToken = '';
     authRecord.refreshToken = '';
     localStorage.setItem('mdds-auth-record', JSON.stringify(authRecord));
+  }
+  
+
+  setAdminInterface(isAdminInterface: boolean): void {
+    this.adminInterface = isAdminInterface;
+    localStorage.setItem('adminInterface', JSON.stringify(isAdminInterface));
+  }
+  
+  isAdminInterface(): boolean {
+    return this.adminInterface;
   }
 }
