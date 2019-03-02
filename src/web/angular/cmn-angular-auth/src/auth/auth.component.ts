@@ -22,7 +22,7 @@ export class AuthenticationComponent {
         this.adminInterface = authenticationService.isAdminInterface();
         this.userIntEnabled = true;
         this.adminIntEnabled = true;
-      } else if (str.includes("administrator")) { //administrator only
+      } else if (str.includes("admin")) { //administrator only
         this.authenticationService.setAdminInterface(true);
         this.adminIntEnabled = true;
       } else { //users only
