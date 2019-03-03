@@ -62,7 +62,7 @@ const schemas = {
     schema: permissionSchema,
     views: [permBrief, permDetail, permCreat, permEdit, permTextSearch, permIndex],
     name: 'Permission'
-  },
+  }
 };
 
 const dateFormat = "MM-DD-YYYY";
@@ -74,29 +74,30 @@ const config = {
 }
 
 const authz = { //only users with permission can see this module
-  "module-authz": {"LoginUser": {"others": "CRUD", "own": "CURD"}, "Anyone": ""},
+  "module-authz": {"LoginUser": {"others": "", "own": ""}, "Anyone": ""},
 }
 
 const GetAuthzDef = function(userSchemaName, userSchema) {
   schemas[userSchemaName] = userSchema;
   
-  //define user<->role schema
-  const userRoleSchema = new Schema({
-    user: { type: Schema.Types.ObjectId, ref: userSchemaName, required: true, index: { unique: true } },
+  //define account<->role schema
+  const accountRoleSchema = new Schema({
+    account: { type: Schema.Types.ObjectId, ref: userSchemaName, required: true, index: { unique: true } },
     role: { type: [{type: Schema.Types.ObjectId, ref: 'mrole'}] }, 
   });
+
+  const accountRoleBrief = "account role";
+  const accountRoleDetail = "account role";
+  const accountRoleCreat = "account role";
+  const accountRoleEdit = "account role";
+  const accountRoleTextSearch = "account role";
+  const accountRoleIndex = "account"; //let's temporarily put any field here since this schema is not referred.
   
-  const userRoleBrief = "user role";
-  const userRoleDetail = "user role";
-  const userRoleCreat = "user role";
-  const userRoleEdit = "user role";
-  const userRoleTextSearch = "user role";
-  const userRoleIndex = "user"; //let's temporarily put any field here since this schema is not referred.
-  
-  schemas['muserRole'] = {
-    schema: userRoleSchema,
-    views: [userRoleBrief, userRoleDetail, userRoleCreat, userRoleEdit, userRoleTextSearch, userRoleIndex],
-    name: 'User Role'
+  schemas['maccountRole'] = {
+    schema: accountRoleSchema,
+    views: [accountRoleBrief, accountRoleDetail, accountRoleCreat, 
+      accountRoleEdit, accountRoleTextSearch, accountRoleIndex],
+    name: 'Account Role'
   }
   
   return {schemas: schemas, config: config, authz: authz};

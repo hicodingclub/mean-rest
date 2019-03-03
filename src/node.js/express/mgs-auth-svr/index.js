@@ -1,32 +1,48 @@
 const meanRestExpress = require('mean-rest-express')
 const addPasswordHandlers = require('./authn/password_handler');
+const addPasswordHandlersToDef = function(authDef) {
+  let authUserSchema, authPasswordField;
+  if (!authDef.authn ) {
+    throw Error("addPasswordHandlersToDef: authn not defined for the schema.");
+  }
+  authUserSchema = authDef.authn.authUserSchema;
+  authPasswordField = authDef.authn.authPasswordField;
+
+  //add password handler for the default auth account schema
+  authDef.schemas[authUserSchema].schema = addPasswordHandlers(authDef.schemas[authUserSchema].schema, authPasswordField);
+}
 
 const restController = meanRestExpress.restController;
 
 //authentication
 const GetAuthnRouter = require('./authn/router')  //a function, input is the schema definition, return router
-const authUserDef = require('./authn/model') //default auth user schema definition
+const authUserDef = require('./authn/model.user') //default auth user schema definition
+const authAccountDef = require('./authn/model.account');
+addPasswordHandlersToDef(authUserDef);
+addPasswordHandlersToDef(authAccountDef);
 
-//add password handler for the default auth user schema
-let {authUserSchema, authPasswordField} = authUserDef.authn;
-authUserDef.schemas[authUserSchema].schema = addPasswordHandlers(authUserDef.schemas[authUserSchema].schema, authPasswordField);
+module.exports.authUserDef = authUserDef;
+module.exports.authAccountDef = authAccountDef;
 
 //authorization
-const GetAuthzDef = require('./authz/model')  //a function, input is the user schema, return authz sys def.
-const authzDef = GetAuthzDef(authUserSchema, authUserDef.schemas[authUserSchema]); //default authz sys def, with default auth user schema
+const GetAuthzDef = require('./authz/model.role');
+let accScmName = authAccountDef.authn.authUserSchema;
+const authzDef = GetAuthzDef(accScmName, authAccountDef.schemas[accScmName]);
+
+const AuthzController = require('./authz/controller');
+let getAccountRoles = AuthzController.getAccountRoles
+
+module.exports.authzDef = authzDef;
 
 //authentication
-module.exports.GetAuthnRouter = GetAuthnRouter;
-module.exports.GetDefaultAuthnRouter = function() {
-  return GetAuthnRouter(authUserDef);
+module.exports.GetDefaultAuthnRouter = function(authDef, withRoles) {
+  if (withRoles) return GetAuthnRouter(authDef, getAccountRoles);
+  return GetAuthnRouter(authDef);
 }
-//used to manage the user profiles
-module.exports.GetDefaultUserRouter = function(authAppConfig) {
-  return meanRestExpress.RestRouter(authUserDef, 'Users', authAppConfig);
-}
+
 //used to manage the user authorizations
-module.exports.GetDefaultAuthzRouter =  function(authAppConfig) {
-  const authzRouter =  meanRestExpress.RestRouter(authzDef, 'Roles', authAppConfig);
+module.exports.GetDefaultAuthzRouter =  function(authAppFuncs) {
+  const authzRouter =  meanRestExpress.RestRouter(authzDef, 'Roles', authAppFuncs);
   
   function modelExecuteSuccess(taskStr) {
     function doSomething(result) {
@@ -97,16 +113,16 @@ module.exports.GetDefaultAuthzRouter =  function(authAppConfig) {
               {role: adminRoleId, module: allModuleId, modulePermission: "CRUD"}//document
           ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
     }    
-    takInfo = 'create "admin" user with initial password "adminPassword"...';
+    takInfo = 'create "admin" account with initial password "adminPassword"...';
     await restController.ModelExecute(
-            "muser",
+            "maccount",
             "create",
             {username: 'admin', password: 'adminPassword'} //document
         ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
     let adminUserId;
-    takInfo = 'get "admin" user information...';
+    takInfo = 'get "admin" account information...';
     await restController.ModelExecute(
-            "muser",
+            "maccount",
             "findOne",
             {username: "admin"}//search criteria
         ).then(function(result) {
@@ -114,11 +130,11 @@ module.exports.GetDefaultAuthzRouter =  function(authAppConfig) {
           }, 
           modelExecuteError(takInfo));
     if (adminRoleId && adminUserId) {
-      takInfo = 'insert "admin" user with "Administrator" role...';
+      takInfo = 'insert "admin" account with "Administrator" role...';
       restController.ModelExecute(
-              "muserrole",
+              "maccountrole",
               "create",
-              {user: adminUserId, role: [adminRoleId] } //document
+              {account: adminUserId, role: [adminRoleId] } //document
           ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
     }    
 
@@ -127,6 +143,7 @@ module.exports.GetDefaultAuthzRouter =  function(authAppConfig) {
     //1. "Anyone" user role
     //2. "LoginUserOwn" user role
     //3. "LoginUserOthers" user role    
+    /*
     takInfo = 'create "Anyone" role ...';
     await restController.ModelExecute(
             "mrole",
@@ -145,7 +162,7 @@ module.exports.GetDefaultAuthzRouter =  function(authAppConfig) {
             "create",
             {role: 'LoginUserOthers', description: 'Any login user, when trying to manage other user\'s resource'} //document
         ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
-        
+    */
   }
   
   runDB();

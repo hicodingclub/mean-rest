@@ -2,8 +2,9 @@ const express = require('express');
 
 const AuthnController = require('./controller')
 
-const AuthnRouter = function(sysDef) {
-  const authn = sysDef.authn || {};
+const AuthnRouter = function(userDef, getUserRoleFunc) {
+  let authModelCreated = false; 
+  const authn = userDef.authn || {};
   let authUserFields = "username";
   if ("authUserFields" in authn) {
     authUserFields = authn["authUserFields"];
@@ -17,48 +18,53 @@ const AuthnRouter = function(sysDef) {
     authSchemaName = authn["authUserSchema"];
   }
 
-  let schemas = sysDef.schemas;
+  let schemas = userDef.schemas;
   for (let schemaName in schemas) {
     let schemaDef = schemas[schemaName];
     //schemaDef.views in [briefView, detailView, CreateView, EditView, SearchView] sequence
 
     if (schemaName == authSchemaName) {
       let schm = schemaDef.schema;
-      AuthnController.registerAuth(authSchemaName, schemaDef.schema, authUserFields, authPasswordField);
+      AuthnController.registerAuth(authSchemaName, schemaDef.schema, 
+              authUserFields, authPasswordField);
+      authModelCreated = true;
       break;
     }
   }
   
-  //let expressRouter = meanRestExpressRouter(sysDef);
   let expressRouter = express.Router();
+  let setSchemaName = function(req, res, next) {
+    req.authSchemaName = authSchemaName;
+    next();
+  }
+  
+  let roleFunc = function(req, res, next) {
+    if (getUserRoleFunc) getUserRoleFunc(req, res, next);
+    else next();
+  }
 
-  if (!!authSchemaName) {
+  if (authModelCreated) {
     expressRouter.post(
       "/login", 
-      (req, res, next) => {
-        AuthnController.authLogin(req, res, next);
-      },
-      (req, res, next) => {
-        AuthnController.generateToken(req, res, next);
-      }
+      setSchemaName,
+      AuthnController.authLogin,
+      roleFunc,
+      AuthnController.generateToken
     );
 
     expressRouter.post(
-      "/refresh", 
-      (req, res, next) => {
-        AuthnController.verifyRefreshToken(req, res, next);
-      },
-      (req, res, next) => {
-        AuthnController.authRefresh(req, res, next);
-      },
-      (req, res, next) => {
-        AuthnController.generateToken(req, res, next);
-      }
+      "/refresh",
+      setSchemaName,
+      AuthnController.verifyRefreshToken,
+      AuthnController.authRefresh,
+      roleFunc,
+      AuthnController.generateToken
     );
 
-    expressRouter.post("/register", (req, res, next) => {
-      AuthnController.authRegister(req, res, next);
-    });
+    expressRouter.post("/register",
+      setSchemaName,
+      AuthnController.authRegister
+    );
     //expressRouter = util.moveRouterStackTailToHead(expressRouter, 3);
     
     //not supported api
