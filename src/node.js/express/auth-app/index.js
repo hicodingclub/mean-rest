@@ -118,9 +118,11 @@ const downloadRolesAndPermissionsLocal = async function() {
       takInfo = `get "${m}" module permisions...`;
       await restController.ModelExecute2(
               "mpermission",
-              {'find': [{module: mModuleId}], //search criteria
-               'populate': ['role', 'role'] //return role name for the role reference.
-              }
+              [
+                ['find', [{module: mModuleId}]], //search criteria
+                ['populate', ['role', 'role']], //return role name for the role reference.
+                ['populate', ['module', 'module']] //return module name for the role reference.
+              ]
           ).then(function(result) {
               if (result) {
                 modulePermissions[m] = result;

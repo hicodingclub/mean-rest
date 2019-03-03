@@ -127,7 +127,8 @@ const createError = require('http-errors');
 const getPermission = function(permissions, identity, schemaName) {
   let perm;
   for (let p of permissions) {
-    if (p.role.role == identity) {
+    if (!p.role) continue; //ignore bad permission
+    if (p.role.role == identity || p.role['_id'] == identity) {
       perm = p;
       break;
     }
@@ -159,7 +160,11 @@ const getPermission = function(permissions, identity, schemaName) {
 
 const verifyPermission = function(req, res, next) {
   const loggedIn = !!req.muser
-
+  
+  if (loggedIn && req.muser.role) {
+    return next();  //now allow any role
+  } 
+  
   let schemaName = req.meanRestSchemaName;
 
   let httpOperation = req.method;
@@ -180,54 +185,55 @@ const verifyPermission = function(req, res, next) {
     else operation = 'U';
   }
   //mddsPermission is set by restRouter before authorization (rest_router.js)
-  let mddsPermissions = req.mddsPermission? req.mddsPermission : [];
-  let anyonePermission = getPermission(mddsPermissions, 'Anyone', schemaName);
-  let loginOwnPermission = getPermission(mddsPermissions, "LoginUserOwn", schemaName);
-  let loginOthersPermission = getPermission(mddsPermissions, "LoginUserOthers", schemaName);
+  let mddsModulePermissions = req.mddsPermission? req.mddsPermission : [];
+  let mddsAllModulePermissions = [];
+  let anyonePermission = getPermission(mddsModulePermissions, 'Anyone', schemaName, mddsAllModulePermissions);
+  let loginOwnPermission = getPermission(mddsModulePermissions, "LoginUserOwn", schemaName, mddsAllModulePermissions);
+  let loginOthersPermission = getPermission(mddsModulePermissions, "LoginUserOthers", schemaName, mddsAllModulePermissions);
   
   let permission = "N";
 
   if (typeof anyonePermission === 'undefined' &&
           typeof loginOwnPermission == 'undefined' &&
-          typeof loginOthersPermission === 'undefined') {
+          typeof loginOthersPermission === 'undefined') { //[0, 0, 0]
     //not permitted
     permission = "N";
   } else if (typeof loginOwnPermission == 'undefined' &&
-          typeof loginOthersPermission === 'undefined') {
+          typeof loginOthersPermission === 'undefined') { //only anyone defined [1, 0, 0]
     permission = anyonePermission;
-  } else if (typeof anyonePermission == 'undefined') {
-    if (loggedIn) { permission = loginOthersPermission;}
+  } else if (typeof anyonePermission == 'undefined') { // any one undefined, one of login permissions defined. [0, 1, 0], [0, 1, 0], [0, 1, 1]
+    if (loggedIn) { permission = loginOthersPermission ? loginOthersPermission : 'N';}
     else permission = "N"; //not permitted
-  } else {
-    if (loggedIn) { permission = loginOthersPermission;}
+  } else { //anyone defined, and one of login defined [1, 1, 0], [1, 0, 1], [1, 1, 1] 
+    if (loggedIn) { permission = loginOthersPermission ? loginOthersPermission : 'N';}
     else permission = anyonePermission;
   }
 
-  let permitted = false;
   if (permission.includes(operation)) {
-    permitted = true;
-  } else if (loggedIn) {
-    if (typeof loginOthersPermission == 'undefined' || !loginOthersPermission.includes(operation)) {
-      permitted = false;
-    } else {
-      req.loginOwnPermission = loginOwnPermission;
-      req.permissionOperation = operation;
-      return next();  //have to be resolved in controller based on the owner of record
-    }
-  }
-
-  if (permitted) {
     return next();
   } 
+  
   if (!loggedIn) {
     return next(createError(401, "Not Authorized.")); //ask for login
   }
-  let role;
-  if (req.muser) {
-    role = req.muser.role; //[] array, list of role Ids.
+  
+  if (req.muser.role) {
+    for (let r of role) {
+      let rolePermission = getPermission(mddsModulePermissions, r, schemaName, mddsAllModulePermissions);
+      if (rolePermission) {
+        if (rolePermission.includes(operation)) return next();  //any role permits the operation
+      }
+    }
   }
 
-  return next(createError(403, "Forbidden.")); 
+  //check if need own resource resolution
+  if ( !loginOthersPermission || !loginOthersPermission.includes(operation)) {
+    return next(createError(403, "Forbidden."));
+  } 
+  
+  req.loginOwnPermission = loginOwnPermission;
+  req.permissionOperation = operation;
+  return next();  //have to be resolved in controller based on the owner of record
 }
 
 module.exports = verifyPermission;
