@@ -17,7 +17,7 @@ AuthzController.getAccountRoles = function(req, res, next) {
   restController.ModelExecute(
           "maccountrole",
           'findOne',
-          {user: userId} //search criteria
+          {account: userId} //search criteria
       ).then(
         function(result) {
           if (result) { //role defined for the user

@@ -77,7 +77,7 @@ const authz = { //only users with permission can see this module
   "module-authz": {"LoginUser": {"others": "", "own": ""}, "Anyone": ""},
 }
 
-const GetAuthzDef = function(userSchemaName, userSchema) {
+const GetAuthzModuleDef = function(userSchemaName, userSchema) {
   schemas[userSchemaName] = userSchema;
   
   //define account<->role schema
@@ -103,4 +103,4 @@ const GetAuthzDef = function(userSchemaName, userSchema) {
   return {schemas: schemas, config: config, authz: authz};
 }
 
-module.exports = GetAuthzDef;
+module.exports = GetAuthzModuleDef;

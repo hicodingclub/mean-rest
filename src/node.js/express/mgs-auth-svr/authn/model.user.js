@@ -64,8 +64,8 @@ const authn = {
 }
 
 const authz = {
-  "module-authz": {"LoginUser": {"others": "CRUD", "own": "CRUD"}, "Anyone": ""},
-  "muser": {"LoginUser": {"others": "CRUD", "own": "CRUD"}, "Anyone": ""}
+  "module-authz": {"LoginUser": {"others": "", "own": "RU"}, "Anyone": ""},
+  "muser": {"LoginUser": {"others": "", "own": "RU"}, "Anyone": ""}
 }
 
 module.exports = {schemas: schemas, config: config, authn: authn, authz: authz}
