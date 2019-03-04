@@ -34,7 +34,7 @@
 			</div>
 			<div class="col-3">
 				<div class="total_counts">
-					Total: <b>{{total_count}}</b> items 
-					<a class="float-right" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a>
+					Total: <b>{{total_count}}</b> items <%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {%>
+					<a class="float-right" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a><% } %>
 				</div>
 			</div>			

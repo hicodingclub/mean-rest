@@ -16,7 +16,7 @@
 
 
 		<hr/>
-		<div class="row"><% include schema-list.pagination.html %>
+		<div class="row"><%_ let showRefreshIcon = true;%><% include schema-list.pagination.html %>
 		</div>
 	</div>
 	
@@ -50,7 +50,7 @@
 	</table>
 	
 	<div class="container">
-		<div class="row"><% include schema-list.pagination.html %>
+		<div class="row"><%_ showRefreshIcon = false;%><% include schema-list.pagination.html %>
 		</div>
 	</div>
 	

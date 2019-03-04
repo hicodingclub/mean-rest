@@ -72,6 +72,8 @@ export class BaseComponent implements BaseComponentInterface {
     protected itemName: string;
     protected parentItem: string;
   
+    protected refreshing: boolean = false;
+  
     protected commonService: MraCommonService;
 
     constructor(
@@ -91,6 +93,9 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     protected onServiceError(error:ServiceError):void {
+        //clear any pending flags
+        this.refreshing = false;
+      
         let errMsg:string;
         let more:string;
         if (error.clientErrorMsg) {
@@ -634,6 +639,14 @@ export class BaseComponent implements BaseComponentInterface {
             if (action == 'edit') {
               this.extraInfoPopulate();//collect other info required for edit view
             }
+            if (this.refreshing) {
+              this.refreshing = false;
+              let snackBarConfig: SnackBarConfig = {
+                  content: "Detail refreshed"
+              }
+              let snackBar = new SnackBar(snackBarConfig);
+              snackBar.show();
+            }
         },
         this.onServiceError
       );
@@ -847,6 +860,16 @@ export class BaseComponent implements BaseComponentInterface {
             this.checkedItem = 
                 Array.apply(null, Array(this.list.length)).map(Boolean.prototype.valueOf,false);
             this.checkAll = false;
+            
+            if (this.refreshing) {
+              this.refreshing = false;
+              let snackBarConfig: SnackBarConfig = {
+                  content: "List refreshed"
+              }
+              let snackBar = new SnackBar(snackBarConfig);
+              snackBar.show();
+            }
+            
           },
           this.onServiceError
         );
@@ -856,8 +879,10 @@ export class BaseComponent implements BaseComponentInterface {
     /*UI operations handlers*/
     public onRefresh():void {
         if (this.view == ViewType.LIST) {
+          this.refreshing = true;
           this.populateList();
         } else if (this.view == ViewType.DETAIL) {
+          this.refreshing = true;
           if (!this.id) this.id = this.route.snapshot.paramMap.get('id');
           if (this.id) this.populateDetail(this.id);
           else console.error("Routing error for detail view... no id...");
