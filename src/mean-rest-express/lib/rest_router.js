@@ -35,7 +35,10 @@ var processViewStr = function(viewStr) {
 
 const _setModuleAuthz = function(moduleName) {
   return function(req, res, next) {
-    req.mddsPermission = RestController.getPermission(moduleName);
+    req.mddsModulePermissions = RestController.getPermission(moduleName);
+    req.mddsAllModulePermissions = RestController.getPermission("All Modules");
+    req.mddsModuleAccesses = RestController.getAccess(moduleName);
+    req.mddsAllModuleAccesses = RestController.getAccess("All Modules");
     next();
   }
 }

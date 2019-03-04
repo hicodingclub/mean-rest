@@ -1,12 +1,13 @@
 const createError = require('http-errors');
-const getPermissionFromAuthz = require('./authz_util')
+const getPermissionFromAuthz = require('./authz_util');
 
 const schema_collection = {};
 const views_collection = {}; //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 const model_collection = {};
 const populate_collection = {};
 const system_modules = {}; //{'moduleName': [resource1, resource2...]}
-const permission_collection = {}; //{'moduleName': {"module-authz": {"LoginUser": {"others": "CRUD", "own": "CURD"}, "Anyone": ""}}}
+const permission_collection = {}; 
+const access_collection = {}; 
 const auth = {};
 
 const loadContextVarsByName = function(name) {
@@ -16,7 +17,7 @@ const loadContextVarsByName = function(name) {
   let populates = populate_collection[name];
   if (!schema || !model || !views || !populates) throw(createError(500, "Cannot load context from name " + name))
   return {name: name, schema: schema, model: model, views: views, populates: populates};
-}
+};
 
 const loadContextVars = function(req) {
   //let url = req.originalUrl
@@ -26,7 +27,7 @@ const loadContextVars = function(req) {
 
   let name = req.meanRestSchemaName.toLowerCase();
   return loadContextVarsByName(name);
-}
+};
 
 const createRegex = function(obj) {
   //obj in {key: string} format
@@ -39,7 +40,7 @@ const createRegex = function(obj) {
       'i');
   }
   return obj;
-}
+};
 
 const checkAndSetValue = function(obj, schema) {
   //obj in {item: value} format
@@ -85,7 +86,7 @@ const checkAndSetValue = function(obj, schema) {
     }
   }
   return obj;
-}
+};
 
 const getViewPopulates = function(schema, viewStr) {
 	
@@ -113,14 +114,14 @@ const getViewPopulates = function(schema, viewStr) {
 		}
 	});
 	return populates;
-}
+};
 
 const getPopulatesRefFields = function(ref) {
 	let views = views_collection[ref.toLowerCase()]; //view registered with lowerCase
 	if (!views) return null;
 	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 	return views[5]; //indexView
-}
+};
 
 const fieldReducerForRef = function(refObj, indexField) {
   let newRefObj = {};
@@ -131,7 +132,7 @@ const fieldReducerForRef = function(refObj, indexField) {
       newRefObj[indexField] = refObj[indexField];
   }
   return newRefObj;
-}
+};
 
 const objectReducerForRef = function(obj, populateMap) {
     if (typeof obj !== 'object' || obj == null) {
@@ -155,7 +156,7 @@ const objectReducerForRef = function(obj, populateMap) {
         obj[path] = newRefObj;
     }
     return obj;
-}
+};
 
 const resultReducerForRef = function (result, populateMap) {
     if (Object.keys(populateMap).length == 0) {
@@ -171,7 +172,7 @@ const resultReducerForRef = function (result, populateMap) {
         result = objectReducerForRef(result, populateMap);
     }
     return result;
-}
+};
 
 const objectReducerForView  = function(obj, viewStr) {
   //console.log("***obj: ", obj);
@@ -190,7 +191,7 @@ const objectReducerForView  = function(obj, viewStr) {
     }
     //console.log("***newObj: ", newObj);
     return newObj;
-}
+};
 
 const resultReducerForView = function (result, viewStr) {
     if (!viewStr) {
@@ -206,7 +207,7 @@ const resultReducerForView = function (result, viewStr) {
         result = objectReducerForView(result, viewStr);
     }
     return result;
-}
+};
 
 let RestController = function() {}
 
@@ -227,7 +228,9 @@ RestController.register = function(schemaName, schema, views, model, moduleName)
 	}
 	if (moduleName) {
 	  if (moduleName in system_modules) {
-	    system_modules[moduleName].push(schemaName);
+	    if (!system_modules[moduleName].includes(schemaName)) {
+	      system_modules[moduleName].push(schemaName);
+	    }
 	  } else {
       system_modules[moduleName] = [schemaName];
 	  }
@@ -239,7 +242,7 @@ RestController.getAllModules = function() {
 };
 
 RestController.registerAuthz = function(moduleName, authz) {
-  permission_collection[moduleName] = getPermissionFromAuthz(authz);
+  access_collection[moduleName] = getPermissionFromAuthz(authz);
 };
 
 RestController.getPermission = function(moduleName) {
@@ -250,11 +253,20 @@ RestController.setPermissions = function(modulePermissions) {
   for (let moduleName in modulePermissions) {
     permission_collection[moduleName] = modulePermissions[moduleName];
   }
-}
+};
+RestController.getAccess = function(moduleName) {
+  return access_collection[moduleName];
+};
+
+RestController.setAccesses = function(modulePermissions) {
+  for (let moduleName in modulePermissions) {
+    access_collection[moduleName] = modulePermissions[moduleName];
+  }
+};
 
 RestController.getAll = function(req, res, next) {
 	return RestController.searchAll(req, res, next, {});
-}
+};
 
 RestController.searchAll = function(req, res, next, searchContext) {
   let {name: name, schema: schema, model: model, views: views, populates:populates} 
@@ -436,7 +448,7 @@ RestController.PostActions = function(req, res, next) {
     default:
     	return next(createError(404, "Bad Action: " + action));
 	}
-}
+};
 
 RestController.deleteManyByIds = function(req, res, next, ids) {
 	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req);
@@ -527,7 +539,7 @@ RestController.ModelExecute = function(modelName, apiName, ...params) {
   let dbExe = model[apiName].apply(model, params);
   
   return dbExe.exec();
-}
+};
 
 RestController.ModelExecute2 = function(modelName, apis) {
   let model = model_collection[modelName];
@@ -553,6 +565,6 @@ RestController.ModelExecute2 = function(modelName, apis) {
   }
   
   return dbExe.exec();
-}
+};
 
 module.exports = RestController;

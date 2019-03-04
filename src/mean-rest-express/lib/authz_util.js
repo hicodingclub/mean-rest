@@ -7,12 +7,18 @@ const getAuthzByIdentity = function(identity, authz) {
         }
     */
   function getLoginUserAuthz(key, authObj) {
-    if (typeof authObj == 'string') return authObj;
+    if (typeof authObj == 'string') {
+      if (key == 'own') { //same for 'own' and 'others'. let 'others' take effect
+        return undefined;
+      } else {
+        return authObj;
+      }
+    }
     else if (typeof authObj == 'object') return authObj[key];
     return undefined;
   }
   let az = {
-      'role': {'role': identity},
+      'group': {'group': identity},
       'modulePermission': undefined,
       'resourcePermission': {}
   };
