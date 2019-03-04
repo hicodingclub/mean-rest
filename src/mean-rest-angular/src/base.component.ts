@@ -854,6 +854,16 @@ export class BaseComponent implements BaseComponentInterface {
     
     
     /*UI operations handlers*/
+    public onRefresh():void {
+        if (this.view == ViewType.LIST) {
+          this.populateList();
+        } else if (this.view == ViewType.DETAIL) {
+          if (!this.id) this.id = this.route.snapshot.paramMap.get('id');
+          if (this.id) this.populateDetail(this.id);
+          else console.error("Routing error for detail view... no id...");
+        }
+    }
+    
     public onCheckAllChange():void {
         this.checkedItem = 
              Array.apply(null, Array(this.list.length)).

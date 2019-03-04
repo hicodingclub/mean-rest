@@ -9,7 +9,9 @@
 	
 	<div class="card text-left">
 	  <div class="card-body">
-	    <h4 class="card-title">{{ItemCamelName}} Detail</h4>    
+	    <h4 class="card-title">{{ItemCamelName}} Detail
+	    	<a class="float-right" style="font-size: 1rem;" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a>
+	    </h4>    
 		<div class="card-text">
 <%_ let view = "detail"; let viewGrp = detailViewGrp; %><%_ include schema-display.group.html %>
 		</div>
