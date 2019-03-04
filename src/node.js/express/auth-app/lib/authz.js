@@ -123,18 +123,7 @@ const createError = require('http-errors');
   Result: W permitted.
 
 */
-
-const getPermission = function(permissions, identity, schemaName) {
-  let perm;
-  for (let p of permissions) {
-    if (!p.role) continue; //ignore bad permission
-    if (p.role.role == identity || p.role['_id'] == identity) {
-      perm = p;
-      break;
-    }
-  }
-  if (!perm) return undefined; //not defined
-  
+const getSchemaPermission = function(perm, schemaName) {
   let resourcePermission = {};
   if (perm['resourcePermission'] instanceof Map) {
     //convert Map to object.
@@ -157,16 +146,44 @@ const getPermission = function(permissions, identity, schemaName) {
   }
   return undefined;
 }
-
-const verifyPermission = function(req, res, next) {
-  const loggedIn = !!req.muser
+const getPermission = function(permissions, permType, identity, schemaName, allModulePermissions) {
+  //permType: role, group
+  let mperm;
+  for (let p of permissions) {
+    if (!p[permType]) continue; //ignore bad permission
+    if (p[permType][permType] == identity || p[permType]['_id'] == identity) {
+      mperm = p;
+      break;
+    }
+  }
   
-  if (loggedIn && req.muser.role) {
-    return next();  //now allow any role
-  } 
+  let permission;
+  if (mperm) {
+    permission = getSchemaPermission(mperm, schemaName)
+  }
   
-  let schemaName = req.meanRestSchemaName;
+  if (permission) return permission;
+  
+  //if not defined in module permission, check the allModulue permission for this role
+  let allperm;
+  for (let p of allModulePermissions) {
+    if (!p[permType]) continue; //ignore bad permission
+    if (p[permType][permType] == identity || p[permType]['_id'] == identity) {
+      allperm = p;
+      break;
+    }
+  }
+  
+  let allpermission;
+  if (allperm) {
+    allpermission = getSchemaPermission(allperm, schemaName)
+  }
+  
+  return allpermission; //undefined, or defined.
+};
 
+//Check restControllers for all supported operations
+const getOperation = function(req) {
   let httpOperation = req.method;
   let action;
   if (req.query) {
@@ -184,12 +201,63 @@ const verifyPermission = function(req, res, next) {
     else if (action && action == "Search") operation = 'R';
     else operation = 'U';
   }
+  return operation;
+}
+
+
+const verifyRolePermission = function(req, res, next) {
+  let schemaName = req.meanRestSchemaName;
+  //console.log("***schemaName", schemaName)  
+  let operation = getOperation(req);
+  
+  let roles = req.muser.role; //[] list of role ids
+  
+  let roleDisallow = false;
+  let mddsModulePermissions = req.mddsModulePermissions? req.mddsModulePermissions : [];
+  let mddsAllModulePermissions = req.mddsAllModulePermissions? req.mddsAllModulePermissions : [];
+  //console.log("***mddsModulePermissions", mddsModulePermissions)  
+  //console.log("***mddsAllModulePermissions", mddsAllModulePermissions)  
+  for (let rId of roles) {
+    //mddsPermission is set by restRouter before authorization (rest_router.js)
+    let rolePermission = getPermission(mddsModulePermissions, 'role', rId, schemaName, mddsAllModulePermissions);
+    
+    if (rolePermission && rolePermission.includes(operation)) { //any role allows it
+      return next();
+    }
+    if (rolePermission) roleDisallow = true; //disallowed by any least one row.
+  }
+
+  if (roleDisallow) {
+    return next(createError(403, "Forbidden."));
+  }
+  
+  let loginPermission = getPermission(mddsModulePermissions, 'role', "LoginUser", schemaName, mddsAllModulePermissions);
+
+  if (loginPermission && loginPermission.includes(operation)) {
+    return next(); //allowed by allModulePermission
+  }
+
+  return next(createError(403, "Forbidden."));
+}
+
+
+const verifyPermission = function(req, res, next) {
+  const loggedIn = !!req.muser
+  //console.log("***req.muser", req.muser)
+    
+  if (loggedIn && req.muser.role) {
+    return verifyRolePermission(req, res, next); //use role based permission
+  } 
+  
+  let schemaName = req.meanRestSchemaName;
+  let operation = getOperation(req);
+  
   //mddsPermission is set by restRouter before authorization (rest_router.js)
-  let mddsModulePermissions = req.mddsPermission? req.mddsPermission : [];
-  let mddsAllModulePermissions = [];
-  let anyonePermission = getPermission(mddsModulePermissions, 'Anyone', schemaName, mddsAllModulePermissions);
-  let loginOwnPermission = getPermission(mddsModulePermissions, "LoginUserOwn", schemaName, mddsAllModulePermissions);
-  let loginOthersPermission = getPermission(mddsModulePermissions, "LoginUserOthers", schemaName, mddsAllModulePermissions);
+  let mddsModuleAccesses = req.mddsModuleAccesses? req.mddsModuleAccesses : [];
+  let mddsAllModuleAccesses = req.mddsAllModuleAccesses? req.mddsAllModuleAccesses : [];
+  let anyonePermission = getPermission(mddsModuleAccesses, 'group', 'Anyone', schemaName, mddsAllModuleAccesses);
+  let loginOwnPermission = getPermission(mddsModuleAccesses, 'group', "LoginUserOwn", schemaName, mddsAllModuleAccesses);
+  let loginOthersPermission = getPermission(mddsModuleAccesses, 'group', "LoginUserOthers", schemaName, mddsAllModuleAccesses);
   
   let permission = "N";
 
@@ -216,18 +284,9 @@ const verifyPermission = function(req, res, next) {
   if (!loggedIn) {
     return next(createError(401, "Not Authorized.")); //ask for login
   }
-  
-  if (req.muser.role) {
-    for (let r of role) {
-      let rolePermission = getPermission(mddsModulePermissions, r, schemaName, mddsAllModulePermissions);
-      if (rolePermission) {
-        if (rolePermission.includes(operation)) return next();  //any role permits the operation
-      }
-    }
-  }
 
   //check if need own resource resolution
-  if ( !loginOthersPermission || !loginOthersPermission.includes(operation)) {
+  if ( !loginOwnPermission || !loginOwnPermission.includes(operation)) {
     return next(createError(403, "Forbidden."));
   } 
   
