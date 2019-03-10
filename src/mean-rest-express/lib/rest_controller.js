@@ -1,14 +1,9 @@
 const createError = require('http-errors');
-const getPermissionFromAuthz = require('./authz_util');
 
 const schema_collection = {};
 const views_collection = {}; //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 const model_collection = {};
 const populate_collection = {};
-const system_modules = {}; //{'moduleName': [resource1, resource2...]}
-const permission_collection = {}; 
-const access_collection = {}; 
-const auth = {};
 
 const loadContextVarsByName = function(name) {
   let schema = schema_collection[name];
@@ -226,42 +221,6 @@ RestController.register = function(schemaName, schema, views, model, moduleName)
 			briefView: getViewPopulates(schema, views[0]),
 			detailView: getViewPopulates(schema, views[1])
 	}
-	if (moduleName) {
-	  if (moduleName in system_modules) {
-	    if (!system_modules[moduleName].includes(schemaName)) {
-	      system_modules[moduleName].push(schemaName);
-	    }
-	  } else {
-      system_modules[moduleName] = [schemaName];
-	  }
-	}
-};
-
-RestController.getAllModules = function() {
-  return system_modules;
-};
-
-RestController.registerAuthz = function(moduleName, authz) {
-  access_collection[moduleName] = getPermissionFromAuthz(authz);
-};
-
-RestController.getPermission = function(moduleName) {
-  return permission_collection[moduleName];
-};
-
-RestController.setPermissions = function(modulePermissions) {
-  for (let moduleName in modulePermissions) {
-    permission_collection[moduleName] = modulePermissions[moduleName];
-  }
-};
-RestController.getAccess = function(moduleName) {
-  return access_collection[moduleName];
-};
-
-RestController.setAccesses = function(modulePermissions) {
-  for (let moduleName in modulePermissions) {
-    access_collection[moduleName] = modulePermissions[moduleName];
-  }
 };
 
 RestController.getAll = function(req, res, next) {

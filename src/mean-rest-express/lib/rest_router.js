@@ -32,37 +32,29 @@ var processViewStr = function(viewStr) {
   return viewStr;
 }
 
-
-const _setModuleAuthz = function(moduleName) {
-  return function(req, res, next) {
-    req.mddsModulePermissions = RestController.getPermission(moduleName);
-    req.mddsAllModulePermissions = RestController.getPermission("All Modules");
-    req.mddsModuleAccesses = RestController.getAccess(moduleName);
-    req.mddsAllModuleAccesses = RestController.getAccess("All Modules");
-    next();
-  }
-}
 const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
   let expressRouter = express.Router();
   if (!moduleName) moduleName = randomString(10);
 
-  if (!sysDef.authz) sysDef.authz = {};
-  RestController.registerAuthz(moduleName, sysDef.authz);
-  
-  let setModuleAuthz = _setModuleAuthz(moduleName);
-  expressRouter.use(setModuleAuthz); 
-  
-
-  let schemas = sysDef.schemas;
-  
   let authzFunc;
+  let permissionStore;
   if (authConfig) {
     let authnFunc = authConfig.authnFunc;
     if (authnFunc) expressRouter.use(authnFunc);
 
     authzFunc = authConfig.authzFunc;
+    permissionStore = authConfig.permissionStore;
+    
+    if (!sysDef.authz) sysDef.authz = {};
+    permissionStore.registerAuthz(moduleName, sysDef.authz);
+
+    let setPermissionFunc = authConfig.setPermissionFunc;    
+    let setModuleAuthz = setPermissionFunc(moduleName);
+    expressRouter.use(setModuleAuthz); 
   }
+  
   //console.log("*******sysDef", sysDef)
+  let schemas = sysDef.schemas;
 
   let sub_routes = [];
   for (let schemaName in schemas) {
@@ -83,6 +75,9 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     }
     //pass pure view string to register.
     RestController.register(schemaName, schemaDef.schema, views, model, moduleName);
+    if (permissionStore) {
+      permissionStore.registerResource(permissionStore, moduleName);
+    }
   }
   
   for (let schemaName in schemas) {
