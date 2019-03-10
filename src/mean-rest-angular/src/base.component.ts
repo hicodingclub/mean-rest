@@ -1,5 +1,6 @@
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { Injector } from '@angular/core';
+import { Injector, EventEmitter } from '@angular/core';
+
 import { Location } from '@angular/common';
 
 import { Observable } from 'rxjs';
@@ -31,6 +32,7 @@ export class BaseComponent implements BaseComponentInterface {
     protected list:any[] = [];
         
     protected majorUi = true;
+    protected eventEmitter: EventEmitter<boolean> = new EventEmitter();
     
     protected page: number = 1;
     protected per_page: number = 25;
@@ -827,7 +829,7 @@ export class BaseComponent implements BaseComponentInterface {
         if (detail) this.detail = detail;
     }
     
-    protected populateList():void {
+    protected populateList():EventEmitter<boolean> {
         //First let's handle page
         let new_page;
         let searchContext, searchText;
@@ -869,10 +871,11 @@ export class BaseComponent implements BaseComponentInterface {
               let snackBar = new SnackBar(snackBarConfig);
               snackBar.show();
             }
-            
+            this.eventEmitter.emit(true);
           },
           this.onServiceError
         );
+      return this.eventEmitter;
     }
     
     
