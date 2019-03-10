@@ -1,5 +1,6 @@
 const meanRestExpress = require('mean-rest-express')
 const restController = meanRestExpress.restController;
+const permissionStore = require('./lib/permission.store');
 
 const publicModuleIds = {};
 
@@ -42,7 +43,7 @@ const uploadPublicModulesAndAccessLocal = async function(publicModules) {
           modelExecuteError1(takInfo));
     userGroupIds[ar] = rId;
   }
-  let modules = restController.getAllModules();
+  let modules = permissionStore.getAllModules();
   for (let m in modules) { //{'moduleName': [resource1, resource2...]}
     if (publicModules && !publicModules.includes(m)) continue; //modules not managed by this app
     
@@ -67,7 +68,7 @@ const uploadPublicModulesAndAccessLocal = async function(publicModules) {
     
     publicModuleIds[m] = mModuleId;//cached id for later use
     
-    let authz = restController.getAccess(m);
+    let authz = permissionStore.getAccess(m);
     // authz: permission array [{'group': {...}, 'modulePermission':xxx, 'resourcePermission':{...}}, ...]
     for (let ar of roleArr) {
       let rId = userGroupIds[ar];
@@ -118,7 +119,7 @@ const uploadPublicModulesAndAccessLocal = async function(publicModules) {
 }
 
 const downloadPublicGroupsAndAccessLocal = async function(publicModules) {
-  let modules = restController.getAllModules();
+  let modules = permissionStore.getAllModules();
   for (let m in modules) { //{'moduleName': [resource1, resource2...]}
     if (publicModules && !publicModules.includes(m)) continue; //modules not managed by this app
 
@@ -159,7 +160,7 @@ const downloadPublicGroupsAndAccessLocal = async function(publicModules) {
           }, 
           modelExecuteError1(takInfo));
   }
-  restController.setAccesses(publicModuleAccess);
+  permissionStore.setAccesses(publicModuleAccess);
 }
 
 function modelExecuteSuccess2(taskStr) {
@@ -180,7 +181,7 @@ function modelExecuteError2(taskStr) {
 const uploadAdminModulesLocal = async function(adminModules) {
   let takInfo;
 
-  let modules = restController.getAllModules();
+  let modules = permissionStore.getAllModules();
   for (let m in modules) { //{'moduleName': [resource1, resource2...]}
     if (adminModules && !adminModules.includes(m)) continue; //modules not managed by this app
     
@@ -217,7 +218,7 @@ const uploadAdminModulesLocal = async function(adminModules) {
 }
 
 const downloadAdminRoleAndPermissionsLocal = async function(adminModules) {
-  let modules = restController.getAllModules();
+  let modules = permissionStore.getAllModules();
   for (let m in modules) { //{'moduleName': [resource1, resource2...]}
     if (adminModules && !adminModules.includes(m)) continue; //modules not managed by this app
     
@@ -258,7 +259,7 @@ const downloadAdminRoleAndPermissionsLocal = async function(adminModules) {
           }, 
           modelExecuteError2(takInfo));
   }
-  restController.setPermissions(adminModulePermissions);
+  permissionStore.setPermissions(adminModulePermissions);
 }
 
 module.exports = {

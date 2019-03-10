@@ -2,11 +2,15 @@ const meanRestExpress = require('mean-rest-express');
 const restController = meanRestExpress.restController;
 
 const verifyToken = require('./lib/authn');
-const verifyPermission = require('./lib/authz');
+const authz = require('./lib/authz');
+
+const PermissionStore = require('./lib/permission.store');
 
 const authFuncs = {
   "authnFunc": verifyToken,
-  "authzFunc": verifyPermission
+  "authzFunc": authz.verifyPermission,
+  "setPermissionFunc": authz.setModulePermission,
+  "permissionStore": PermissionStore
 };
 
 const dbOperation = require('./defaultDbOperations');
