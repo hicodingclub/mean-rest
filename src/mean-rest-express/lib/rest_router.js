@@ -76,7 +76,7 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     //pass pure view string to register.
     RestController.register(schemaName, schemaDef.schema, views, model, moduleName);
     if (permissionStore) {
-      permissionStore.registerResource(permissionStore, moduleName);
+      permissionStore.registerResource(schemaName, moduleName);
     }
   }
   
