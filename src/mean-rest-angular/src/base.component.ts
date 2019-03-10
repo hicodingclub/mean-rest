@@ -32,7 +32,7 @@ export class BaseComponent implements BaseComponentInterface {
     protected list:any[] = [];
         
     protected majorUi = true;
-    protected eventEmitter: EventEmitter<boolean> = new EventEmitter();
+    protected eventEmitter: EventEmitter<any> = new EventEmitter();
     
     protected page: number = 1;
     protected per_page: number = 25;
@@ -625,11 +625,11 @@ export class BaseComponent implements BaseComponentInterface {
         return cpy;
     }
     
-    protected populateDetail(id: string):void {
-      this.populateDetailForAction(id, null);
+    protected populateDetail(id: string):EventEmitter<any> {
+      return this.populateDetailForAction(id, null);
     }
 
-    protected populateDetailForAction(id: string, action: string):void {
+    protected populateDetailForAction(id: string, action: string):EventEmitter<any> {
       //action: eg: action=edit  -> get detail for editing purpose 
       this.service.getDetailForAction(id, action).subscribe(
         detail => {
@@ -649,9 +649,11 @@ export class BaseComponent implements BaseComponentInterface {
               let snackBar = new SnackBar(snackBarConfig);
               snackBar.show();
             }
+            this.eventEmitter.emit(this.detail);
         },
         this.onServiceError
       );
+      return this.eventEmitter;
     }
     
 
@@ -829,7 +831,7 @@ export class BaseComponent implements BaseComponentInterface {
         if (detail) this.detail = detail;
     }
     
-    protected populateList():EventEmitter<boolean> {
+    protected populateList():EventEmitter<any> {
         //First let's handle page
         let new_page;
         let searchContext, searchText;
@@ -871,7 +873,7 @@ export class BaseComponent implements BaseComponentInterface {
               let snackBar = new SnackBar(snackBarConfig);
               snackBar.show();
             }
-            this.eventEmitter.emit(true);
+            this.eventEmitter.emit(this.list);
           },
           this.onServiceError
         );
