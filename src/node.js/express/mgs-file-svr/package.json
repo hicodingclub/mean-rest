@@ -1,0 +1,39 @@
+{
+  "name": "mdds-mongoose-express-file-server",
+  "version": "0.1.0",
+  "description": "Model Driver Development Stack - File server which stores files in MongoDB through Mongoose.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "Express",
+    "Node.js",
+    "Mongoose",
+    "File Server",
+    "Uploade"
+  ],
+  "author": "Xibin Liu",
+  "license": "MIT",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "dependencies": {
+    "express-fileupload": "^1.1.2-alpha.1"
+  },
+  "peerDependencies": {
+    "express": "^4.16.3",
+    "http-errors": "~1.6.2",
+    "mongoose": "^5.2.6"
+  },
+  "devDependencies": {
+    "express": "^4.16.3",
+    "http-errors": "~1.6.2",
+    "mongoose": "^5.2.6"
+  }
+}
