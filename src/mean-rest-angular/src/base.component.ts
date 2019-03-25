@@ -1176,13 +1176,21 @@ export class BaseComponent implements BaseComponentInterface {
     protected componentFactoryResolver: any; //injected by extended class, if needed.
     private componentSubscription
     public onRefSelect(fieldName:string) {
+        if (!this.refSelectDirective) {
+          console.warn("No reference directive for field: ", fieldName);
+          return;
+        }
         let viewContainerRef = this.refSelectDirective.viewContainerRef;
         viewContainerRef.clear();
         
+        if (!this.selectComponents[fieldName]) {
+          console.warn("No reference defined for field: ", fieldName);
+          return;
+        }
         let componentRef = this.selectComponents[fieldName]["componentRef"];
         if (!componentRef) {
             let comType = this.selectComponents[fieldName]["select-type"]
-            if (!comType) console.error("No component type found for: %s", "select-type");
+            if (!comType) console.warn("No component type found for reference field ", fieldName);
 
             let componentFactory = this.componentFactoryResolver.resolveComponentFactory(comType);
             componentRef = viewContainerRef.createComponent(componentFactory);//create and insert in one call

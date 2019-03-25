@@ -61,7 +61,7 @@ export class BaseService {
                 );
         }
         httpOptions.params = httpOptions.params.set('action', "Search");
-        return this.http.post<any>(this.serviceUrl, searchContext, httpOptions)
+        return this.http.post<any>(this.serviceUrl+ "mddsaction/get", searchContext, httpOptions)
             .pipe(
                 catchError(this.errorResponseHandler)
             );
@@ -85,10 +85,13 @@ export class BaseService {
         let httpOptions = {
           headers: new HttpHeaders({ 'Accept': 'application/json' }),
         };
+        let serviceUrl = this.serviceUrl
         if (action) {
           httpOptions['params'] = new HttpParams().set('action', action);
+          if (action == "edit") action == "post"
+          serviceUrl = serviceUrl + "mddsaction/" + action + "/";
         }
-        return this.http.get<any>(this.serviceUrl + id, httpOptions)
+        return this.http.get<any>(serviceUrl + id, httpOptions)
             .pipe(
                 map(this.formatDetail),
                 catchError(this.errorResponseHandler)
@@ -108,7 +111,7 @@ export class BaseService {
             headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
             params: new HttpParams().set('action', "DeleteManyByIds"),
         };
-        return this.http.post<any>(this.serviceUrl, ids, httpOptions)
+        return this.http.post<any>(this.serviceUrl + "mddsaction/delete", ids, httpOptions)
             .pipe(
                 catchError(this.errorResponseHandler)
             );
