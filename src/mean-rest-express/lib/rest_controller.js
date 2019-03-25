@@ -298,11 +298,11 @@ RestController.searchAll = function(req, res, next, searchContext) {
     	let dbExec = model.find(query) //return every thing for the document
             .skip(skipCount)
             .limit(__per_page)
-        for (let pi = 0; pi < populateArray.length; pi ++) {
-        	let p = populateArray[pi];
-        	//dbExec = dbExec.populate(p);
-        	dbExec = dbExec.populate(p.path); //only give the reference path. return everything
-        }
+      for (let pi = 0; pi < populateArray.length; pi ++) {
+      	let p = populateArray[pi];
+      	//dbExec = dbExec.populate(p);
+      	dbExec = dbExec.populate(p.path); //only give the reference path. return everything
+      }
     	dbExec.exec(function(err, result) {
                 if (err) return next(err);
 
@@ -325,13 +325,17 @@ RestController.getDetailsById = function(req, res, next) {
 	let {name: name, schema: schema, model: model, views: views, populates:populates} 
 			= loadContextVars(req);
 	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+	
+	/*
   let action = "";
   if (req.query) {
     action = req.query['action'];
   }
+  */
+	let originalUrl = req.originalUrl;
   
   let detailView;
-  if (action == 'edit') {
+  if (originalUrl.includes('/mddsaction/post')) {
     detailView = views[3]; //return based on edit view
   } else {
     detailView = views[1];
@@ -360,11 +364,11 @@ RestController.getDetailsById = function(req, res, next) {
         dbExec = dbExec.populate(p.path); //only give the reference path. return everything for reference
 	}
 	dbExec.exec(function (err, result) {
-        if (err) { return next(err); }
-        
-        result = JSON.parse(JSON.stringify(result));
-        result = resultReducerForRef(result, populateMap);
-        result = resultReducerForView(result, detailView);
+    if (err) { return next(err); }
+    
+    result = JSON.parse(JSON.stringify(result));
+    result = resultReducerForRef(result, populateMap);
+    result = resultReducerForView(result, detailView);
 		return res.send(result);
 	});
 };
@@ -381,26 +385,28 @@ RestController.HardDeleteById = function(req, res, next) {
 };
 
 RestController.PostActions = function(req, res, next) {	
-	let action = "";
+	/*
 	if (req.query) {
 		action = req.query['action'];
 	}
+	*/
 	
 	let body = req.body;
 	if (typeof body === "string") {
 	    try {
 	        body = JSON.parse(body);
 	    } catch(e) {
-	    	return next(createError(404, "Bad " + name + " document."));
+	    	return next(createError(400, "Bad document in body."));
 	    }
 	}
-
+	
+  let action = req.path
 	switch(action) {
-    case "DeleteManyByIds":
+    case "/mddsaction/delete":
     	let ids = body;
         RestController.deleteManyByIds(req, res, next, ids);
         break;
-    case "Search":
+    case "/mddsaction/get":
     	let searchContext = body;
     	RestController.searchAll(req, res, next, searchContext);
     	break;
