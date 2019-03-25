@@ -1,9 +1,11 @@
-const FileExpressRouter = require('./lib/file.router');
-const defaultFileModuleAuthzDef = {
-  "module-authz": {"LoginUser": {"others": "CRUD", "own": ""}, "Anyone": "R"}
-}
+const FileExpressRouter = require('./lib/router');
+const schemas = require('./model/schema');
+const sampleAdminSysDef = require('./model/sample.admin');
+const sampleUserSysDef = require('./model/sample.user');
 
 module.exports ={
-  RestRouter: FileExpressRouter,
-  defaultAuthzDef: defaultFileModuleAuthzDef
+  ExpressRouter: FileExpressRouter,
+  schemas: schemas,
+  sampleAdminSysDef: sampleAdminSysDef,
+  sampleUserSysDef: sampleUserSysDef,  
 }
