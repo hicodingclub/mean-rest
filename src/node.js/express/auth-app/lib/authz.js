@@ -135,7 +135,7 @@ const getSchemaPermission = function(perm, schemaName) {
     resourcePermission = perm['resourcePermission'];
   }
   
-  if (resourcePermission[schemaName]) {
+  if (schemaName && resourcePermission[schemaName]) {
     //use the permission definition for the schema
     return resourcePermission[schemaName];
   } 
@@ -149,6 +149,9 @@ const getSchemaPermission = function(perm, schemaName) {
 const getPermission = function(permissions, permType, identity, schemaName, allModulePermissions) {
   //permType: role, group
   let mperm;
+  if (!permissions) permissions = [];
+  if (!allModulePermissions) allModulePermissions = [];
+  
   for (let p of permissions) {
     if (!p[permType]) continue; //ignore bad permission
     if (p[permType][permType] == identity || p[permType]['_id'] == identity) {
@@ -185,23 +188,29 @@ const getPermission = function(permissions, permType, identity, schemaName, allM
 //Check restControllers for all supported operations
 const getOperation = function(req) {
   let httpOperation = req.method;
+  /*
   let action;
   if (req.query) {
     action = req.query['action'];
   }
+  */
+  let originalUrl = req.originalUrl;
 
-  let operation = "UNKNOWN";
-  if (httpOperation == "GET" && action == 'edit') operation = 'U';  //get for edit
-  else if (httpOperation == "GET") operation = 'R';
+  let operation;
+  if (originalUrl.includes('/mddsaction/')) {
+    if (originalUrl.includes('/mddsaction/get')) operation = 'R';
+    else if (originalUrl.includes('/mddsaction/post')) operation = 'U';
+    else if (originalUrl.includes('/mddsaction/delete')) operation = 'D';
+    else if (originalUrl.includes('/mddsaction/put')) operation = 'C';
+  }
+  if (operation) return operation;
+  
+  if (httpOperation == "GET") operation = 'R';
   else if (httpOperation == "PUT") operation = 'C';
   else if (httpOperation == "DELETE") operation = 'D';
-  else if (httpOperation == "POST") {
-    //see RestController.PostActions
-    if (action && action == "DeleteManyByIds") operation = 'D';
-    else if (action && action == "Search") operation = 'R';
-    else operation = 'U';
-  }
-  return operation;
+  else if (httpOperation == "POST") operation = 'U';
+  
+  return operation || "UNKOWN";
 }
 
 
@@ -216,7 +225,7 @@ const verifyRolePermission = function(req, res, next) {
   let mddsModulePermissions = req.mddsModulePermissions? req.mddsModulePermissions : [];
   let mddsAllModulePermissions = req.mddsAllModulePermissions? req.mddsAllModulePermissions : [];
   //console.log("***mddsModulePermissions", mddsModulePermissions)  
-  //console.log("***mddsAllModulePermissions", mddsAllModulePermissions)  
+  //console.log("***mddsAllModulePermissions", mddsAllModulePermissions)
   for (let rId of roles) {
     //mddsPermission is set by restRouter before authorization (rest_router.js)
     let rolePermission = getPermission(mddsModulePermissions, 'role', rId, schemaName, mddsAllModulePermissions);
@@ -243,7 +252,8 @@ const verifyRolePermission = function(req, res, next) {
 
 const verifyPermission = function(req, res, next) {
   const loggedIn = !!req.muser
-  //console.log("***req.muser", req.muser)
+  console.log("***req.muser", req.muser)
+  console.log("***req.mddsModuleAccesses", req.mddsModuleAccesses)
     
   if (loggedIn && req.muser.role) {
     return verifyRolePermission(req, res, next); //use role based permission
@@ -296,14 +306,13 @@ const verifyPermission = function(req, res, next) {
 }
 
 const permissionStore = require('./permission.store');
-const setModulePermission = function(moduleName) {
-  return function(req, res, next) {
-    req.mddsModulePermissions = permissionStore.getPermission(moduleName);
-    req.mddsAllModulePermissions = permissionStore.getPermission("All Modules");
-    req.mddsModuleAccesses = permissionStore.getAccess(moduleName);
-    req.mddsAllModuleAccesses = permissionStore.getAccess("All Modules");
-    next();
-  }
+const setModulePermission = function(req, res, next) {
+  const moduleName = req.mddsModuleName;
+  req.mddsModulePermissions = permissionStore.getPermission(moduleName);
+  req.mddsAllModulePermissions = permissionStore.getPermission("All Modules");
+  req.mddsModuleAccesses = permissionStore.getAccess(moduleName);
+  req.mddsAllModuleAccesses = permissionStore.getAccess("All Modules");
+  next();
 }
 
 module.exports = { verifyPermission: verifyPermission, setModulePermission: setModulePermission};
