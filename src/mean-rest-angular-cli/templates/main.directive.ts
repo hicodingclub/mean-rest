@@ -5,7 +5,7 @@ import { NG_VALIDATORS, Validator, ValidationErrors, AbstractControl, FormGroup 
 import { NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { dateStructureToString, stringToDateStructure } from 'mean-rest-angular';
 
-  export class MraNgbDateFormatterService extends NgbDateParserFormatter {
+export class MraNgbDateFormatterService extends NgbDateParserFormatter {
     private dateFormat = '<%-dateFormat%>';
     private timeFormat = '<%-timeFormat%>';
 

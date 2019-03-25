@@ -1,10 +1,10 @@
 <div class="detail" *ngIf="detail">
 	<div class="action-buttons">
         <!--<a href="javascript:void(0)" (click)="goBack()"><i class="fas fa-angle-double-left" title="Back"></i></a>-->
-        <a [routerLink]="['../../list' ]"><i class="fas fa-list" title="List"></i><!--  span>&nbsp;&nbsp;{{ItemCamelName}} List</span--></a>
-		<a [routerLink]="['../../edit', detail['_id'] ]" [skipLocationChange]="false" class="btn btn-outline-primary">Edit</a>
-		<a [routerLink]="['../../new']" [queryParams]="{cid: detail['_id']}" [skipLocationChange]="false" class="btn btn-outline-primary">New</a>
-		<a routerLink="." class="btn btn-outline-primary" (click)="onDelete(detail['_id'], null)">Delete</a>
+        <% if (api.includes("L")) {%><a [routerLink]="['../../list' ]"><i class="fas fa-list" title="List"></i><!--  span>&nbsp;&nbsp;{{ItemCamelName}} List</span--></a><%}%>
+		<% if (api.includes("U")) {%><a [routerLink]="['../../edit', detail['_id'] ]" [skipLocationChange]="false" class="btn btn-outline-primary">Edit</a><%}%>
+		<% if (api.includes("C")) {%><a [routerLink]="['../../new']" [queryParams]="{cid: detail['_id']}" [skipLocationChange]="false" class="btn btn-outline-primary">New</a><%}%>
+		<% if (api.includes("D")) {%><a routerLink="." class="btn btn-outline-primary" (click)="onDelete(detail['_id'], null)">Delete</a><%}%>
 	</div>
 	
 	<div class="card text-left">
@@ -21,11 +21,11 @@
 	<br/>
 	
 	<ul class="nav nav-tabs">
-	  <% for (let ref of referredBy) {%>
-	  <li class="nav-item">
+	  <% for (let ref of referredBy) { let refApi = ref[8];%>
+	    <%if (refApi.includes("L")) {%><li class="nav-item">
 	    <a [routerLink]="['./<%-ref[0]%>/list']"
 	        class="nav-link" routerLinkActive="active"><%-ref[5]%></a>
-	  </li><%}%>
+	  </li><%}%><%}%>
     </ul><%}%>
     <router-outlet></router-outlet>
 </div>

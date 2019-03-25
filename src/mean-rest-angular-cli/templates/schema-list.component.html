@@ -7,9 +7,9 @@
 		    </div>
 			<div class="col-3">
 		        <div class="action-buttons">
-					<a [routerLink]="['../new' ]" [skipLocationChange]="false" class="btn btn-outline-primary">Create</a>
-					<a routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
-						[ngClass]="{'disabled': !isItemSelected()}">Delete</a>
+					<%if(api.includes("C")){%><a [routerLink]="['../new' ]" [skipLocationChange]="false" class="btn btn-outline-primary">Create</a><%}%>
+					<%if(api.includes("D")){%><a routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
+						[ngClass]="{'disabled': !isItemSelected()}">Delete</a><%}%>
 				</div>
 			</div>
 		</div>
@@ -26,25 +26,30 @@
 		        <th scope="col">#</th>
 <%_ for (let field of briefView){ %>
 		        <th scope="col"><%-field.displayName%></th><%_ } %>		        
-		        <th scope="col" style="width:8rem;"></th>
-		        <th scope="col" style="width:2rem;">
+		        <%if(api.includes("D") || api.includes("U")){%><th scope="col" style="width:6rem;"></th><%}%>
+		        <%if(api.includes("D")){%><th scope="col" style="width:2rem;">
 		        	<input type="checkbox" [(ngModel)]="checkAll" (change)="onCheckAllChange()">
-		        </th>
+		        </th><%}%>
 	        </tr>
 	    </thead>
 	    <tbody>
 	        <tr *ngFor="let detail of list;  let i = index" [ngClass]="{'clicked-row': clickedId==detail['_id']}">
-	            <td scope="row" (click)="onDetailLinkClicked(detail['_id'])"  class="pointer">{{(page-1)*per_page+i+1}}</td>
-<%_ let view = 'list'; for (let field of briefView){ let fn = field.fieldName, ft = field.type; let ref_link = true; %>
-	            <td (click)="onDetailLinkClicked(detail['_id'])"  class="pointer"><% include schema-display.field.html %>
-	            </td><%_ } %>
-	            <td>
-	            	<a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a>
-	            	<a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a>
+	            <td scope="row" <%if(api.includes("D")){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%>>
+	            	{{(page-1)*per_page+i+1}}
 	            </td>
+<%_ let view = 'list'; for (let field of briefView){ let fn = field.fieldName, ft = field.type; let ref_link = true; %>
+	            <td <%if(api.includes("D")){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%>>
+	            	<% include schema-display.field.html %>
+	            </td><%_ } %>
+	            <%if(api.includes("D") || api.includes("U")){%>
+	            <td>
+	            	<%if(api.includes("U")){%><a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>
+	            	<%if(api.includes("D")){%><a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
+	            </td><%}%>
+	            <%if(api.includes("D")){%>
 	            <td>      
 	            	<input type="checkbox" [(ngModel)]="checkedItem[i]"/>
-	            </td>
+	            </td><%}%>
 	        </tr>
 	    </tbody>
 	</table>

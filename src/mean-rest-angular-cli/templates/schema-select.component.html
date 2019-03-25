@@ -30,7 +30,8 @@
 		        <th scope="col">#</th>
 <%_ for (let field of briefView.slice(0,FIELD_NUMBER_FOR_SELECT_VIEW)){ %>
 		        <th scope="col"><%-field.displayName%></th><%_ } %>
-		        <th></th>	        
+	            <%_ if (api.includes("R")) { %>
+		        <th></th><%}%>      
 	        </tr>
 	    </thead>
 	    <tbody>
@@ -41,10 +42,11 @@
 				let fn = field.fieldName, ft = field.type; let ref_link = false; %>
 	            <td (click)="selectItemSelected(i)"  class="pointer"><% include schema-display.field.html %>
 	            </td><%_ } %>
+	            <%_ if (api.includes("R")) { %>
 	            <td><a routerLink="." class="btn" 
 	                 [ngClass]="{'btn-primary': detail['_id']==selectedId, 'btn-outline-primary': detail['_id']!==selectedId}"
 	            	 (click)="selectViewDetail(i)">View Details</a>
-	            </td>
+	            </td><%}%>
 	        </tr>
 	    </tbody>
 	</table>

@@ -1,10 +1,11 @@
 <div>
-    <% if (embeddedViewOnly) {%><div class="add-area">
+	<%_ if (api.includes("C")) {%>
+      <% if (embeddedViewOnly) {%><div class="add-area">
         <a href="javascript:void(0)" (click)="onAdd()"><i class="fas fa-plus-square" title="Add"></i></a>
         <div *ngIf="isAdding">
             <app-<%-schemaName%>-edit [initData]="parentData" (done)="onAddDone($event)"></app-<%-schemaName%>-edit>
         </div>
-    </div><%}%>
+    </div><%}%><%}%>
 	<div class="container search">
 		<div class="row"><% include schema-list.pagination.html %>
 		</div>
@@ -19,7 +20,8 @@
 		        	<%-field.displayName%>
 		        </th><%_ } %>		        
                 <th scope="col" style="width:2rem;"></th>
-		        <th scope="col" style="width:2rem;"></th>
+                <%_ if ( (!embeddedViewOnly && api.includes("R")) || (embeddedViewOnly && api.includes("D"))) {%>
+		        <th scope="col" style="width:2rem;"></th><%}%>
 	        </tr>
 	    </thead>
 	    <tbody>
@@ -32,21 +34,25 @@
                 </td><%_ } %>
 	            <td>
                     <%_ if (detailSubView.length != 0) {%>
+                    	<%if(api.includes("R")){%>
 			        <span class="pointer" (click)="toggleCheckedItem(i)">
 			            <i *ngIf="!checkedItem[i]" class="fas fa-caret-down" title="More"></i>
 			            <i *ngIf="checkedItem[i]" class="fas fa-caret-up" title="Less"></i>
-			        </span><%}%>
+			        </span><%}%><%}%>
                 </td>
+                <%_ if ( (!embeddedViewOnly && api.includes("R")) || (embeddedViewOnly && api.includes("D"))) {%>
 	            <td>
-                <%_ if (!embeddedViewOnly) {%>
+                <%_ if (!embeddedViewOnly && api.includes("R")) {%>
 	            	<a routerLink="." (click)="onDetailLinkClicked(detail['_id'])"><i class="fas fa-external-link-square-alt" title="View Details"></i></a>
-                <%} else {%>
+                <%_ } else if (embeddedViewOnly && api.includes("D")){%>	              <%if(){%>
 	            	<a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a>
-                <%}%> 
-                </td>   
+                <%_ }%>
+                </td><%}%>
 	        </tr>
-	        <%_ let colspan = briefView.length %>
-	        <tr *ngIf="checkedItem[i]" > <td colspan="<%-colspan%>"> <app-<%-schemaName%>-detail-sub [inputData]="detail['_id']"></app-<%-schemaName%>-detail-sub></td></tr>
+	        <%_ let colspan = briefView.length %><%if(api.includes("R")){%>
+	        <tr *ngIf="checkedItem[i]" >
+	        	<td colspan="<%-colspan%>"><app-<%-schemaName%>-detail-sub [inputData]="detail['_id']"></app-<%-schemaName%>-detail-sub></td>
+	        </tr><%}%>
 	      </ng-template>
 	    </tbody>
 	</table>

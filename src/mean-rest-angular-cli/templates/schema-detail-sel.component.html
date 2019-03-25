@@ -15,7 +15,7 @@
 
 <div class="detail" *ngIf="detail">
 	<div class="action-buttons">
-        <a routerLink="." (click)="detailSelBack()"><i class="fas fa-angle-double-left" title="Back to list">&nbsp; {{ItemCamelName}} List</i></a>
+        <% if(api.includes("L")) {%><a routerLink="." (click)="detailSelBack()"><i class="fas fa-angle-double-left" title="Back to list">&nbsp; {{ItemCamelName}} List</i></a><%}%>
 		<a routerLink="." class="btn btn-outline-primary" (click)="detailSelSelected()">Select</a>
 	</div>
 	

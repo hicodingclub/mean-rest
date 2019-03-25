@@ -14,22 +14,22 @@ import { ElementRef } from '@angular/core';<%}%>
 <%if (schemaHasRef) {%>
 import { ComponentFactoryResolver } from '@angular/core';
 import { <%-ModuleName%>RefSelectDirective } from '../<%-moduleName%>.component';
-    <%_ for (let field of compositeEditView) { 
+    <%_ for (let field of compositeEditBriefView) { 
         if (field.Ref) {%>
-import { <%-field.Ref%>DetailSelComponent } from '../<%-field.ref%>/<%-field.ref%>-detail/<%-field.ref%>-detail-sel.component';
-import { <%-field.Ref%>DetailPopComponent } from '../<%-field.ref%>/<%-field.ref%>-detail/<%-field.ref%>-detail-pop.component';
-import { <%-field.Ref%>SelectComponent } from '../<%-field.ref%>/<%-field.ref%>-list/<%-field.ref%>-select.component';<%}}%>
+  <%_ if (refApi[field.ref].includes("R")) {%>import { <%-field.Ref%>DetailSelComponent } from '../<%-field.ref%>/<%-field.ref%>-detail/<%-field.ref%>-detail-sel.component';<%}%>
+  <%_ if (refApi[field.ref].includes("R")) {%>import { <%-field.Ref%>DetailPopComponent } from '../<%-field.ref%>/<%-field.ref%>-detail/<%-field.ref%>-detail-pop.component';<%}%>
+  <%_ if (refApi[field.ref].includes("L")) {%>import { <%-field.Ref%>SelectComponent } from '../<%-field.ref%>/<%-field.ref%>-list/<%-field.ref%>-select.component';<%}%><%}}%>
 <%}%>
 
 export class <%-SchemaName%>Component extends BaseComponent {
 <%if (schemaHasRef) {%>
     protected selectComponents = {
-  <%_ for (let field of compositeEditView) { 
+  <%_ for (let field of compositeEditBriefView) { 
       if (field.Ref) {%>
       '<%-field.fieldName%>': {
-          'select-type':<%-field.Ref%>SelectComponent, 
-          'select-detail-type': <%-field.Ref%>DetailSelComponent,
-          'pop-detail-type': <%-field.Ref%>DetailPopComponent,
+          <% if (refApi[field.ref].includes("R")) {%>'select-type':<%-field.Ref%>SelectComponent,<%}%>
+          <% if (refApi[field.ref].includes("R")) {%>'select-detail-type': <%-field.Ref%>DetailSelComponent,<%}%>
+          <% if (refApi[field.ref].includes("L")) {%>'pop-detail-type': <%-field.Ref%>DetailPopComponent,<%}%>
           'componentRef': null},<%}}%>
     }
     @ViewChild(<%-ModuleName%>RefSelectDirective) refSelectDirective: <%-ModuleName%>RefSelectDirective;
