@@ -111,6 +111,11 @@ var templates = {
   mraCss: ["../templates/mean-express-angular.css", "mean-express-angular.css", "mean-rest-angular css file", 'W'],
 }
 
+const PredefinedPatchFields = {
+  muser_id: { type: String, index: true},
+  mmodule_name: { type: String, index: true},
+}
+
 var generateSourceFile = function(keyname, template, renderObj, outputDir) {
 	let renderOptions = {};
 	let templateFile = basedirFile(template[0]);
@@ -741,7 +746,7 @@ function main() {
 	  apiBase = program.api;
 	  console.info('Using "%s" as api base to call Rest APIs...', apiBase);
   }
-  
+
   // output directory
   let outputDir;
   if (!program.output) {
@@ -767,6 +772,11 @@ function main() {
   let config = sysDef.config;
   let authz = sysDef.authz;
   
+  let patch = []; //extra fields patching to the schema
+  if (sysDef.config && sysDef.config.patch){
+    patch = sysDef.config.patch
+  }
+
   let schemaMap = {};
   let validatorFields = [];
   let referenceSchemas = []; ////schemas that are referred
@@ -807,6 +817,20 @@ function main() {
       console.log('No schema defined. Ignore', name)
       continue
     }
+    
+    if (mongooseSchema) { //patch fields
+      const patchFields = schemaDef.patch || patch;
+      for (const p of patchFields) {
+        if (p in PredefinedPatchFields) {
+          const f = {};
+          f[p] = PredefinedPatchFields[p];
+          mongooseSchema.add(f);
+        } else {
+          console.warn("Warning: ignore patching. Field is not a predefined patch fields:", p);
+        }
+      }
+    }
+
     let embeddedViewOnly = schemaDef.embeddedViewOnly? true: false;
     let viewName = schemaDef.name; //Display name on UI
     let api = schemaDef.api; //APIs exposed to front end ("LCRUD")
