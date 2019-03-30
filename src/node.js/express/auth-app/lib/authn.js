@@ -14,7 +14,7 @@ const verifyToken = function(req, res, next) {
         token = parts[1];
       }
   } 
-  
+
   if (!token) {
     req.muser = undefined;
     return next();

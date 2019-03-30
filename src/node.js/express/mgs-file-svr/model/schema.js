@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
  
 const fileSchema = new Schema({
-  module: { type: String, index: true}, //link returned to the user
   name: { type: String, maxlength: 128},
   type: { type: String},
   labels: {type: [String]},
