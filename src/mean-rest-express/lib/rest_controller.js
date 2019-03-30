@@ -1,17 +1,21 @@
 const createError = require('http-errors');
 
 const schema_collection = {};
-const views_collection = {}; //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+const views_collection = {}; // views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 const model_collection = {};
 const populate_collection = {};
+const owner_config = {}; // {enable: true, type: 'user | module'
 
 const loadContextVarsByName = function(name) {
-  let schema = schema_collection[name];
-  let model = model_collection[name];
-  let views = views_collection[name];
-  let populates = populate_collection[name];
-  if (!schema || !model || !views || !populates) throw(createError(500, "Cannot load context from name " + name))
-  return {name: name, schema: schema, model: model, views: views, populates: populates};
+  const schema = schema_collection[name];
+  const model = model_collection[name];
+  const views = views_collection[name];
+  const populates = populate_collection[name];
+  const owner = owner_config[name];
+  if (!schema || !model || !views || !populates || !owner) {
+    throw(createError(500, "Cannot load context from name " + name))
+  }
+  return {name, schema, model, views, populates, owner};
 };
 
 const loadContextVars = function(req) {
@@ -104,7 +108,7 @@ const getViewPopulates = function(schema, viewStr) {
             populates.push([item, ref]);
           break;
         default:
-          ;
+          break;
 			}
 		}
 	});
@@ -130,89 +134,100 @@ const fieldReducerForRef = function(refObj, indexField) {
 };
 
 const objectReducerForRef = function(obj, populateMap) {
-    if (typeof obj !== 'object' || obj == null) {
-        return obj;
-    }
-    for (let path in populateMap) {
-        let fields = populateMap[path].match(/\S+/g); // \S matches no space characters.
-        if (!fields) continue;
-
-        let indexField = fields[0];  //always use first one as index
-
-        let newRefObj;
-        let refObj = obj[path];
-        if (typeof refObj !== 'object' || refObj == null) continue;
-        if (Array.isArray(refObj)) { //list of ref objects
-          newRefObj = refObj.map(o=>fieldReducerForRef(o, indexField)); //recursive call
-        } else {
-          newRefObj = fieldReducerForRef(refObj, indexField);
-        }
-        //now only "_id" and the indexField will be left.
-        obj[path] = newRefObj;
-    }
+  if (typeof obj !== 'object' || obj == null) {
     return obj;
+  }
+  for (let path in populateMap) {
+    let fields = populateMap[path].match(/\S+/g); // \S matches no space characters.
+    if (!fields) continue;
+
+    let indexField = fields[0];  //always use first one as index
+
+    let newRefObj;
+    let refObj = obj[path];
+    if (typeof refObj !== 'object' || refObj == null) continue;
+    if (Array.isArray(refObj)) { //list of ref objects
+      newRefObj = refObj.map(o=>fieldReducerForRef(o, indexField)); //recursive call
+    } else {
+      newRefObj = fieldReducerForRef(refObj, indexField);
+    }
+    //now only "_id" and the indexField will be left.
+    obj[path] = newRefObj;
+  }
+  return obj;
 };
 
 const resultReducerForRef = function (result, populateMap) {
-    if (Object.keys(populateMap).length == 0) {
-        //not ref fields
-        return result;
-    }
-    if (typeof result !== 'object' || result == null) { //array is also object
-        return result;
-    }
-    if (Array.isArray(result)) {
-        result = result.map(obj=>objectReducerForRef(obj, populateMap));
-    } else {
-        result = objectReducerForRef(result, populateMap);
-    }
+  if (Object.keys(populateMap).length == 0) {
+    //not ref fields
     return result;
+  }
+  if (typeof result !== 'object' || result == null) { //array is also object
+    return result;
+  }
+  if (Array.isArray(result)) {
+    result = result.map(obj=>objectReducerForRef(obj, populateMap));
+  } else {
+    result = objectReducerForRef(result, populateMap);
+  }
+  return result;
 };
 
 const objectReducerForView  = function(obj, viewStr) {
   //console.log("***obj: ", obj);
   //console.log("***viewStr: ", viewStr);
-    if (typeof obj !== 'object' || obj == null) {
-        return obj;
-    }
+  if (typeof obj !== 'object' || obj == null) {
+    return obj;
+  }
 
-    let fields = viewStr.match(/\S+/g); // \S matches no space characters.
-    if (!fields) return obj;
+  let fields = viewStr.match(/\S+/g); // \S matches no space characters.
+  if (!fields) return obj;
 
-    let newObj = {};
-    newObj["_id"] = obj["_id"];
-    for (let path of fields) {
-        if (path in obj) newObj[path] = obj[path];
-    }
-    //console.log("***newObj: ", newObj);
-    return newObj;
+  let newObj = {};
+  newObj["_id"] = obj["_id"];
+  for (let path of fields) {
+    if (path in obj) newObj[path] = obj[path];
+  }
+  //console.log("***newObj: ", newObj);
+  return newObj;
 };
 
 const resultReducerForView = function (result, viewStr) {
-    if (!viewStr) {
-        //not specified. Return everything
-        return result;
-    }
-    if (typeof result !== 'object' || result == null) { //array is also object
-        return result;
-    }
-    if (Array.isArray(result)) {
-        result = result.map(obj=>objectReducerForView(obj, viewStr));
-    } else {
-        result = objectReducerForView(result, viewStr);
-    }
+  if (!viewStr) {
+    //not specified. Return everything
     return result;
+  }
+  if (typeof result !== 'object' || result == null) { //array is also object
+    return result;
+  }
+  if (Array.isArray(result)) {
+    result = result.map(obj=>objectReducerForView(obj, viewStr));
+  } else {
+    result = objectReducerForView(result, viewStr);
+  }
+  return result;
 };
 
-let RestController = function() {}
+const ownerPatch = function (query, owner, req) {
+  if (owner && owner.enabled) {
+    if (owner.type === 'module') {
+      query.mmodule_name = req.mddsModuleName;
+    } else if (owner.type === 'user') {
+      query.muser_id = req.muser._id;
+    }
+  }
+  return query;
+}
+const RestController = function() {}
 
 RestController.loadContextVarsByName = loadContextVarsByName;
 
-RestController.register = function(schemaName, schema, views, model, moduleName) {
+RestController.register = function(schemaName, schema, views, model, moduleName, ownerConfig) {
   let name = schemaName.toLowerCase();
 	schema_collection[name] = schema;
 	views_collection[name] = views;
 	model_collection[name] = model;
+	owner_config[name] = ownerConfig;
 
 	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format	
 	populate_collection[name] = {
@@ -228,16 +243,15 @@ RestController.getAll = function(req, res, next) {
 };
 
 RestController.searchAll = function(req, res, next, searchContext) {
-  let {name: name, schema: schema, model: model, views: views, populates:populates} 
-		= loadContextVars(req);
+  const {name, schema, model, views, populates, owner} = loadContextVars(req);
   //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-  let briefView = views[0];
+  const briefView = views[0];
 	
-  let populateArray = [];
-  let populateMap = {};
+  const populateArray = [];
+  const populateMap = {};
   populates.briefView.forEach( (p)=> {
 		//an array, with [field, ref]
-		let fields = getPopulatesRefFields(p[1]);
+    const fields = getPopulatesRefFields(p[1]);
 		if (fields != null) {//only push when the ref schema is found
 			populateArray.push({ path: p[0], select: fields });
             populateMap[p[0]] = fields;
@@ -262,8 +276,8 @@ RestController.searchAll = function(req, res, next, searchContext) {
 	
   let count = 0;
   if (searchContext) {
-        //console.log("searchContext is ....", searchContext);
-        // searchContext ={'$and', [{'$or', []},{'$and', []}]}
+    //console.log("searchContext is ....", searchContext);
+    // searchContext ={'$and', [{'$or', []},{'$and', []}]}
 		if (searchContext['$and']) {
 		  for (let subContext of searchContext['$and']) {
 			  if ('$or' in subContext) {
@@ -275,55 +289,57 @@ RestController.searchAll = function(req, res, next, searchContext) {
 			  }
 		  }
 		}
+		//merge the url query and body query
 		query = searchContext;
 		//console.log("query is ....", query['$and'][0]['$or'], query['$and'][1]['$and']);
   }
 
+  query = ownerPatch(query, owner, req);
+  
   model.countDocuments(query).exec(function(err, cnt) {
-        if (err) { return next(err); }
-        count = cnt;
-        
-        if (isNaN(__per_page) || __per_page <= 0) __per_page = PER_PAGE;
-        else if (__per_page > MAX_PER_PAGE) __per_page = MAX_PER_PAGE;
+    if (err) { return next(err); }
+    count = cnt;
 
-    	let maxPageNum = Math.ceil(count/(__per_page*1.0));
+    if (isNaN(__per_page) || __per_page <= 0) __per_page = PER_PAGE;
+    else if (__per_page > MAX_PER_PAGE) __per_page = MAX_PER_PAGE;
 
-    	if (isNaN(__page)) __page = 1;
-    	if (__page > maxPageNum) __page = maxPageNum;
-    	if (__page <= 0) __page = 1;
-    	
-    	let skipCount = (__page - 1) * __per_page;
-    	
-    	//let dbExec = model.find(query, briefView)
-    	let dbExec = model.find(query) //return every thing for the document
-            .skip(skipCount)
-            .limit(__per_page)
-      for (let pi = 0; pi < populateArray.length; pi ++) {
-      	let p = populateArray[pi];
-      	//dbExec = dbExec.populate(p);
-      	dbExec = dbExec.populate(p.path); //only give the reference path. return everything
+    let maxPageNum = Math.ceil(count/(__per_page*1.0));
+
+    if (isNaN(__page)) __page = 1;
+    if (__page > maxPageNum) __page = maxPageNum;
+    if (__page <= 0) __page = 1;
+
+    let skipCount = (__page - 1) * __per_page;
+  	
+    //let dbExec = model.find(query, briefView)
+    let dbExec = model.find(query) //return every thing for the document
+      .skip(skipCount)
+      .limit(__per_page)
+    for (let pi = 0; pi < populateArray.length; pi ++) {
+      let p = populateArray[pi];
+      //dbExec = dbExec.populate(p);
+      dbExec = dbExec.populate(p.path); //only give the reference path. return everything
+    }
+    dbExec.exec(function(err, result) {
+      if (err) return next(err);
+
+      let output = {
+        total_count: count,
+        total_pages: maxPageNum,
+        page: __page,
+        per_page: __per_page,
+        items: result
       }
-    	dbExec.exec(function(err, result) {
-                if (err) return next(err);
-
-                let output = {
-                	total_count: count,
-                	total_pages: maxPageNum,
-                	page: __page,
-                	per_page: __per_page,
-                	items: result
-                }
-                output = JSON.parse(JSON.stringify(output));
-                output.items = resultReducerForRef(output.items, populateMap);
-                output.items = resultReducerForView(output.items, briefView);
-                return res.send(output);
-            })        
-  })
+      output = JSON.parse(JSON.stringify(output));
+      output.items = resultReducerForRef(output.items, populateMap);
+      output.items = resultReducerForView(output.items, briefView);
+      return res.send(output);
+    });
+  });
 };
 	
 RestController.getDetailsById = function(req, res, next) {
-	let {name: name, schema: schema, model: model, views: views, populates:populates} 
-			= loadContextVars(req);
+  const {name, schema, model, views, populates, owner} = loadContextVars(req);
 	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 	
 	/*
@@ -351,7 +367,6 @@ RestController.getDetailsById = function(req, res, next) {
             populateMap[p[0]] = fields;
         }
 	});
-	let query = {};
 
 	let idParam = name + "Id";
 	let id = req.params[idParam];
@@ -374,7 +389,7 @@ RestController.getDetailsById = function(req, res, next) {
 };
 	
 RestController.HardDeleteById = function(req, res, next) {
-	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req);
+  const {name, schema, model, views, populates, owner} = loadContextVars(req);
 	
 	let idParam = name + "Id";
 	let id = req.params[idParam];
@@ -416,7 +431,7 @@ RestController.PostActions = function(req, res, next) {
 };
 
 RestController.deleteManyByIds = function(req, res, next, ids) {
-	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req);
+  const {name, schema, model, views, populates, owner} = loadContextVars(req);
 
 	model.deleteMany({"_id": {$in: ids}})
 		.exec(function (err, result) {
@@ -426,7 +441,7 @@ RestController.deleteManyByIds = function(req, res, next, ids) {
 };
 
 RestController.Create = function(req, res, next) {
-	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req);
+  const {name, schema, model, views, populates, owner} = loadContextVars(req);
 	
 	let body = req.body;
 	if (typeof body === "string") {
@@ -437,6 +452,8 @@ RestController.Create = function(req, res, next) {
 	    }
 	}
 
+	body = ownerPatch(body, owner, req);
+
 	model.create(body, function (err, result) {
 		if (err) { return next(err); }
 		return res.send(result);
@@ -444,7 +461,7 @@ RestController.Create = function(req, res, next) {
 };
 
 RestController.Update = function(req, res, next) {
-	let {name: name, schema: schema, model: model, views: views} = loadContextVars(req);
+  const {name, schema, model, views, populates, owner} = loadContextVars(req);
   //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
 
     let body = req.body;
@@ -470,9 +487,11 @@ RestController.Update = function(req, res, next) {
       for (let field of viewFields) {
         if (!field in body) {
           //not in body means user deleted this field
-          delete body[field]
+          delete result[field]
         }
       }
+      result = ownerPatch(result, owner, req);
+
       result.save(function (err, result) {
         if (err) { return next(err); }
         return res.send();

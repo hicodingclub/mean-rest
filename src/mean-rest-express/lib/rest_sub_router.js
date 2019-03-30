@@ -4,8 +4,9 @@ const RestController = require('./rest_controller')
 
 const _setSchemaName = function(name) {
   return function(req, res, next) {
+    console.log("name", name);
     req.meanRestSchemaName = name;
-    next();
+    return next();
   }
 }
 

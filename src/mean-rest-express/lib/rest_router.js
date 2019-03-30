@@ -6,11 +6,15 @@ const util = require('../util')
 const RestController = require('./rest_controller')
 const RestRouter = require('./rest_sub_router')
 
+const PredefinedPatchFields = {
+  muser_id: { type: String, index: true},
+  mmodule_name: { type: String, index: true},
+}
 
 const processField = function(x) {
   let hidden = false;
   let field = x;
-  let matches = x.match(/\((.*?)\)/);
+  const matches = x.match(/\((.*?)\)/);
   if (matches) {
     hidden = true;
     field = matches[1];
@@ -24,7 +28,7 @@ var processViewStr = function(viewStr) {
   let fields = viewStr.replace(/\|/g, ' ').match(/\S+/g)
   //2. process each field
   fields = fields.map(x=>{
-    let [f, hidden] = processField(x);
+    const [f, hidden] = processField(x);
     return f;
   })
   //3. join to string
@@ -36,16 +40,25 @@ var processViewStr = function(viewStr) {
 const _setModuleName = function(name) {
   return function(req, res, next) {
     req.mddsModuleName = name;
-    next();
+    return next();
   }
 }
 
 const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
-  let expressRouter = express.Router();
+  const expressRouter = express.Router();
   if (!moduleName) moduleName = randomString(10);
   
-  let setModuleName = _setModuleName(moduleName)
+  const setModuleName = _setModuleName(moduleName)
   expressRouter.use(setModuleName);
+  
+  let patch = []; //extra fields patching to the schema
+  if (sysDef.config && sysDef.config.patch){
+    patch = sysDef.config.patch
+  }
+  let owner = {enable: false, type: "user"};
+  if (sysDef.config && sysDef.config.owner){
+    owner = sysDef.config.owner
+  }
   
   let authzFunc;
   let permissionStore;
@@ -78,16 +91,26 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
       api = "LCRUD";
     }
 
-    let schm = schemaDef.schema;
+    const schm = schemaDef.schema;
     let model;
     if (schm) {
+      const patchFields = schemaDef.patch || patch;
+      for (const p of patchFields) {
+        if (p in PredefinedPatchFields) {
+          const f = {};
+          f[p] = PredefinedPatchFields[p];
+          schm.add(f);
+        } else {
+          console.warn("Warning: ignore patching. Field is not a predefined patch fields:", p);
+        }
+      }
       schm.set('toObject', {getters: false, virtuals: true});
       schm.set('toJSON', {getters: false, virtuals: true});
       model = mongoose.model(schemaName, schm );//model uses given name
     }
     //schemaDef.views in [briefView, detailView, CreateView, EditView, SearchView] sequence
-    let views = [];
-    let schemaViews = schemaDef.views;
+    const views = [];
+    const schemaViews = schemaDef.views;
     if (schemaViews) {
       for (let view of schemaDef.views) {
         view = processViewStr(view);
@@ -97,7 +120,10 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     }
     //pass pure view string to register.
     if (schm) {
-      RestController.register(schemaName, schemaDef.schema, views, model, moduleName);
+      const ownerConfig = schemaDef.owner || owner;
+      schm.options.useSaveInsteadOfUpdate = true; //this is a special indicator to controller use save.
+      
+      RestController.register(schemaName, schm, views, model, moduleName, ownerConfig);
     }
     if (permissionStore && api) {
       permissionStore.registerResource(schemaName, moduleName);
@@ -105,8 +131,8 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
   }
   
   for (let schemaName in schemas) {
-    var schemaDef = schemas[schemaName];
-    let name = schemaName.toLowerCase();
+    const schemaDef = schemas[schemaName];
+    const name = schemaName.toLowerCase();
     let api;
     if ("api" in schemas[schemaName]) {
       api = schemas[schemaName].api
@@ -138,7 +164,7 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
   
   //error handler
   expressRouter.use(function(err, req, res, next) {     
-    let e = {"error": err.message,
+    const e = {"error": err.message,
       "status": err.status || 500};
     if (req.app.get('env') === 'development') {
         e.details = err.stack
@@ -146,7 +172,7 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
      
       // render the error page
     res.status(err.status || 500);
-    res.json(e);
+    return res.json(e);
   });
 
   return expressRouter;
@@ -155,7 +181,7 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
 const _setSchemaName = function(name) {
   return function(req, res, next) {
     req.meanRestSchemaName = name;
-    next();
+    return next();
   }
 }
 
