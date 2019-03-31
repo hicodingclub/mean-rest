@@ -58,7 +58,7 @@ export class BaseComponent implements BaseComponentInterface {
     //for fields with enum values
     protected enums:any = {};
     protected stringFields = [];
-    protected referenceFields = [];
+    protected referenceFields: string[] = [];
     protected referenceFieldsMap = {};
     protected dateFields = [];
     protected indexFields = [];

@@ -88,7 +88,7 @@ export class BaseService {
         let serviceUrl = this.serviceUrl
         if (action) {
           httpOptions['params'] = new HttpParams().set('action', action);
-          if (action == "edit") action == "post"
+          if (action == "edit") action = "post"
           serviceUrl = serviceUrl + "mddsaction/" + action + "/";
         }
         return this.http.get<any>(serviceUrl + id, httpOptions)
