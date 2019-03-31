@@ -74,7 +74,7 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
     @ViewChildren(MraRichTextSelectDirective) textEditors: QueryList<MraRichTextSelectDirective>;
   <% for (let field of compositeEditView) { let fn=field.fieldName, Fn=field.FieldName; 
     if (field.type === "SchemaString" && field.editor) { %>
-    private <%-schemaName%>Edit<%-Fn%> = {valid: true};
+    private Edit<%-Fn%> = {valid: true};
 <% }}%><%}%>
         
     constructor(
@@ -89,12 +89,12 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
 <% let theView = compositeEditView; let isEditView = true;%><%_ include schema-construct.component.ts %>
 <% for (let field of compositeEditView) { let fn=field.fieldName, Fn=field.FieldName; 
     if (field.type === "SchemaString" && field.editor) { %>
-          this.textEditorMap['<%-schemaName%>Edit<%-Fn%>'] = {
+          this.textEditorMap['Edit<%-Fn%>'] = {
             required: <%if (field.required) {%>true <%}else{%> false <%}%>,
             <%if (typeof field.maxlength === 'number') {%>maxlength: <%-field.maxlength%>,<%}%>
             <%if (typeof field.minlength === 'number') {%>minlength: <%-field.minlength%>,<%}%>
             <%if (field.validators) {%>validators: new <%-SchemaName%>Directive<%-field.FieldName%>(), <%}%>
-            fieldState: this.<%-schemaName%>Edit<%-Fn%>,
+            fieldState: this.Edit<%-Fn%>,
             fieldName: '<%-fn%>'
           };<% }}%>
           

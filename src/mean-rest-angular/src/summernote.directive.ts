@@ -59,114 +59,112 @@ var fullscreenHtml = `
 
 
 var summerNoteConfig = {
-          minHeight: 200,
-          focus: false,
-          airMode: false,
-          //fontNames: ['Roboto', 'Calibri', 'Times New Roman', 'Arial'],
-          //fontNamesIgnoreCheck: ['Roboto', 'Calibri'],
-          dialogsInBody: true,
-          dialogsFade: true,
-          disableDragAndDrop: false,
-          toolbar: [
-            // [groupName, [list of button]]
-            ['font', ['style', 'fontname','fontsize', 'color']],
-            ['style', ['bold', 'italic', 'underline']],//, 'strikethrough'
-            //['font', [ 'superscript', 'subscript','clear']],
-             ['paragraph', ['ul', 'ol', 'paragraph']],//, 'height'
-             ['insert', ['table', 'picture', 'link', 'video']],//, 'hr'
-            //['misc', ['undo', 'redo', 'print', 'help', 'fullscreen']]
-            ['misc', ['undo', 'redo', 'fullscreen']]
-          ],
+  minHeight: 200,
+  focus: false,
+  airMode: false,
+  //fontNames: ['Roboto', 'Calibri', 'Times New Roman', 'Arial'],
+  //fontNamesIgnoreCheck: ['Roboto', 'Calibri'],
+  dialogsInBody: true,
+  dialogsFade: true,
+  disableDragAndDrop: false,
+  toolbar: [
+    // [groupName, [list of button]]
+    ['font', ['style', 'fontname','fontsize', 'color']],
+    ['style', ['bold', 'italic', 'underline']],//, 'strikethrough'
+    //['font', [ 'superscript', 'subscript','clear']],
+     ['paragraph', ['ul', 'ol', 'paragraph']],//, 'height'
+     ['insert', ['table', 'picture', 'link', 'video']],//, 'hr'
+    //['misc', ['undo', 'redo', 'print', 'help', 'fullscreen']]
+    ['misc', ['undo', 'redo', 'fullscreen']]
+  ],
 //          popover: {
 //            air: [
 //              ['color', ['color']],
 //              ['font', ['bold', 'underline', 'clear']]
 //            ]
 //          }
-        }
+}
 
 @Directive({
     selector: '[mra-richtext-select]',
 })
 export class MraRichTextSelectDirective {
-    @Input('mra-richtext-select') name: string;
+  @Input('mra-richtext-select') name: string;
 
-    content:string;
-    private id;
+  content:string;
+  private id;
+  
+  constructor(private el: ElementRef, private render: Renderer2) {
+    this.id = Date.now();
+
+    //<!-- Create the editor container -->
+    let html = `
+      <div id="richtext` + this.id +`">
+      </div>
+      <div id="fullscreen` + this.id +`"></div>'
+      `; 
+
+    if (!$('#mraeditorfullscreenCss').length) {
+      $("<style type='text/css' id='mraeditorfullscreenCss'>" + fullscreenCss + "</style>").appendTo("head"); 
+    }
+
+
+    this.render.setProperty(this.el.nativeElement, 'innerHTML', html);
     
-    constructor(private el: ElementRef, private render: Renderer2) {
-        this.id = Date.now();
-
-        //<!-- Create the editor container -->
-        let html = `
-            <div id="richtext` + this.id +`">
-            </div>
-            <div id="fullscreen` + this.id +`"></div>'
-            `; 
-
-        if (!$('#mraeditorfullscreenCss').length) {
-            $("<style type='text/css' id='mraeditorfullscreenCss'>" + fullscreenCss + "</style>").appendTo("head"); 
-        }
-
-
-        this.render.setProperty(this.el.nativeElement, 'innerHTML', html);
-        
-        
-        setTimeout(()=> {
-            if (this.content) $("#richtext"+this.id).html(this.content);
-            $("#richtext"+this.id).summernote(summerNoteConfig);
-        }, 1);
-    }
     
-    setContent(content:string) {
-        this.content = content;
-        if (this.content) {
-            $("#richtext"+this.id).each(function( index ) {
-              $(this).summernote('destroy');
-            });            
-            $("#richtext"+this.id).html(this.content);
-            $("#richtext"+this.id).summernote(summerNoteConfig);
-        }
+    setTimeout(()=> {
+        if (this.content) $("#richtext"+this.id).html(this.content);
+        $("#richtext"+this.id).summernote(summerNoteConfig);
+    }, 1);
+  }
+  
+  setContent(content:string) {
+    this.content = content;
+    if (this.content) {
+      $("#richtext"+this.id).each(function( index ) {
+        $(this).summernote('destroy');
+      });            
+      $("#richtext"+this.id).html(this.content);
+      $("#richtext"+this.id).summernote(summerNoteConfig);
     }
-    
-    getContent():string[] {
-        let html = $("#richtext"+this.id).summernote('code');
-        let text = $("<div>"+html+"</div>").text();
-        return [html, text];
+  }
+  
+  getContent():string[] {
+    let html = $("#richtext"+this.id).summernote('code');
+    let text = $("<div>"+html+"</div>").text();
+    return [html, text];
+  }
+  preview() {
+    if (!$('#mraeditorfullscreenDiv').length) {
+        $("#fullscreen"+this.id).append(fullscreenHtml); 
     }
-    preview() {
-        
-        if (!$('#mraeditorfullscreenDiv').length) {
-            $("#fullscreen"+this.id).append(fullscreenHtml); 
-        }
 
-        $("#mraeditorfullscreenClose" ).click(function() {
-            $('#mraeditorfullscreenDiv').remove();
-        });
+    $("#mraeditorfullscreenClose" ).click(function() {
+        $('#mraeditorfullscreenDiv').remove();
+    });
 
-        let [html, text] = this.getContent();
-        $("#mrafullscreenHtml").html(html);
-    }
+    let [html, text] = this.getContent();
+    $("#mrafullscreenHtml").html(html);
+  }
 }
 
 @Directive({
     selector: '[mra-richtext-show]',
 })
 export class MraRichTextShowDirective {
-    @Input('mra-richtext-show') name: string;
-    constructor(private el: ElementRef, private render: Renderer2) {
-    }
-    
-    setContent(content:string) {
-        let id = Date.now();
-        var displayHtml = `
-            <div class="card">
-                <div class="card-body" id="mraeditordisplay` + id +`"></div>
-            </div>
-        `;
+  @Input('mra-richtext-show') name: string;
+  constructor(private el: ElementRef, private render: Renderer2) {
+  }
+  
+  setContent(content:string) {
+    let id = Date.now();
+    var displayHtml = `
+      <div class="card">
+          <div class="card-body" id="mraeditordisplay` + id +`"></div>
+      </div>
+    `;
 
-        this.render.setProperty(this.el.nativeElement, 'innerHTML', displayHtml);
-        $("#mraeditordisplay" + id).html(content);
-    }
-    
+    this.render.setProperty(this.el.nativeElement, 'innerHTML', displayHtml);
+    $("#mraeditordisplay" + id).html(content);
+  }
 }
