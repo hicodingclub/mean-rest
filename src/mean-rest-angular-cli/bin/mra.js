@@ -833,7 +833,7 @@ function main() {
 
     let embeddedViewOnly = schemaDef.embeddedViewOnly? true: false;
     let viewName = schemaDef.name; //Display name on UI
-    let api = schemaDef.api; //APIs exposed to front end ("LCRUD")
+    let api = schemaDef.api || "LCRUD"; //APIs exposed to front end ("LCRUD")
 //	console.log(mongooseSchema);
 //	if (mongooseSchema.paths.author) {
 //		console.log("===author: ", mongooseSchema.paths.author.options);

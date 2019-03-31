@@ -44,7 +44,7 @@
 	            <td>
                 <%_ if (!embeddedViewOnly && api.includes("R")) {%>
 	            	<a routerLink="." (click)="onDetailLinkClicked(detail['_id'])"><i class="fas fa-external-link-square-alt" title="View Details"></i></a>
-                <%_ } else if (embeddedViewOnly && api.includes("D")){%>	              <%if(){%>
+                <%_ } else if (embeddedViewOnly && api.includes("D")){%>
 	            	<a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a>
                 <%_ }%>
                 </td><%}%>
