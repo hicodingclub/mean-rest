@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 const createError = require('http-errors');
 const path = require('path');
-var fs = require('fs');
+const imageThumbnail = require('image-thumbnail');
+const sizeOf = require('image-size')
+const fs = require('fs');
 
 const schemas = require('../model/schema');
 const fileSchema = schemas.fileSchema;
@@ -16,7 +18,7 @@ const configs = {
 
 defaultSOption = {
   storage: 'db',
-  linkRoot: ''   //link = moduleName.toLowerCase() + "/download" - download needs to be enabled.
+  linkRoot: ''   // link = moduleName.toLowerCase() + "/download" - download needs to be enabled.
 };
 /* Config examples:
 const fileSOption = {
@@ -36,6 +38,7 @@ const getOptionByName = function(moduleName) {
 const getConfigByName = function(moduleName) {
   return configs[moduleName] || {  owner: {enable: true, type: 'module'} };
 };
+
 const ownerPatch = function (query, owner, req) {
   if (owner && owner.enabled) {
     if (owner.type === 'module') {
@@ -45,6 +48,47 @@ const ownerPatch = function (query, owner, req) {
     }
   }
   return query;
+};
+
+const StoreToFileSystem = function(file, fileId, directory, cb) {
+  // Use the mv() method to place the file somewhere on your server
+  let fileName = path.join(directory, fileId);
+  file.mv(fileName, function(err) {
+    if (err) {
+      return cb(err, null)
+    }
+    return cb(null, fileName)
+  });
+};
+
+const StoreThumbnailToFileSystem = function(buffer, file, directory, cb) {
+  if (!buffer) {
+    return cb(null, 0);
+  }
+  let fileName = path.join(directory, file);
+  
+  fs.writeFile(fileName, buffer, (err, bytes) => {
+    if (err) { return cb(err); }
+    return cb(null, bytes);
+  });
+};
+
+const LoadFromFileSystem = function(fileId, directory, cb) {
+  // Use the mv() method to place the file somewhere on your server
+  let fileName = path.join(directory, fileId)
+  fs.readFile(fileName, function (err, data) {
+    return cb(err, data);
+  });
+};
+
+const DeleteFromFileSystem = function(fileId, directory, hasFile, cb) {
+  if (!hasFile) {return cb(null);}
+  
+  // Use the mv() method to place the file somewhere on your server
+  let fileName = path.join(directory, fileId)
+  fs.unlink(fileName, function (err) {
+    return cb(err);
+  });
 };
 
 const FileController = function() {};
@@ -59,9 +103,11 @@ FileController.setOption = function(moduleName, option) {
       if (!option.directory) {
         throw "File Server: storage directory must be provided for storage type 'fs'";
       }
+      /*
       if (!fs.existsSync(option.directory)) {
         fs.mkdirSync(option.directory, {recursive: true});
       }
+      */
       if (!fs.existsSync(option.directory)) {
         throw "File Server: storage directory doesn't exist for storage type 'fs': " + option.directory;
       }
@@ -81,7 +127,7 @@ FileController.setOption = function(moduleName, option) {
 };
 
 
-FileController.Create = function(req, res, next) {
+FileController.Create = async function (req, res, next) {
   let moduleName = req.mddsModuleName;
   let sOption = getOptionByName(moduleName);
   let owner = getConfigByName(moduleName).owner;
@@ -106,6 +152,16 @@ FileController.Create = function(req, res, next) {
     md5: file.md5,
     //data: file.data
   };
+  
+  let thumbnail;
+  try {
+    const dimensions = sizeOf(file.data);
+    let options = { height: 160, width: Math.floor(160*dimensions.width/dimensions.height), responseType: 'buffer' };
+    thumbnail = await imageThumbnail(file.data.toString('base64'), options);
+  } catch (err) {
+    console.log("thumbnail create error: ", err);
+  }
+  fo.hasThumbnail = !!thumbnail;
 
   if (owner && owner.enable) {
     fo = ownerPatch(fo, owner, req);
@@ -113,8 +169,9 @@ FileController.Create = function(req, res, next) {
   
   if (sOption && sOption.storage == 'db') {
     fo.data = file.data
+    fo.thumbnail = thumbnail;
   }
-  
+
   File.create(fo, function (err, savedDoc) {
     if (err) { return next(err); }
     
@@ -131,10 +188,17 @@ FileController.Create = function(req, res, next) {
           File.findByIdAndDelete(doc._id).exec();
           return next(err); 
         }
-        savedDoc.link = sOption.linkRoot + "/" + doc._id.toString();
-        savedDoc.save();
-        doc.link = savedDoc.link;
-        return res.send(doc);
+        StoreThumbnailToFileSystem(thumbnail, doc._id.toString()  + '_thumbnail',
+                sOption.directory, (err, result) => {
+          if (err) {
+            File.findByIdAndDelete(doc._id).exec();
+            return next(err); 
+          }
+          savedDoc.link = sOption.linkRoot + "/" + doc._id.toString(); //assume the storage is under web root.
+          savedDoc.save();
+          doc.link = savedDoc.link;
+          return res.send(doc);
+       });
       });
     } else if (sOption && sOption.storage == 'db') {
       savedDoc.link = sOption.linkRoot + '/download/' + doc._id.toString();
@@ -149,20 +213,32 @@ FileController.Download = function(req, res, next) {
   let moduleName = req.mddsModuleName;
   let sOption = getOptionByName(moduleName);
 
-  let id = req.params["fileID"];
-
+  let fileName = req.params["fileID"];
+  let id = fileName;
+  let thumbnail = false;
+  if (fileName.includes('_thumbnail')) {
+    id = fileName.replace('_thumbnail', '');
+    thumbnail = true;
+  }
+  
   let dbExec = File.findById(id, function (err, doc) {
     if (err) {
       return next(err); 
     }
+    if (thumbnail && !doc.hasThumbnail) {
+      return next(createError(404, "File not found."));
+    }
     if (sOption && sOption.storage == 'fs') {
-      LoadFromFileSystem(doc._id.toString(), sOption.directory, (err, data) => {
+      LoadFromFileSystem(fileName, sOption.directory, (err, data) => {
         if (err) {
           return next(err); 
         }
         return res.send(data);
       });
     } else if (sOption && sOption.storage == 'db') {
+      if (thumbnail) {
+        return res.send(doc.thumbnail);
+      }
       return res.send(doc.data);
     }
   });
@@ -177,42 +253,20 @@ FileController.Delete = function(req, res, next) {
   File.findByIdAndDelete(id).exec(function (err, result) {
     if (err) { return next(err); }
     if (sOption && sOption.storage == 'fs') {
-      DeleteFromFileSystem(doc._id.toString(), sOption.directory, (err) => {
+      DeleteFromFileSystem(doc._id.toString(), sOption.directory, true, (err) => {
         if (err) {
           return next(err); 
         }
-        return res.send();
+        DeleteFromFileSystem(doc._id.toString() + '_thumbnail', sOption.directory, doc.hasThumbnail, (err) => {
+          if (err) {
+            return next(err); 
+          }
+          return res.send();
+        });
       });
     } else if (sOption && sOption.storage == 'db') {
       return res.send();
     }
-  });
-};
-
-const StoreToFileSystem = function(file, fileId, directory, cb) {
-  // Use the mv() method to place the file somewhere on your server
-  let fileName = path.join(directory, fileId)
-  file.mv(fileName, function(err) {
-    if (err) {
-      return cb(err, null)
-    }
-    return cb(null, fileName)
-  });
-};
-
-const LoadFromFileSystem = function(fileId, directory, cb) {
-  // Use the mv() method to place the file somewhere on your server
-  let fileName = path.join(directory, fileId)
-  fs.readFile(fileName, function (err, data) {
-    return cb(err, data);
-  });
-};
-
-const DeleteFromFileSystem = function(fileId, directory, cb) {
-  // Use the mv() method to place the file somewhere on your server
-  let fileName = path.join(directory, fileId)
-  fs.unlink(fileName, function (err) {
-    return cb(err);
   });
 };
 

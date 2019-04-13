@@ -1,8 +1,8 @@
 const schema = require('./schema');
 
 const fileSchema = schema.fileSchema;
-const fB = 'name type labels size link uploaded thumbnail';
-const fD = 'name type labels size link uploaded thumbnail';
+const fB = 'name type labels size link uploaded hasThumbnail';
+const fD = 'name type labels size link uploaded hasThumbnail';
 const fC = 'name labels';
 const fE = 'name labels';
 const fTS = 'name labels';  // fields that can make text search on.

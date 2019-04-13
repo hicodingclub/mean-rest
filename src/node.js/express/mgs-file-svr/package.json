@@ -24,7 +24,9 @@
   },
   "homepage": "",
   "dependencies": {
-    "express-fileupload": "^1.1.2-alpha.1"
+    "express-fileupload": "^1.1.2-alpha.1",
+    "image-size": "^0.7.2",
+    "image-thumbnail": "^1.0.2"
   },
   "peerDependencies": {
     "express": "^4.16.3",
