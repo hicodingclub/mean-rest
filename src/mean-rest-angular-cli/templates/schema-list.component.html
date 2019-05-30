@@ -19,13 +19,13 @@
 		<div class="row"><%_ let showRefreshIcon = true;%><% include schema-list.pagination.html %>
 		</div>
 	</div>
-	
-	<table class="table table-bordered table-hover">
+
+	<table *ngIf="isShowListView()" class="table table-bordered table-hover">
 	    <thead class="thead-light">
 	    	<tr>
 		        <th scope="col">#</th>
 <%_ for (let field of briefView){ %>
-		        <th scope="col"><%-field.displayName%></th><%_ } %>		        
+		        <th scope="col"><%-field.displayName%></th><%_ } %>
 		        <%if(api.includes("D") || api.includes("U")){%><th scope="col" style="width:6rem;"></th><%}%>
 		        <%if(api.includes("D")){%><th scope="col" style="width:2rem;">
 		        	<input type="checkbox" [(ngModel)]="checkAll" (change)="onCheckAllChange()">
@@ -34,11 +34,11 @@
 	    </thead>
 	    <tbody>
 	        <tr *ngFor="let detail of list;  let i = index" [ngClass]="{'clicked-row': clickedId==detail['_id']}">
-	            <td scope="row" <%if(api.includes("D")){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%>>
+	            <td scope="row" <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%>>
 	            	{{(page-1)*per_page+i+1}}
 	            </td>
 <%_ let view = 'list'; for (let field of briefView){ let fn = field.fieldName, ft = field.type; let ref_link = true; %>
-	            <td <%if(api.includes("D")){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%>>
+	            <td <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%>>
 	            	<% include schema-display.field.html %>
 	            </td><%_ } %>
 	            <%if(api.includes("D") || api.includes("U")){%>
@@ -53,7 +53,21 @@
 	        </tr>
 	    </tbody>
 	</table>
-	
+
+	<div class="grids" *ngIf="!isShowListView()">
+		<div class="grid-block" *ngFor="let detail of list;  let i = index">
+			<div class="card text-left <%if(api.includes('R')){%>clickable-card<%}%>"
+			    <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"
+				[ngClass]="{'clicked-row': clickedId==detail['_id']}" <%}%>>
+				<div class="card-body">
+					<div class="card-text">
+			<%_ let viewFields = briefView; %><%_ include schema-display.fields.html %>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<div class="container">
 		<div class="row"><%_ showRefreshIcon = false;%><% include schema-list.pagination.html %>
 		</div>

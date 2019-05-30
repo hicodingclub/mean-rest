@@ -1,4 +1,8 @@
-			<div class="col-3">
+			<div class="col-3"><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {%>				
+				<input type="radio" name="view-filter" id="list-view" class="view-radio" (click)="setListView(true)" checked>
+					<label for="list-view"><i class="fa fa-list-alt"></i></label>
+				<input type="radio" name="view-filter" id="grid-view" class="view-radio" (click)="setListView(false)">
+					<label for="grid-view"><i class="fa fa-th"></i></label><% } %>
 			</div>
 			<div class="col-6">
 			  <div *ngIf="total_pages > 1">
@@ -34,7 +38,7 @@
 			</div>
 			<div class="col-3">
 				<div class="total_counts">
-					Total: <b>{{total_count}}</b> items <%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {%>
-					<a class="float-right" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a><% } %>
+					Total: <b>{{total_count}}</b> items <%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {%>				
+					<a class="mr-2 float-right" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a><% } %>
 				</div>
 			</div>			

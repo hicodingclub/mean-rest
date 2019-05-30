@@ -68,14 +68,16 @@ export class BaseComponent implements BaseComponentInterface {
     protected dateFormat = "MM/DD/YYYY";
     protected timeFormat = "hh:mm:ss";
 
+    protected showListView = true; // true: list, false: grid
+
     protected hiddenFields = []; //fields hide from view. Currrently used by "Add" view of edit-sub
 
     protected ItemCamelName: string;
     protected itemName: string;
     protected parentItem: string;
-  
+
     protected refreshing: boolean = false;
-  
+
     protected commonService: MraCommonService;
 
     constructor(
@@ -882,6 +884,13 @@ export class BaseComponent implements BaseComponentInterface {
     
     
     /*UI operations handlers*/
+    public setListView(list:boolean):void {
+        this.showListView = list;
+    }
+    public isShowListView():boolean {
+        return this.showListView;
+    }
+
     public onRefresh():void {
         if (this.view == ViewType.LIST) {
           this.refreshing = true;

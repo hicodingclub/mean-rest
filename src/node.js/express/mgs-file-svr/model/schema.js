@@ -21,6 +21,6 @@ const fileLabelsSchema = new Schema({
 });
 
 module.exports = {
-        fileSchema: fileSchema,
-        fileLabelsSchema: fileLabelsSchema,
+  fileSchema: fileSchema,
+  fileLabelsSchema: fileLabelsSchema,
 }

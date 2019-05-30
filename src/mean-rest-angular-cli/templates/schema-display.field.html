@@ -10,32 +10,32 @@
                         if (field.enumValues && field.elementUnique) {%>
                     <div class="badge badge-pill badge-secondary" *ngFor="let element of enums['<%-fn%>']">
                          <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection'][element]">{{element}}</div>
-                    </div><%}%><%
-                } else if (field.elementType === 'SchemaString') {%>
+                    </div><%
+                        } else if (field.elementType === 'SchemaString') {%>
                     <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
-                    	<ng-template ngFor let-element [ngForOf]="detail['<%-fn%>']['selection']" let-idx="index">
+                        <ng-template ngFor let-element [ngForOf]="detail['<%-fn%>']['selection']" let-idx="index">
                             <div class="badge badge-pill badge-secondary">
                                 {{element}}
                             </div>
-						</ng-template>
+                        </ng-template>
                     </div><%
-                } else if (field.elementType === 'ObjectId') {%>
+                        } else if (field.elementType === 'ObjectId') {%>
                     <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
-                    	<ng-template ngFor let-element [ngForOf]="detail['<%-fn%>']['selection']" let-idx="index">
+                        <ng-template ngFor let-element [ngForOf]="detail['<%-fn%>']['selection']" let-idx="index">
                             <div class="badge-click badge badge-pill badge-secondary" 
                                 (click)="onDisplayRefClicked('<%-fn%>', detail['<%-fn%>']['selection'][idx], $event)">
                                 {{element.value}}
                             </div>
-						</ng-template>
-                    </div><%                       
+                        </ng-template>
+                    </div><%}%><%
                 } else if (ft === 'Map') {
                         if (field.elementType === 'SchemaString') {%>
                     <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
-                    	<ng-template ngFor let-element [ngForOf]="objectKeys(detail['<%-fn%>']['selection'])" let-idx="index">
+                        <ng-template ngFor let-element [ngForOf]="objectKeys(detail['<%-fn%>']['selection'])" let-idx="index">
                             <div class="row">
                                 <div class="col-3">{{element}}:</div>
                                 <div class="col-3">{{detail['<%-fn%>']['selection'][element]}}</div>
                             </div>
-						</ng-template>
+                        </ng-template>
                     </div><%}%><%
                 } else {%>  {{detail['<%-fn%>']}} <%}%>

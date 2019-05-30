@@ -106,10 +106,11 @@ table {
 }
 
 .clicked-row {
-background-color: #dcdfe0;
+    /*background-color: #dcdfe0;
+    background-color: rgba(0,0,0,.075); */
 }
 .selected-row {
-background-color: #c9f5eb;
+    background-color: #c9f5eb;
 }
 
 
@@ -175,4 +176,55 @@ tr th:first-child{
 div.badge-click:hover {
   background-color: #495057 !important;
   text-decoration: underline;
+}
+
+.view-radio + label {
+  transition: all 0.2s ease-in-out;
+  color: #bbbdbf;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 1rem 0 0;
+}
+.view-radio:checked + label {
+  color: #212529;
+}
+.view-radio + label:hover {
+  color: #212529;
+}
+
+.view-radio {
+  display: none;
+}
+
+.grids {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  border-top: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.grid-block {
+  width: 18rem;
+  display: inline-block;
+  margin: 0.5rem;
+  align-self: stretch;
+  border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;
+}
+
+.clickable-card:hover {
+  cursor: pointer;
+  background-color: rgba(0,0,0,.075);
+}
+
+.card label {
+  font-weight: bold;
+	font-size: 1rem;
+}
+
+.grid-block .card {
+  border: none;
 }
