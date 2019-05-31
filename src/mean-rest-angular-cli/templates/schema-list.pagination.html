@@ -1,8 +1,10 @@
 			<div class="col-3"><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {%>				
-				<input type="radio" name="view-filter" id="list-view" class="view-radio" (click)="setListView(true)" checked>
+				<input type="radio" name="view-filter" id="list-view" class="view-radio" 
+					(click)="setListViewFilter('list')" [checked]="isShowListView()">
 					<label for="list-view"><i class="fa fa-list-alt"></i></label>
-				<input type="radio" name="view-filter" id="grid-view" class="view-radio" (click)="setListView(false)">
-					<label for="grid-view"><i class="fa fa-th"></i></label><% } %>
+				<input type="radio" name="view-filter" id="grid-view" class="view-radio"
+					(click)="setListViewFilter('grid')" [checked]="!isShowListView()">
+				  <label for="grid-view"><i class="fa fa-th"></i></label><% } %>
 			</div>
 			<div class="col-6">
 			  <div *ngIf="total_pages > 1">

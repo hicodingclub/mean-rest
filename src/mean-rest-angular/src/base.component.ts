@@ -68,7 +68,7 @@ export class BaseComponent implements BaseComponentInterface {
     protected dateFormat = "MM/DD/YYYY";
     protected timeFormat = "hh:mm:ss";
 
-    protected showListView = true; // true: list, false: grid
+    protected listViewFilter = 'list'; // list, or grid
 
     protected hiddenFields = []; //fields hide from view. Currrently used by "Add" view of edit-sub
 
@@ -884,11 +884,13 @@ export class BaseComponent implements BaseComponentInterface {
     
     
     /*UI operations handlers*/
-    public setListView(list:boolean):void {
-        this.showListView = list;
+    public setListViewFilter(view: string):void {
+        this.listViewFilter = view;
+        this.putToStorage('listViewFilter', view);
     }
     public isShowListView():boolean {
-        return this.showListView;
+        const cached = this.getFromStorage('listViewFilter');
+        return cached ? cached === 'list' : this.listViewFilter === 'list';
     }
 
     public onRefresh():void {

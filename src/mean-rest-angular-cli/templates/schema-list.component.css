@@ -2,15 +2,26 @@ table {
 	margin-top: 0.5rem;
 }
 
-td i {
+.card-action-icons {
+  text-align: right;
+  position: absolute;
+  bottom: 0px;
+  right: 0.5rem;
+}
+
+td i, .card-action-icons i {
 	color:black;
 	margin-left: 0.5rem;
 	margin-right: 0.5rem;
 }
-td a i:hover {
+.card-action-icons input {
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+}
+td a i:hover, .card-action-icons a i:hover{
 	color: blue;
 }
-td a i.fa-trash-alt:hover {
+td a i.fa-trash-alt:hover, .card-action-icons a i.fa-trash-alt:hover {
 	color: red;
 }
 
@@ -211,8 +222,8 @@ div.badge-click:hover {
   display: inline-block;
   margin: 0.5rem;
   align-self: stretch;
-  border: 1px solid rgba(0,0,0,.125);
-  border-radius: .25rem;
+  /*border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;*/
 }
 
 .clickable-card:hover {
@@ -225,6 +236,17 @@ div.badge-click:hover {
 	font-size: 1rem;
 }
 
-.grid-block .card {
-  border: none;
+.thumbnail {
+  overflow: hidden;
+  height: 72px;
+}
+.thumbnail-card-top {
+  overflow: hidden;
+  height: 40%;
+}
+.thumbnail img, .thumbnail-card-top img  {
+  height: 100%;
+  left: 50%;
+  position: relative;
+  transform: translateX(-50%);
 }
