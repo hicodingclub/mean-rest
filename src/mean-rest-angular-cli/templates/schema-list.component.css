@@ -1,5 +1,50 @@
+/* table rows, cards, and icons in list view and card view
+*/
+
 table {
-	margin-top: 0.5rem;
+  margin-top: 0.5rem;
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+
+.clicked-row {
+  /*background-color: #dcdfe0;
+  background-color: rgba(0,0,0,.075); */
+}
+.selected-row {
+  background-color: #c9f5eb;
+}
+
+
+tr th:first-child{
+  width:8%;
+  white-space:nowrap;
+}
+
+.grids {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  border-top: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.grid-block {
+  width: 18rem;
+  display: inline-block;
+  margin: 0.5rem;
+  align-self: stretch;
+  /*border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;*/
+}
+
+.clickable-card:hover {
+  background-color: rgba(0,0,0,.075);
+}
+
+.card label {
+  font-weight: bold;
+	font-size: 1rem;
 }
 
 .card-action-icons {
@@ -9,21 +54,29 @@ table {
   right: 0.5rem;
 }
 
-td i, .card-action-icons i {
+td input, .card-action-icons input {
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+}
+
+td a i, .card-action-icons a i {
+	color:rgb(196, 191, 191);
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+}
+/*change the icon color when card is hoverred*/
+tr:hover td a i, .clickable-card:hover .card-action-icons a i {
 	color:black;
-	margin-left: 0.5rem;
-	margin-right: 0.5rem;
 }
-.card-action-icons input {
-	margin-left: 0.5rem;
-	margin-right: 0.5rem;
-}
-td a i:hover, .card-action-icons a i:hover{
+tr:hover td i.fa-edit:hover, .clickable-card:hover .card-action-icons i.fa-edit:hover{
 	color: blue;
 }
-td a i.fa-trash-alt:hover, .card-action-icons a i.fa-trash-alt:hover {
+tr:hover td i.fa-trash-alt:hover, .clickable-card:hover .card-action-icons i.fa-trash-alt:hover {
 	color: red;
 }
+
+/* action buttons and paginations
+*/
 
 .action-buttons {
 	width: 100%;
@@ -35,13 +88,17 @@ td a i.fa-trash-alt:hover, .card-action-icons a i.fa-trash-alt:hover {
 	margin-left: 1rem;
 }
 
-
 .pagination li {
 	min-width: 2.8rem;
 }
 .total_counts {
-	padding-top: 0.8rem;
+  padding-top: 0.8rem;
+  text-align: right;
 }
+
+
+/* earch area
+*/
 
 ::-ms-clear {
   display: none;
@@ -81,6 +138,9 @@ margin-left: 1rem;
   color: #868181;
 }
 
+/* pop-up models
+*/
+
 .select-model {
     display: block; 
     position: fixed; 
@@ -111,24 +171,6 @@ margin-left: 1rem;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
 }
 
-table {
-    table-layout: fixed;
-    word-wrap: break-word;
-}
-
-.clicked-row {
-    /*background-color: #dcdfe0;
-    background-color: rgba(0,0,0,.075); */
-}
-.selected-row {
-    background-color: #c9f5eb;
-}
-
-
-tr th:first-child{
-    width:8%;
-    white-space:nowrap;
-}
 
 .single-line-edit {
 	
@@ -189,6 +231,9 @@ div.badge-click:hover {
   text-decoration: underline;
 }
 
+/* Grid/List view filter
+*/
+
 .view-radio + label {
   transition: all 0.2s ease-in-out;
   color: #bbbdbf;
@@ -209,33 +254,8 @@ div.badge-click:hover {
   display: none;
 }
 
-.grids {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: left;
-  border-top: 1px solid #dee2e6;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.grid-block {
-  width: 18rem;
-  display: inline-block;
-  margin: 0.5rem;
-  align-self: stretch;
-  /*border: 1px solid rgba(0,0,0,.125);
-  border-radius: .25rem;*/
-}
-
-.clickable-card:hover {
-  cursor: pointer;
-  background-color: rgba(0,0,0,.075);
-}
-
-.card label {
-  font-weight: bold;
-	font-size: 1rem;
-}
-
+/* Show pictures in list/grid view
+*/
 .thumbnail {
   overflow: hidden;
   height: 72px;

@@ -16,7 +16,8 @@
 
 
 		<hr/>
-		<div class="row"><%_ let showRefreshIcon = true;%><% include schema-list.pagination.html %>
+		<div class="row">
+			<%_ let showRefreshIcon = true;%><% include schema-list.pagination.html %>
 		</div>
 	</div>
 
@@ -26,11 +27,11 @@
 		        <th scope="col">#</th>
 <%_ for (let field of briefView){ %>
 		        <th scope="col"><%-field.displayName%></th><%_ } %>
-		        <%if(api.includes("D") || api.includes("U")){%><th scope="col" style="width:6rem;"></th><%}%>
-		        <%if(api.includes("D")){%><th scope="col" style="width:2rem;">
-		        	<input type="checkbox" [(ngModel)]="checkAll" (change)="onCheckAllChange()">
-		        </th><%}%>
-	        </tr>
+		        <% let widthTh = 1.8;
+				if (api.includes("D")) {widthTh += 4;}
+				if (api.includes("U")) {widthTh += 2;}
+				if (widthTh > 1.8){%><th scope="col" style="width:<%-widthTh%>rem;"></th><%}%>
+	    	</tr>
 	    </thead>
 	    <tbody>
 	        <tr *ngFor="let detail of list;  let i = index" [ngClass]="{'clicked-row': clickedId==detail['_id']}">
@@ -45,10 +46,7 @@
 	            <td>
 	            	<%if(api.includes("U")){%><a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>
 	            	<%if(api.includes("D")){%><a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
-	            </td><%}%>
-	            <%if(api.includes("D")){%>
-	            <td>      
-	            	<input type="checkbox" [(ngModel)]="checkedItem[i]"/>
+					<%if(api.includes("D")){%><input type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
 	            </td><%}%>
 	        </tr>
 	    </tbody>
@@ -56,7 +54,7 @@
 
 	<div class="grids" *ngIf="!isShowListView()">
 		<div class="grid-block" *ngFor="let detail of list;  let i = index">
-			<div class="card text-left h-100 <%if(api.includes('R')){%>clickable-card<%}%>"
+			<div class="card text-left h-100 clickable-card <%if(api.includes('R')){%>pointer<%}%>"
 				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >
 				<div class="card-body" <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%>>
 					<div class="card-text">

@@ -40,7 +40,9 @@
 			</div>
 			<div class="col-3">
 				<div class="total_counts">
-					Total: <b>{{total_count}}</b> items <%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {%>				
-					<a class="mr-2 float-right" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a><% } %>
+					Total: <b>{{total_count}}</b><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {
+					%><%if(api.includes("D")){%>
+					<input type="checkbox" class="ml-3 mr-1" [(ngModel)]="checkAll" (change)="onCheckAllChange()"><small>Select All</small><%}%>			
+					<a class="ml-3" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a><%}%>
 				</div>
 			</div>			
