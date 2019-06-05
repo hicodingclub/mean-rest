@@ -1,0 +1,27 @@
+<input type="file" #file style="display: none" (change)="onFilesAdded()"  /><!-- add 'multiple' to allow multiple file selection -->
+<div style="width: 100%;">
+  <div class="thumbnail d-inline-block w-50">
+    <img *ngIf="downloadUrl" src="{{downloadUrl}}">
+    <i *ngIf="!downloadUrl" class="far fa-image"></i>
+  </div>
+  <div class="select-file">
+    <div *ngIf="!progress && localImage" class="thumbnail-local">
+        <img [src]="localImage | SafeUrlPipe">
+    </div>
+    <div *ngIf="progress">
+        <ul>
+            <li *ngFor="let file of files">
+                <small>{{file.name}}
+                    <span>{{progress[file.name].progress | async}} </span>
+                    <span *ngIf="uploadSuccessful">
+                        <span *ngIf="progress[file.name].result.success">SUCC</span>
+                        <span *ngIf="!progress[file.name].result.success">FAIL</span>
+                    </span>
+                </small>
+            </li>
+        </ul>
+    </div>
+    <button type="button" class="btn btn-link ml-2" (click)="selectFiles()">Choose</button>
+    <button type="button" [disabled]="uploadSuccessful" class="btn btn-link ml-2" (click)="uploadFiles()">Use This</button>    
+  </div>
+</div>

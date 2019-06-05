@@ -1,0 +1,34 @@
+/* Show pictures in list/grid view
+*/
+.thumbnail {
+    overflow: hidden;
+    height: 6rem;
+    background-color: #a39f9f;
+}
+
+.thumbnail-local {
+    overflow: hidden;
+    height: 4rem;
+    background-color: #f1f1f1;
+}
+
+.thumbnail img, .thumbnail-local img {
+    height: 100%;
+    left: 50%;
+    position: relative;
+    transform: translateX(-50%);
+    padding: 1px;
+}
+
+.thumbnail i {
+    font-size: 6rem;
+    left: 50%;
+    position: relative;
+    transform: translateX(-50%);
+}
+
+.select-file {
+    display: inline-block;
+    max-width: 50%;
+    padding-left: 0.75rem;
+}
