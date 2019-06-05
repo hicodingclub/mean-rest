@@ -132,6 +132,9 @@ class FileController {
     let sOption = getOptionByName(moduleName);
     let owner = getConfigByName(moduleName).owner;
     const files = Object.values(req.files); //[mfile1, mfile2, ... ]
+
+    let fileID = req.params["fileID"];
+
     if (files.length == 0) {
       return next(createError(400, "No files were included in the request."));
     }
@@ -148,13 +151,15 @@ class FileController {
       size: file.size,
       md5: file.md5,
     };
+    let filter = {
+      _id: "doesn't exist"
+    };
     let thumbnail;
     try {
       const dimensions = sizeOf(file.data);
       let options = { height: 160, width: Math.floor(160 * dimensions.width / dimensions.height), responseType: 'buffer' };
       thumbnail = await imageThumbnail(file.data.toString('base64'), options);
-    }
-    catch (err) {
+    } catch (err) {
       console.log("thumbnail create error: ", err);
     }
     fo.hasThumbnail = !!thumbnail;
@@ -165,10 +170,20 @@ class FileController {
       fo.data = file.data;
       fo.thumbnail = thumbnail;
     }
-    File.create(fo, function (err, savedDoc) {
-      if (err) {
-        return next(err);
+    if (fileID) {
+      fo._id = fileID;
+      filter._id = fileID;
+    } 
+    try {
+      let savedDoc;
+      if (fileID) {
+        await File.update(filter, fo, {upsert: true, setDefaultsOnInsert: true});
+        savedDoc = fo;
+        savedDoc._id = filter._id;
+      } else {
+        savedDoc = await File.create(fo);
       }
+
       let doc = {
         _id: savedDoc._id,
         name: savedDoc.name,
@@ -200,7 +215,9 @@ class FileController {
         doc.link = savedDoc.link;
         return res.send(doc);
       }
-    });
+    } catch (err) {
+      return next(err);
+    }
   }
   
   static Download(req, res, next) {

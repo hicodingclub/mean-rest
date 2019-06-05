@@ -18,6 +18,7 @@ const FileExpressRouter = function(sysDef, moduleName, authConfig, options) {
   router = express.Router();
   router.use(fileUpload());
   router.post("/", FileController.Create);
+  router.post("/:fileID", FileController.Replace);
   restRouter = meanRestExpress.RestRouter.Hook(restRouter, "upload", router);
   //2. load "download" router for file download
   router = express.Router();
