@@ -151,7 +151,9 @@ var getPrimitiveField = function(fieldSchema) {
     let flagDate = false;
     let flagRef = false;
     let flagEditor = false;
-
+    let flagPicture = false;
+    let flagFile = false;
+    let flagSharable = false;
 
     type = fieldSchema.constructor.name;
 
@@ -171,7 +173,13 @@ var getPrimitiveField = function(fieldSchema) {
             if (fieldSchema.options.editor == true) {
                 editor = true;
                 flagEditor = true;
-            }					
+            }	else if (fieldSchema.options.mraType === 'picture') {
+              flagPicture = true;
+              flagSharable = !!fieldSchema.options.mraSharable;
+            } else if (fieldSchema.options.mraType === 'file' ) {
+              flagFile = true;
+              flagSharable = !!fieldSchema.options.mraSharable;
+            }
             break;
         case "SchemaBoolean":
             jstype = "boolean";
@@ -204,7 +212,7 @@ var getPrimitiveField = function(fieldSchema) {
 
     return [type, jstype, numberMin, numberMax, maxlength, minlength,  enumValues, 
             ref, Ref, RefCamel, editor,
-            flagDate, flagRef, flagEditor]
+            flagDate, flagRef, flagEditor, flagPicture, flagFile, flagSharable];
 }
 
 var processField = function(x) {
@@ -267,6 +275,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
     let hasRequiredMultiSelection = false;
     let hasRequiredArray = false;
     let hasRequiredMap = false;
+    let hasFileUpload = false;
 
 	  for (let item of viewDef) {
 	    let hidden = false;
@@ -291,7 +300,10 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
       let flagDate = false;
       let flagRef = false;
       let flagEditor = false;
-
+      let flagPicture = false;
+      let flagFile = false;
+      let flagSharable = false;
+  
       //for array
       let elementUnique = false;
       let elementType;
@@ -315,16 +327,17 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
           case "SchemaDate":
               [type,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
               ref, Ref, RefCamel, editor,
-              flagDate, flagRef, flagEditor]
+              flagDate, flagRef, flagEditor, flagPicture, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema);
               if (flagDate) hasDate = true;
               if (flagRef) hasRef = true;
               if (flagEditor) hasEditor = true;
+              if (flagPicture || flagFile) hasFileUpload = true;
               break;
           case "SchemaArray":
               [elementType,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
               ref, Ref, RefCamel, editor,
-              flagDate, flagRef, flagEditor]
+              flagDate, flagRef, flagEditor, flagPicture, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema.caster);
               //rewrite the default value for array
               let defaultInput = fieldSchema.options.default;
@@ -354,7 +367,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
           case "Map":
               [elementType,  jstype,  numberMin,  numberMax,  maxlength,  minlength,  enumValues, 
               ref, Ref, RefCamel, editor,
-              flagDate, flagRef, flagEditor]
+              flagDate, flagRef, flagEditor, flagPicture, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema['$__schemaType']);
               //console.log("getPrimitiveField", getPrimitiveField(fieldSchema['$__schemaType']));
               //rewrite the default value for array
@@ -404,6 +417,9 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
           Ref: Ref,
           RefCamel: RefCamel,
           editor: editor,
+          picture: flagPicture, // a picture field
+          file: flagFile, // a file field
+          sharable: flagSharable, // picture or file is sharable
           //TODO: required could be a function
           required: requiredField,
           defaultValue: defaultValue,
@@ -470,7 +486,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
         if (arr.length > 0) viewGroups.push(arr);
     }
   	return [viewGroups, view, hasDate, hasRef, hasEditor, 
-  	        hasRequiredMultiSelection, hasRequiredArray, hasRequiredMap];
+  	        hasRequiredMultiSelection, hasRequiredArray, hasRequiredMap, hasFileUpload];
 }
 
 const getLoginUserPermission = function(permission) {
@@ -788,10 +804,13 @@ function main() {
   let hasRequiredMultiSelection = false;
   let hasRequiredArray = false;
   let hasRequiredMap = false;
+  let hasFileUpload = false;
   let dateFormat = 'MM/DD/YYYY';
   if (config && config.dateFormat) dateFormat = config.dateFormat;
   let timeFormat = 'hh:mm:ss';
   if (config && config.timeFormat) timeFormat = config.timeFormat;
+  let fileServer;
+  if (config && config.fileServer) fileServer = config.fileServer;
   let authRequired = false;
   
   for (let name in schemas) {
@@ -872,24 +891,24 @@ function main() {
   	});
   	//briefView, detailView, CreateView, EditView, SearchView, indexView]		
     let [briefViewGrp, briefView, hasDate1, hasRef1, hasEditor1, 
-          hasReqGrp1, hasReqArr1, hasReqMap1] = 
+          hasReqGrp1, hasReqArr1, hasReqMap1, hasFileUpload1] =
             generateViewPicture(name, views[0], mongooseSchema, validators);
     //console.log("***briefView", briefView);
     //console.log("***hasRef1", hasRef1);
     let [detailViewGrp, detailView, hasDate2, hasRef2, hasEditor2, 
-          hasReqGrp2, hasReqArr2, hasReqMap2] = 
+          hasReqGrp2, hasReqArr2, hasReqMap2, hasFileUpload2] = 
             generateViewPicture(name, views[1], mongooseSchema, validators);
     let [createViewGrp, createView, hasDate3, hasRef3, hasEditor3, 
-          hasReqGrp3, hasReqArr3, hasReqMap3] = 
+          hasReqGrp3, hasReqArr3, hasReqMap3, hasFileUpload3] =
             generateViewPicture(name, views[2], mongooseSchema, validators);
     let [editViewGrp, editView, hasDate4, hasRef4, hasEditor4, 
-          hasReqGrp4, hasReqArr4, hasReqMap4] = 
+          hasReqGrp4, hasReqArr4, hasReqMap4, hasFileUpload4] =
             generateViewPicture(name, views[3], mongooseSchema, validators);
     let [searchViewGrp, searchView, hasDate5, hasRef5, hasEditor5, 
-          hasReqGrp5, hasReqArr5, hasReqMap5] = 
+          hasReqGrp5, hasReqArr5, hasReqMap5, hasFileUpload5] =
             generateViewPicture(name, views[4], mongooseSchema, validators);
     let [indexViewGrp, indexView, hasDate6, hasRef6, hasEditor6, 
-          hasReqGrp6, hasReqArr6, hasReqMap6] = 
+          hasReqGrp6, hasReqArr6, hasReqMap6, hasFileUpload6] =
             generateViewPicture(name, views[5], mongooseSchema, validators);
   	let schemaHasDate = hasDate5 || hasDate6;
   	let schemaHasRef = false;
@@ -897,6 +916,7 @@ function main() {
     let schemaHasRequiredMultiSelection = false;
     let schemaHasRequiredArray = false;
     let schemaHasRequiredMap = false;
+    let schemaHasFileUpload = false;
     if (api.includes("L")) { // includes list view
       schemaHasDate = schemaHasDate || hasDate1;
       schemaHasRef = schemaHasRef || hasRef1;
@@ -911,6 +931,7 @@ function main() {
       schemaHasRequiredMultiSelection = schemaHasRequiredMultiSelection || hasReqGrp3;
       schemaHasRequiredArray = schemaHasRequiredArray || hasReqArr3;
       schemaHasRequiredMap = schemaHasRequiredMap || hasReqMap3;
+      schemaHasFileUpload = schemaHasFileUpload || hasFileUpload3;
     }
     if (api.includes("U")) { // includes editView
       schemaHasDate = schemaHasDate || hasDate4;
@@ -919,6 +940,7 @@ function main() {
       schemaHasRequiredMultiSelection = schemaHasRequiredMultiSelection || hasReqGrp4;
       schemaHasRequiredArray = schemaHasRequiredArray || hasReqArr4;
       schemaHasRequiredMap = schemaHasRequiredMap || hasReqMap4;
+      schemaHasFileUpload = schemaHasFileUpload || hasFileUpload4;
     }
     if (schemaHasDate) hasDate = true;
     if (schemaHasRef) hasRef = true;
@@ -926,6 +948,7 @@ function main() {
     if (schemaHasRequiredMultiSelection) hasRequiredMultiSelection = true;
     if (schemaHasRequiredArray) hasRequiredArray = true;
     if (schemaHasRequiredMap) hasRequiredMap = true;
+    if (schemaHasFileUpload) hasFileUpload = true;
       
     //let detailFields = views[1].replace(/\|/g, ' ').match(/\S+/g) || [];
     let detailSubViewStr = views[1];
@@ -934,7 +957,7 @@ function main() {
   	  detailSubViewStr = detailSubViewStr.replace(i, '');
   	}
   	let [detailSubViewGrp, detailSubView, hasDate7, hasRef7, 
-  	      hasEditor7, hasReqGrp7, hasReqMap7] = generateViewPicture(name, detailSubViewStr, mongooseSchema, validators);
+  	      hasEditor7, hasReqGrp7, hasReqMap7, hasFileUpload7] = generateViewPicture(name, detailSubViewStr, mongooseSchema, validators);
 
     let compositeEditView = [];
   	if (api.includes("U") ) {
@@ -1019,13 +1042,16 @@ function main() {
       schemaHasRequiredMultiSelection: schemaHasRequiredMultiSelection,
       schemaHasRequiredArray: schemaHasRequiredArray,
       schemaHasRequiredMap: schemaHasRequiredMap,
+      schemaHasFileUpload: schemaHasFileUpload,
       schemaHasValidator: schemaHasValidator,
       permission: schemaAnyonePermission,
       embeddedViewOnly: embeddedViewOnly,
       
       api: api,
       refApi: {},
-  		
+      
+      fileServer: fileServer,
+
   		FIELD_NUMBER_FOR_SELECT_VIEW: FIELD_NUMBER_FOR_SELECT_VIEW
   	}
   	//console.log("======schemaObj", schemaObj);
@@ -1088,9 +1114,11 @@ function main() {
     hasRequiredMultiSelection: hasRequiredMultiSelection,
     hasRequiredArray: hasRequiredArray,
     hasRequiredMap: hasRequiredMap,
+    hasFileUpload: hasFileUpload,
   	dateFormat: dateFormat,
     timeFormat: timeFormat,
-    authRequired: authRequired
+    authRequired: authRequired,
+    fileServer: fileServer,
   }
   //console.log("***renderObj", renderObj);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);

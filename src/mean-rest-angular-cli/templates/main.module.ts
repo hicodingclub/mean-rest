@@ -11,6 +11,8 @@ import { DirectiveMultiSelectionRequired } from './<%-moduleName%>.directive';<%
 import { DirectiveArrayRequired } from './<%-moduleName%>.directive';<%_ } %>
 <%_ if (hasRequiredMap) {%>
 import { DirectiveMapRequired } from './<%-moduleName%>.directive';<%_ } %>
+<%if (hasFileUpload) {%>
+import { FileUploadModule } from 'mdds-angular-file';<%}%>
 
 import { MraModule } from 'mean-rest-angular';
 
@@ -42,10 +44,10 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
   imports: [
     CommonModule,
     HttpClientModule,
-    FormsModule,
-    <%_ if (hasDate) {%>
+    FormsModule,<%_ if (hasDate) {%>
     NgbModule,<%}%>
-    MraModule,
+    MraModule,<%if (hasFileUpload) {%>
+    FileUploadModule,<%}%>
 
     <%-ModuleName%>RoutingModule
   ],
