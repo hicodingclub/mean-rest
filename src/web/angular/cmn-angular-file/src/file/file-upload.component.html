@@ -1,9 +1,12 @@
 <input type="file" #file style="display: none" (change)="onFilesAdded()"  /><!-- add 'multiple' to allow multiple file selection -->
 <div style="width: 100%;">
-  <div class="thumbnail d-inline-block w-50">
-    <img *ngIf="downloadUrl" src="{{downloadUrl}}">
-    <i *ngIf="!downloadUrl" class="far fa-image"></i>
+  <div class="display-file">
+    <div class="thumbnail">
+        <img *ngIf="downloadUrl" src="{{downloadUrl}}_thumbnail">
+        <i *ngIf="!downloadUrl" class="far fa-image"></i>
+    </div>
   </div>
+
   <div class="select-file">
     <div *ngIf="!progress && localImage" class="thumbnail-local">
         <img [src]="localImage | SafeUrlPipe">

@@ -1,0 +1,24 @@
+/* Show pictures in list/grid view
+*/
+.thumbnail {
+    overflow: hidden;
+    height: 6rem;
+    background-color: #f1f1f1;
+    width:100%;
+    max-width: 12rem;
+}
+
+.thumbnail img {
+    height: 100%;
+    left: 50%;
+    position: relative;
+    transform: translateX(-50%);
+    padding: 1px;
+}
+
+.thumbnail i {
+    font-size: 6rem;
+    left: 50%;
+    position: relative;
+    transform: translateX(-50%);
+}

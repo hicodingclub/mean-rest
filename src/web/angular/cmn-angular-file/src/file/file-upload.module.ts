@@ -4,6 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { MddsFileUploadService } from './file-upload.service';
 import { FileUploadComponent, SafeUrlPipe } from './file-upload.component';
+import { FileDisplayComponent } from './file-display.component';
 
 @NgModule({
     imports: [
@@ -13,9 +14,12 @@ import { FileUploadComponent, SafeUrlPipe } from './file-upload.component';
     declarations: [
         FileUploadComponent,
         SafeUrlPipe,
+
+        FileDisplayComponent,
     ],
     exports: [
-        FileUploadComponent
+        FileUploadComponent,
+        FileDisplayComponent,
     ],
     providers: [
         MddsFileUploadService,

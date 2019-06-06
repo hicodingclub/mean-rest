@@ -3,12 +3,16 @@
 .thumbnail {
     overflow: hidden;
     height: 6rem;
+    width:100%;
+    max-width: 12rem;
     background-color: #a39f9f;
 }
 
 .thumbnail-local {
     overflow: hidden;
     height: 4rem;
+    max-width: 8rem;
+    width:100%;
     background-color: #f1f1f1;
 }
 
@@ -25,6 +29,11 @@
     left: 50%;
     position: relative;
     transform: translateX(-50%);
+}
+
+.display-file {
+    display: inline-block;
+    width: 50%;
 }
 
 .select-file {
