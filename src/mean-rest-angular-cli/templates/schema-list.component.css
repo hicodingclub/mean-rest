@@ -21,7 +21,7 @@ tr th:first-child{
   white-space:nowrap;
 }
 
-.grids {
+.gridview {
   display: flex;
   flex-wrap: wrap;
   justify-content: left;
@@ -41,18 +41,58 @@ tr th:first-child{
   border-radius: .25rem;*/
 }
 
+.listview {
+  border-top: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.list-block {
+  width: 100%;
+  margin: 0.5rem;
+
+  word-break: break-word;
+  overflow-wrap: break-word;
+  /*border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;*/
+}
+
+.list-block > div {
+  display: flex;
+  align-items: center;
+}
+
+.list-fields {
+  display: inline-flex;
+  align-items: center;
+}
+.list-head-picture {
+  width: 6rem;
+  height: 6rem;
+  background-color: #f1f1f1;
+}
+.list-body-fields {
+}
+.list-diverder-gradient {
+  border: 0;
+  height: 2px;
+  background: #095484;
+  background-image: linear-gradient(to right, #ccc, #095484, #ccc);
+}
+.list-diverder {
+  width: 80%
+}
+
 .clickable-card:hover {
   background-color: rgba(0,0,0,.075);
 }
 
-.card label {
+.card label, .list-body-fields label {
   font-weight: bold;
 	font-size: 1rem;
 }
 
 .card-action-icons {
   text-align: right;
-  position: absolute;
   bottom: 0px;
   right: 0.5rem;
 }
