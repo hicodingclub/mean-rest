@@ -256,20 +256,3 @@ div.badge-click:hover {
 .view-radio {
   display: none;
 }
-
-/* Show pictures in list/grid view
-*/
-.thumbnail {
-  overflow: hidden;
-  height: 6rem;
-}
-.thumbnail-card-top {
-  overflow: hidden;
-  height: 40%;
-}
-.thumbnail img, .thumbnail-card-top img  {
-  height: 100%;
-  left: 50%;
-  position: relative;
-  transform: translateX(-50%);
-}

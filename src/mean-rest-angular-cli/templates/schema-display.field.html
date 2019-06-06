@@ -3,9 +3,6 @@
 	            	{{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}}
 	              <%if (ref_link){%></a><%_}%><%_
                 } else if (ft === 'SchemaDate') {%>  {{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}}<%_
-                } else if (ft === 'SchemaString' && field.editor && view == 'detail') {%> 
-	            	 <div mra-richtext-show="<%-schemaName%>Detail<%-field.FieldName%>"></div>
-	            	{{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}}<%_
                 } else if (ft === 'SchemaArray') {
                         if (field.enumValues && field.elementUnique) {%>
                     <div class="badge badge-pill badge-secondary" *ngFor="let element of enums['<%-fn%>']">
@@ -38,4 +35,13 @@
                             </div>
                         </ng-template>
                     </div><%}%><%
+                } else if (ft === 'SchemaString') {
+                        if (field.editor && view == 'detail') {%> 
+                    <div mra-richtext-show="<%-schemaName%>Detail<%-field.FieldName%>"></div>
+                   {{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}}<%
+                        } else if (field.picture) {%>
+                    <file-display [downloadUrl]="detail['<%-fn%>']"></file-display><%
+                        } else {%>
+                    {{detail['<%-fn%>']}}<%_
+                        }%><%
                 } else {%>  {{detail['<%-fn%>']}} <%}%>

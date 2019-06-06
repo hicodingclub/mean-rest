@@ -1,10 +1,8 @@
     <%_ for (let field of viewFields){
-        let lableLength = field.displayName.length;
-        let contentLength = field.displayName.toString().length;
         let fn = field.fieldName; let ft = field.type; let ref_link = true;
-        %><% if (lableLength + contentLength > 30) {%>
+        %><% if (field.picture) {%>
 			<div><label><%-field.displayName%>:</label></div>
-      <div class="ml-2"><% include schema-display.field.html %></div><%}
+      <div class="ml-2 w-75"><% include schema-display.field.html %></div><%}
         else {%>
       <div>
         <div class="d-inline-block"><label><%-field.displayName%>:</label></div>
