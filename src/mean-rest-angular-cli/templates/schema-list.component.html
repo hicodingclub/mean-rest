@@ -21,7 +21,7 @@
 		</div>
 	</div>
 
-	<table *ngIf="isShowListView()" class="table table-bordered table-hover">
+	<table *ngIf="isShowListView('table')" class="table table-bordered table-hover">
 	    <thead class="thead-light">
 	    	<tr>
 		        <th scope="col">#</th>
@@ -52,7 +52,7 @@
 	    </tbody>
 	</table>
 
-	<div class="grids" *ngIf="!isShowListView()">
+	<div class="grids" *ngIf="isShowListView('grid')">
 		<div class="grid-block" *ngFor="let detail of list;  let i = index">
 			<div class="card text-left h-100 clickable-card <%if(api.includes('R')){%>pointer<%}%>"
 				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >

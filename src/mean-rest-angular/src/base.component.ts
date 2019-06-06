@@ -65,10 +65,11 @@ export class BaseComponent implements BaseComponentInterface {
     protected multiSelectionFields = [];
     protected arrayFields = []; //element is [fieldName, elementType]
     protected mapFields = []; //element is [fieldName, elementType, mapKey]
+    protected fileFields = {}; //fieldName: {selectedFiles: [selected files]}
     protected dateFormat = "MM/DD/YYYY";
     protected timeFormat = "hh:mm:ss";
 
-    protected listViewFilter = 'list'; // list, or grid
+    protected listViewFilter = 'table'; // list, or grid
 
     protected hiddenFields = []; //fields hide from view. Currrently used by "Add" view of edit-sub
 
@@ -230,7 +231,7 @@ export class BaseComponent implements BaseComponentInterface {
         if (str.length > 30) str = str.substr(0, 27) + '...';
         return str;
     }
-  
+
     /***Start: handle reference fields***/
     protected formatReferenceField(field: any, fieldName: string ):any {
         let id, value;
@@ -657,7 +658,6 @@ export class BaseComponent implements BaseComponentInterface {
       );
       return this.eventEmitter;
     }
-    
 
     protected populateDetailFromCopy(copy_id:string):void {
       this.service.getDetail(copy_id).subscribe(
@@ -881,16 +881,15 @@ export class BaseComponent implements BaseComponentInterface {
         );
       return this.eventEmitter;
     }
-    
-    
+
     /*UI operations handlers*/
     public setListViewFilter(view: string):void {
         this.listViewFilter = view;
         this.putToStorage('listViewFilter', view);
     }
-    public isShowListView():boolean {
+    public isShowListView(view: string):boolean {
         const cached = this.getFromStorage('listViewFilter');
-        return cached ? cached === 'list' : this.listViewFilter === 'list';
+        return cached ? cached === view : this.listViewFilter === view;
     }
 
     public onRefresh():void {
