@@ -122,13 +122,15 @@ const getPopulatesRefFields = function(ref) {
 	return views[5]; //indexView
 };
 
-const fieldReducerForRef = function(refObj, indexField) {
+const fieldReducerForRef = function(refObj, indexFields) {
   let newRefObj = {};
   if ('_id' in refObj) {
       newRefObj['_id'] = refObj['_id'];
   }
-  if (indexField in refObj) {
+  for (let indexField of indexFields) {
+    if (indexField in refObj) {
       newRefObj[indexField] = refObj[indexField];
+    }
   }
   return newRefObj;
 };
@@ -141,15 +143,15 @@ const objectReducerForRef = function(obj, populateMap) {
     let fields = populateMap[path].match(/\S+/g); // \S matches no space characters.
     if (!fields) continue;
 
-    let indexField = fields[0];  //always use first one as index
+    let indexFields = fields;  //use all the fields
 
     let newRefObj;
     let refObj = obj[path];
     if (typeof refObj !== 'object' || refObj == null) continue;
     if (Array.isArray(refObj)) { //list of ref objects
-      newRefObj = refObj.map(o=>fieldReducerForRef(o, indexField)); //recursive call
+      newRefObj = refObj.map(o=>fieldReducerForRef(o, indexFields)); //recursive call
     } else {
-      newRefObj = fieldReducerForRef(refObj, indexField);
+      newRefObj = fieldReducerForRef(refObj, indexFields);
     }
     //now only "_id" and the indexField will be left.
     obj[path] = newRefObj;

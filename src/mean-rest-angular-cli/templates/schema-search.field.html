@@ -5,15 +5,13 @@
 
     <%_ if (field.type === "SchemaString") { %>
         <%_ if (field.enumValues) { %>
-	        <div class="form-check"
 	          <%_ field.enumValues.forEach( (f) => { %>
 	          <div class="form-check-inline">
 		        <input type="radio" name="<%-sn%>Edit<%-Fn%>" 
 		        	class="form-check-input"
 		        	id="<%-sn%>Edit<%-Fn%><%-f%>" [value]="'<%-f%>'"
 		        	#<%-sn%>Edit<%-Fn%>="ngModel">
-		      	<label class="form-check-label"><%-f%></label>
-		      </div>
+		      	<span class="form-check-label"><%-f%></span>
 		      <%_ }) %>
 		    </div>
         <%_ } else { %>
@@ -23,24 +21,22 @@
 	                #<%-sn%>Edit<%-Fn%>="ngModel">
         <%_ } %>
     <%_ } else if (field.type === "SchemaBoolean") { %>
-	        <div class="form-check">
-	          <div class="form-check-inline">
-		        <input type="radio" name="<%-sn%>Edit<%-Fn%>" 
+	        <div class="form-check-inline">
+		      	<input type="radio" name="<%-sn%>Edit<%-Fn%>" 
 		        	class="form-check-input"
 		        	id="<%-sn%>Edit<%-Fn%>Yes" [value]="true" 
 		        	[(ngModel)]="detail['<%-fn%>']"
 		        	#<%-sn%>Edit<%-Fn%>="ngModel">
-		      	<label class="form-check-label">Yes</label>
+		      	<span class="form-check-label">Yes</span>
 		      </div>
-	          <div class="form-check-inline">
+	        <div class="form-check-inline">
 		        <input type="radio" name="<%-sn%>Edit<%-Fn%>" 
 		        	class="form-check-input"
 		        	id="<%-sn%>Edit<%-Fn%>No" [value]="false"
 		        	[(ngModel)]="detail['<%-fn%>']"
 		        	#<%-sn%>Edit<%-Fn%>="ngModel">
-		      	<label class="form-check-label">No</label>
+		      	<span class="form-check-label">No</span>
 		      </div>
-		    </div>
     <%_ } else if (field.type === "SchemaNumber") { %>
 	        <input type="number" class="form-control" id="<%-sn%>Edit<%-Fn%>" 
 	                [(ngModel)]="detail['<%-fn%>']" name="<%-sn%>Edit<%-Fn%>"
@@ -94,7 +90,7 @@
 		        	id="<%-sn%>Edit<%-Fn%><%-f%>"
 		        	[(ngModel)]="detail['<%-fn%>']['selection']['<%-f%>']"
 		        	#<%-sn%>Edit<%-Fn%><%-f%>="ngModel">
-		      	<label class="form-check-label"><%-f%></label>
+		      	<span class="form-check-label"><%-f%></span>
 		    </div>
 		    <%_ }) %>
         <%_ } else { %>

@@ -32,13 +32,28 @@ tr th:first-child{
 .grid-block {
   width: 18rem;
   display: inline-block;
-  margin: 0.5rem;
+  margin: 1rem;
   align-self: stretch;
 
   word-break: break-word;
   overflow-wrap: break-word;
   /*border: 1px solid rgba(0,0,0,.125);
   border-radius: .25rem;*/
+}
+
+.grid-fields {
+  height: 100%;
+}
+.grid-head {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+.grid-head-picture, .list-head-picture {
+  width: 6rem;
+  height: 6rem;
+  background-color: #f1f1f1;
 }
 
 .listview {
@@ -56,20 +71,17 @@ tr th:first-child{
   border-radius: .25rem;*/
 }
 
-.list-block > div {
+.list-card {
   display: flex;
   align-items: center;
+  padding: 0.5rem;
 }
 
 .list-fields {
   display: inline-flex;
   align-items: center;
 }
-.list-head-picture {
-  width: 6rem;
-  height: 6rem;
-  background-color: #f1f1f1;
-}
+
 .list-body-fields {
 }
 .list-diverder-gradient {

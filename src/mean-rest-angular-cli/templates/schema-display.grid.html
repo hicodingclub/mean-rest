@@ -1,12 +1,35 @@
-    <%_ for (let field of viewFields){
+    <%_{
+      let pictureFields = viewFields.filter(x => x.picture);
+      let indexedFields = viewFields.filter(x => !x.picture && x.isIndexField);
+      let otherFields = viewFields.filter(x => !x.picture && !x.isIndexField);%>
+      <div class="card-header grid-head"><%
+      for (let field of pictureFields){
         let fn = field.fieldName; let ft = field.type; let ref_link = true;
-        %><% if (field.picture) {%>
-			<div><label><%-field.displayName%>:</label></div>
-      <div class="ml-2 w-75"><% include schema-display.field.html %></div><%}
-        else {%>
-      <div>
-        <div class="d-inline-block"><label><%-field.displayName%>:</label></div>
-        <div class="ml-3 d-inline-block"><% include schema-display.field.html %>
+        %>
+        <div class="grid-head-picture mr-1"><% include schema-display.field.html %>
+        </div><%
+      }%>
+        <div class="ml-1 d-inline-block">
+          <h5><%
+      for (let [index, field] of indexedFields.entries()){
+          let fn = field.fieldName; let ft = field.type; let ref_link = true;
+          %>
+            <div class="mr-1 d-inline-block">
+              <% include schema-display.field.html %>
+            </div><%_
+      }%>
+          </h5>
         </div>
-      </div><%}
-    %><%_}%>
+      </div>
+      <div class="card-body"><%
+      for (let [index, field] of otherFields.entries()){
+          let fn = field.fieldName; let ft = field.type; let ref_link = true;
+          %>
+          <div>
+            <div class="d-inline-block"><label><%-field.displayName%>:</label></div>
+            <div class="ml-3 d-inline-block"><% include schema-display.field.html %>
+            </div>
+          </div><%_ 
+      }%>
+      </div><%
+    }%>

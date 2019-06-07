@@ -1,17 +1,27 @@
   <%_{
-    let pictureFields = viewFields.filter(x => x.picture === true);
-    let otherFields = viewFields.filter(x => x.picture !== true);
+    let pictureFields = viewFields.filter(x => x.picture);
+    let indexedFields = viewFields.filter(x => !x.picture && x.isIndexField);
+    let otherFields = viewFields.filter(x => !x.picture && !x.isIndexField);
     for (let field of pictureFields){
       let fn = field.fieldName; let ft = field.type; let ref_link = true;
       %>
       <div class="list-head-picture mr-1 d-inline-block"><% include schema-display.field.html %>
       </div>
     <%}%>
-      <div class="list-body-fields ml-1 d-inline-block"><%
+      <div class="list-body-fields ml-1 d-inline-block">
+        <h5><%
+    for (let [index, field] of indexedFields.entries()){
+        let fn = field.fieldName; let ft = field.type; let ref_link = true;
+        %>
+          <div class="mr-1 d-inline-block">
+            <% include schema-display.field.html %>
+          </div><%_  
+    }%>
+        </h5><%
     for (let [index, field] of otherFields.entries()){
         let fn = field.fieldName; let ft = field.type; let ref_link = true;
         %>
-        <div class="mr-3 d-inline-block <%if (index === 0) {%>w-100<%}%>">
+        <div class="mr-3 d-inline-block">
           <div class="d-inline-block"><label><%-field.displayName%>:</label></div>
           <div class="ml-3 d-inline-block"><% include schema-display.field.html %>
           </div>

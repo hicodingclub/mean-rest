@@ -55,7 +55,7 @@
 	<div class="listview" *ngIf="isShowListView('list')">
 		<div class="list-block" *ngFor="let detail of list;  let i = index">
 			<hr *ngIf="i==0" class="list-diverder">
-			<div class="text-left clickable-card"
+			<div class="list-card text-left clickable-card"
 				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >
 				<div class="list-fields w-75 <%if(api.includes('R')){%>pointer<%}%>" <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%>>
 			<%_ let viewFields = briefView; %><%_ include schema-display.list.html %>
@@ -73,12 +73,10 @@
 
 	<div class="gridview" *ngIf="isShowListView('grid')">
 		<div class="grid-block" *ngFor="let detail of list;  let i = index">
-			<div class="card text-left h-100 clickable-card <%if(api.includes('R')){%>pointer<%}%>"
+			<div class="card text-left h-100 clickable-card"
 				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >
-				<div class="card-body" <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%>>
-					<div class="card-text">
+				<div class="grid-fields <%if(api.includes('R')){%>pointer<%}%>" <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%>>
 			<%_ viewFields = briefView; %><%_ include schema-display.grid.html %>
-					</div>
 				</div>
 				<%if(api.includes("D") || api.includes("U")){%>
 				<div class="card-action-icons">

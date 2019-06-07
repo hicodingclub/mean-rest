@@ -245,7 +245,7 @@ var processFieldGroups = function(fieldGroups) {
   
   return fieldGroups;
 }
-var generateViewPicture = function(schemaName, viewStr, schema, validators) {
+var generateViewPicture = function(schemaName, viewStr, schema, validators, indexViewNames) {
     //process | in viewStr
     let fieldGroups = [];
     if (viewStr.indexOf('|') > -1) {
@@ -285,6 +285,9 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
       if (validators && Array.isArray(validators[item])) {
           validatorArray = validators[item];
       }
+
+      let isIndexField = false;
+      if ( indexViewNames.includes(item) ) isIndexField = true;
 
       let type;
       let jstype;
@@ -430,6 +433,8 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators) {
           minlength: minlength,
           enumValues: enumValues,
           validators: validatorArray,
+
+          isIndexField: isIndexField,
 
           //for array and map
           elementType: elementType,
@@ -887,29 +892,35 @@ function main() {
   			//console.info('Creating sub-component directory "%s"...', subComponentDir);
   			mkdir(".", subComponentDir)
   		}
-  		
-  	});
-  	//briefView, detailView, CreateView, EditView, SearchView, indexView]		
+    });
+    let indexViewNames = [];
+    //briefView, detailView, CreateView, EditView, SearchView, indexView]
+
+    let [indexViewGrp, indexView, hasDate6, hasRef6, hasEditor6,
+      hasReqGrp6, hasReqArr6, hasReqMap6, hasFileUpload6] =
+        generateViewPicture(name, views[5], mongooseSchema, validators, indexViewNames);
+    for (let s of indexView) {
+      indexViewNames.push(s.fieldName);
+    }
+
     let [briefViewGrp, briefView, hasDate1, hasRef1, hasEditor1, 
           hasReqGrp1, hasReqArr1, hasReqMap1, hasFileUpload1] =
-            generateViewPicture(name, views[0], mongooseSchema, validators);
+            generateViewPicture(name, views[0], mongooseSchema, validators, indexViewNames);
     //console.log("***briefView", briefView);
     //console.log("***hasRef1", hasRef1);
     let [detailViewGrp, detailView, hasDate2, hasRef2, hasEditor2, 
           hasReqGrp2, hasReqArr2, hasReqMap2, hasFileUpload2] = 
-            generateViewPicture(name, views[1], mongooseSchema, validators);
+            generateViewPicture(name, views[1], mongooseSchema, validators, indexViewNames);
     let [createViewGrp, createView, hasDate3, hasRef3, hasEditor3, 
           hasReqGrp3, hasReqArr3, hasReqMap3, hasFileUpload3] =
-            generateViewPicture(name, views[2], mongooseSchema, validators);
+            generateViewPicture(name, views[2], mongooseSchema, validators, indexViewNames);
     let [editViewGrp, editView, hasDate4, hasRef4, hasEditor4, 
           hasReqGrp4, hasReqArr4, hasReqMap4, hasFileUpload4] =
-            generateViewPicture(name, views[3], mongooseSchema, validators);
+            generateViewPicture(name, views[3], mongooseSchema, validators, indexViewNames);
     let [searchViewGrp, searchView, hasDate5, hasRef5, hasEditor5, 
           hasReqGrp5, hasReqArr5, hasReqMap5, hasFileUpload5] =
-            generateViewPicture(name, views[4], mongooseSchema, validators);
-    let [indexViewGrp, indexView, hasDate6, hasRef6, hasEditor6, 
-          hasReqGrp6, hasReqArr6, hasReqMap6, hasFileUpload6] =
-            generateViewPicture(name, views[5], mongooseSchema, validators);
+            generateViewPicture(name, views[4], mongooseSchema, validators, indexViewNames);
+
   	let schemaHasDate = hasDate5 || hasDate6;
   	let schemaHasRef = false;
     let schemaHasEditor = false;
@@ -957,7 +968,8 @@ function main() {
   	  detailSubViewStr = detailSubViewStr.replace(i, '');
   	}
   	let [detailSubViewGrp, detailSubView, hasDate7, hasRef7, 
-  	      hasEditor7, hasReqGrp7, hasReqMap7, hasFileUpload7] = generateViewPicture(name, detailSubViewStr, mongooseSchema, validators);
+          hasEditor7, hasReqGrp7, hasReqMap7, hasFileUpload7] =
+          generateViewPicture(name, detailSubViewStr, mongooseSchema, validators, indexViewNames);
 
     let compositeEditView = [];
   	if (api.includes("U") ) {
