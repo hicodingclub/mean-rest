@@ -94,9 +94,18 @@ var templates = {
   schemaListSubComponent: ["../templates/schema-list-sub.component.ts", "list-sub.component.ts", "list-sub component file", 'W'],
   schemaListSubComponentHtml: ["../templates/schema-list-sub.component.html", "list-sub.component.html", "list-sub component html file", 'W'],
 	
-  schemaDetailComponent: ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
-  schemaDetailComponentHtml: ["../templates/schema-detail.component.html", "detail.component.html", "detail component html file", 'W'],
-  schemaDetailComponentCss: ["../templates/schema-detail.component.css", "detail.component.css", "detail component css file", 'W'],
+  schemaDetail: {
+    'normal': [
+      ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
+      ["../templates/schema-detail.component.html", "detail.component.html", "detail component html file", 'W'],
+      ["../templates/schema-detail.component.css", "detail.component.css", "detail component css file", 'W'],
+    ],
+    'post': [
+      ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
+      ["../templates/schema-detail-post.component.html", "detail.component.html", "detail component html file", 'W'],
+      ["../templates/schema-detail-post.component.css", "detail.component.css", "detail component css file", 'W'],
+    ],
+  },
 
   schemaDetailSelComponent: ["../templates/schema-detail-sel.component.ts", "detail-sel.component.ts", "detail select component file", 'W'],
   schemaDetailSelComponentHtml: ["../templates/schema-detail-sel.component.html", "detail-sel.component.html", "detail select component html file", 'W'],
@@ -855,6 +864,16 @@ function main() {
       }
     }
 
+    let detailType = 'normal';
+    if (schemaDef.mraUI) {
+      switch (schemaDef.mraUI.detailType) {
+        case 'post':
+          detailType = 'post';
+          break;
+        default:
+      }
+    }
+
     let embeddedViewOnly = schemaDef.embeddedViewOnly? true: false;
     let viewName = schemaDef.name; //Display name on UI
     let api = schemaDef.api || "LCRUD"; //APIs exposed to front end ("LCRUD")
@@ -1058,6 +1077,8 @@ function main() {
       schemaHasValidator: schemaHasValidator,
       permission: schemaAnyonePermission,
       embeddedViewOnly: embeddedViewOnly,
+
+      detailType: detailType, // normal, post, ...
       
       api: api,
       refApi: {},
@@ -1177,9 +1198,9 @@ function main() {
 
     if (schemaObj.api.includes("R")) {
     	subComponentDir = path.join(componentDir, schemaName+'-detail');
-    	generateSourceFile(schemaName, templates.schemaDetailComponent, schemaObj, subComponentDir);
-    	generateSourceFile(schemaName, templates.schemaDetailComponentHtml, schemaObj, subComponentDir);
-    	generateSourceFile(schemaName, templates.schemaDetailComponentCss, schemaObj, subComponentDir);
+    	generateSourceFile(schemaName, templates.schemaDetail[schemaObj.detailType][0], schemaObj, subComponentDir);
+    	generateSourceFile(schemaName, templates.schemaDetail[schemaObj.detailType][1], schemaObj, subComponentDir);
+    	generateSourceFile(schemaName, templates.schemaDetail[schemaObj.detailType][2], schemaObj, subComponentDir);
     	if (referenceSchemas.indexOf(schemaName) != -1) { //referenced by others, provide select component
     		generateSourceFile(schemaName, templates.schemaDetailSelComponent, schemaObj, subComponentDir);
     		generateSourceFile(schemaName, templates.schemaDetailSelComponentHtml, schemaObj, subComponentDir);
