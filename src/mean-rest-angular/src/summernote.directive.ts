@@ -159,9 +159,7 @@ export class MraRichTextShowDirective {
   setContent(content:string) {
     let id = Date.now();
     var displayHtml = `
-      <div class="card">
-          <div class="card-body" id="mraeditordisplay` + id +`"></div>
-      </div>
+      <div id="mraeditordisplay` + id +`"></div>
     `;
 
     this.render.setProperty(this.el.nativeElement, 'innerHTML', displayHtml);
