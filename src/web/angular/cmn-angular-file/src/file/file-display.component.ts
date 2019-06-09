@@ -8,6 +8,7 @@
 export class FileDisplayComponent {
     @Input() downloadUrl: string;
     @Input() clickToShow: boolean;
+    @Input() isLarge: boolean = false;
 
     constructor() {}
     

@@ -1,5 +1,6 @@
 <div style="width: 100%;">
-  <div *ngIf="downloadUrl" class="thumbnail">
-    <img src="{{downloadUrl}}_thumbnail">
+  <div *ngIf="downloadUrl" [ngClass]="{'thumbnail': !isLarge, 'thumbnail-large': isLarge}">
+    <img class="thumbnail-img" *ngIf="!isLarge" src="{{downloadUrl}}_thumbnail">
+    <img class="thumbnail-img" *ngIf="isLarge" src="{{downloadUrl}}">
   </div>
 </div>
