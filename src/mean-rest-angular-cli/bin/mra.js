@@ -596,6 +596,7 @@ program
   .option('-a, --api <api_base>', 'api base that will be used for rest calls. Default is "/api/<module_name>".')
   .option('-o, --output <output_dir>', 'output directory of generated files')
   .option('-f, --force', 'force to overwrite existing files')
+  .option('-v, --view <view name>', 'admin, or public. Define the views to generate.')
   .parse(process.argv)
 
 if (!exit.exited) {
@@ -776,6 +777,15 @@ function main() {
 	  apiBase = program.api;
 	  console.info('Using "%s" as api base to call Rest APIs...', apiBase);
   }
+
+  let generateView;
+  if (!program.view) {
+	  generateView = "admin";
+  } else {
+    generateView = program.view;
+    if (generateView !== 'public') generateView = 'admin';
+  }
+  console.log('Note: generateView for ', generateView);
 
   // output directory
   let outputDir;
@@ -1079,6 +1089,8 @@ function main() {
       embeddedViewOnly: embeddedViewOnly,
 
       detailType: detailType, // normal, post, ...
+
+      generateView: generateView,
       
       api: api,
       refApi: {},

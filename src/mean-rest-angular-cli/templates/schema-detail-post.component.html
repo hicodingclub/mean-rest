@@ -1,4 +1,5 @@
 <div class="detail" *ngIf="detail">
+	<%if (generateView === 'admin') {%>
 	<div class="action-buttons">
         <!--<a href="javascript:void(0)" (click)="goBack()"><i class="fas fa-angle-double-left" title="Back"></i></a>-->
     <% if (api.includes("L")) {%><a [routerLink]="['../../list' ]"><i class="fas fa-list" title="List"></i><!--  span>&nbsp;&nbsp;{{ItemCamelName}} List</span--></a><%}%>
@@ -6,6 +7,7 @@
 		<% if (api.includes("C")) {%><a [routerLink]="['../../new']" [queryParams]="{cid: detail['_id']}" [skipLocationChange]="false" class="btn btn-outline-primary">New</a><%}%>
 		<% if (api.includes("D")) {%><a routerLink="." class="btn btn-outline-primary" (click)="onDelete(detail['_id'], null)">Delete</a><%}%>
 	</div>
+	<%}%>
 	<div class="card transparent-border"><%
 		{ let view = 'detail'; let largePicture = true;
 		field = detailView[0]; let fn = field.fieldName; let ft = field.type; let ref_link = true;%>
@@ -33,6 +35,7 @@
 			</div>
 		</div>
 	</div>
+<%if (generateView === 'admin') {%>
 <% if (referred) {%>
 	<br/>
 	<ul class="nav nav-tabs">
@@ -43,4 +46,5 @@
 		</li><%}%><%}%>
 	</ul><%}%>
 	<router-outlet></router-outlet>
+<%}%>
 </div>
