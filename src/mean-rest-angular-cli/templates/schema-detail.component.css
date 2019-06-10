@@ -87,3 +87,22 @@ div.badge-click:hover {
   background-color: #495057 !important;
   text-decoration: underline;
 }
+
+.grid-fields {
+  height: 100%;
+}
+.grid-head {
+  display: inline-flex;
+  align-items: center;
+  /*width: 100%;
+  background-color: rgba(0, 0, 0, 0.04);*/
+}
+.grid-head-picture, .list-head-picture {
+  width: 6rem;
+  height: 6rem;
+  background-color: #f1f1f1;
+}
+
+.transparent-border {
+  border-color: rgba(0,0,0,0);
+}

@@ -6,17 +6,13 @@
 		<% if (api.includes("C")) {%><a [routerLink]="['../../new']" [queryParams]="{cid: detail['_id']}" [skipLocationChange]="false" class="btn btn-outline-primary">New</a><%}%>
 		<% if (api.includes("D")) {%><a routerLink="." class="btn btn-outline-primary" (click)="onDelete(detail['_id'], null)">Delete</a><%}%>
 	</div>
-	
-	<div class="card text-left">
-	  <div class="card-body">
-	    <h4 class="card-title">{{ItemCamelName}} Detail
-	    	<a class="float-right" style="font-size: 1rem;" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a>
-	    </h4>    
-		<div class="card-text">
-<%_ let view = "detail"; let viewGrp = detailViewGrp; %><%_ include schema-display.group.html %>
-		</div>
-	  </div>
+
+<div class="card text-left transparent-border ">
+	<div class="grid-fields">
+<%_ viewFields = detailView; let view='detail'; let largePicture=false;%><%_ include schema-display.detail.html %>
 	</div>
+</div>
+
 <% if (referred) {%>
 	<br/>
 	
@@ -29,3 +25,4 @@
     </ul><%}%>
     <router-outlet></router-outlet>
 </div>
+
