@@ -244,7 +244,112 @@ RestController.getAll = function(req, res, next) {
 	return RestController.searchAll(req, res, next, {});
 };
 
-RestController.searchAll = function(req, res, next, searchContext) {
+RestController.searchAll = async function(req, res, next, searchContext) {
+  const {name, schema, model, views, populates, owner} = loadContextVars(req);
+  //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+  const briefView = views[0];
+	
+  const populateArray = [];
+  const populateMap = {};
+  populates.briefView.forEach( (p)=> {
+		//an array, with [field, ref]
+    const fields = getPopulatesRefFields(p[1]);
+		if (fields != null) {//only push when the ref schema is found
+			populateArray.push({ path: p[0], select: fields });
+            populateMap[p[0]] = fields;
+        }
+  });
+  let query = {};
+
+  //get the query parameters ?a=b&c=d, but filter out unknown ones
+	
+  const PER_PAGE = 25, MAX_PER_PAGE = 1000;
+	
+  let __page = 1;
+  let __per_page = PER_PAGE;
+
+  let __sort, __order;
+	
+  for (let prop in req.query) {
+		if (prop === '__page') __page = parseInt(req.query[prop]);
+    else if (prop === '__per_page') __per_page = parseInt(req.query[prop]);
+    else if (prop === '__sort') __sort = req.query[prop];
+    else if (prop === '__order') __order = req.query[prop];
+		else if (prop in schema.paths) {
+			query[prop] = req.query[prop];
+		}
+  }
+	
+  let count = 0;
+  if (searchContext) {
+    //console.log("searchContext is ....", searchContext);
+    // searchContext ={'$and', [{'$or', []},{'$and', []}]}
+		if (searchContext['$and']) {
+		  for (let subContext of searchContext['$and']) {
+			  if ('$or' in subContext) {
+				  if (subContext['$or'].length == 0) subContext['$or'] = [{}];
+				  subContext['$or']=subContext['$or'].map(x=>createRegex(x));
+			  } else if ( '$and' in subContext) {
+				  if (subContext['$and'].length == 0) subContext['$and'] = [{}];
+				  subContext['$and']=subContext['$and'].map(x=>checkAndSetValue(x,schema));
+			  }
+		  }
+		}
+		//merge the url query and body query
+		query = searchContext;
+		//console.log("query is ....", query['$and'][0]['$or'], query['$and'][1]['$and']);
+  }
+
+  query = ownerPatch(query, owner, req);
+  
+  try {
+    count = await model.countDocuments(query).exec();
+  } catch (err) {
+    return next(err);
+  }
+
+  if (isNaN(__per_page) || __per_page <= 0) __per_page = PER_PAGE;
+  else if (__per_page > MAX_PER_PAGE) __per_page = MAX_PER_PAGE;
+
+  let maxPageNum = Math.ceil(count/(__per_page*1.0));
+
+  if (isNaN(__page)) __page = 1;
+  if (__page > maxPageNum) __page = maxPageNum;
+  if (__page <= 0) __page = 1;
+
+  let skipCount = (__page - 1) * __per_page;
+
+  let srt = {};
+  if (__sort && __order) srt[__sort] == __order;
+  
+  //let dbExec = model.find(query, briefView)
+  let dbExec = model.find(query) //return every thing for the document
+    .sort(srt)
+    .skip(skipCount)
+    .limit(__per_page)
+  for (let pi = 0; pi < populateArray.length; pi ++) {
+    let p = populateArray[pi];
+    //dbExec = dbExec.populate(p);
+    dbExec = dbExec.populate(p.path); //only give the reference path. return everything
+  }
+  dbExec.exec(function(err, result) {
+    if (err) return next(err);
+
+    let output = {
+      total_count: count,
+      total_pages: maxPageNum,
+      page: __page,
+      per_page: __per_page,
+      items: result
+    }
+    output = JSON.parse(JSON.stringify(output));
+    output.items = resultReducerForRef(output.items, populateMap);
+    output.items = resultReducerForView(output.items, briefView);
+    return res.send(output);
+  });
+};
+
+RestController.getSamples = function(req, res, next, searchContext, ) {
   const {name, schema, model, views, populates, owner} = loadContextVars(req);
   //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
   const briefView = views[0];
@@ -339,7 +444,8 @@ RestController.searchAll = function(req, res, next, searchContext) {
     });
   });
 };
-	
+
+
 RestController.getDetailsById = function(req, res, next) {
   const {name, schema, model, views, populates, owner} = loadContextVars(req);
 	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
@@ -420,15 +526,15 @@ RestController.PostActions = function(req, res, next) {
   let action = req.path
 	switch(action) {
     case "/mddsaction/delete":
-    	let ids = body;
-        RestController.deleteManyByIds(req, res, next, ids);
-        break;
+      let ids = body;
+      RestController.deleteManyByIds(req, res, next, ids);
+      break;
     case "/mddsaction/get":
-    	let searchContext = body;
-    	RestController.searchAll(req, res, next, searchContext);
-    	break;
+      let searchContext = body;
+      RestController.searchAll(req, res, next, searchContext);
+      break;
     default:
-    	return next(createError(404, "Bad Action: " + action));
+      return next(createError(404, "Bad Action: " + action));
 	}
 };
 
