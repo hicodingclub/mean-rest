@@ -61,6 +61,10 @@ module.exports.blogService = {
 	ebmeddedViewOnly: <true | false>,
 	api: <supported APIs in string format, eg: "LCRUD">,
 	validators: <validator object>
+	mraUI {
+		detailType: 'post', //use the post view in detailed page
+		listViewType: 'list', // list, table, or grid
+	},
     }
 ```
 
@@ -200,6 +204,16 @@ const blog2Validators = {
 	]
 };
 ```
+
+#### mraUI
+
+- optional
+- this configuration controls the UI generation. It has the following attributes:
+	- detailType: type of detailed view. 'normal', or 'post'.
+		- 'normal': show detailed information line by line, with index fields as the title.
+		- 'post': detailView shall be defined in "signaturePicture title author publishDate content" sequence. It will be shown as a post.
+	- listType: type of the list view. 'table', 'list', or 'grid'
+
 ## mean-rest-express
 
 Usage:

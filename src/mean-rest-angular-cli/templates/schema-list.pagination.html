@@ -1,13 +1,15 @@
 			<div class="col-3"><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {%>
+				<%_ for (const viewType of listTypes) { %><% if (viewType === 'table') { %>
 				<input type="radio" name="view-filter" id="table-view" class="view-radio"
 					(click)="setListViewFilter('table')" [checked]="isShowListView('table')">
-					<label for="table-view"><i class="fa fa-list-alt"></i></label>
+					<label for="table-view"><i class="fa fa-list-alt"></i></label><%}%><% if (viewType === 'list') { %>
 				<input type="radio" name="view-filter" id="list-view" class="view-radio"
 					(click)="setListViewFilter('list')" [checked]="isShowListView('list')">
-				  <label for="list-view"><i class="fa fa-th-list"></i></label>
+				  <label for="list-view"><i class="fa fa-th-list"></i></label><%}%><% if (viewType === 'grid') { %>
 				<input type="radio" name="view-filter" id="grid-view" class="view-radio"
 					(click)="setListViewFilter('grid')" [checked]="isShowListView('grid')">
-				  <label for="grid-view"><i class="fa fa-th"></i></label><% } %>
+					<label for="grid-view"><i class="fa fa-th"></i></label><%}%>
+			<%_ } %><% } %>
 			</div>
 			<div class="col-6">
 			  <div *ngIf="total_pages > 1">

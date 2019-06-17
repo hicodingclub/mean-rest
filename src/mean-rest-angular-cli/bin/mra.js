@@ -875,14 +875,30 @@ function main() {
     }
 
     let detailType = 'normal';
+    let listType = 'list';
     if (schemaDef.mraUI) {
       switch (schemaDef.mraUI.detailType) {
         case 'post':
           detailType = 'post';
           break;
         default:
+          detailType = 'normal';
+      }
+      switch (schemaDef.mraUI.listType) {
+        case 'grid':
+          listType = 'grid';
+          break;
+        case 'table':
+          listType = 'table';
+          break;
+        default:
+          listType = 'list';
       }
     }
+    let listTypes = ['list', 'grid', 'table'];
+    const tindex = listTypes.indexOf(listType);
+    if (tindex !== -1) listTypes.splice(tindex, 1);
+    listTypes = [listType].concat(listTypes);
 
     let embeddedViewOnly = schemaDef.embeddedViewOnly? true: false;
     let viewName = schemaDef.name; //Display name on UI
@@ -1089,6 +1105,8 @@ function main() {
       embeddedViewOnly: embeddedViewOnly,
 
       detailType: detailType, // normal, post, ...
+      listType: listType, // gird, table, list
+      listTypes: listTypes, //array of grid, table, list
 
       generateView: generateView,
       

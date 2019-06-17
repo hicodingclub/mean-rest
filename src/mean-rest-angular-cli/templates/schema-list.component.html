@@ -20,73 +20,11 @@
 			<%_ let showRefreshIcon = true;%><% include schema-list.pagination.html %>
 		</div>
 	</div>
-
-	<table *ngIf="isShowListView('table')" class="table table-bordered table-hover">
-	    <thead class="thead-light">
-	    	<tr>
-		        <th scope="col">#</th>
-<%_ for (let field of briefView){ %>
-		        <th scope="col"><%-field.displayName%></th><%_ } %>
-		        <% let widthTh = 1.8;
-				if (api.includes("D")) {widthTh += 4;}
-				if (api.includes("U")) {widthTh += 2;}
-				if (widthTh > 1.8){%><th scope="col" style="width:<%-widthTh%>rem;"></th><%}%>
-	    	</tr>
-	    </thead>
-	    <tbody>
-	        <tr *ngFor="let detail of list;  let i = index" [ngClass]="{'clicked-row': clickedId==detail['_id']}">
-	            <td scope="row" <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%>>
-	            	{{(page-1)*per_page+i+1}}
-	            </td>
-<%_ let view = 'list'; for (let field of briefView){ let fn = field.fieldName, ft = field.type; let ref_link = true; %>
-	            <td <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%>>
-	            	<% include schema-display.field.html %>
-	            </td><%_ } %>
-	            <%if(api.includes("D") || api.includes("U")){%>
-	            <td>
-	            	<%if(api.includes("U")){%><a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>
-	            	<%if(api.includes("D")){%><a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
-					<%if(api.includes("D")){%><input type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
-	            </td><%}%>
-	        </tr>
-	    </tbody>
-	</table>
-
-	<div class="listview" *ngIf="isShowListView('list')">
-		<div class="list-block" *ngFor="let detail of list;  let i = index">
-			<hr *ngIf="i==0" class="list-diverder">
-			<div class="list-card text-left clickable-card"
-				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >
-				<div class="list-fields w-75 <%if(api.includes('R')){%>pointer<%}%>" <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%>>
-			<%_ let viewFields = briefView; %><%_ include schema-display.list.html %>
-				</div>
-				<%if(api.includes("D") || api.includes("U")){%>
-				<div class="card-action-icons d-inline-block w-25">
-					<%if(api.includes("U")){%><a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>
-					<%if(api.includes("D")){%><a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
-					<%if(api.includes("D")){%><input type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
-				</div><%}%>
-			</div>
-			<hr class="list-diverder">
-		</div>
-	</div>
-
-	<div class="gridview" *ngIf="isShowListView('grid')">
-		<div class="grid-block" *ngFor="let detail of list;  let i = index">
-			<div class="card text-left h-100 clickable-card"
-				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >
-				<div class="grid-fields <%if(api.includes('R')){%>pointer<%}%>" <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%>>
-			<%_ viewFields = briefView; %><%_ include schema-display.grid.html %>
-				</div>
-				<%if(api.includes("D") || api.includes("U")){%>
-				<div class="card-action-icons">
-					<%if(api.includes("U")){%><a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>
-					<%if(api.includes("D")){%><a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
-					<%if(api.includes("D")){%><input type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
-				</div><%}%>
-			</div>
-		</div>
-	</div>
+	<% let view='list'; for (const viewType of listTypes) {%><%_if (viewType === 'list') {%>
+<% include schema-list.view.list.html %><%}%><%_if (viewType === 'grid') {%>
+<% include schema-list.view.grid.html %><%}%><%_if (viewType === 'table') {%>
+<% include schema-list.view.table.html %><%}%>
+	<%_ } %>
 
 	<div class="container">
 		<div class="row"><%_ showRefreshIcon = false;%><% include schema-list.pagination.html %>

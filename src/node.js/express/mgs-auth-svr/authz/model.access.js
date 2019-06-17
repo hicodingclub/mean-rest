@@ -35,6 +35,7 @@ const permissionSchema = new Schema({
   modulePermission: { type: String }, //"CRUD" 
   resourcePermission: {type: Map, of: String},  //{resource: "CRUD"}
 });
+
 //to make the association unique
 permissionSchema.index({ group: 1, module: 1}, {unique: true}); // schema level
 

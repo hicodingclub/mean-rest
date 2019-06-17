@@ -28,6 +28,8 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
                 <%-schemaName%>Service, injector, router, route, location, ViewType.LIST);
 <% let theView = briefView; %><%_ include schema-construct.component.ts %>
+
+          this.listViewFilter = '<%-listType%>';
           // this is to initialize the detail that will be used for search condition selection
           const detail = {};
           this.detail = this.formatDetail(detail);
