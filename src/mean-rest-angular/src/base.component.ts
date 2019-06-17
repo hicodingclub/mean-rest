@@ -70,6 +70,9 @@ export class BaseComponent implements BaseComponentInterface {
     protected timeFormat = "hh:mm:ss";
 
     protected listViewFilter = 'table'; // list, or grid
+    protected listSortField: string;
+    protected listSortFieldDisplay: string;
+    protected listSortOrder: string; // 'asc', 'desc'
 
     protected hiddenFields = []; //fields hide from view. Currrently used by "Add" view of edit-sub
 
@@ -829,6 +832,10 @@ export class BaseComponent implements BaseComponentInterface {
         //Now let's reload the search condition to UI
         this.searchText = this.getFromStorage("searchText");
         this.searchMoreDetail = this.getFromStorage("searchMoreDetail");
+        this.listSortField = this.getFromStorage('listSortField');
+        this.listSortFieldDisplay = this.getFromStorage('listSortFieldDisplay');
+        this.listSortOrder = this.getFromStorage('listSortOrder');
+
         let detail = this.getFromStorage("detail");
         if (detail) this.detail = detail;
     }
@@ -854,7 +861,7 @@ export class BaseComponent implements BaseComponentInterface {
         searchContext = this.getFromStorage("searchContext");
         this.loadUIFromCache();      
 
-        this.service.getList(new_page, this.per_page, searchContext).subscribe(
+        this.service.getList(new_page, this.per_page, searchContext, this.listSortField, this.listSortOrder).subscribe(
           result => { 
             this.list = result.items.map(x=>this.formatDetail(x));
             this.page = result.page;
@@ -890,6 +897,36 @@ export class BaseComponent implements BaseComponentInterface {
     public isShowListView(view: string):boolean {
         const cached = this.getFromStorage('listViewFilter');
         return cached ? cached === view : this.listViewFilter === view;
+    }
+    public setListSort(field:string, fieldDisplay:string, order:string): void {
+        let refresh = false;
+        if (field !== this.listSortField || order !== this.listSortOrder) {
+            refresh = true;
+        }
+        this.listSortField = field;
+        this.listSortFieldDisplay = fieldDisplay;
+        this.listSortOrder = order;
+        this.putToStorage('listSortField', field);
+        this.putToStorage('listSortFieldDisplay', fieldDisplay);
+        this.putToStorage('listSortOrder', order);
+
+        if (refresh) this.populateList(); 
+    }
+    public toggleListSort(field:string, fieldDisplay:string): void {
+        if (field !== this.listSortField) {
+            this.listSortOrder = 'asc';
+        } else {
+            if (this.listSortOrder === 'asc') this.listSortOrder = 'desc';
+            else this.listSortOrder = 'asc';
+        }
+        this.listSortField = field;
+        this.listSortFieldDisplay = fieldDisplay;
+ 
+        this.putToStorage('listSortField', field);
+        this.putToStorage('listSortFieldDisplay', fieldDisplay);
+        this.putToStorage('listSortOrder', this.listSortOrder);
+
+        this.populateList(); 
     }
 
     public onRefresh():void {

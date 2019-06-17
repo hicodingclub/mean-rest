@@ -46,10 +46,15 @@ export class BaseService {
         return list;
     }
 
-    getList(page:number, per_page:number, searchContext:any) {
+    getList(page:number, per_page:number, searchContext:any, sort:string, order:string) {
+        let params = new HttpParams()
+            .set('__page', page.toString())
+            .set('__per_page', per_page.toString());
+        if (sort && order) {
+            params = params.set('__sort', sort).set('__order', order);
+        }
         let httpOptions = {
-            params: new HttpParams().set('__page', page.toString())
-                                    .set('__per_page', per_page.toString()),
+            params: params,
             headers: new HttpHeaders({ 'Accept': 'application/json' }),
         };
         
