@@ -1,0 +1,16 @@
+	<div class="gridview" *ngIf="isShowListView('grid')">
+		<div class="grid-block" *ngFor="let detail of list;  let i = index">
+			<div class="card text-left h-100 clickable-card"
+				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >
+				<div class="grid-fields <%if(api.includes('R')){%>pointer<%}%>" <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%>>
+			<%_ viewFields = briefView; %><%_ include schema-display.grid.html %>
+				</div>
+				<%if(api.includes("D") || api.includes("U")){%>
+				<div class="card-action-icons">
+					<%if(api.includes("U")){%><a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>
+					<%if(api.includes("D")){%><a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
+					<%if(api.includes("D")){%><input type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
+				</div><%}%>
+			</div>
+		</div>
+	</div>

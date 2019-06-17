@@ -308,3 +308,24 @@ div.badge-click:hover {
 .view-radio {
   display: none;
 }
+
+.sort-selection {
+  min-width: 200px;
+  position: relative;
+}
+
+.sort-dropdown {
+  width: 100%;
+  text-align: left;
+}
+
+.sort-selection i {
+  color:#007bff;
+  margin-left: 1rem;
+  margin-right: 2rem;
+}
+
+.th-sort-arrow {
+  color:#007bff;
+  margin-left: 1rem;
+}

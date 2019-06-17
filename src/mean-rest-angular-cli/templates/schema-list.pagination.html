@@ -1,3 +1,21 @@
+		<%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {%>
+		<div class="row justify-content-end">
+			<div class="sort-selection">
+					<div class="dropdown" style="width: 100%;">
+						<button class="sort-dropdown btn btn-light btn-sm dropdown-toggle"
+							type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Sort: <span *ngIf="listSortField">{{listSortFieldDisplay}}</span>
+							<i *ngIf="listSortOrder === 'asc'" class="fas fa-arrow-up"></i>
+							<i *ngIf="listSortOrder === 'desc'" class="fas fa-arrow-down"></i>
+						</button>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><% for (let field of briefView) { %>
+							<a class="dropdown-item pointer" (click)="setListSort('<%-field.fieldName%>', '<%-field.displayName%>', 'asc')"><%-field.FieldName%><i class="fas fa-arrow-up"></i></a>
+							<a class="dropdown-item pointer" (click)="setListSort('<%-field.fieldName%>', '<%-field.displayName%>', 'desc')"><%-field.FieldName%><i class="fas fa-arrow-down"></i></a><%}%>
+						</div>
+					</div>
+			</div>
+		</div><%}%>
+		<div class="row">
 			<div class="col-3"><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {%>
 				<%_ for (const viewType of listTypes) { %><% if (viewType === 'table') { %>
 				<input type="radio" name="view-filter" id="table-view" class="view-radio"
@@ -9,7 +27,8 @@
 				<input type="radio" name="view-filter" id="grid-view" class="view-radio"
 					(click)="setListViewFilter('grid')" [checked]="isShowListView('grid')">
 					<label for="grid-view"><i class="fa fa-th"></i></label><%}%>
-			<%_ } %><% } %>
+				<%_ } %>
+			<%_ } %>
 			</div>
 			<div class="col-6">
 			  <div *ngIf="total_pages > 1">
@@ -49,4 +68,5 @@
 					<input type="checkbox" class="ml-3 mr-1" [(ngModel)]="checkAll" (change)="onCheckAllChange()">All<%}%>
 					<a class="ml-3" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a><%}%>
 				</div>
-			</div>			
+			</div>
+		</div>

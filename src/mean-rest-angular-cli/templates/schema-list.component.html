@@ -16,9 +16,7 @@
 
 
 		<hr/>
-		<div class="row">
-			<%_ let showRefreshIcon = true;%><% include schema-list.pagination.html %>
-		</div>
+		<%_ let showRefreshIcon = true;%><% include schema-list.pagination.html %>
 	</div>
 	<% let view='list'; for (const viewType of listTypes) {%><%_if (viewType === 'list') {%>
 <% include schema-list.view.list.html %><%}%><%_if (viewType === 'grid') {%>
@@ -27,8 +25,7 @@
 	<%_ } %>
 
 	<div class="container">
-		<div class="row"><%_ showRefreshIcon = false;%><% include schema-list.pagination.html %>
-		</div>
+		<%_ showRefreshIcon = false;%><% include schema-list.pagination.html %>
 	</div>
 	
 </div>

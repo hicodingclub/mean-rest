@@ -1,0 +1,36 @@
+	<table *ngIf="isShowListView('table')" class="table table-bordered table-hover">
+	    <thead class="thead-light">
+	    	<tr>
+		        <th scope="col">#</th>
+<%_ for (let field of briefView){ %>
+				<th class="pointer" scope="col" (click)="toggleListSort('<%-field.fieldName%>', '<%-field.displayName%>')">
+					<%-field.displayName%>
+					<span *ngIf="listSortField === '<%-field.fieldName%>'">
+						<i *ngIf="listSortOrder === 'asc'" class="fas fa-arrow-up th-sort-arrow"></i>
+						<i *ngIf="listSortOrder === 'desc'" class="fas fa-arrow-down th-sort-arrow"></i>
+					</span>
+				</th><%_ } %>
+		        <% let widthTh = 1.8;
+				if (api.includes("D")) {widthTh += 4;}
+				if (api.includes("U")) {widthTh += 2;}
+				if (widthTh > 1.8){%><th scope="col" style="width:<%-widthTh%>rem;"></th><%}%>
+	    	</tr>
+	    </thead>
+	    <tbody>
+	        <tr *ngFor="let detail of list;  let i = index" [ngClass]="{'clicked-row': clickedId==detail['_id']}">
+	            <td scope="row" <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%>>
+	            	{{(page-1)*per_page+i+1}}
+	            </td>
+<%_ let view = 'list'; for (let field of briefView){ let fn = field.fieldName, ft = field.type; let ref_link = true; %>
+	            <td <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%>>
+	            	<% include schema-display.field.html %>
+	            </td><%_ } %>
+	            <%if(api.includes("D") || api.includes("U")){%>
+	            <td>
+	            	<%if(api.includes("U")){%><a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>
+	            	<%if(api.includes("D")){%><a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
+					<%if(api.includes("D")){%><input type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
+	            </td><%}%>
+	        </tr>
+	    </tbody>
+	</table>
