@@ -2,14 +2,16 @@
 	    <thead class="thead-light">
 	    	<tr>
 		        <th scope="col">#</th>
-<%_ for (let field of briefView){ %>
+<%_ for (let field of briefView){ if (field.sortable) { %>
 				<th class="pointer" scope="col" (click)="toggleListSort('<%-field.fieldName%>', '<%-field.displayName%>')">
 					<%-field.displayName%>
 					<span *ngIf="listSortField === '<%-field.fieldName%>'">
 						<i *ngIf="listSortOrder === 'asc'" class="fas fa-arrow-up th-sort-arrow"></i>
 						<i *ngIf="listSortOrder === 'desc'" class="fas fa-arrow-down th-sort-arrow"></i>
 					</span>
-				</th><%_ } %>
+				</th><%} else {%>
+				<th scope="col"><%-field.displayName%></th>
+				<%_ } }%>
 		        <% let widthTh = 1.8;
 				if (api.includes("D")) {widthTh += 4;}
 				if (api.includes("U")) {widthTh += 2;}

@@ -321,6 +321,8 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
       let elementType;
       let mapKey;
 
+      let sortable = false;
+
   		if (item in schema.paths) {
         let fieldSchema = schema.paths[item];
         type = fieldSchema.constructor.name;
@@ -345,6 +347,9 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
               if (flagRef) hasRef = true;
               if (flagEditor) hasEditor = true;
               if (flagPicture || flagFile) hasFileUpload = true;
+
+              sortable = true;
+              if (flagEditor || flagPicture || flagFile) sortable = false;
               break;
           case "SchemaArray":
               [elementType,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
@@ -444,6 +449,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           validators: validatorArray,
 
           isIndexField: isIndexField,
+          sortable: sortable,
 
           //for array and map
           elementType: elementType,
