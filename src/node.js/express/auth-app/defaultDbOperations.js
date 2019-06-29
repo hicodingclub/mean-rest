@@ -3,6 +3,7 @@ const restController = meanRestExpress.restController;
 const permissionStore = require('./lib/permission.store');
 
 const publicModuleIds = {};
+let publicAllModuleId;
 
 const adminModuleIds = {};
 let adminAllModuleId;
@@ -120,6 +121,8 @@ const uploadPublicModulesAndAccessLocal = async function(publicModules) {
 
 const downloadPublicGroupsAndAccessLocal = async function(publicModules) {
   let modules = permissionStore.getAllModules();
+  
+  let reload = false;
   for (let m in modules) { //{'moduleName': [resource1, resource2...]}
     if (publicModules && !publicModules.includes(m)) continue; //modules not managed by this app
 
@@ -141,7 +144,13 @@ const downloadPublicGroupsAndAccessLocal = async function(publicModules) {
             modelExecuteError1(takInfo));
     } else {
       console.warn(` --- Warning: auth app: public module "${m}" not found in system.`);
+      reload = true;
+      break;
     }
+  }
+  if (reload) {
+    uploadPublicModulesAndAccessLocal(publicModules);
+    return;
   }
 
   if (publicAllModuleId) {
