@@ -894,7 +894,7 @@ function main() {
     let listType = 'list';
     let listToDetail = 'click';
     let defaultSortField, defaultSortOrder;
-    let homeListNumber = 6;
+    let homeListNumber = 4;
     if (schemaDef.mraUI) {
       let mraUI = schemaDef.mraUI;
       switch (mraUI.detailType) {

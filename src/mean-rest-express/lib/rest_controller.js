@@ -271,7 +271,7 @@ RestController.searchAll = async function(req, res, next, searchContext) {
   let __sort, __order;
 	
   for (let prop in req.query) {
-		if (prop === '__page') __page = parseInt(req.query[prop]);
+    if (prop === '__page') __page = parseInt(req.query[prop]);
     else if (prop === '__per_page') __per_page = parseInt(req.query[prop]);
     else if (prop === '__sort') __sort = req.query[prop];
     else if (prop === '__order') __order = req.query[prop];
@@ -320,7 +320,7 @@ RestController.searchAll = async function(req, res, next, searchContext) {
   let skipCount = (__page - 1) * __per_page;
 
   let srt = {};
-  if (__sort && __order) srt[__sort] == __order;
+  if (__sort && __order) srt[__sort] = __order;
   
   //let dbExec = model.find(query, briefView)
   let dbExec = model.find(query) //return every thing for the document
