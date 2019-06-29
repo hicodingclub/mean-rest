@@ -5,20 +5,22 @@
 			<div class="col-9">
 			    <%_ include schema-search.bar.html %>
 		    </div>
-			<div class="col-3">
+			<div class="col-3"><%if (generateView === 'admin') {%>
 		        <div class="action-buttons">
 					<%if(api.includes("C")){%><a [routerLink]="['../new' ]" [skipLocationChange]="false" class="btn btn-outline-primary">Create</a><%}%>
 					<%if(api.includes("D")){%><a routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
 						[ngClass]="{'disabled': !isItemSelected()}">Delete</a><%}%>
-				</div>
+				</div><%}%>
 			</div>
 		</div>
 
 
 		<hr/>
 		<%_ let showRefreshIcon = true;%><% include schema-list.pagination.html %>
-	</div>
-	<% let view='list'; for (const viewType of listTypes) {%><%_if (viewType === 'list') {%>
+	</div><%
+	let cardCanClick = api.includes('R') && listToDetail === 'click';
+	let cardHasLink = api.includes('R') && listToDetail === 'link';
+	%><% let view='list'; for (const viewType of listTypes) {%><%_if (viewType === 'list') {%>
 <% include schema-list.view.list.html %><%}%><%_if (viewType === 'grid') {%>
 <% include schema-list.view.grid.html %><%}%><%_if (viewType === 'table') {%>
 <% include schema-list.view.table.html %><%}%>

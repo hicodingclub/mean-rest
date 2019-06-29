@@ -1,7 +1,5 @@
 <div class="container">
-  <div class="row">
-    <div class="col">
-		<div class="card">
+		<div class="card component-main-card"><%if (generateView === 'admin') {%>
 		  <div class="card-header">
 			  <nav class="nav nav-pills">
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name];
@@ -11,11 +9,9 @@
 <%_ }
 } %>
 			  </nav>
-		  </div>
+		  </div><%}%>
 		  <div class="card-body">
 			<router-outlet></router-outlet>
 		  </div>
 		</div>
-	</div>
-  </div>
 </div>

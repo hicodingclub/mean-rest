@@ -1,8 +1,10 @@
 .detail {
-	width: 100%;
 	margin: 0 auto;
 }
 
+.detail .card-header {
+  padding: 0;
+}
 .action-buttons {
 	width: 100%;
 	float:right; 
@@ -27,13 +29,9 @@
 	margin-top:  0.5rem
 }
 
-.card-title, .card-subtitle {
+.card-title {
 	text-align: center;
 }
-.card-text{
-	margin-top: 2rem;
-}
-
 .card label {
   font-weight: bold;
 	font-size: 1rem;
@@ -92,11 +90,29 @@ div.badge-click:hover {
   text-decoration: underline;
 }
 
-.post-head-picture {
-  width: 100%;
-  height: 20rem;
-  overflow: hidden;
+.grid-fields {
+  height: 100%;
 }
+.grid-head {
+  display: inline-flex;
+  width: 100%;
+  align-items: center;
+  /*width: 100%;*/
+  background-color: rgba(0, 0, 0, 0);
+
+}
+.grid-head-picture, .list-head-picture {
+  width: 50%;
+  height: 20rem;
+  background-color: #f1f1f1;
+}
+
 .transparent-border {
   border-color: rgba(0,0,0,0);
+}
+
+.info-description-text {
+  line-height: 2rem;
+  width: 70%;
+  margin-left: 10%;
 }

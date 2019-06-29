@@ -21,12 +21,22 @@ tr th:first-child{
   white-space:nowrap;
 }
 
+.line-breaker {
+  height: 0px;
+  border-top: 1px solid #dee2e6;
+  width: 100%;
+  margin: 20px 0 20px 0;
+}
+
 .gridview {
   display: flex;
   flex-wrap: wrap;
   justify-content: left;
+
+  /*
   border-top: 1px solid #dee2e6;
   border-bottom: 1px solid #dee2e6;
+  */
 }
 
 .grid-block {
@@ -57,8 +67,10 @@ tr th:first-child{
 }
 
 .listview {
+  /*
   border-top: 1px solid #dee2e6;
   border-bottom: 1px solid #dee2e6;
+  */
 }
 
 .list-block {
@@ -328,4 +340,11 @@ div.badge-click:hover {
 .th-sort-arrow {
   color:#007bff;
   margin-left: 1rem;
+}
+
+.read-more {
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  margin-top: 1rem;
+  color: #307bff;
+  cursor: pointer;
 }

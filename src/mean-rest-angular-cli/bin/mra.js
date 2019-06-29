@@ -93,6 +93,8 @@ var templates = {
   schemaSelectComponentHtml: ["../templates/schema-select.component.html", "select.component.html", "select component html file", 'W'],
   schemaListSubComponent: ["../templates/schema-list-sub.component.ts", "list-sub.component.ts", "list-sub component file", 'W'],
   schemaListSubComponentHtml: ["../templates/schema-list-sub.component.html", "list-sub.component.html", "list-sub component html file", 'W'],
+  schemaListHomeComponent: ["../templates/schema-list-home.component.ts", "list-home.component.ts", "list-home component file", 'W'],
+  schemaListHomeComponentHtml: ["../templates/schema-list-home.component.html", "list-home.component.html", "list-home component html file", 'W'],
 	
   schemaDetail: {
     'normal': [
@@ -104,6 +106,16 @@ var templates = {
       ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
       ["../templates/schema-detail-post.component.html", "detail.component.html", "detail component html file", 'W'],
       ["../templates/schema-detail-post.component.css", "detail.component.css", "detail component css file", 'W'],
+    ],
+    'info': [
+      ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
+      ["../templates/schema-detail-info.component.html", "detail.component.html", "detail component html file", 'W'],
+      ["../templates/schema-detail-info.component.css", "detail.component.css", "detail component css file", 'W'],
+    ],
+    'slide': [
+      ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
+      ["../templates/schema-detail-slide.component.html", "detail.component.html", "detail component html file", 'W'],
+      ["../templates/schema-detail-slide.component.css", "detail.component.css", "detail component css file", 'W'],
     ],
   },
 
@@ -672,8 +684,6 @@ function copyTemplateMulti (fromDir, toDir, nameGlob) {
     })
 }
 
-
-
 /**
  * Check if the given directory `dir` is empty.
  *
@@ -882,23 +892,55 @@ function main() {
 
     let detailType = 'normal';
     let listType = 'list';
+    let listToDetail = 'click';
+    let defaultSortField, defaultSortOrder;
+    let homeListNumber = 6;
     if (schemaDef.mraUI) {
-      switch (schemaDef.mraUI.detailType) {
+      let mraUI = schemaDef.mraUI;
+      switch (mraUI.detailType) {
         case 'post':
           detailType = 'post';
+          break;
+        case 'info':
+          detailType = 'info';
+          break;
+        case 'slide':
+          detailType = 'slide';
           break;
         default:
           detailType = 'normal';
       }
-      switch (schemaDef.mraUI.listType) {
+      switch (mraUI.listType) {
         case 'grid':
           listType = 'grid';
           break;
         case 'table':
           listType = 'table';
           break;
+        case 'slide':
+          break;
         default:
           listType = 'list';
+      }
+      switch (mraUI.listToDetail) {
+        case 'none':
+          listToDetail = 'none';
+          break;
+        case 'link':
+          listToDetail = 'link';
+          break;
+        default:
+          listToDetail = 'click';
+      }
+      if (mraUI.defaultListSort) {
+        const keys = Object.keys(mraUI.defaultListSort);
+        if (keys.length > 0) {
+          defaultSortField = keys[0];
+          defaultSortOrder = mraUI.defaultListSort[defaultSortField];
+        }
+      }
+      if (typeof mraUI.homeListNumber === 'number') {
+        homeListNumber = mraUI.homeListNumber;
       }
     }
     let listTypes = ['list', 'grid', 'table'];
@@ -1066,8 +1108,24 @@ function main() {
       if (x.mapKeyInfo && x.mapKeyInfo.type == 'ObjectId') {
         mapFieldsRef.push([x.mapKeyInfo.refSchema, x.mapKeyInfo.refService]);
       }
-  	});
-  	
+    });
+    
+    let defaultSortFieldDisplay;
+    if (defaultSortField) {
+      let fieldFound = false;
+      for (let i=0; i<briefView.length; i++) {
+        if (briefView[i].fieldName === defaultSortField) {
+          defaultSortFieldDisplay = briefView[i].displayName;
+          fieldFound = true;
+          break;
+        }
+      }
+      if (!fieldFound) {
+        console.log('Sorting field is not found in view definition. Ignore... ', defaultSortField);
+        defaultSortField = undefined;
+      }
+    }
+
   	let schemaObj = {
   		moduleName: moduleName,
   		ModuleName: ModuleName,
@@ -1113,6 +1171,12 @@ function main() {
       detailType: detailType, // normal, post, ...
       listType: listType, // gird, table, list
       listTypes: listTypes, //array of grid, table, list
+      listToDetail: listToDetail, // link, click, none
+
+      defaultSortField: defaultSortField,
+      defaultSortFieldDisplay: defaultSortFieldDisplay,
+      defaultSortOrder: defaultSortOrder,
+      homeListNumber: homeListNumber,
 
       generateView: generateView,
       
@@ -1188,6 +1252,8 @@ function main() {
     timeFormat: timeFormat,
     authRequired: authRequired,
     fileServer: fileServer,
+
+    generateView: generateView,
   }
   //console.log("***renderObj", renderObj);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
@@ -1229,7 +1295,11 @@ function main() {
     	if (schemaObj.schemaHasRef) {
     		generateSourceFile(schemaName, templates.schemaListSubComponent, schemaObj, subComponentDir);
     		generateSourceFile(schemaName, templates.schemaListSubComponentHtml, schemaObj, subComponentDir);
-    	}
+      }
+      if (schemaObj.generateView === 'public') { //generate home component for public
+        generateSourceFile(schemaName, templates.schemaListHomeComponent, schemaObj, subComponentDir);
+    		generateSourceFile(schemaName, templates.schemaListHomeComponentHtml, schemaObj, subComponentDir);
+      }
   	}
 
     if (schemaObj.api.includes("R")) {

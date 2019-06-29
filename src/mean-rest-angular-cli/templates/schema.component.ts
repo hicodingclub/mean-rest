@@ -48,6 +48,7 @@ export class <%-SchemaName%>Component extends BaseComponent {
         super(<%-schemaName%>Service, injector, router, route, location, view, itemCamelName);
         <% if (schemaHasDate)  {%>this.dateFormat = '<%-dateFormat%>';
         this.timeFormat = '<%-timeFormat%>';<%}%>
+        this.modulePath = '<%-moduleName%>';
         this.indexFields = [<%for (let field of indexView) {%>'<%-field.fieldName%>',<%}%> ];
     }
 }

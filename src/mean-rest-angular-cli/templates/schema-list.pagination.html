@@ -12,8 +12,8 @@
 							<i *ngIf="listSortOrder === 'desc'" class="fas fa-arrow-down"></i>
 						</button>
 						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><% for (let field of briefView) { if (field.sortable) {%>
-							<a class="dropdown-item pointer" (click)="setListSort('<%-field.fieldName%>', '<%-field.displayName%>', 'asc')"><%-field.FieldName%><i class="fas fa-arrow-up"></i></a>
-							<a class="dropdown-item pointer" (click)="setListSort('<%-field.fieldName%>', '<%-field.displayName%>', 'desc')"><%-field.FieldName%><i class="fas fa-arrow-down"></i></a><%} }%>
+							<a class="dropdown-item pointer" (click)="setListSortAndRefresh('<%-field.fieldName%>', '<%-field.displayName%>', 'asc')"><%-field.FieldName%><i class="fas fa-arrow-up"></i></a>
+							<a class="dropdown-item pointer" (click)="setListSortAndRefresh('<%-field.fieldName%>', '<%-field.displayName%>', 'desc')"><%-field.FieldName%><i class="fas fa-arrow-down"></i></a><%} }%>
 						</div>
 					</div>
 			</div>
@@ -67,8 +67,9 @@
 			<div class="col-3">
 				<div class="total_counts">
 					Total: <b>{{total_count}}</b><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {
-					%><%if(api.includes("D")){%>
-					<input type="checkbox" class="ml-3 mr-1" [(ngModel)]="checkAll" (change)="onCheckAllChange()">All<%}%>
+					%><%if (generateView === 'admin') {%>
+						<%if(api.includes("D")){%>
+					<input type="checkbox" class="ml-3 mr-1" [(ngModel)]="checkAll" (change)="onCheckAllChange()">All<%}%><%}%>
 					<a class="ml-3" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a><%}%>
 				</div>
 			</div>

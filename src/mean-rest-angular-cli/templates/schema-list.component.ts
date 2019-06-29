@@ -29,7 +29,8 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
                 <%-schemaName%>Service, injector, router, route, location, ViewType.LIST);
 <% let theView = briefView; %><%_ include schema-construct.component.ts %>
 
-          this.listViewFilter = '<%-listType%>';
+          this.listViewFilter = '<%-listType%>';<% if (defaultSortField) { %>
+          this.setListSort('<%-defaultSortField%>', '<%-defaultSortFieldDisplay%>', '<%-defaultSortOrder%>');<%}%>
           // this is to initialize the detail that will be used for search condition selection
           const detail = {};
           this.detail = this.formatDetail(detail);

@@ -12,10 +12,10 @@
 				</th><%} else {%>
 				<th scope="col"><%-field.displayName%></th>
 				<%_ } }%>
-		        <% let widthTh = 1.8;
+		        <%_if (generateView !== 'public') {%><% let widthTh = 1.8;
 				if (api.includes("D")) {widthTh += 4;}
 				if (api.includes("U")) {widthTh += 2;}
-				if (widthTh > 1.8){%><th scope="col" style="width:<%-widthTh%>rem;"></th><%}%>
+				if (widthTh > 1.8){%><th scope="col" style="width:<%-widthTh%>rem;"></th><%}%><%}%>
 	    	</tr>
 	    </thead>
 	    <tbody>
@@ -27,12 +27,12 @@
 	            <td <%if(api.includes("R")){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%>>
 	            	<% include schema-display.field.html %>
 	            </td><%_ } %>
-	            <%if(api.includes("D") || api.includes("U")){%>
+	            <%_if (generateView !== 'public') {%><%if(api.includes("D") || api.includes("U")){%>
 	            <td>
 	            	<%if(api.includes("U")){%><a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>
 	            	<%if(api.includes("D")){%><a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
 					<%if(api.includes("D")){%><input type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
-	            </td><%}%>
+	            </td><%}%><%}%>
 	        </tr>
 	    </tbody>
 	</table>
