@@ -1,6 +1,6 @@
 {
   "name": "mdds-angular-file",
-  "version": "0.2.4",
+  "version": "0.6.0",
   "description": "Augular File Upload Module",
   "scripts": {
     "copy": "cp README.md dist;",
