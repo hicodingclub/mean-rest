@@ -12,18 +12,11 @@ import { ErrorToastConfig, ErrorToast} from './util.errortoast';
 
 import { BaseService, ServiceError } from './base.service';
 import { MraCommonService } from './common.service';
-import { BaseComponentInterface } from './base.interface';
 import { Util } from './util.tools';
-
-export enum ViewType {
-    LIST,
-    DETAIL,
-    EDIT,
-}
 
 export {ServiceError};
 
-export class BaseComponent implements BaseComponentInterface {
+export class CompositeComponent {
     protected objectKeys = Object.keys;
   
     private storage:any = {};
@@ -32,7 +25,6 @@ export class BaseComponent implements BaseComponentInterface {
     protected list:any[] = [];
         
     protected majorUi = true;
-    protected modulePath:string;
     protected eventEmitter: EventEmitter<any> = new EventEmitter();
     
     protected page: number = 1;
@@ -66,14 +58,10 @@ export class BaseComponent implements BaseComponentInterface {
     protected multiSelectionFields = [];
     protected arrayFields = []; //element is [fieldName, elementType]
     protected mapFields = []; //element is [fieldName, elementType, mapKey]
-    protected fileFields = {}; //fieldName: {selectedFiles: [selected files]}
     protected dateFormat = "MM/DD/YYYY";
     protected timeFormat = "hh:mm:ss";
 
-    protected listViewFilter = 'table'; // list, or grid
-    protected listSortField: string;
-    protected listSortFieldDisplay: string;
-    protected listSortOrder: string; // 'asc', 'desc'
+    protected listViewFilter = 'list'; // list, or grid
 
     protected hiddenFields = []; //fields hide from view. Currrently used by "Add" view of edit-sub
 
@@ -235,7 +223,7 @@ export class BaseComponent implements BaseComponentInterface {
         if (str.length > 30) str = str.substr(0, 27) + '...';
         return str;
     }
-
+  
     /***Start: handle reference fields***/
     protected formatReferenceField(field: any, fieldName: string ):any {
         let id, value;
@@ -636,59 +624,33 @@ export class BaseComponent implements BaseComponentInterface {
       return this.populateDetailForAction(id, null);
     }
 
-    private onDetailReturned(detail: any, action: string): void {
-        let originalDetail = Util.clone(detail);
-        if (detail["_id"]) this.commonService.putToStorage(detail["_id"], originalDetail);//cache it
-        
-        this.detail = this.formatDetail(detail);
-        this.extraFieldsUnload();//unload data to text editors, etc
-        if (action == 'edit') {
-          this.extraInfoPopulate();//collect other info required for edit view
-        }
-        if (this.refreshing) {
-          this.refreshing = false;
-          let snackBarConfig: SnackBarConfig = {
-              content: "Detail refreshed"
-          }
-          let snackBar = new SnackBar(snackBarConfig);
-          snackBar.show();
-        }
-        this.eventEmitter.emit(this.detail);
-    }
-
-    protected populateDetailByField(field: string, value: string):EventEmitter<any> {
-        let searchContext = {'$and': [
-            {'$or': []},
-            {'$and': []},
-        ]};
-
-        let o = {}
-        o[field] = value;
-        searchContext['$and'][1]['$and'].push(o);
-        this.service.getList(1, 1, searchContext, null, null).subscribe(
-            result => {
-                let detail = {};
-                if (result.items && result.items.length >= 1) {
-                    detail = result.items[0];
-                }
-                let action = null;
-                this.onDetailReturned(detail, action);
-            },
-            this.onServiceError
-        );
-        return this.eventEmitter;
-    }
-
     protected populateDetailForAction(id: string, action: string):EventEmitter<any> {
       //action: eg: action=edit  -> get detail for editing purpose 
       this.service.getDetailForAction(id, action).subscribe(
         detail => {
-            this.onDetailReturned(detail, action);
+            let originalDetail = Util.clone(detail);
+            if (detail["_id"]) this.commonService.putToStorage(detail["_id"], originalDetail);//cache it
+            
+            this.detail = this.formatDetail(detail);
+            this.extraFieldsUnload();//unload data to text editors, etc
+            if (action == 'edit') {
+              this.extraInfoPopulate();//collect other info required for edit view
+            }
+            if (this.refreshing) {
+              this.refreshing = false;
+              let snackBarConfig: SnackBarConfig = {
+                  content: "Detail refreshed"
+              }
+              let snackBar = new SnackBar(snackBarConfig);
+              snackBar.show();
+            }
+            this.eventEmitter.emit(this.detail);
         },
         this.onServiceError
       );
       return this.eventEmitter;
     }
+    
 
     protected populateDetailFromCopy(copy_id:string):void {
       this.service.getDetail(copy_id).subscribe(
@@ -860,10 +822,6 @@ export class BaseComponent implements BaseComponentInterface {
         //Now let's reload the search condition to UI
         this.searchText = this.getFromStorage("searchText");
         this.searchMoreDetail = this.getFromStorage("searchMoreDetail");
-        this.listSortField = this.getFromStorage('listSortField');
-        this.listSortFieldDisplay = this.getFromStorage('listSortFieldDisplay');
-        this.listSortOrder = this.getFromStorage('listSortOrder');
-
         let detail = this.getFromStorage("detail");
         if (detail) this.detail = detail;
     }
@@ -889,7 +847,7 @@ export class BaseComponent implements BaseComponentInterface {
         searchContext = this.getFromStorage("searchContext");
         this.loadUIFromCache();      
 
-        this.service.getList(new_page, this.per_page, searchContext, this.listSortField, this.listSortOrder).subscribe(
+        this.service.getList(new_page, this.per_page, searchContext).subscribe(
           result => { 
             this.list = result.items.map(x=>this.formatDetail(x));
             this.page = result.page;
@@ -916,44 +874,16 @@ export class BaseComponent implements BaseComponentInterface {
         );
       return this.eventEmitter;
     }
-
+    
+    
     /*UI operations handlers*/
     public setListViewFilter(view: string):void {
         this.listViewFilter = view;
         this.putToStorage('listViewFilter', view);
     }
-    public isShowListView(view: string):boolean {
+    public isShowListView():boolean {
         const cached = this.getFromStorage('listViewFilter');
-        return cached ? cached === view : this.listViewFilter === view;
-    }
-    public setListSort(field:string, fieldDisplay:string, order:string): boolean {
-        let refresh = false;
-        if (field !== this.listSortField || order !== this.listSortOrder) {
-            refresh = true;
-        }
-        this.listSortField = field;
-        this.listSortFieldDisplay = fieldDisplay;
-        this.listSortOrder = order;
-        this.putToStorage('listSortField', field);
-        this.putToStorage('listSortFieldDisplay', fieldDisplay);
-        this.putToStorage('listSortOrder', order);
-
-        return refresh;
-    }
-    public setListSortAndRefresh(field:string, fieldDisplay:string, order:string): void {
-        let refresh = this.setListSort(field, fieldDisplay, order);
-        if (refresh) this.populateList();
-    }
-    public toggleListSort(field:string, fieldDisplay:string): void {
-        if (field !== this.listSortField) {
-            this.listSortOrder = 'asc';
-        } else {
-            if (this.listSortOrder === 'asc') this.listSortOrder = 'desc';
-            else this.listSortOrder = 'asc';
-        }
-        this.setListSort(field, fieldDisplay, this.listSortOrder);
-
-        this.populateList(); 
+        return cached ? cached === 'list' : this.listViewFilter === 'list';
     }
 
     public onRefresh():void {
@@ -1132,7 +1062,7 @@ export class BaseComponent implements BaseComponentInterface {
 
     public onDetailLinkClicked(id:string):void {
         this.clickedId = id; 
-        this.router.navigate([this.modulePath, this.itemName, 'detail', id]); // {relativeTo: this.getParentActivatedRouter() }
+        this.router.navigate([this.itemName, 'detail', id], {relativeTo: this.getParentActivatedRouter() });
     }
     
     protected getRefFromField(fn:string):string {
@@ -1280,7 +1210,8 @@ export class BaseComponent implements BaseComponentInterface {
             }            
         }
         componentInstance.setFocus();
-
+        
+ 
         this.componentSubscription = componentInstance.done.subscribe( (val) => {
             if (val) {
                 this.componentSubscription.unsubscribe();
