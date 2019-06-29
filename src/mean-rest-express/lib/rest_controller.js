@@ -584,7 +584,7 @@ RestController.Update = function(req, res, next) {
 	let idParam = name + "Id";
 	let id = req.params[idParam];
 	let editViewStr = views[3];
-	let viewFields = editViewStr.match(/\S+/g) || [];
+  let viewFields = editViewStr.match(/\S+/g) || [];
 	if (schema.options.useSaveInsteadOfUpdate) {
 	  model.findOne({_id: id}, function (err, result){
       if (err) { return next(err); }
@@ -593,9 +593,10 @@ RestController.Update = function(req, res, next) {
         result[field] = body[field];
 	    }
       for (let field of viewFields) {
-        if (!field in body) {
+        if (!(field in body)) {
           //not in body means user deleted this field
-          delete result[field]
+          // delete result[field]
+          result[field] = undefined;
         }
       }
       result = ownerPatch(result, owner, req);
