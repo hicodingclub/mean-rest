@@ -12,7 +12,9 @@
 	  
 	  	<div class="dropdown-divider"></div>
 	    <ng-container *ngIf="isAuthorized(); else notAuthorized">
-		    <a class="dropdown-item" href="#">Profile</a>
+			<a class="dropdown-item btn" *ngFor="let item of dropdownItems; let i = index;" (click)="dropdownItemClicked(i)">
+				{{item.displayName}}
+			</a>
 		    
 		    <div class="dropdown-divider"></div>
 		    

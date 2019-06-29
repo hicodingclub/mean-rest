@@ -1,4 +1,12 @@
-export { AUTHTICATION_SERVER_ROOT_URI, AUTHTICATION_LOGIN_PAGE_URI, AUTHTICATION_INTERFACES } from './auth/tokens';
+export {
+    AUTHENTICATION_SERVER_ROOT_URI,
+    AUTHENTICATION_LOGIN_PAGE_URI,
+    AUTHENTICATION_INTERFACES,
+    AUTHENTICATION_DROPDOWN_ITEMS,
+    AUTHENTICATION_LOGIN_PIPELINE,
+ } from './auth/tokens';
+
 export { AuthGuard } from './auth/auth.guard';
 export { AuthenticationService } from './auth/auth.service';
 export { AuthenticationModule } from './auth/auth.module';
+export { DropdownItem } from './auth/auth-icon/dropdown-item';

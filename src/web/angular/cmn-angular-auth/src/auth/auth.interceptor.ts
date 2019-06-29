@@ -12,7 +12,7 @@ import { Observable, BehaviorSubject, throwError, EMPTY } from 'rxjs';
 import { tap, catchError, switchMap, filter, take } from 'rxjs/operators';
 
 import { AuthenticationService } from './auth.service';
-import { AUTHTICATION_LOGIN_PAGE_URI } from './tokens';
+import { AUTHENTICATION_LOGIN_PAGE_URI } from './tokens';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
@@ -24,7 +24,7 @@ export class TokenInterceptor implements HttpInterceptor {
   constructor(
     private router: Router,
     private authService: AuthenticationService,
-    @Inject(AUTHTICATION_LOGIN_PAGE_URI) private loginPageUri: string
+    @Inject(AUTHENTICATION_LOGIN_PAGE_URI) private loginPageUri: string
     ) {}
 
   addAuthHeader(request) {

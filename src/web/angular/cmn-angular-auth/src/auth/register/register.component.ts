@@ -32,7 +32,8 @@ export class RegisterComponent implements OnInit {
         private formBuilder: FormBuilder,
         private router: Router,
         private route: ActivatedRoute,
-        private authenticationService: AuthenticationService) { }
+        private authenticationService: AuthenticationService
+        ) { }
 
 
     ngOnInit() {
@@ -59,9 +60,10 @@ export class RegisterComponent implements OnInit {
             .pipe(first())
             .subscribe(
                 data => {
+                    this.servererror = false;
+
                     // this.alertService.success('Registration successful', true);
                     this.router.navigate(['../login'], {relativeTo: this.route, });
-                    this.servererror = false;
                 },
                 error => {
                     // this.alertService.error(error);

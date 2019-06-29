@@ -6,7 +6,7 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AuthRoutingModule } from './auth-routing.module';
 import { AuthenticationService } from './auth.service';
-import { AUTHTICATION_LOGIN_PAGE_URI, AUTHTICATION_SERVER_ROOT_URI } from './tokens';
+import { AUTHENTICATION_LOGIN_PAGE_URI, AUTHENTICATION_SERVER_ROOT_URI } from './tokens';
 import { TokenInterceptor } from './auth.interceptor';
 import { AuthenticationComponent } from './auth.component';
 import { LoginComponent } from './login';

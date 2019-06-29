@@ -26,15 +26,15 @@ export const authentication_server_root_uri: string = '/api/auth';
 
 3. Declare two providers in your app.module.ts:
 
-  import { AUTHTICATION_LOGIN_PAGE_URI, AUTHTICATION_SERVER_ROOT_URI } from 'mdds-angular-auth';
+  import { AUTHENTICATION_LOGIN_PAGE_URI, AUTHENTICATION_SERVER_ROOT_URI } from 'mdds-angular-auth';
   import { authentication_login_page_uri, authentication_server_root_uri } from './auth.config';
   ...
   @NgModule(
   ...
   providers: [
     ...
-    { provide: AUTHTICATION_LOGIN_PAGE_URI, useValue: authentication_login_page_uri },
-    { provide: AUTHTICATION_SERVER_ROOT_URI, useValue: authentication_server_root_uri }
+    { provide: AUTHENTICATION_LOGIN_PAGE_URI, useValue: authentication_login_page_uri },
+    { provide: AUTHENTICATION_SERVER_ROOT_URI, useValue: authentication_server_root_uri }
 
   ]
   ...

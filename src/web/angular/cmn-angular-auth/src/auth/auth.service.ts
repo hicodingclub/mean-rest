@@ -4,7 +4,7 @@ import { catchError, map, filter, retry } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { Router, NavigationEnd  } from '@angular/router';
 
-import { AUTHTICATION_SERVER_ROOT_URI } from './tokens';
+import { AUTHENTICATION_SERVER_ROOT_URI } from './tokens';
 
 @Injectable()
 export class AuthenticationService {
@@ -19,7 +19,7 @@ export class AuthenticationService {
   private adminInterface: boolean = false;
 
   constructor(
-            @Inject(AUTHTICATION_SERVER_ROOT_URI) private authServerRootUri: string,
+            @Inject(AUTHENTICATION_SERVER_ROOT_URI) private authServerRootUri: string,
             private router: Router,
             private http: HttpClient) {
     this.navigateEndTime = Date.now();

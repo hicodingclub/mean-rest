@@ -1,6 +1,6 @@
 ﻿import { Component, Inject } from '@angular/core';
 import { AuthenticationService } from './auth.service';
-import { AUTHTICATION_INTERFACES } from './tokens';
+import { AUTHENTICATION_INTERFACES } from './tokens';
 
 @Component({
     selector: 'app-auth',
@@ -14,7 +14,7 @@ export class AuthenticationComponent {
 
     constructor(
         private authenticationService: AuthenticationService,
-        @Inject(AUTHTICATION_INTERFACES) private authenticationInterfaces: string
+        @Inject(AUTHENTICATION_INTERFACES) private authenticationInterfaces: string
         ) {
       
       let str = authenticationInterfaces.toLowerCase();

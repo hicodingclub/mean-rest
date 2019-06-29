@@ -2,7 +2,8 @@
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { AuthenticationService } from '../auth.service';
 
-import { AUTHTICATION_LOGIN_PAGE_URI } from '../tokens';
+import { AUTHENTICATION_LOGIN_PAGE_URI, AUTHENTICATION_DROPDOWN_ITEMS } from '../tokens';
+import { DropdownItem } from './dropdown-item';
 
 @Component({
     selector: 'app-auth-icon',
@@ -18,7 +19,10 @@ export class AuthIconComponent implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthenticationService,
-    @Inject(AUTHTICATION_LOGIN_PAGE_URI) private loginPageUri: string) { }
+    @Inject(AUTHENTICATION_LOGIN_PAGE_URI) private loginPageUri: string,
+    @Inject(AUTHENTICATION_DROPDOWN_ITEMS) public dropdownItems: DropdownItem[]) {
+
+  }
 
   ngOnInit() {
     this.isAuthorized();
@@ -57,6 +61,12 @@ export class AuthIconComponent implements OnInit {
         }
     }
     return isAuth;
+  }
+
+  public dropdownItemClicked(i: number):void {
+    let item = this.dropdownItems[i];
+    this.router.navigate([item.routerLink]);
+    this.popup = false;
   }
 
   public login() {

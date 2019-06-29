@@ -1,14 +1,14 @@
 ﻿import { Injectable, Inject } from '@angular/core';
 import { Router, CanActivate, CanActivateChild, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { AuthenticationService } from './auth.service';
-import { AUTHTICATION_LOGIN_PAGE_URI } from './tokens';
+import { AUTHENTICATION_LOGIN_PAGE_URI } from './tokens';
 
 @Injectable()
 export class AuthGuard implements CanActivate, CanActivateChild {
   constructor(
     private router: Router,
     private authService: AuthenticationService,
-    @Inject(AUTHTICATION_LOGIN_PAGE_URI) private loginPageUri: string) { }
+    @Inject(AUTHENTICATION_LOGIN_PAGE_URI) private loginPageUri: string) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     if (this.authService.isAuthorized()) {
