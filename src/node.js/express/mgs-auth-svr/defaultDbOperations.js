@@ -1,8 +1,5 @@
-const meanRestExpress = require('mean-rest-express')
-const restController = meanRestExpress.restController;
-
 // DB Population
-const populateAdminRoles = function() {
+const populateAdminRoles = function(restController) {
   function modelExecuteSuccess(taskStr) {
     function doSomething(result) {
       console.log(" --- auth server (admin roles): model excecute succeeded: ", taskStr);
@@ -109,7 +106,7 @@ const populateAdminRoles = function() {
   runDB();
 };
 
-const populatePublicAccess = function() {
+const populatePublicAccess = function(restController) {
   function modelExecuteSuccess(taskStr) {
     function doSomething(result) {
       console.log(" --- auth server (public access): model excecute succeeded: ", taskStr);
@@ -164,6 +161,6 @@ const populatePublicAccess = function() {
 };
 
 module.exports = {
-        populatePublicAccess: populatePublicAccess,
-        populateAdminRoles: populateAdminRoles
-      };
+  populatePublicAccess: populatePublicAccess,
+  populateAdminRoles: populateAdminRoles
+};

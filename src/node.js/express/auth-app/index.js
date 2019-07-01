@@ -15,7 +15,7 @@ const authFuncs = {
 
 const dbOperation = require('./defaultDbOperations');
 
-const run = function(authServerUrl, appKey, appSecrete, options) {
+const run = function(authServerUrl, appKey, appSecrete, localRouter, options) {
   //options: {'roleModules': [], 'accessModules': []}
   let accessModules = [];
   let roleModules = [];
@@ -29,35 +29,34 @@ const run = function(authServerUrl, appKey, appSecrete, options) {
   if (accessModules.length > 0) {//manages public module authorization
     //1. upload modules and initial permissions
     
-    if (authServerUrl == 'local') {
+    if (localRouter) {
       //wait until auth-server finished insert roles
-      setTimeout(dbOperation.uploadPublicModulesAndAccessLocal, 3000, accessModules);
+      setTimeout(dbOperation.uploadPublicModulesAndAccessLocal, 3000, accessModules, localRouter.restController);
     }
-    
+
     //2. download roles and permissions periodically
-    if (authServerUrl == 'local') {
-      setTimeout(dbOperation.downloadPublicGroupsAndAccessLocal, 6000, accessModules);
-      
-      setInterval(dbOperation.downloadPublicGroupsAndAccessLocal, 1000*60, accessModules);
+    if (localRouter) {
+      setTimeout(dbOperation.downloadPublicGroupsAndAccessLocal, 6000, accessModules, localRouter.restController);
+      setInterval(dbOperation.downloadPublicGroupsAndAccessLocal, 1000*60, accessModules, localRouter.restController);
     }
   }
   
   if (roleModules.length > 0) {//manages admin module authorization
     //1. upload modules and initial permissions
-    
-    if (authServerUrl == 'local') {
+
+    if (localRouter) {
       //wait until auth-server finished insert roles
-      setTimeout(dbOperation.uploadAdminModulesLocal, 3000, roleModules);
+      setTimeout(dbOperation.uploadAdminModulesLocal, 3000, roleModules, localRouter.restController);
     }
-    
+
     //2. download roles and permissions periodically
-    if (authServerUrl == 'local') {
-      setTimeout(dbOperation.downloadAdminRoleAndPermissionsLocal, 6000, roleModules);
-      
-      setInterval(dbOperation.downloadAdminRoleAndPermissionsLocal, 1000*60, roleModules);
+    if (localRouter) {
+      setTimeout(dbOperation.downloadAdminRoleAndPermissionsLocal, 6000, roleModules, localRouter.restController);
+      setInterval(dbOperation.downloadAdminRoleAndPermissionsLocal, 1000*60, roleModules, localRouter.restController);
     }
   }
 }
+
 module.exports = {
   authFuncs: authFuncs,
   run: run

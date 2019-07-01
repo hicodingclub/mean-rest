@@ -22,40 +22,43 @@ addPasswordHandlersToDef(authAccountDef);
 module.exports.authUserDef = authUserDef;
 module.exports.authAccountDef = authAccountDef;
 
-//authorization  - Admin Roles
+//authorization  - Admin Roles based authorization
 const GetAuthzModuleDef = require('./authz/model.role');
 let accScmName = authAccountDef.authn.authUserSchema;
 const authzDef = GetAuthzModuleDef(accScmName, authAccountDef.schemas[accScmName]);
 
+// need a restController instance that the role table can be accessed.
+const internalRoleRouter =  meanRestExpress.RestRouter(authzDef, 'internal-role-manager');
+const restController = internalRoleRouter.restController;
+//getAccountRoles - the function to get account roles that can be used as middleware in Authn router.
 const AuthzController = require('./authz/controller');
-let getAccountRoles = AuthzController.getAccountRoles
+let getAccountRoles = AuthzController.getAccountRoles(restController)
+
+//authorization  - Public Access based authorization, used to manage the public access
+const accessDef = require('./authz/model.access');
 
 module.exports.authzDef = authzDef;
 
-//authorization  - Public Access
-const accessDef = require('./authz/model.access');
-
-//authentication
+//authentication router
 module.exports.GetDefaultAuthnRouter = function(authDef, withRoles) {
   if (withRoles) return GetAuthnRouter(authDef, getAccountRoles); //append user roles in user info
   return GetAuthnRouter(authDef);
 }
-
 
 const dbOperations = require('./defaultDbOperations');
 
 //used to manage the admin user authorizations
 module.exports.GetDefaultRolesManageRouter =  function(moduleName, authAppFuncs) {
   const authzRouter =  meanRestExpress.RestRouter(authzDef, moduleName, authAppFuncs);
-  dbOperations.populateAdminRoles();
-
+  const restController = authzRouter.restController;
+  dbOperations.populateAdminRoles(restController);
   return authzRouter;
 }
 
 //used to manage the public access
 module.exports.GetDefaultAccessManageRouter =  function(moduleName, authAppFuncs) {
   const accessRouter =  meanRestExpress.RestRouter(accessDef, moduleName, authAppFuncs);
-  dbOperations.populatePublicAccess();
-
+  const restController = accessRouter.restController;
+  dbOperations.populatePublicAccess(restController);
   return accessRouter;
 }
