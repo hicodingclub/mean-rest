@@ -16,9 +16,9 @@ Both modules take the single input from the Mongoose schema you defined, and gen
 
 ```
 
-## Schema and View Definition
+## 1. Quick Start
 
-### Quick Start
+### 1.1 Schema and View Definition
 
 - Define your Mongoose schema and views in "blog.js"
 
@@ -26,32 +26,80 @@ Both modules take the single input from the Mongoose schema you defined, and gen
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-//Schema definition
+// Schema definition
 const blogSchema = new Schema({
     title:  String,
     author: String,
     body:   String,
     date: { type: Date, default: Date.now }
 });
-//Define views for query(blogBrief, blogDetail), create (blogCreate), Update (blogEdit), and Search (blogSearch)
+// Define views for query(blogBrief, blogDetail), create (blogCreate), Update (blogEdit), and Search (blogSearch)
 const blogBrief = "title author date";		//The fields showed in the list view of the document
 const blogDetail = "title author body date";	//The fileds that show when reviewing the details of the document
 const blogCreat = "title body";			//The fields that show in 'Create' view
 const blogEdit = "title body";			//The editable fields show in 'Edit' view
 const blogSearch = "title author body date";	//Future use
 const blogIndex = "title";			//The field that is used as the index of the document viewable in front end
+
+// 1. put schema definition together:
+const blogSchemaDef = {
+    schema: blogSchema,
+    views: [blogBrief, blogDetail, blogCreat, blogEdit, blogSearch, blogIndex],
+    name: 'Blog', //Optional. The name on front end UI
+}
+// 2. Configuration of all schema definition and generation:
+const config = {
+  dateFormat: "MM-DD-YYYY",
+  timeFormat: "hh:mm:ss",
+}
+// 3. Authorization definition of the schemas
+const authz = {
+  "module-authz": {"LoginUser": 'R', "Anyone": ""},
+  "blog": {"LoginUser": 'CRUD', "Anyone": "R"},
+}
+
 //Export the views so mean-rest-express and mean-rest-angular can use
-module.exports.blogService = {
-    "blog": {
-        schema: blogSchema,
-	views: [blogBrief, blogDetail, blogCreat, blogEdit, blogSearch, blogIndex],
-	name: 'Blog', //Optional. The name on front end UI
-    }
+module.exports = {
+    schemas: {
+        "blog": blogSchemaDef
+    },
+    config,
+    authz,
 };
 ```
+### 1.2 Create Express Router for above schema and views in "app.js"
 
-### Schema Definition
+- Install mean-rest-express to your project:
 
+```
+$ npm install mean-rest-express
+```
+
+- Use mean-rest-express in your code:
+
+```javascript
+const blog = require('./blog');
+
+const meanRestExpress = require('mean-rest-express');
+const blogRouter = meanRestExpress.RestRouter(blog);
+
+app.use('/', blogRouter);
+```
+
+### 1.3 Generated APIs:
+Now you can access the Blog with following REST APIs:
+
+  + GET /blog/   -- list of blogs with Brief View
+  + GET /blog/:id  -- get details of a blog (Detail View)
+  + PUT /blog/ - -create a new blog, with information in the Create View
+  + POST /blog/:id -- update a blog, with information in the Edit View
+  + DELETE /blog/:id -- delete a blog
+
+### 1.4 Generated Angular Front End for above schema:
+Use mra tool to generated front end code (to be added).
+
+## 2. Schema Definition
+- Schema definition has the following format:
 ```
     {
         schema: <Schema>,
@@ -68,8 +116,8 @@ module.exports.blogService = {
     }
 ```
 
-#### schema
 
+### 2.1 schema
 - A mongoose schema object, with some extentions
 
 ###### Extentions:
@@ -96,7 +144,7 @@ const person = new Schema({
 });
 ```
 
-#### views
+### 2.2 views
 
 - A string array, with each string containing a list of fields showing under different views:
 	- <brief view>: 	The fields showed in the list view of the document
@@ -125,12 +173,12 @@ var Brief = "question answer (order)";
 var views = [Brief, Detail, Creat, Edit, TextSearch, Index]
 ```
 
-#### name
+### 2.3 name
 
 - Optional.
 - The viewable name of the defined schema in fornt end UI.
 
-#### patch
+### 2.4 patch
 
 - Optional
 - A list of extra predefined fields that will be added to the schema when creating the document.
@@ -142,13 +190,21 @@ const PredefinedPatchFields = {
   mmodule_name: { type: String, index: true},
 };
 ```
+### 2.5 owner
 
-#### ebmeddedViewOnly
+- optional
+- enable the ownership of the schema. Owner type could be: user, and module.
+
+```
+  owner: {enable: true, type: 'module'},
+```
+
+### 2.6 ebmeddedViewOnly
 
 - Optional. Default: false
 - All views for this schema are embedded. Usually used for association of two schemas.
 
-#### api
+### 2.7 api
 
 - Optional. Default: 'LCRUD'
 - A list of supported APIs for this schema
@@ -158,7 +214,7 @@ const PredefinedPatchFields = {
 	- U: update a document
 	- D: delete a document
 
-#### validators
+### 2.8 validators
 
 - Optional
 - validator object in the format of:
@@ -205,40 +261,77 @@ const blog2Validators = {
 };
 ```
 
-#### mraUI
+### 2.9 mraUI
 
 - optional
 - this configuration controls the UI generation. It has the following attributes:
 	- detailType: type of detailed view. 'normal', or 'post'.
 		- 'normal': show detailed information line by line, with index fields as the title.
 		- 'post': detailView shall be defined in "signaturePicture title author publishDate content" sequence. It will be shown as a post.
+		- 'info': detailView shall be defined in "signaturePicture title content" sequence. It will be shown as titled information, with picture if provided..
+		- 'slide': detailView shall be defined in "signaturePicture title subtitle description" sequence. It will be shown as picture in the background and other info on top of the picture.
+		
 	- listType: type of the list view. 'table', 'list', or 'grid'
-
-## mean-rest-express
-
-Usage:
-- Install mean-rest-express to your project
+		- table
+		- list
+		- grid
+	- listToDetail: how to transit from list to detail view:
+		- 'click'
+		- 'link'
+	- defaultListSort: how to sort the list. An object with the key as the sorting field, and the value is 'asc', or 'desc'.
+	```
+		defaultListSort: {last_name: 'asc'}
+	```
+	- homeListNumber: number of items to show in the 'home' list view
+	- detailPipelines: add extra button in detailed view, which will trigger the given pipeline
+	```
+		detailPipelines: [["Enroll", "/pipeline/register-class"]],
+	```
+## 3. System Configuration
+- Schema configuration has the configurations that applies to all schema. It has the following format:
 ```
-$ npm install mean-rest-express
+const config = {
+  dateFormat,
+  timeFormat,
+  patch: ['mmodule_name'], // extra fields to patch to all schemas
+  owner: {enable: true, type: 'module'},
+  fileServer: {
+    uploadUrl: '/api/files/upload',
+    downloadUrl: '/api/files/download'
+  }
+};
+```
+### 3.1 dateFormat and timeFormat
+
+Defines what date and time format to show on UI. Examples are:
+```
+const dateFormat = 'MM/DD/YYYY';
+const timeFormat = 'hh:mm:ss';
 ```
 
-### Create Express Router for above schema and views in "app.js"
+### 3.2 patch
+See 2.4
+### 3.2 owner
+See 2.5
+### 3.3 fileServer
+File server urls that upload and download files used by the 'file' field in the schema (field with mraType defined as 'file').
 
-```javascript
-const blog = require('./blog');
+## 4. Authorization Definition
 
-const meanRestExpress = require('mean-rest-express');
-const blogRouter = meanRestExpress.RestRouter(blog.views);
-
-app.use('/', blogRouter);
 ```
-### Generated APIs:
-Now you can access the Blog with following REST APIs:
+const authz = {
+  "module-authz": {"LoginUser": 'R', "Anyone": ""},
+  "Class": {"LoginUser": '', "Anyone": "R"},
+}
+```
 
-  + GET /blog/   -- list of blogs with Brief View
-  + GET /blog/:id  -- get details of a blog (Detail View)
-  + PUT /blog/ - -create a new blog, with information in the Create View
-  + POST /blog/:id -- update a blog, with information in the Edit View
-  + DELETE /blog/:id -- delete a blog
+## 5. mean-rest-express
+## 6. mean-rest-angular
+## 7. mean-rest-angular-cli
+## 8. Server auth module
+## 9. Client auth module
+## 10. File Server
+## 11. Client file uploading
 
-## mean-rest-angular
+
+
