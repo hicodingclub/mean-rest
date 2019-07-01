@@ -656,15 +656,17 @@ export class BaseComponent implements BaseComponentInterface {
         this.eventEmitter.emit(this.detail);
     }
 
-    protected populateDetailByField(field: string, value: string):EventEmitter<any> {
+    protected populateDetailByFields(searchObj: any):EventEmitter<any> {
         let searchContext = {'$and': [
             {'$or': []},
             {'$and': []},
         ]};
 
-        let o = {}
-        o[field] = value;
-        searchContext['$and'][1]['$and'].push(o);
+        for (let field in searchObj) {
+            let o = {}
+            o[field] = searchObj[field];
+            searchContext['$and'][1]['$and'].push(o);
+        }
         this.service.getList(1, 1, searchContext, null, null).subscribe(
             result => {
                 let detail = {};
@@ -852,7 +854,9 @@ export class BaseComponent implements BaseComponentInterface {
     protected searchList():void {
         this.processSearchContext();
         //update the URL
-        this.router.navigate(['.', {}], {relativeTo: this.route});//start from 1st page
+        if (!this.isEmptyRoutingPath()) {
+            this.router.navigate(['.', {}], {relativeTo: this.route});//start from 1st page
+        }
         this.putToStorage("page", 1);//start from 1st page
         this.populateList();
     }
@@ -878,10 +882,12 @@ export class BaseComponent implements BaseComponentInterface {
             
         if (cached_page) { 
             new_page = cached_page;
-            if (cached_page == 1)
+            if (!this.isEmptyRoutingPath()) {
+                if (cached_page == 1)
                 this.router.navigate(['.', {}], {relativeTo: this.route, });//update the url
             else
                 this.router.navigate(['.', {page: cached_page}], {relativeTo: this.route, });//update the url
+            }
         }
         else if (url_page) new_page = url_page;
         else new_page = 1;
@@ -1125,7 +1131,7 @@ export class BaseComponent implements BaseComponentInterface {
                     if (item[fn] == d) this.clickedId = item['_id'];
                 }
             }
-            this.router.navigate([ref, 'detail', d['_id']], {relativeTo: this.getParentActivatedRouter() });
+            this.router.navigate([this.modulePath, ref, 'detail', d['_id']]); // {relativeTo: this.getParentActivatedRouter() };
         }
         if (event) event.stopPropagation();
     }
@@ -1570,6 +1576,9 @@ export class BaseComponent implements BaseComponentInterface {
             route = route.parent;
         } while (route)
         return this.route.root;
+    }
+    protected isEmptyRoutingPath():boolean {
+        return this.route.snapshot.url.length === 0;
     }
     
     /*Sub detail show flag*/
