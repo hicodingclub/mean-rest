@@ -211,7 +211,7 @@ const resultReducerForView = function (result, viewStr) {
 };
 
 const ownerPatch = function (query, owner, req) {
-  if (owner && owner.enabled) {
+  if (owner && owner.enable) {
     if (owner.type === 'module') {
       query.mmodule_name = req.mddsModuleName;
     } else if (owner.type === 'user') {
