@@ -1,0 +1,5 @@
+<% if (detailPipelines.length > 0) {%>
+    <br/><%for (let p of detailPipelines) { %>
+    <div class="row">
+        <button type="button" class="btn btn-primary"><%-p[0]%></button>
+    </div><%} }%>

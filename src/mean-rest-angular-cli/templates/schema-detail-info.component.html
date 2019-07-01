@@ -1,13 +1,5 @@
 <div class="detail" *ngIf="detail">
-	<%if (generateView === 'admin') {%>
-	<div class="action-buttons">
-		<!--<a href="javascript:void(0)" (click)="goBack()"><i class="fas fa-angle-double-left" title="Back"></i></a>-->
-		<% if (api.includes("L")) {%><a [routerLink]="['../../list' ]"><i class="fas fa-list" title="List"></i><!--  span>&nbsp;&nbsp;{{ItemCamelName}} List</span--></a><%}%>
-		<% if (api.includes("U")) {%><a [routerLink]="['../../edit', detail['_id'] ]" [skipLocationChange]="false" class="btn btn-outline-primary">Edit</a><%}%>
-		<% if (api.includes("C")) {%><a [routerLink]="['../../new']" [queryParams]="{cid: detail['_id']}" [skipLocationChange]="false" class="btn btn-outline-primary">New</a><%}%>
-		<% if (api.includes("D")) {%><a routerLink="." class="btn btn-outline-primary" (click)="onDelete(detail['_id'], null)">Delete</a><%}%>
-	</div>
-	<%}%>
+	<%_ include schema-detail.d.actions.html %>
 	<div class="card text-left transparent-border ">
 	  <div class="grid-fields">
 		<div class="card-header grid-head"><%_{
@@ -35,17 +27,6 @@
 		</div>
 	  </div>
 	</div>
-		<%if (generateView === 'admin') {%>
-			<% if (referred) {%>
-		<br/>
-		
-		<ul class="nav nav-tabs">
-		  <% for (let ref of referredBy) { let refApi = ref[8];%>
-			<%if (refApi.includes("L")) {%><li class="nav-item">
-			<a [routerLink]="['./<%-ref[0]%>/list']"
-				class="nav-link" routerLinkActive="active"><%-ref[5]%></a>
-		  </li><%}%><%}%>
-		</ul><%}%>
-			<router-outlet></router-outlet>
-		<%}%>
+	<%_ include schema-detail.d.pipeline.html %>
+    <%_ include schema-detail.d.ref.html %>
 </div>

@@ -1,0 +1,10 @@
+<% if (referred) {%>
+    <br/>
+    <ul class="nav nav-tabs">
+        <% for (let ref of referredBy) { let refApi = ref[8];%>
+            <%if (refApi.includes("L")) {%><li class="nav-item">
+            <a [routerLink]="['./<%-ref[0]%>/list']"
+                    class="nav-link" routerLinkActive="active"><%-ref[5]%></a>
+        </li><%}%><%}%>
+    </ul>
+    <router-outlet></router-outlet><%}%>

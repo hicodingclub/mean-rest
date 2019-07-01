@@ -3,7 +3,11 @@ import { Routes } from '@angular/router';
 import { <%-ModuleName%>Component } from './<%-moduleName%>/<%-moduleName%>.component';
 
 //Import routing paths
-import { <%_ for (let sch_name in schemaMap) { %><%-schemaMap[sch_name].schemaName%>RoutingPath, <% }%> } from './<%-moduleName%>/<%-moduleName%>-routing.path';
+import { <% 
+  for (let sch_name in schemaMap) {
+    let schDef = schemaMap[sch_name];
+    if (['L', 'C', 'R', 'U', 'D'].some(x => schDef.api.includes(x))) {
+  %><%-schDef.schemaName%>RoutingPath, <% } }%> } from './<%-moduleName%>/<%-moduleName%>-routing.path';
 
 export const <%-ModuleName%>Routes: Routes = [
   { path: '<%-moduleName%>', 

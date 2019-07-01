@@ -895,6 +895,7 @@ function main() {
     let listToDetail = 'click';
     let defaultSortField, defaultSortOrder;
     let homeListNumber = 4;
+    let detailPipelines = []; //extra buttons that trigger other pipelines
     if (schemaDef.mraUI) {
       let mraUI = schemaDef.mraUI;
       switch (mraUI.detailType) {
@@ -941,6 +942,9 @@ function main() {
       }
       if (typeof mraUI.homeListNumber === 'number') {
         homeListNumber = mraUI.homeListNumber;
+      }
+      if (mraUI.detailPipelines) {
+        detailPipelines = mraUI.detailPipelines;
       }
     }
     let listTypes = ['list', 'grid', 'table'];
@@ -1177,6 +1181,7 @@ function main() {
       defaultSortFieldDisplay: defaultSortFieldDisplay,
       defaultSortOrder: defaultSortOrder,
       homeListNumber: homeListNumber,
+      detailPipelines: detailPipelines,
 
       generateView: generateView,
       

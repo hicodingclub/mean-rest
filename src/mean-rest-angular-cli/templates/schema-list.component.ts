@@ -18,6 +18,9 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
   <%_ if (schemaHasDate) { %>
   private  minDate = {year: (new Date()).getFullYear() - 100, month: 1, day: 1};<%}%>
 
+  @Input()
+  protected searchObj:any;
+
   constructor(
       <%_ if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
       protected <%-schemaName%>Service: <%-SchemaName%>Service,
@@ -32,7 +35,7 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
           this.listViewFilter = '<%-listType%>';<% if (defaultSortField) { %>
           this.setListSort('<%-defaultSortField%>', '<%-defaultSortFieldDisplay%>', '<%-defaultSortOrder%>');<%}%>
           // this is to initialize the detail that will be used for search condition selection
-          const detail = {};
+          const detail = this.searchObj || {};
           this.detail = this.formatDetail(detail);
   }
 

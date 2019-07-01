@@ -24,6 +24,8 @@ export class <%-SchemaName%>ListHomeComponent extends <%-SchemaName%>ListCompone
   }
 
   ngOnInit() {
-      this.populateList();
+    const detail = this.searchObj || {};
+    this.detail = this.formatDetail(detail);
+    this.searchList();
   }
 }
