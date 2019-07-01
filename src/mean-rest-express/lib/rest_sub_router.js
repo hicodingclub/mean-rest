@@ -1,6 +1,5 @@
 const express = require('express');
-
-const RestController = require('./rest_controller')
+const RestControllerP = require('./rest_controller');
 
 const _setSchemaName = function(name) {
   return function(req, res, next) {
@@ -9,7 +8,7 @@ const _setSchemaName = function(name) {
   }
 }
 
-const RestRouter = function(schemaName, authzFunc, api) {  
+const RestRouter = function(restController, schemaName, authzFunc, api) {  
   let router = express.Router();
   if (!api) return router;
 
@@ -19,25 +18,24 @@ const RestRouter = function(schemaName, authzFunc, api) {
   if (authzFunc) router.use(authzFunc);
 
   if (api.includes("L")) {
-    router.get('/', RestController.getAll);
-    router.post('/mddsaction/get', RestController.PostActions);
+    router.get('/', restController.getAll.bind(restController));
+    router.post('/mddsaction/get', restController.PostActions.bind(restController));
   }
   let idParam = name + "Id";
   if (api.includes("R")) {
-    router.get('/:' + idParam, RestController.getDetailsById);
+    router.get('/:' + idParam, restController.getDetailsById.bind(restController));
   }
   if (api.includes("C")) {
-    router.put('/', RestController.Create);
+    router.put('/', restController.Create.bind(restController));
   }
   if (api.includes("U")) {
-    router.post('/:' + idParam, RestController.Update);
-    router.get('/mddsaction/post/:' + idParam, RestController.getDetailsById);
+    router.post('/:' + idParam, restController.Update.bind(restController));
+    router.get('/mddsaction/post/:' + idParam, restController.getDetailsById.bind(restController));
   }
   if (api.includes("D")) {
-    router.delete('/:' + idParam, RestController.HardDeleteById);
-    router.post('/mddsaction/delete', RestController.PostActions);
+    router.delete('/:' + idParam, restController.HardDeleteById.bind(restController));
+    router.post('/mddsaction/delete', restController.PostActions.bind(restController));
   }
-  
   return router;
 }
 

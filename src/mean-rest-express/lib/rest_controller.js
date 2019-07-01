@@ -1,33 +1,5 @@
 const createError = require('http-errors');
 
-const schema_collection = {};
-const views_collection = {}; // views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-const model_collection = {};
-const populate_collection = {};
-const owner_config = {}; // {enable: true, type: 'user | module'
-
-const loadContextVarsByName = function(name) {
-  const schema = schema_collection[name];
-  const model = model_collection[name];
-  const views = views_collection[name];
-  const populates = populate_collection[name];
-  const owner = owner_config[name];
-  if (!schema || !model || !views || !populates || !owner) {
-    throw(createError(500, "Cannot load context from name " + name))
-  }
-  return {name, schema, model, views, populates, owner};
-};
-
-const loadContextVars = function(req) {
-  //let url = req.originalUrl
-  //let arr = url.split('/');
-  //if (arr.length < 2) throw(createError(500, "Cannot identify context name from routing path: " + url))
-  //let name = arr[arr.length-2].toLowerCase();
-
-  let name = req.meanRestSchemaName.toLowerCase();
-  return loadContextVarsByName(name);
-};
-
 const createRegex = function(obj) {
   //obj in {key: string} format
   for (let prop in obj) {
@@ -87,41 +59,6 @@ const checkAndSetValue = function(obj, schema) {
   return obj;
 };
 
-const getViewPopulates = function(schema, viewStr) {
-	
-	let populates = [];
-	let viewFields = viewStr.match(/\S+/g) || [];
-	viewFields.forEach((item) => {
-		if (item in schema.paths) {
-			let type = schema.paths[item].constructor.name;
-			switch (type) {
-        case "SchemaArray":
-          if (schema.paths[item].caster.options.ref) {
-            let ref = schema.paths[item].caster.options.ref;
-            if (ref)
-              populates.push([item, ref]);
-          }
-          break;
-        case "ObjectId":
-          let ref = schema.paths[item].options.ref;
-          if (ref)
-            populates.push([item, ref]);
-          break;
-        default:
-          break;
-			}
-		}
-	});
-	return populates;
-};
-
-const getPopulatesRefFields = function(ref) {
-	let views = views_collection[ref.toLowerCase()]; //view registered with lowerCase
-	if (!views) return null;
-	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-	return views[5]; //indexView
-};
-
 const fieldReducerForRef = function(refObj, indexFields) {
   let newRefObj = {};
   if ('_id' in refObj) {
@@ -157,6 +94,34 @@ const objectReducerForRef = function(obj, populateMap) {
     obj[path] = newRefObj;
   }
   return obj;
+};
+
+const getViewPopulates = function(schema, viewStr) {
+    
+  let populates = [];
+  let viewFields = viewStr.match(/\S+/g) || [];
+  viewFields.forEach((item) => {
+    if (item in schema.paths) {
+      let type = schema.paths[item].constructor.name;
+      switch (type) {
+        case "SchemaArray":
+          if (schema.paths[item].caster.options.ref) {
+            let ref = schema.paths[item].caster.options.ref;
+            if (ref)
+              populates.push([item, ref]);
+          }
+          break;
+        case "ObjectId":
+          let ref = schema.paths[item].options.ref;
+          if (ref)
+            populates.push([item, ref]);
+          break;
+        default:
+          break;
+      }
+    }
+  });
+  return populates;
 };
 
 const resultReducerForRef = function (result, populateMap) {
@@ -220,444 +185,466 @@ const ownerPatch = function (query, owner, req) {
   }
   return query;
 }
-const RestController = function() {}
 
-RestController.loadContextVarsByName = loadContextVarsByName;
-
-RestController.register = function(schemaName, schema, views, model, moduleName, ownerConfig) {
-  let name = schemaName.toLowerCase();
-	schema_collection[name] = schema;
-	views_collection[name] = views;
-	model_collection[name] = model;
-	owner_config[name] = ownerConfig;
-
-	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format	
-	populate_collection[name] = {
-			//populates in a array, each populate is an array, too, with [field, ref]
-			//eg: [["person", "Person"], ["comments", "Comments"]]
-			briefView: getViewPopulates(schema, views[0]),
-			detailView: getViewPopulates(schema, views[1])
-	}
-};
-
-RestController.getAll = function(req, res, next) {
-	return RestController.searchAll(req, res, next, {});
-};
-
-RestController.searchAll = async function(req, res, next, searchContext) {
-  const {name, schema, model, views, populates, owner} = loadContextVars(req);
-  //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-  const briefView = views[0];
-	
-  const populateArray = [];
-  const populateMap = {};
-  populates.briefView.forEach( (p)=> {
-		//an array, with [field, ref]
-    const fields = getPopulatesRefFields(p[1]);
-		if (fields != null) {//only push when the ref schema is found
-			populateArray.push({ path: p[0], select: fields });
-            populateMap[p[0]] = fields;
-        }
-  });
-  let query = {};
-
-  //get the query parameters ?a=b&c=d, but filter out unknown ones
-	
-  const PER_PAGE = 25, MAX_PER_PAGE = 1000;
-	
-  let __page = 1;
-  let __per_page = PER_PAGE;
-
-  let __sort, __order;
-	
-  for (let prop in req.query) {
-    if (prop === '__page') __page = parseInt(req.query[prop]);
-    else if (prop === '__per_page') __per_page = parseInt(req.query[prop]);
-    else if (prop === '__sort') __sort = req.query[prop];
-    else if (prop === '__order') __order = req.query[prop];
-		else if (prop in schema.paths) {
-			query[prop] = req.query[prop];
-		}
-  }
-	
-  let count = 0;
-  if (searchContext) {
-    //console.log("searchContext is ....", searchContext);
-    // searchContext ={'$and', [{'$or', []},{'$and', []}]}
-		if (searchContext['$and']) {
-		  for (let subContext of searchContext['$and']) {
-			  if ('$or' in subContext) {
-				  if (subContext['$or'].length == 0) subContext['$or'] = [{}];
-				  subContext['$or']=subContext['$or'].map(x=>createRegex(x));
-			  } else if ( '$and' in subContext) {
-				  if (subContext['$and'].length == 0) subContext['$and'] = [{}];
-				  subContext['$and']=subContext['$and'].map(x=>checkAndSetValue(x,schema));
-			  }
-		  }
-		}
-		//merge the url query and body query
-		query = searchContext;
-		//console.log("query is ....", query['$and'][0]['$or'], query['$and'][1]['$and']);
+class RestController {
+  constructor() {
+    this.schema_collection = {};
+    this.views_collection = {}; // views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+    this.model_collection = {};
+    this.populate_collection = {};
+    this.owner_config = {}; // {enable: true, type: 'user | module'
   }
 
-  query = ownerPatch(query, owner, req);
-  
-  try {
-    count = await model.countDocuments(query).exec();
-  } catch (err) {
-    return next(err);
-  }
-
-  if (isNaN(__per_page) || __per_page <= 0) __per_page = PER_PAGE;
-  else if (__per_page > MAX_PER_PAGE) __per_page = MAX_PER_PAGE;
-
-  let maxPageNum = Math.ceil(count/(__per_page*1.0));
-
-  if (isNaN(__page)) __page = 1;
-  if (__page > maxPageNum) __page = maxPageNum;
-  if (__page <= 0) __page = 1;
-
-  let skipCount = (__page - 1) * __per_page;
-
-  let srt = {};
-  if (__sort && __order) srt[__sort] = __order;
-  
-  //let dbExec = model.find(query, briefView)
-  let dbExec = model.find(query) //return every thing for the document
-    .sort(srt)
-    .skip(skipCount)
-    .limit(__per_page)
-  for (let pi = 0; pi < populateArray.length; pi ++) {
-    let p = populateArray[pi];
-    //dbExec = dbExec.populate(p);
-    dbExec = dbExec.populate(p.path); //only give the reference path. return everything
-  }
-  dbExec.exec(function(err, result) {
-    if (err) return next(err);
-
-    let output = {
-      total_count: count,
-      total_pages: maxPageNum,
-      page: __page,
-      per_page: __per_page,
-      items: result
+  loadContextVarsByName(name) {
+    const schema = this.schema_collection[name];
+    const model = this.model_collection[name];
+    const views = this.views_collection[name];
+    const populates = this.populate_collection[name];
+    const owner = this.owner_config[name];
+    if (!schema || !model || !views || !populates || !owner) {
+      throw(createError(500, "Cannot load context from name " + name))
     }
-    output = JSON.parse(JSON.stringify(output));
-    output.items = resultReducerForRef(output.items, populateMap);
-    output.items = resultReducerForView(output.items, briefView);
-    return res.send(output);
-  });
-};
-
-RestController.getSamples = function(req, res, next, searchContext, ) {
-  const {name, schema, model, views, populates, owner} = loadContextVars(req);
-  //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-  const briefView = views[0];
-	
-  const populateArray = [];
-  const populateMap = {};
-  populates.briefView.forEach( (p)=> {
-		//an array, with [field, ref]
-    const fields = getPopulatesRefFields(p[1]);
-		if (fields != null) {//only push when the ref schema is found
-			populateArray.push({ path: p[0], select: fields });
-            populateMap[p[0]] = fields;
-        }
-  });
-  let query = {};
-
-  //get the query parameters ?a=b&c=d, but filter out unknown ones
-	
-  const PER_PAGE = 25, MAX_PER_PAGE = 1000;
-	
-  let __page = 1;
-  let __per_page = PER_PAGE;
-	
-  for (let prop in req.query) {
-		if (prop === "__page") __page = parseInt(req.query[prop]);
-		else if (prop === "__per_page") __per_page = parseInt(req.query[prop]);
-		else if (prop in schema.paths) {
-			query[prop] = req.query[prop];
-		}
-  }
-	
-  let count = 0;
-  if (searchContext) {
-    //console.log("searchContext is ....", searchContext);
-    // searchContext ={'$and', [{'$or', []},{'$and', []}]}
-		if (searchContext['$and']) {
-		  for (let subContext of searchContext['$and']) {
-			  if ('$or' in subContext) {
-				  if (subContext['$or'].length == 0) subContext['$or'] = [{}];
-				  subContext['$or']=subContext['$or'].map(x=>createRegex(x));
-			  } else if ( '$and' in subContext) {
-				  if (subContext['$and'].length == 0) subContext['$and'] = [{}];
-				  subContext['$and']=subContext['$and'].map(x=>checkAndSetValue(x,schema));
-			  }
-		  }
-		}
-		//merge the url query and body query
-		query = searchContext;
-		//console.log("query is ....", query['$and'][0]['$or'], query['$and'][1]['$and']);
-  }
-
-  query = ownerPatch(query, owner, req);
+    return {name, schema, model, views, populates, owner};
+  };
   
-  model.countDocuments(query).exec(function(err, cnt) {
-    if (err) { return next(err); }
-    count = cnt;
+  loadContextVars(req) {
+    //let url = req.originalUrl
+    //let arr = url.split('/');
+    //if (arr.length < 2) throw(createError(500, "Cannot identify context name from routing path: " + url))
+    //let name = arr[arr.length-2].toLowerCase();
+  
+    let name = req.meanRestSchemaName.toLowerCase();
+    return this.loadContextVarsByName(name);
+  };
+  
+  getPopulatesRefFields(ref) {
+    let views = this.views_collection[ref.toLowerCase()]; //view registered with lowerCase
+    if (!views) return null;
+    //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+    return views[5]; //indexView
+  };
 
-    if (isNaN(__per_page) || __per_page <= 0) __per_page = PER_PAGE;
-    else if (__per_page > MAX_PER_PAGE) __per_page = MAX_PER_PAGE;
-
-    let maxPageNum = Math.ceil(count/(__per_page*1.0));
-
-    if (isNaN(__page)) __page = 1;
-    if (__page > maxPageNum) __page = maxPageNum;
-    if (__page <= 0) __page = 1;
-
+  register(schemaName, schema, views, model, moduleName, ownerConfig) {
+    let name = schemaName.toLowerCase();
+    this.schema_collection[name] = schema;
+    this.views_collection[name] = views;
+    this.model_collection[name] = model;
+    this.owner_config[name] = ownerConfig;
+    //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format	
+    this.populate_collection[name] = {
+      //populates in a array, each populate is an array, too, with [field, ref]
+      //eg: [["person", "Person"], ["comments", "Comments"]]
+      briefView: getViewPopulates(schema, views[0]),
+      detailView: getViewPopulates(schema, views[1])
+    };
+  }
+  getAll(req, res, next) {
+    return this.searchAll(req, res, next, {});
+  }
+  async searchAll(req, res, next, searchContext) {
+    const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
+    //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+    const briefView = views[0];
+    const populateArray = [];
+    const populateMap = {};
+    populates.briefView.forEach((p) => {
+      //an array, with [field, ref]
+      const fields = this.getPopulatesRefFields(p[1]);
+      if (fields != null) { //only push when the ref schema is found
+        populateArray.push({ path: p[0], select: fields });
+        populateMap[p[0]] = fields;
+      }
+    });
+    let query = {};
+    //get the query parameters ?a=b&c=d, but filter out unknown ones
+    const PER_PAGE = 25, MAX_PER_PAGE = 1000;
+    let __page = 1;
+    let __per_page = PER_PAGE;
+    let __sort, __order;
+    for (let prop in req.query) {
+      if (prop === '__page')
+        __page = parseInt(req.query[prop]);
+      else if (prop === '__per_page')
+        __per_page = parseInt(req.query[prop]);
+      else if (prop === '__sort')
+        __sort = req.query[prop];
+      else if (prop === '__order')
+        __order = req.query[prop];
+      else if (prop in schema.paths) {
+        query[prop] = req.query[prop];
+      }
+    }
+    let count = 0;
+    if (searchContext) {
+      //console.log("searchContext is ....", searchContext);
+      // searchContext ={'$and', [{'$or', []},{'$and', []}]}
+      if (searchContext['$and']) {
+        for (let subContext of searchContext['$and']) {
+          if ('$or' in subContext) {
+            if (subContext['$or'].length == 0)
+              subContext['$or'] = [{}];
+            subContext['$or'] = subContext['$or'].map(x => createRegex(x));
+          }
+          else if ('$and' in subContext) {
+            if (subContext['$and'].length == 0)
+              subContext['$and'] = [{}];
+            subContext['$and'] = subContext['$and'].map(x => checkAndSetValue(x, schema));
+          }
+        }
+      }
+      //merge the url query and body query
+      query = searchContext;
+      //console.log("query is ....", query['$and'][0]['$or'], query['$and'][1]['$and']);
+    }
+    query = ownerPatch(query, owner, req);
+    try {
+      count = await model.countDocuments(query).exec();
+    }
+    catch (err) {
+      return next(err);
+    }
+    if (isNaN(__per_page) || __per_page <= 0)
+      __per_page = PER_PAGE;
+    else if (__per_page > MAX_PER_PAGE)
+      __per_page = MAX_PER_PAGE;
+    let maxPageNum = Math.ceil(count / (__per_page * 1.0));
+    if (isNaN(__page))
+      __page = 1;
+    if (__page > maxPageNum)
+      __page = maxPageNum;
+    if (__page <= 0)
+      __page = 1;
     let skipCount = (__page - 1) * __per_page;
-  	
+    let srt = {};
+    if (__sort && __order)
+      srt[__sort] = __order;
     //let dbExec = model.find(query, briefView)
     let dbExec = model.find(query) //return every thing for the document
+      .sort(srt)
       .skip(skipCount)
-      .limit(__per_page)
-    for (let pi = 0; pi < populateArray.length; pi ++) {
+      .limit(__per_page);
+    for (let pi = 0; pi < populateArray.length; pi++) {
       let p = populateArray[pi];
       //dbExec = dbExec.populate(p);
       dbExec = dbExec.populate(p.path); //only give the reference path. return everything
     }
-    dbExec.exec(function(err, result) {
-      if (err) return next(err);
-
+    dbExec.exec(function (err, result) {
+      if (err)
+        return next(err);
       let output = {
         total_count: count,
         total_pages: maxPageNum,
         page: __page,
         per_page: __per_page,
         items: result
-      }
+      };
       output = JSON.parse(JSON.stringify(output));
       output.items = resultReducerForRef(output.items, populateMap);
       output.items = resultReducerForView(output.items, briefView);
       return res.send(output);
     });
-  });
-};
-
-
-RestController.getDetailsById = function(req, res, next) {
-  const {name, schema, model, views, populates, owner} = loadContextVars(req);
-	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-	
-	/*
-  let action = "";
-  if (req.query) {
-    action = req.query['action'];
   }
-  */
-	let originalUrl = req.originalUrl;
-  
-  let detailView;
-  if (originalUrl.includes('/mddsaction/post')) {
-    detailView = views[3]; //return based on edit view
-  } else {
-    detailView = views[1];
-  }
-
-	let populateArray = [];
-	let populateMap = {};
-	populates.detailView.forEach( (p)=> {
-		//an array, with [field, ref]
-		let fields = getPopulatesRefFields(p[1]);
-		if (fields != null) {//only push when the ref schema is found
-			populateArray.push({ path: p[0], select: fields });
-            populateMap[p[0]] = fields;
-        }
-	});
-
-	let idParam = name + "Id";
-	let id = req.params[idParam];
-	
-	//let dbExec = model.findById(id, detailView)
-	let dbExec = model.findById(id) //return every thing for the document
-	for (let pi = 0; pi < populateArray.length; pi ++) {
-		let p = populateArray[pi];
-		//dbExec = dbExec.populate(p);
-        dbExec = dbExec.populate(p.path); //only give the reference path. return everything for reference
-	}
-	dbExec.exec(function (err, result) {
-    if (err) { return next(err); }
-    
-    result = JSON.parse(JSON.stringify(result));
-    result = resultReducerForRef(result, populateMap);
-    result = resultReducerForView(result, detailView);
-		return res.send(result);
-	});
-};
-	
-RestController.HardDeleteById = function(req, res, next) {
-  const {name, schema, model, views, populates, owner} = loadContextVars(req);
-	
-	let idParam = name + "Id";
-	let id = req.params[idParam];
-	model.findByIdAndDelete(id).exec(function (err, result) {
-		if (err) { return next(err); }
-		return res.send();
-	});
-};
-
-RestController.PostActions = function(req, res, next) {	
-	/*
-	if (req.query) {
-		action = req.query['action'];
-	}
-	*/
-	
-	let body = req.body;
-	if (typeof body === "string") {
-	    try {
-	        body = JSON.parse(body);
-	    } catch(e) {
-	    	return next(createError(400, "Bad document in body."));
-	    }
-	}
-	
-  let action = req.path
-	switch(action) {
-    case "/mddsaction/delete":
-      let ids = body;
-      RestController.deleteManyByIds(req, res, next, ids);
-      break;
-    case "/mddsaction/get":
-      let searchContext = body;
-      RestController.searchAll(req, res, next, searchContext);
-      break;
-    default:
-      return next(createError(404, "Bad Action: " + action));
-	}
-};
-
-RestController.deleteManyByIds = function(req, res, next, ids) {
-  const {name, schema, model, views, populates, owner} = loadContextVars(req);
-
-	model.deleteMany({"_id": {$in: ids}})
-		.exec(function (err, result) {
-		if (err) { return next(err); }
-		return res.send();
-	});
-};
-
-RestController.Create = function(req, res, next) {
-  const {name, schema, model, views, populates, owner} = loadContextVars(req);
-	
-	let body = req.body;
-	if (typeof body === "string") {
-	    try {
-	        body = JSON.parse(body);
-	    } catch(e) {
-	    	return next(createError(404, "Bad " + name + " document."));
-	    }
-	}
-
-	body = ownerPatch(body, owner, req);
-
-	model.create(body, function (err, result) {
-		if (err) { return next(err); }
-		return res.send(result);
-	});	
-};
-
-RestController.Update = function(req, res, next) {
-  const {name, schema, model, views, populates, owner} = loadContextVars(req);
-  //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-
-    let body = req.body;
-    if (typeof body === "string") {
-        try {
-            body = JSON.parse(body);
-        } catch(e) {
-            return next(createError(404, "Bad " + name + " document."));
-        }
+  getSamples(req, res, next, searchContext) {
+    const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
+    //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+    const briefView = views[0];
+    const populateArray = [];
+    const populateMap = {};
+    populates.briefView.forEach((p) => {
+      //an array, with [field, ref]
+      const fields = this.getPopulatesRefFields(p[1]);
+      if (fields != null) { //only push when the ref schema is found
+        populateArray.push({ path: p[0], select: fields });
+        populateMap[p[0]] = fields;
+      }
+    });
+    let query = {};
+    //get the query parameters ?a=b&c=d, but filter out unknown ones
+    const PER_PAGE = 25, MAX_PER_PAGE = 1000;
+    let __page = 1;
+    let __per_page = PER_PAGE;
+    for (let prop in req.query) {
+      if (prop === "__page")
+        __page = parseInt(req.query[prop]);
+      else if (prop === "__per_page")
+        __per_page = parseInt(req.query[prop]);
+      else if (prop in schema.paths) {
+        query[prop] = req.query[prop];
+      }
     }
-
-	let idParam = name + "Id";
-	let id = req.params[idParam];
-	let editViewStr = views[3];
-  let viewFields = editViewStr.match(/\S+/g) || [];
-	if (schema.options.useSaveInsteadOfUpdate) {
-	  model.findOne({_id: id}, function (err, result){
-      if (err) { return next(err); }
-	    for (let field in body) {
-	      //all fields from client
-        result[field] = body[field];
-	    }
-      for (let field of viewFields) {
-        if (!(field in body)) {
-          //not in body means user deleted this field
-          // delete result[field]
-          result[field] = undefined;
+    let count = 0;
+    if (searchContext) {
+      //console.log("searchContext is ....", searchContext);
+      // searchContext ={'$and', [{'$or', []},{'$and', []}]}
+      if (searchContext['$and']) {
+        for (let subContext of searchContext['$and']) {
+          if ('$or' in subContext) {
+            if (subContext['$or'].length == 0)
+              subContext['$or'] = [{}];
+            subContext['$or'] = subContext['$or'].map(x => createRegex(x));
+          }
+          else if ('$and' in subContext) {
+            if (subContext['$and'].length == 0)
+              subContext['$and'] = [{}];
+            subContext['$and'] = subContext['$and'].map(x => checkAndSetValue(x, schema));
+          }
         }
       }
-      result = ownerPatch(result, owner, req);
-
-      result.save(function (err, result) {
-        if (err) { return next(err); }
+      //merge the url query and body query
+      query = searchContext;
+      //console.log("query is ....", query['$and'][0]['$or'], query['$and'][1]['$and']);
+    }
+    query = ownerPatch(query, owner, req);
+    model.countDocuments(query).exec(function (err, cnt) {
+      if (err) {
+        return next(err);
+      }
+      count = cnt;
+      if (isNaN(__per_page) || __per_page <= 0)
+        __per_page = PER_PAGE;
+      else if (__per_page > MAX_PER_PAGE)
+        __per_page = MAX_PER_PAGE;
+      let maxPageNum = Math.ceil(count / (__per_page * 1.0));
+      if (isNaN(__page))
+        __page = 1;
+      if (__page > maxPageNum)
+        __page = maxPageNum;
+      if (__page <= 0)
+        __page = 1;
+      let skipCount = (__page - 1) * __per_page;
+      //let dbExec = model.find(query, briefView)
+      let dbExec = model.find(query) //return every thing for the document
+        .skip(skipCount)
+        .limit(__per_page);
+      for (let pi = 0; pi < populateArray.length; pi++) {
+        let p = populateArray[pi];
+        //dbExec = dbExec.populate(p);
+        dbExec = dbExec.populate(p.path); //only give the reference path. return everything
+      }
+      dbExec.exec(function (err, result) {
+        if (err)
+          return next(err);
+        let output = {
+          total_count: count,
+          total_pages: maxPageNum,
+          page: __page,
+          per_page: __per_page,
+          items: result
+        };
+        output = JSON.parse(JSON.stringify(output));
+        output.items = resultReducerForRef(output.items, populateMap);
+        output.items = resultReducerForView(output.items, briefView);
+        return res.send(output);
+      });
+    });
+  }
+  getDetailsById(req, res, next) {
+    const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
+    //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+    /*
+    let action = "";
+    if (req.query) {
+      action = req.query['action'];
+    }
+    */
+    let originalUrl = req.originalUrl;
+    let detailView;
+    if (originalUrl.includes('/mddsaction/post')) {
+      detailView = views[3]; //return based on edit view
+    }
+    else {
+      detailView = views[1];
+    }
+    let populateArray = [];
+    let populateMap = {};
+    populates.detailView.forEach((p) => {
+      //an array, with [field, ref]
+      let fields = this.getPopulatesRefFields(p[1]);
+      if (fields != null) { //only push when the ref schema is found
+        populateArray.push({ path: p[0], select: fields });
+        populateMap[p[0]] = fields;
+      }
+    });
+    let idParam = name + "Id";
+    let id = req.params[idParam];
+    //let dbExec = model.findById(id, detailView)
+    let dbExec = model.findById(id); //return every thing for the document
+    for (let pi = 0; pi < populateArray.length; pi++) {
+      let p = populateArray[pi];
+      //dbExec = dbExec.populate(p);
+      dbExec = dbExec.populate(p.path); //only give the reference path. return everything for reference
+    }
+    dbExec.exec(function (err, result) {
+      if (err) {
+        return next(err);
+      }
+      result = JSON.parse(JSON.stringify(result));
+      result = resultReducerForRef(result, populateMap);
+      result = resultReducerForView(result, detailView);
+      return res.send(result);
+    });
+  }
+  HardDeleteById(req, res, next) {
+    const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
+    let idParam = name + "Id";
+    let id = req.params[idParam];
+    model.findByIdAndDelete(id).exec(function (err, result) {
+      if (err) {
+        return next(err);
+      }
+      return res.send();
+    });
+  }
+  PostActions(req, res, next) {
+    /*
+    if (req.query) {
+        action = req.query['action'];
+    }
+    */
+    let body = req.body;
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      }
+      catch (e) {
+        return next(createError(400, "Bad document in body."));
+      }
+    }
+    let action = req.path;
+    switch (action) {
+      case "/mddsaction/delete":
+        let ids = body;
+        this.deleteManyByIds(req, res, next, ids);
+        break;
+      case "/mddsaction/get":
+        let searchContext = body;
+        this.searchAll(req, res, next, searchContext);
+        break;
+      default:
+        return next(createError(404, "Bad Action: " + action));
+    }
+  }
+  deleteManyByIds(req, res, next, ids) {
+    const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
+    model.deleteMany({ "_id": { $in: ids } })
+      .exec(function (err, result) {
+        if (err) {
+          return next(err);
+        }
         return res.send();
       });
-	  });
-	} else {
-    //all top-level update keys that are not $atomic operation names are treated as $set operations
-    model.updateOne({_id: id}, body, function (err, result) {
-       if (err) { return next(err); }
+  }
+  Create(req, res, next) {
+    const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
+    let body = req.body;
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      }
+      catch (e) {
+        return next(createError(404, "Bad " + name + " document."));
+      }
+    }
+    body = ownerPatch(body, owner, req);
+    model.create(body, function (err, result) {
+      if (err) {
+        return next(err);
+      }
+      return res.send(result);
+    });
+  }
+  Update(req, res, next) {
+    const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
+    //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+    let body = req.body;
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      }
+      catch (e) {
+        return next(createError(404, "Bad " + name + " document."));
+      }
+    }
+    let idParam = name + "Id";
+    let id = req.params[idParam];
+    let editViewStr = views[3];
+    let viewFields = editViewStr.match(/\S+/g) || [];
+    if (schema.options.useSaveInsteadOfUpdate) {
+      model.findOne({ _id: id }, function (err, result) {
+        if (err) {
+          return next(err);
+        }
+        for (let field in body) {
+          //all fields from client
+          result[field] = body[field];
+        }
+        for (let field of viewFields) {
+          if (!(field in body)) {
+            //not in body means user deleted this field
+            // delete result[field]
+            result[field] = undefined;
+          }
+        }
+        result = ownerPatch(result, owner, req);
+        result.save(function (err, result) {
+          if (err) {
+            return next(err);
+          }
           return res.send();
+        });
       });
-	}
-};
-
-
-//Return a promise.
-RestController.ModelExecute = function(modelName, apiName, ...params) {
-  let model = model_collection[modelName];
-  if (!model || !model[apiName]) {
-    let err = new Error(`model ${modelName} or mode API ${apiName} doesn't exit`);
-    return new Promise(function(resolve, reject) {
-      reject(err);
-    });
+    }
+    else {
+      //all top-level update keys that are not $atomic operation names are treated as $set operations
+      model.updateOne({ _id: id }, body, function (err, result) {
+        if (err) {
+          return next(err);
+        }
+        return res.send();
+      });
+    }
   }
-  if (apiName == 'create') {
-    return model.create(params);
-    
-  }
-  let dbExe = model[apiName].apply(model, params);
-  
-  return dbExe.exec();
-};
-
-RestController.ModelExecute2 = function(modelName, apis) {
-  let model = model_collection[modelName];
-  if (!model) {
-    let err = new Error(`model ${modelName} or mode API ${apiName} doesn't exit`);
-    return new Promise(function(resolve, reject) {
-      reject(err);
-    });
-  }
-
-  let dbExe;
-  for (let item of apis) {
-    let apiName = item[0];
-    let apiArgs = item[1];
-    try {
-      if (!dbExe) dbExe = model[apiName].apply(model, apiArgs);
-      else dbExe = dbExe[apiName].apply(dbExe, apiArgs);
-    } catch (err) {
-      return new Promise(function(resolve, reject) {
+  //Return a promise.
+  ModelExecute(modelName, apiName, ...params) {
+    let model = this.model_collection[modelName];
+    if (!model || !model[apiName]) {
+      let err = new Error(`model ${modelName} or mode API ${apiName} doesn't exit`);
+      return new Promise(function (resolve, reject) {
         reject(err);
       });
     }
+    if (apiName == 'create') {
+      return model.create(params);
+    }
+    let dbExe = model[apiName].apply(model, params);
+    return dbExe.exec();
   }
-  
-  return dbExe.exec();
-};
+  ModelExecute2(modelName, apis) {
+    let model = this.model_collection[modelName];
+    if (!model) {
+      let err = new Error(`model ${modelName} or mode API ${apiName} doesn't exit`);
+      return new Promise(function (resolve, reject) {
+        reject(err);
+      });
+    }
+    let dbExe;
+    for (let item of apis) {
+      let apiName = item[0];
+      let apiArgs = item[1];
+      try {
+        if (!dbExe)
+          dbExe = model[apiName].apply(model, apiArgs);
+        else
+          dbExe = dbExe[apiName].apply(dbExe, apiArgs);
+      }
+      catch (err) {
+        return new Promise(function (resolve, reject) {
+          reject(err);
+        });
+      }
+    }
+    return dbExe.exec();
+  }
+}
 
 module.exports = RestController;

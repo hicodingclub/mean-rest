@@ -46,6 +46,9 @@ const _setModuleName = function(name) {
 
 const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
   const expressRouter = express.Router();
+  const restController = new RestController();
+  expressRouter.restController = restController;
+
   if (!moduleName) moduleName = randomString(10);
   
   const setModuleName = _setModuleName(moduleName)
@@ -123,7 +126,7 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
       const ownerConfig = schemaDef.owner || owner;
       schm.options.useSaveInsteadOfUpdate = true; //this is a special indicator to controller use save.
       
-      RestController.register(schemaName, schm, views, model, moduleName, ownerConfig);
+      restController.register(schemaName, schm, views, model, moduleName, ownerConfig);
     }
     if (permissionStore && api) {
       permissionStore.registerResource(schemaName, moduleName);
@@ -143,8 +146,8 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     if (!api) continue;
     sub_routes.push("/" + name);
     
-    if (!schemaDef.schema) continue
-    restRouter = RestRouter(schemaName, authzFunc, api);
+    if (!schemaDef.schema) continue;
+    restRouter = RestRouter(restController, schemaName, authzFunc, api);
     expressRouter.use("/" + name, restRouter)
   }
   
