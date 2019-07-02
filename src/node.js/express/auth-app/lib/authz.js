@@ -256,7 +256,7 @@ const verifyPermission = function(req, res, next) {
   console.log("***req.mddsModuleAccesses - public access\n", req.mddsModuleAccesses)
   console.log("***req.mddsModulePermissions - role access\n", req.mddsModulePermissions)
 
-  if (loggedIn && req.muser.role) {
+  if (loggedIn && req.muser.role && req.muser.role.length > 0) {
     return verifyRolePermission(req, res, next); //use role based permission
   } 
   
