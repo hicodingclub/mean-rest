@@ -1034,10 +1034,12 @@ function main() {
       schemaHasDate = schemaHasDate || hasDate1;
       schemaHasRef = schemaHasRef || hasRef1;
       schemaHasFileUpload = schemaHasFileUpload || hasFileUpload1;
+      schemaHasEditor = schemaHasEditor || hasEditor1;
     }
     if (api.includes("R")) { // includes detail view
       schemaHasDate = schemaHasDate || hasDate2;
       schemaHasFileUpload = schemaHasFileUpload || hasFileUpload2;
+      schemaHasEditor = schemaHasEditor || hasEditor2;
     }
     if (api.includes("C")) { // includes CreateView
       schemaHasDate = schemaHasDate || hasDate3;
