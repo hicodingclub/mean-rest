@@ -3,21 +3,26 @@
 	<div class="container search">
 		<div class="row">
 			<div class="col-9">
-			    <%_ include schema-search.bar.html %>
+				<% if (!disableListSearch) {%><%_ include schema-search.bar.html %><%}%>
 		    </div>
-			<div class="col-3"><%if (generateView === 'admin') {%>
+			<div class="col-3">
 		        <div class="action-buttons">
-					<%if(api.includes("C")){%><a [routerLink]="['../new' ]" [skipLocationChange]="false" class="btn btn-outline-primary">Create</a><%}%>
-					<%if(api.includes("D")){%><a routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
-						[ngClass]="{'disabled': !isItemSelected()}">Delete</a><%}%>
-				</div><%}%>
+					<%if(api.includes("C")){%><a [routerLink]="['../new' ]" [skipLocationChange]="false" class="btn btn-outline-primary"><%-listActionButtons[0]%></a><%}%>
+					<%if(api.includes("D")){%><a *ngIf="list.length > 1" routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
+						[ngClass]="{'disabled': !isItemSelected()}"><%-listActionButtons[1]%></a><%}%>
+				</div>
 			</div>
 		</div>
 
 
 		<hr/>
 		<%_ let showRefreshIcon = true;%><% include schema-list.pagination.html %>
-	</div><%
+	</div>
+	<div class="no-records" *ngIf="list.length === 0">
+		<span *ngIf="loaded">No records found.</span>
+		<span *ngIf="!loaded">Loading...</span>
+	</div>
+	<div *ngIf="list.length > 0"><%
 	let cardCanClick = api.includes('R') && listToDetail === 'click';
 	let cardHasLink = api.includes('R') && listToDetail === 'link';
 	%><% let view='list'; for (const viewType of listTypes) {%><%_if (viewType === 'list') {%>
@@ -25,7 +30,7 @@
 <% include schema-list.view.grid.html %><%}%><%_if (viewType === 'table') {%>
 <% include schema-list.view.table.html %><%}%>
 	<%_ } %>
-
+	</div>
 	<div class="container">
 		<%_ showRefreshIcon = false;%><% include schema-list.pagination.html %>
 	</div>

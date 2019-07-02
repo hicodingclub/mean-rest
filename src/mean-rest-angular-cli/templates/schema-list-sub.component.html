@@ -6,11 +6,15 @@
             <app-<%-schemaName%>-edit [initData]="parentData" (done)="onAddDone($event)"></app-<%-schemaName%>-edit>
         </div>
     </div><%}%><%}%>
+	
+	<div *ngIf="list.length === 0" class="no-records">
+		<span *ngIf="loaded">No records found.</span>
+		<span *ngIf="!loaded">Loading...</span>
+	</div>
 	<div class="container search">
 		<% include schema-list.pagination.html %>
 	</div>
-	
-	<table class="table">
+	<table *ngIf="list.length > 0" class="table">
 	    <thead>
 	    	<tr>
 		        <th scope="col">#</th>

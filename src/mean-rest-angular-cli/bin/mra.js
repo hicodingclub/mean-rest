@@ -892,10 +892,15 @@ function main() {
 
     let detailType = 'normal';
     let listType = 'list';
+    let disableListSearch = false;
     let listToDetail = 'click';
     let defaultSortField, defaultSortOrder;
     let homeListNumber = 4;
     let detailPipelines = []; //extra buttons that trigger other pipelines
+    let detailActionButtons = ['Edit', 'New', 'Delete'];
+    let listActionButtons = ['Create', 'Delete'];
+    let detailRefBlackList = undefined;
+    let detailRefName = {};
     if (schemaDef.mraUI) {
       let mraUI = schemaDef.mraUI;
       switch (mraUI.detailType) {
@@ -933,6 +938,13 @@ function main() {
         default:
           listToDetail = 'click';
       }
+
+      disableListSearch = !!mraUI.disableListSearch;
+      detailActionButtons = mraUI.detailActionButtons || detailActionButtons;
+      listActionButtons = mraUI.listActionButtons || listActionButtons;
+      detailRefBlackList = mraUI.detailRefBlackList || detailRefBlackList;
+      detailRefName = mraUI.detailRefName || detailRefName;
+
       if (mraUI.defaultListSort) {
         const keys = Object.keys(mraUI.defaultListSort);
         if (keys.length > 0) {
@@ -955,13 +967,6 @@ function main() {
     let embeddedViewOnly = schemaDef.embeddedViewOnly? true: false;
     let viewName = schemaDef.name; //Display name on UI
     let api = schemaDef.api || "LCRUD"; //APIs exposed to front end ("LCRUD")
-//	console.log(mongooseSchema);
-//	if (mongooseSchema.paths.author) {
-//		console.log("===author: ", mongooseSchema.paths.author.options);
-//	}
-//	if (mongooseSchema.paths.person) {
-//		console.log("===person: ", mongooseSchema.paths.person.options);
-//	}
 
   	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
   	if (typeof views !== 'object' || !Array.isArray(views)) {
@@ -1028,9 +1033,11 @@ function main() {
     if (api.includes("L")) { // includes list view
       schemaHasDate = schemaHasDate || hasDate1;
       schemaHasRef = schemaHasRef || hasRef1;
+      schemaHasFileUpload = schemaHasFileUpload || hasFileUpload1;
     }
     if (api.includes("R")) { // includes detail view
       schemaHasDate = schemaHasDate || hasDate2;
+      schemaHasFileUpload = schemaHasFileUpload || hasFileUpload2;
     }
     if (api.includes("C")) { // includes CreateView
       schemaHasDate = schemaHasDate || hasDate3;
@@ -1131,6 +1138,7 @@ function main() {
     }
 
   	let schemaObj = {
+      name: name,
   		moduleName: moduleName,
   		ModuleName: ModuleName,
   		schemaName: schemaName,
@@ -1176,12 +1184,17 @@ function main() {
       listType: listType, // gird, table, list
       listTypes: listTypes, //array of grid, table, list
       listToDetail: listToDetail, // link, click, none
+      disableListSearch: disableListSearch,
+      listActionButtons: listActionButtons,
+      detailActionButtons: detailActionButtons,
+      detailRefName: detailRefName,
 
       defaultSortField: defaultSortField,
       defaultSortFieldDisplay: defaultSortFieldDisplay,
       defaultSortOrder: defaultSortOrder,
       homeListNumber: homeListNumber,
       detailPipelines: detailPipelines,
+      detailRefBlackList: detailRefBlackList,
 
       generateView: generateView,
       
@@ -1199,23 +1212,31 @@ function main() {
   } /*End of schema name loop*/
   
   referenceSchemas = referenceSchemas.filter((value, index, self) => { 
-	    return self.indexOf(value) === index;
-	  });//de-duplicate
+    return self.indexOf(value) === index;
+  });//de-duplicate
   let referenceObjSchemas = referenceSchemas.map((value) => { 
-	    return {ref: value, Ref: capitalizeFirst(value)};
-	  });
+    return {ref: value, Ref: capitalizeFirst(value)};
+  });
   referenceMap = referenceMap.filter((value, index, self) => { 
-	    return self.indexOf(value) === index;
-	  });//de-duplicate
+    return self.indexOf(value) === index;
+  });//de-duplicate
   referenceMap = referenceMap.map((value) => { 
-	    return JSON.parse(value); //restore the array: [schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel, isArray, api]
-	  });
+    return JSON.parse(value); //restore the array: [schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel, isArray, api]
+  });
   referenceMap = referenceMap.map((value) => { 
-    let schemaObj = schemaMap[value[3]];
-    value.push(schemaObj.api); 
-      //[schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel, isArray, api, refApi]
-    let refObj = schemaMap[value[0]];
+    let schemaObj = schemaMap[value[3]]; // myself
+    value.push(schemaObj.api);
+      //[schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel, isArray, api, refApi, ref Name]
+    let refObj = schemaMap[value[0]]; // the one who referenced me
+
+    value.push(refObj.name); //its name
+
     refObj.refApi[value[3]] = schemaObj.api;
+    value[5] = refObj.SchemaCamelName;
+    if (refObj.name in schemaObj.detailRefName) {
+      value[5] = schemaObj.detailRefName[refObj.name];
+    }
+
     return value;
   });
 
@@ -1235,7 +1256,7 @@ function main() {
       schemaObj.referred = false;
     }
     schemaObj.referredBy = referenceMap.filter(x=>x[3]==schemaName);
-      //Each item has [who (it), Who, which field, refer to me, Me, WhoCamel, MeCamel, isArray, its api, my api] format
+      //Each item has [who (it), Who, which field, refer to me, Me, WhoCamel, MeCamel, isArray, its api, my api, its name] format
   }
 
   let renderObj = {

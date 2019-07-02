@@ -348,3 +348,10 @@ div.badge-click:hover {
   color: #307bff;
   cursor: pointer;
 }
+
+.no-records {
+    margin: 1rem auto 1rem auto; /*centering*/
+
+    width: 20rem;
+    font-size: 1.25rem;
+}

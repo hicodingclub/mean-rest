@@ -1,4 +1,4 @@
-                <%if(ft == 'ObjectId') { if (refApi[field.ref].includes("R")) {ref_link = true;}%>
+                <%if(ft == 'ObjectId') { if (refApi[field.ref] && refApi[field.ref].includes("R")) {ref_link = true;}%>
                	  <%if (ref_link){%><a routerLink="."  (click)="onDisplayRefClicked('<%-fn%>', detail['<%-fn%>'], $event)"><%_}%>
 	            	{{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}}
 	              <%if (ref_link){%></a><%_}%><%_
@@ -29,9 +29,9 @@
                         if (field.elementType === 'SchemaString') {%>
                     <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
                         <ng-template ngFor let-element [ngForOf]="objectKeys(detail['<%-fn%>']['selection'])" let-idx="index">
-                            <div class="row">
-                                <div class="col-3">{{element}}:</div>
-                                <div class="col-3">{{detail['<%-fn%>']['selection'][element]}}</div>
+                            <div class="d-flex">
+                                <div class="mr-2">{{element}}:</div>
+                                <div>{{detail['<%-fn%>']['selection'][element]}}</div>
                             </div>
                         </ng-template>
                     </div><%}%><%

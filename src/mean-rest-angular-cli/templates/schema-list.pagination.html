@@ -1,8 +1,9 @@
-		<%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {
+		<%const SearchAndSortThreshold = 6;
+		%><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {
 			let sortableFields = briefView.filter(x=>x.sortable);
 			if (sortableFields.length > 0) {
 			%>
-		<div class="row justify-content-end">
+		<div class="row justify-content-end" *ngIf="list.length > <%-SearchAndSortThreshold%>">
 			<div class="sort-selection">
 					<div class="dropdown" style="width: 100%;">
 						<button class="sort-dropdown btn btn-light btn-sm dropdown-toggle"
@@ -20,17 +21,19 @@
 		</div><%} }%>
 		<div class="row">
 			<div class="col-3"><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {%>
+				<div *ngIf="list.length > 0">
 				<%_ for (const viewType of listTypes) { %><% if (viewType === 'table') { %>
-				<input type="radio" name="view-filter" id="table-view" class="view-radio"
-					(click)="setListViewFilter('table')" [checked]="isShowListView('table')">
-					<label for="table-view"><i class="fa fa-list-alt"></i></label><%}%><% if (viewType === 'list') { %>
-				<input type="radio" name="view-filter" id="list-view" class="view-radio"
-					(click)="setListViewFilter('list')" [checked]="isShowListView('list')">
-				  <label for="list-view"><i class="fa fa-th-list"></i></label><%}%><% if (viewType === 'grid') { %>
-				<input type="radio" name="view-filter" id="grid-view" class="view-radio"
-					(click)="setListViewFilter('grid')" [checked]="isShowListView('grid')">
-					<label for="grid-view"><i class="fa fa-th"></i></label><%}%>
+					<input type="radio" name="view-filter" id="table-view" class="view-radio"
+						(click)="setListViewFilter('table')" [checked]="isShowListView('table')">
+						<label for="table-view"><i class="fa fa-list-alt"></i></label><%}%><% if (viewType === 'list') { %>
+					<input type="radio" name="view-filter" id="list-view" class="view-radio"
+						(click)="setListViewFilter('list')" [checked]="isShowListView('list')">
+					<label for="list-view"><i class="fa fa-th-list"></i></label><%}%><% if (viewType === 'grid') { %>
+					<input type="radio" name="view-filter" id="grid-view" class="view-radio"
+						(click)="setListViewFilter('grid')" [checked]="isShowListView('grid')">
+						<label for="grid-view"><i class="fa fa-th"></i></label><%}%>
 				<%_ } %>
+				</div>
 			<%_ } %>
 			</div>
 			<div class="col-6">
@@ -66,10 +69,9 @@
 			</div>
 			<div class="col-3">
 				<div class="total_counts">
-					Total: <b>{{total_count}}</b><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {
-					%><%if (generateView === 'admin') {%>
-						<%if(api.includes("D")){%>
-					<input type="checkbox" class="ml-3 mr-1" [(ngModel)]="checkAll" (change)="onCheckAllChange()">All<%}%><%}%>
+					<span *ngIf="list.length > <%-SearchAndSortThreshold%>">Total: <b>{{total_count}}</b></span><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {
+					%><%if(api.includes("D")){%>
+					<span *ngIf="list.length > 1"><input type="checkbox" class="ml-3 mr-1" [(ngModel)]="checkAll" (change)="onCheckAllChange()">All</span><%}%>
 					<a class="ml-3" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a><%}%>
 				</div>
 			</div>

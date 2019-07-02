@@ -5,12 +5,12 @@
 				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >
 				<div class="grid-fields <%if(cardCanClick){%>pointer<%}%>" <%if(cardCanClick){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%>>
 			<%_ viewFields = briefView; %><%_ include schema-display.grid.html %>
-				</div><%_if (generateView !== 'public') {%><%if(api.includes("D") || api.includes("U")){%>
+				</div><%if(api.includes("D") || api.includes("U")){%>
 				<div class="card-action-icons">
 					<%if(api.includes("U")){%><a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>
 					<%if(api.includes("D")){%><a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
-					<%if(api.includes("D")){%><input type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
-				</div><%}%><%}%>
+					<%if(api.includes("D")){%><input *ngIf="list.length > 1" type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
+				</div><%}%>
 			</div>
 		</div>
 	</div>
