@@ -85,6 +85,8 @@ export class BaseComponent implements BaseComponentInterface {
 
     protected commonService: MraCommonService;
 
+    protected loaded: boolean = false;
+
     constructor(
         protected service: BaseService,
         protected injector: Injector,
@@ -130,6 +132,8 @@ export class BaseComponent implements BaseComponentInterface {
         }
         let errorToast = new ErrorToast(errorToastConfig);
         errorToast.show();
+        
+        this.loaded = true;
     }
 
     protected populatePages():void {        
@@ -653,6 +657,7 @@ export class BaseComponent implements BaseComponentInterface {
           let snackBar = new SnackBar(snackBarConfig);
           snackBar.show();
         }
+        this.loaded = true;
         this.eventEmitter.emit(this.detail);
     }
 
@@ -917,6 +922,7 @@ export class BaseComponent implements BaseComponentInterface {
               snackBar.show();
             }
             this.eventEmitter.emit(this.list);
+            this.loaded = true;
           },
           this.onServiceError
         );
@@ -1131,14 +1137,22 @@ export class BaseComponent implements BaseComponentInterface {
                     if (item[fn] == d) this.clickedId = item['_id'];
                 }
             }
-            this.router.navigate([this.modulePath, ref, 'detail', d['_id']]); // {relativeTo: this.getParentActivatedRouter() };
+            if (this.modulePath) {
+                this.router.navigate([this.modulePath, ref, 'detail', d['_id']]); // {relativeTo: this.getParentActivatedRouter() };
+            } else {
+                this.router.navigate([ref, 'detail', d['_id']], {relativeTo: this.getParentActivatedRouter() });
+            }
         }
         if (event) event.stopPropagation();
     }
 
     public onDetailLinkClicked(id:string):void {
         this.clickedId = id; 
-        this.router.navigate([this.modulePath, this.itemName, 'detail', id]); // {relativeTo: this.getParentActivatedRouter() }
+        if (this.modulePath) {
+            this.router.navigate([this.modulePath, this.itemName, 'detail', id]); // {relativeTo: this.getParentActivatedRouter() }
+        } else {
+            this.router.navigate([this.itemName, 'detail', id], {relativeTo: this.getParentActivatedRouter() });
+        }
     }
     
     protected getRefFromField(fn:string):string {
