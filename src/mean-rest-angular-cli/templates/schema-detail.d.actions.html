@@ -1,4 +1,4 @@
-<div class="action-buttons">
+<div *ngIf="!disableActionButtions" class="action-buttons">
     <!--<a href="javascript:void(0)" (click)="goBack()"><i class="fas fa-angle-double-left" title="Back"></i></a>-->
     <% if (api.includes("L")) {%><a [routerLink]="['../../list' ]"><i class="fas fa-list" title="List"></i><!--  span>&nbsp;&nbsp;{{ItemCamelName}} List</span--></a><%}%>
     <% if (api.includes("U")) {%><a [routerLink]="['../../edit', detail['_id'] ]" [skipLocationChange]="false" class="btn btn-outline-primary"><%-detailActionButtons[0]%></a><%}%>

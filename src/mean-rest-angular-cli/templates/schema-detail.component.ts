@@ -22,6 +22,8 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
   protected id:string;
   @Input()
   protected searchObj:any;
+  @Input()
+  protected disableActionButtions:boolean;
 
 <%if (schemaHasEditor) {%>
   @ViewChildren(MraRichTextShowDirective) textEditors: QueryList<MraRichTextShowDirective>;<%}%>
