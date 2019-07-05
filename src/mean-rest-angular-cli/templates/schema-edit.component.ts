@@ -61,14 +61,14 @@ import { MraRichTextSelectDirective } from 'mean-rest-angular';<%}%>
 })
 export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component implements OnInit {        
     @Input() 
-    protected id: string;
+    public id: string;
     @Input()
-    protected cid: string;//copy id
+    public cid: string;//copy id
     @Input()
-    protected initData: any; //some fields has data already. eg: {a: b}. Used for add
+    public initData: any; //some fields has data already. eg: {a: b}. Used for add
     @Output() done = new EventEmitter<boolean>();
 
-    protected action:string;
+    public action:string;
 
 <%if (schemaHasEditor) {%>
     @ViewChildren(MraRichTextSelectDirective) textEditors: QueryList<MraRichTextSelectDirective>;
@@ -78,12 +78,12 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
 <% }}%><%}%>
         
     constructor(
-      <%if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
-      protected <%-schemaName%>Service: <%-SchemaName%>Service,
-      protected injector: Injector,
-      protected router: Router,
-      protected route: ActivatedRoute,
-      protected location: Location) {
+      <%if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
+      public <%-schemaName%>Service: <%-SchemaName%>Service,
+      public injector: Injector,
+      public router: Router,
+      public route: ActivatedRoute,
+      public location: Location) {
           super( <%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
                  <%-schemaName%>Service, injector, router, route, location, ViewType.EDIT);
 <% let theView = compositeEditView; let isEditView = true;%><%_ include schema-construct.component.ts %>

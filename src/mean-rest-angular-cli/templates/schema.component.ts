@@ -23,7 +23,7 @@ import { <%-ModuleName%>RefSelectDirective } from '../<%-moduleName%>.component'
 
 export class <%-SchemaName%>Component extends BaseComponent {
 <%if (schemaHasRef) {%>
-    protected selectComponents = {
+    public selectComponents = {
   <%_ for (let field of compositeEditBriefView) { 
       if (field.Ref) {%>
       '<%-field.fieldName%>': {
@@ -35,16 +35,16 @@ export class <%-SchemaName%>Component extends BaseComponent {
     @ViewChild(<%-ModuleName%>RefSelectDirective) refSelectDirective: <%-ModuleName%>RefSelectDirective;
 <%}%>
 <%if (referred) {%>
-    @ViewChild('<%-ModuleName%>Modal') protected focusEl: ElementRef;<%}%>
+    @ViewChild('<%-ModuleName%>Modal') public focusEl: ElementRef;<%}%>
 
     constructor(
-      <%_ if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
-      protected <%-schemaName%>Service: <%-SchemaName%>Service,
-      protected injector: Injector,
-      protected router: Router,
-      protected route: ActivatedRoute,
-      protected location: Location,
-      protected view: ViewType ) {
+      <%_ if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
+      public <%-schemaName%>Service: <%-SchemaName%>Service,
+      public injector: Injector,
+      public router: Router,
+      public route: ActivatedRoute,
+      public location: Location,
+      public view: ViewType ) {
         super(<%-schemaName%>Service, injector, router, route, location, view, itemCamelName);
         <% if (schemaHasDate)  {%>this.dateFormat = '<%-dateFormat%>';
         this.timeFormat = '<%-timeFormat%>';<%}%>

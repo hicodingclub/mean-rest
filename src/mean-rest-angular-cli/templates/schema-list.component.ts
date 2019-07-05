@@ -16,19 +16,18 @@ import { ComponentFactoryResolver } from '@angular/core';<%}%>
 })
 export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component implements OnInit {
   <%_ if (schemaHasDate) { %>
-  private  minDate = {year: (new Date()).getFullYear() - 100, month: 1, day: 1};<%}%>
-  protected pageTitle = "My list";
+  public minDate = {year: (new Date()).getFullYear() - 100, month: 1, day: 1};<%}%>
 
   @Input()
-  protected searchObj:any;
+  public searchObj:any;
 
   constructor(
-      <%_ if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
-      protected <%-schemaName%>Service: <%-SchemaName%>Service,
-      protected injector: Injector,
-      protected router: Router,
-      protected route: ActivatedRoute,
-      protected location: Location) {
+      <%_ if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
+      public <%-schemaName%>Service: <%-SchemaName%>Service,
+      public injector: Injector,
+      public router: Router,
+      public route: ActivatedRoute,
+      public location: Location) {
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
                 <%-schemaName%>Service, injector, router, route, location, ViewType.LIST);
 <% let theView = briefView; %><%_ include schema-construct.component.ts %>

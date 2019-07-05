@@ -24,77 +24,77 @@ export enum ViewType {
 export {ServiceError};
 
 export class BaseComponent implements BaseComponentInterface {
-    protected objectKeys = Object.keys;
+    public objectKeys = Object.keys;
   
-    private storage:any = {};
+    public storage:any = {};
 
     //For list and pagination
-    protected list:any[] = [];
+    public list:any[] = [];
         
-    protected majorUi = true;
-    protected modulePath:string;
-    protected eventEmitter: EventEmitter<any> = new EventEmitter();
+    public majorUi = true;
+    public modulePath:string;
+    public eventEmitter: EventEmitter<any> = new EventEmitter();
     
-    protected page: number = 1;
-    protected per_page: number = 25;
-    protected total_count: number = 0;
-    protected total_pages: number = 0;
+    public page: number = 1;
+    public per_page: number = 25;
+    public total_count: number = 0;
+    public total_pages: number = 0;
     
-    private new_page;
+    public new_page;
     
-    protected pages: number[] = [];
-    protected left_more:boolean = false;
-    protected right_more:boolean = false;
+    public pages: number[] = [];
+    public left_more:boolean = false;
+    public right_more:boolean = false;
 
-    protected checkAll = false;
+    public checkAll = false;
     //used to mark deleted items, or items that will show sub-detail, etc.
-    protected checkedItem:boolean[] = [];
+    public checkedItem:boolean[] = [];
     
     //For edit and view details
-    protected detail:any = {};
-    private _detail:any = {}; //a clone and used to send/receive from next work
-    private _extra:any = {}; //extra info.
-    protected id:string;
-    protected subEdit = false; //a edit-sub component
+    public detail:any = {};
+    public _detail:any = {}; //a clone and used to send/receive from next work
+    public _extra:any = {}; //extra info.
+    public id:string;
+    public subEdit = false; //a edit-sub component
     //for fields with enum values
-    protected enums:any = {};
-    protected stringFields = [];
-    protected referenceFields: string[] = [];
-    protected referenceFieldsMap = {};
-    protected dateFields = [];
-    protected indexFields = [];
-    protected multiSelectionFields = [];
-    protected arrayFields = []; //element is [fieldName, elementType]
-    protected mapFields = []; //element is [fieldName, elementType, mapKey]
-    protected fileFields = {}; //fieldName: {selectedFiles: [selected files]}
-    protected dateFormat = "MM/DD/YYYY";
-    protected timeFormat = "hh:mm:ss";
+    public enums:any = {};
+    public stringFields = [];
+    public referenceFields: string[] = [];
+    public referenceFieldsMap = {};
+    public dateFields = [];
+    public indexFields = [];
+    public multiSelectionFields = [];
+    public arrayFields = []; //element is [fieldName, elementType]
+    public mapFields = []; //element is [fieldName, elementType, mapKey]
+    public fileFields = {}; //fieldName: {selectedFiles: [selected files]}
+    public dateFormat = "MM/DD/YYYY";
+    public timeFormat = "hh:mm:ss";
 
-    protected listViewFilter = 'table'; // list, or grid
-    protected listSortField: string;
-    protected listSortFieldDisplay: string;
-    protected listSortOrder: string; // 'asc', 'desc'
+    public listViewFilter = 'table'; // list, or grid
+    public listSortField: string;
+    public listSortFieldDisplay: string;
+    public listSortOrder: string; // 'asc', 'desc'
 
-    protected hiddenFields = []; //fields hide from view. Currrently used by "Add" view of edit-sub
+    public hiddenFields = []; //fields hide from view. Currrently used by "Add" view of edit-sub
 
-    protected ItemCamelName: string;
-    protected itemName: string;
-    protected parentItem: string;
+    public ItemCamelName: string;
+    public itemName: string;
+    public parentItem: string;
 
-    protected refreshing: boolean = false;
+    public refreshing: boolean = false;
 
-    protected commonService: MraCommonService;
+    public commonService: MraCommonService;
 
-    protected loaded: boolean = false;
+    public loaded: boolean = false;
 
     constructor(
-        protected service: BaseService,
-        protected injector: Injector,
-        protected router: Router,
-        protected route: ActivatedRoute,
-        protected location: Location,
-        protected view: ViewType,
-        protected itemCamelName: string) {
+        public service: BaseService,
+        public injector: Injector,
+        public router: Router,
+        public route: ActivatedRoute,
+        public location: Location,
+        public view: ViewType,
+        public itemCamelName: string) {
       
         this.ItemCamelName = itemCamelName.charAt(0).toUpperCase() + itemCamelName.substr(1);
         this.itemName = itemCamelName.toLowerCase();
@@ -103,7 +103,7 @@ export class BaseComponent implements BaseComponentInterface {
         
     }
     
-    protected onServiceError(error:ServiceError):void {
+    public onServiceError(error:ServiceError):void {
         //clear any pending flags
         this.refreshing = false;
       
@@ -136,7 +136,7 @@ export class BaseComponent implements BaseComponentInterface {
         this.loaded = true;
     }
 
-    protected populatePages():void {        
+    public populatePages():void {        
         this.pages = []
         const SHOW_PAGE = 9;
         const HALF = (SHOW_PAGE-1)/2;
@@ -194,22 +194,22 @@ export class BaseComponent implements BaseComponentInterface {
         this.populateList();
     }
     
-    protected onNextPage():void {
+    public onNextPage():void {
         if (this.page >= this.total_pages) return;
         this.routeToPage(this.page + 1);
     }
     
-    protected onPreviousPage():void {
+    public onPreviousPage():void {
         if (this.page <= 1) return;
         this.routeToPage(this.page - 1);
     }
 
-    protected onGotoPage(p:number):void {
+    public onGotoPage(p:number):void {
         if (p > this.total_pages || p < 1) return;
         this.routeToPage(p)
     }
     
-    protected goBack() {
+    public goBack() {
         this.location.back();
         /*
         // window.history.back();
@@ -222,7 +222,7 @@ export class BaseComponent implements BaseComponentInterface {
         */
     }
     
-    protected stringify(detail:any): string {
+    public stringify(detail:any): string {
         let str = "";
         for (let fnm of this.indexFields) {
             if (detail[fnm] && typeof detail[fnm] != 'object') str += " " + detail[fnm];
@@ -241,7 +241,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
 
     /***Start: handle reference fields***/
-    protected formatReferenceField(field: any, fieldName: string ):any {
+    public formatReferenceField(field: any, fieldName: string ):any {
         let id, value;
         if (typeof field == 'string') {
             //assume this is the "_id", let see we have the cached details for this ref from service
@@ -265,13 +265,13 @@ export class BaseComponent implements BaseComponentInterface {
         }
         return field;
     }
-    protected formatReference(detail:any ):any {
+    public formatReference(detail:any ):any {
         for (let fnm of this.referenceFields) {
             detail[fnm] = this.formatReferenceField(detail[fnm], fnm);
         }
         return detail;
     }
-    protected deFormatReference(detail:any ):any {
+    public deFormatReference(detail:any ):any {
         for (let fnm of this.referenceFields) {
             if (typeof detail[fnm] !== 'object') { //not defined
                 //let date values undefined
@@ -285,19 +285,19 @@ export class BaseComponent implements BaseComponentInterface {
         return detail;
     }
     
-    protected clearFieldReference(field:any ):any {
+    public clearFieldReference(field:any ):any {
         for (let prop in field) {
             field[prop] = undefined;
         }
         return field;
     }
 
-    protected isDefinedFieldReference(field:any ):any {
+    public isDefinedFieldReference(field:any ):any {
         if ('_id' in field && typeof field['_id'] == 'string') return true;
         return false;
     }
     /***Start: handle date fields***/    
-    protected formatDateField(field:string):any {
+    public formatDateField(field:string):any {
         let fmt = this.dateFormat;
         let t_fmt = this.timeFormat;
         let d, M, yyyy, h, m, s;
@@ -339,7 +339,7 @@ export class BaseComponent implements BaseComponentInterface {
 
     }
     
-    protected formatDate(detail:any ):any {
+    public formatDate(detail:any ):any {
         for (let fnm of this.dateFields) {
             let value, date;
             if (typeof detail[fnm] !== 'string') { //not defined
@@ -353,7 +353,7 @@ export class BaseComponent implements BaseComponentInterface {
         return detail;
     }
     
-    protected deFormatDateField(date:any):string {
+    public deFormatDateField(date:any):string {
         let d, M, yyyy, h, m, s;
         
         yyyy = date.year;
@@ -367,7 +367,7 @@ export class BaseComponent implements BaseComponentInterface {
         }
     }
     
-    protected deFormatDate(detail:any ):any {
+    public deFormatDate(detail:any ):any {
         for (let fnm of this.dateFields) {
             let value;
             if (typeof detail[fnm] !== 'object') { //not defined
@@ -385,13 +385,13 @@ export class BaseComponent implements BaseComponentInterface {
         }
         return detail;
     }
-    protected clearFieldDate(field:any ):any {
+    public clearFieldDate(field:any ):any {
         for (let prop in field) {
             field[prop] = undefined;
         }
         return field;
     }
-    protected isDefinedFieldDate(field:any ):any {
+    public isDefinedFieldDate(field:any ):any {
         if (typeof field === 'object') {
                 if (typeof field['date'] == 'object') return true;
                 if (typeof field['from'] == 'object') return true;
@@ -401,7 +401,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
 
     /***Start: handle array of multi-selection fields***/
-    protected formatArrayMultiSelectionField(field: any, enums: any): any {
+    public formatArrayMultiSelectionField(field: any, enums: any): any {
         let selectObj = {};
         let value = "";
         for (let e of enums) {
@@ -416,14 +416,14 @@ export class BaseComponent implements BaseComponentInterface {
         return {'selection': selectObj, value: value};
 
     }
-    protected formatArrayMultiSelection(detail:any ):any {
+    public formatArrayMultiSelection(detail:any ):any {
         for (let fnm of this.multiSelectionFields) {
             detail[fnm] = this.formatArrayMultiSelectionField(detail[fnm], this.enums[fnm]);
         }
         return detail;
     }
     
-    protected deFormatArrayMultiSelection(detail:any ):any {
+    public deFormatArrayMultiSelection(detail:any ):any {
         for (let fnm of this.multiSelectionFields) {
             if (typeof detail[fnm] !== 'object') { //not defined
                 delete detail[fnm];
@@ -443,7 +443,7 @@ export class BaseComponent implements BaseComponentInterface {
         }
         return detail;
     }
-    protected clearFieldArrayMultiSelection(field:any ):any {
+    public clearFieldArrayMultiSelection(field:any ):any {
         if (!field['selection']) return field;
         for (let prop in field['selection']) {
             field['selection'][prop] = false; //not exist
@@ -451,14 +451,14 @@ export class BaseComponent implements BaseComponentInterface {
         return field;
     }
 
-    protected isDefinedFieldArrayMultiSelection(field:any ):any {
+    public isDefinedFieldArrayMultiSelection(field:any ):any {
         if ('selection' in field && typeof field['selection'] == 'object') {
             let keys = Object.keys(field['selection']);
             return keys.some(e=>{return field['selection'][e]});
         }
         return false;
     }
-    protected multiselectionSelected(fieldName) {
+    public multiselectionSelected(fieldName) {
         if (!this.detail[fieldName] || typeof this.detail[fieldName]['selection'] != 'object') {
             return false;
         }
@@ -466,7 +466,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
     /***End: handle array of multi-selection fields***/
     /***Start: handle map fields***/
-    protected formatMapField(field: any, elementType: string): any {
+    public formatMapField(field: any, elementType: string): any {
         let selectObj = {};
         let values = [];
         if (typeof field == 'object') {
@@ -482,7 +482,7 @@ export class BaseComponent implements BaseComponentInterface {
         return {'selection': selectObj, value: value, keys: []};
 
     }
-    protected formatMapFields(detail:any ):any {
+    public formatMapFields(detail:any ):any {
         for (let f of this.mapFields) {
             //[fieldName, elementType]
             detail[f[0]] = this.formatMapField(detail[f[0]], f[1]);
@@ -490,7 +490,7 @@ export class BaseComponent implements BaseComponentInterface {
         return detail;
     }
 
-    protected deFormatMapFields(detail:any ):any {
+    public deFormatMapFields(detail:any ):any {
         for (let f of this.mapFields) {
             //[fieldName, elementType]
             let fnm = f[0];
@@ -517,20 +517,20 @@ export class BaseComponent implements BaseComponentInterface {
         return detail;
     }
 
-    protected clearFieldMap(field:any ):any {
+    public clearFieldMap(field:any ):any {
         if (!field['selection']) return field;
         field['selection'] = {};
         field.value = undefined;
         return field;
     }
 
-    protected isDefinedFieldMap(field:any ):any {
+    public isDefinedFieldMap(field:any ):any {
         if ('selection' in field && typeof field['selection'] == 'object') {
             return Object.keys(field['selection']).length > 0;
         }
         return false;
     }
-    protected mapSelected(fieldName) {
+    public mapSelected(fieldName) {
         if (!this.detail[fieldName] || typeof this.detail[fieldName]['selection'] != 'object') {
             return false;
         }
@@ -538,7 +538,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
     /***End: handle map fields***/
     /***Start: handle array fields***/
-    protected formatArrayField(field: any, elementType: string): any {
+    public formatArrayField(field: any, elementType: string): any {
         let selectArray = [];
         let values = [];
         if (Array.isArray(field)) { //not defined
@@ -558,7 +558,7 @@ export class BaseComponent implements BaseComponentInterface {
         return {'selection': selectArray, value: value};
 
     }
-    protected formatArrayFields(detail:any ):any {
+    public formatArrayFields(detail:any ):any {
         for (let f of this.arrayFields) {
             //[fieldName, elementType]
             detail[f[0]] = this.formatArrayField(detail[f[0]], f[1]);
@@ -566,7 +566,7 @@ export class BaseComponent implements BaseComponentInterface {
         return detail;
     }
 
-    protected deFormatArrayFields(detail:any ):any {
+    public deFormatArrayFields(detail:any ):any {
         for (let f of this.arrayFields) {
             //[fieldName, elementType]
             let fnm = f[0];
@@ -595,20 +595,20 @@ export class BaseComponent implements BaseComponentInterface {
         return detail;
     }
 
-    protected clearFieldArray(field:any ):any {
+    public clearFieldArray(field:any ):any {
         if (!field['selection']) return field;
         field['selection'] = [];
         field.value = undefined;
         return field;
     }
 
-    protected isDefinedFieldArray(field:any ):any {
+    public isDefinedFieldArray(field:any ):any {
         if ('selection' in field && Array.isArray(field['selection'])) {
             return field['selection'].length > 0;
         }
         return false;
     }
-    protected arraySelected(fieldName) {
+    public arraySelected(fieldName) {
         if (!this.detail[fieldName] || !Array.isArray(this.detail[fieldName]['selection'])) {
             return false;
         }
@@ -616,7 +616,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
     /***End: handle array fields***/
   
-    protected formatDetail(detail:any ):any {
+    public formatDetail(detail:any ):any {
         detail = this.formatReference(detail);
         detail = this.formatDate(detail);
         detail = this.formatArrayMultiSelection(detail);
@@ -625,7 +625,7 @@ export class BaseComponent implements BaseComponentInterface {
         return detail;
     }    
     
-    protected deFormatDetail(detail:any ):any {
+    public deFormatDetail(detail:any ):any {
         let cpy = Util.clone(detail);
         
         cpy = this.deFormatReference(cpy);
@@ -636,11 +636,11 @@ export class BaseComponent implements BaseComponentInterface {
         return cpy;
     }
     
-    protected populateDetail(id: string):EventEmitter<any> {
+    public populateDetail(id: string):EventEmitter<any> {
       return this.populateDetailForAction(id, null);
     }
 
-    private onDetailReturned(detail: any, action: string): void {
+    public onDetailReturned(detail: any, action: string): void {
         let originalDetail = Util.clone(detail);
         if (detail["_id"]) this.commonService.putToStorage(detail["_id"], originalDetail);//cache it
         
@@ -661,7 +661,7 @@ export class BaseComponent implements BaseComponentInterface {
         this.eventEmitter.emit(this.detail);
     }
 
-    protected populateDetailByFields(searchObj: any):EventEmitter<any> {
+    public populateDetailByFields(searchObj: any):EventEmitter<any> {
         let searchContext = {'$and': [
             {'$or': []},
             {'$and': []},
@@ -686,7 +686,7 @@ export class BaseComponent implements BaseComponentInterface {
         return this.eventEmitter;
     }
 
-    protected populateDetailForAction(id: string, action: string):EventEmitter<any> {
+    public populateDetailForAction(id: string, action: string):EventEmitter<any> {
       //action: eg: action=edit  -> get detail for editing purpose 
       this.service.getDetailForAction(id, action).subscribe(
         detail => {
@@ -697,7 +697,7 @@ export class BaseComponent implements BaseComponentInterface {
       return this.eventEmitter;
     }
 
-    protected populateDetailFromCopy(copy_id:string):void {
+    public populateDetailFromCopy(copy_id:string):void {
       this.service.getDetail(copy_id).subscribe(
         detail => {            
             this.detail = this.formatDetail(detail);
@@ -709,7 +709,7 @@ export class BaseComponent implements BaseComponentInterface {
       );
     }
 
-    protected extraInfoPopulate() {
+    public extraInfoPopulate() {
         for (let fieldDef of this.mapFields) { 
           //fieldDef: [field.fieldName, field.elementType, keyType, keyRefName, keyRefService, keyRefSubField]
           let fieldName = fieldDef[0]; //this.<keyRefName>.<keyRefSubField>
@@ -762,7 +762,7 @@ export class BaseComponent implements BaseComponentInterface {
       return false;
     }
 
-    protected processSearchContext() {
+    public processSearchContext() {
         this.moreSearchOpened = false;
         let d = this.detail;
         for (let s of this.stringFields) {
@@ -856,7 +856,7 @@ export class BaseComponent implements BaseComponentInterface {
         this.putToStorage("searchMoreDetail", this.searchMoreDetail);
         this.putToStorage("detail", this.detail);
     }
-    protected searchList():void {
+    public searchList():void {
         this.processSearchContext();
         //update the URL
         if (!this.isEmptyRoutingPath()) {
@@ -865,7 +865,7 @@ export class BaseComponent implements BaseComponentInterface {
         this.putToStorage("page", 1);//start from 1st page
         this.populateList();
     }
-    protected loadUIFromCache():void {
+    public loadUIFromCache():void {
         //Now let's reload the search condition to UI
         this.searchText = this.getFromStorage("searchText");
         this.searchMoreDetail = this.getFromStorage("searchMoreDetail");
@@ -877,7 +877,7 @@ export class BaseComponent implements BaseComponentInterface {
         if (detail) this.detail = detail;
     }
     
-    protected populateList():EventEmitter<any> {
+    public populateList():EventEmitter<any> {
         //First let's handle page
         let new_page;
         let searchContext, searchText;
@@ -1126,7 +1126,7 @@ export class BaseComponent implements BaseComponentInterface {
         } 
     }
 
-    protected clickedId = null;
+    public clickedId = null;
     public onDisplayRefClicked(fn:string, detail:any, event:any):void {
         let ref = this.getRefFromField(fn);
         let d = detail;
@@ -1155,7 +1155,7 @@ export class BaseComponent implements BaseComponentInterface {
         }
     }
     
-    protected getRefFromField(fn:string):string {
+    public getRefFromField(fn:string):string {
         return this.referenceFieldsMap[fn];
     }
 
@@ -1265,10 +1265,10 @@ export class BaseComponent implements BaseComponentInterface {
         }                    
     }
     //**** For parent component of modal UI
-    protected refSelectDirective:any;
-    protected selectComponents:any; //{fieldName: component-type} format
-    protected componentFactoryResolver: any; //injected by extended class, if needed.
-    private componentSubscription
+    public refSelectDirective:any;
+    public selectComponents:any; //{fieldName: component-type} format
+    public componentFactoryResolver: any; //injected by extended class, if needed.
+    public componentSubscription
     public onRefSelect(fieldName:string) {
         if (!this.refSelectDirective) {
           console.warn("No reference directive for field: ", fieldName);
@@ -1404,7 +1404,7 @@ export class BaseComponent implements BaseComponentInterface {
     public inputData;
     public outputData;
     public done:any;
-    protected focusEl; //ElementRef
+    public focusEl; //ElementRef
     setFocus() {
         if (this.focusEl)
             this.focusEl.nativeElement.focus();
@@ -1417,7 +1417,7 @@ export class BaseComponent implements BaseComponentInterface {
         this.uiCloseModal();
     }
 
-    protected selectedId = null;
+    public selectedId = null;
     selectItemSelected(num:number) {
         let detail = this.list[num];
         this.selectedId = detail['_id'];
@@ -1455,8 +1455,8 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     //Search more in the list view
-    protected searchText: string;
-    protected searchMoreDetail: any;
+    public searchText: string;
+    public searchMoreDetail: any;
     public moreSearchOpened:boolean = false;
     toggleMoreSearch() {
         this.moreSearchOpened = !this.moreSearchOpened;
@@ -1473,10 +1473,10 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     /* This is for editor related */
-    protected textEditors:any; //type of QueryList<T>
-    protected textEditorMap:any = {};
+    public textEditors:any; //type of QueryList<T>
+    public textEditorMap:any = {};
     
-    protected extraFieldsUnload() {//from server
+    public extraFieldsUnload() {//from server
         if (this.textEditors) {
             this.textEditors.forEach(editor=>{
                 
@@ -1490,7 +1490,7 @@ export class BaseComponent implements BaseComponentInterface {
         }
     }
         
-    protected extraFieldsLoad() {//to server
+    public extraFieldsLoad() {//to server
         let result = true;
         if (this.textEditors) {
             let array = this.textEditors.toArray();
@@ -1546,7 +1546,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     /*Parent router related*/
-    protected getParentRouteItem():string {
+    public getParentRouteItem():string {
         let routeSnapshot = this.route.snapshot;
         let parentItem;
         do {
@@ -1559,7 +1559,7 @@ export class BaseComponent implements BaseComponentInterface {
         return parentItem;
     }
 
-    protected getParentRouteItemId():string {
+    public getParentRouteItemId():string {
         let routeSnapshot = this.route.snapshot;
         let parentItemId;
         do {
@@ -1572,7 +1572,7 @@ export class BaseComponent implements BaseComponentInterface {
         return parentItemId;
     }
         
-    protected getParentRouteRefField():string {
+    public getParentRouteRefField():string {
         let mp = this.referenceFieldsMap;
         for (let prop in mp) {
             if (mp.hasOwnProperty(prop) && mp[prop] == this.parentItem) {
@@ -1581,7 +1581,7 @@ export class BaseComponent implements BaseComponentInterface {
         }
     }
 
-    protected getParentActivatedRouter():ActivatedRoute {
+    public getParentActivatedRouter():ActivatedRoute {
         let route = this.route;
         do {
             let data = route.snapshot.data;
@@ -1591,7 +1591,7 @@ export class BaseComponent implements BaseComponentInterface {
         } while (route)
         return this.route.root;
     }
-    protected isEmptyRoutingPath():boolean {
+    public isEmptyRoutingPath():boolean {
         return this.route.snapshot.url.length === 0;
     }
     
@@ -1601,7 +1601,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
 
     /*** Any View - add new component in the current view*/
-    protected isAdding: boolean = false;
+    public isAdding: boolean = false;
     public onAdd() {
         this.isAdding = true;
     }

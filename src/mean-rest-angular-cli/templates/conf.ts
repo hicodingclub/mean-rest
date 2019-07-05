@@ -10,13 +10,13 @@ import { <%
   %><%-schDef.schemaName%>RoutingPath, <% } }%> } from './<%-moduleName%>/<%-moduleName%>-routing.path';
 
 export const <%-ModuleName%>Routes: Routes = [
-  { path: '<%-moduleName%>', 
+  { path: '<%-moduleName%>',
     component: <%-ModuleName%>Component,
-    children: [ 
+    children: [
       {path: '',  redirectTo: '<%-defaultSchema%>', pathMatch: 'full'},
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
       { path: "<%-schm.schemaName%>",
-        children: <%-schm.schemaName%>RoutingPath, 
+        children: <%-schm.schemaName%>RoutingPath,
         data: {"mraLevel": 1, "item": "<%-schm.schemaName%>"}
       },<%_
  }%>

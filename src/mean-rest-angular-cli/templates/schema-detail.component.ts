@@ -19,22 +19,22 @@ import { MraRichTextShowDirective } from 'mean-rest-angular';<%}%>
 })
 export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component implements OnInit {
   @Input() 
-  protected id:string;
+  public id:string;
   @Input()
-  protected searchObj:any;
+  public searchObj:any;
   @Input()
-  protected disableActionButtions:boolean;
+  public disableActionButtions:boolean;
 
 <%if (schemaHasEditor) {%>
   @ViewChildren(MraRichTextShowDirective) textEditors: QueryList<MraRichTextShowDirective>;<%}%>
 
   constructor(
-      <%if (schemaHasRef) {%>protected componentFactoryResolver: ComponentFactoryResolver,<%}%>
-      protected <%-schemaName%>Service: <%-SchemaName%>Service,
-      protected injector: Injector,
-      protected router: Router,
-      protected route: ActivatedRoute,
-      protected location: Location) {
+      <%if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
+      public <%-schemaName%>Service: <%-SchemaName%>Service,
+      public injector: Injector,
+      public router: Router,
+      public route: ActivatedRoute,
+      public location: Location) {
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
                 <%-schemaName%>Service, injector, router, route, location, ViewType.DETAIL);
 <% let theView = detailView; let isEditView = false;%><%_ include schema-construct.component.ts %>

@@ -16,11 +16,11 @@ export class <%-SchemaName%>DetailSubComponent extends <%-SchemaName%>DetailComp
     @Input() inputData;
     
     constructor(
-        protected <%-schemaName%>Service: <%-SchemaName%>Service,
-        protected injector: Injector,
-        protected router: Router,
-        protected route: ActivatedRoute,
-        protected location: Location) {
+        public <%-schemaName%>Service: <%-SchemaName%>Service,
+        public injector: Injector,
+        public router: Router,
+        public route: ActivatedRoute,
+        public location: Location) {
             super(<%if (schemaHasRef) {%>null,<%}%><%-schemaName%>Service, injector, router, route, location);
     }
 
