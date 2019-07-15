@@ -1,11 +1,11 @@
 <div class="edit" *ngIf="detail">
-	<div *ngIf="!subEdit" class="action-buttons">
+	<div *ngIf="!embeddedView" class="action-buttons">
         <!-- <a href="javascript:void(0)" (click)="goBack()" ><i class="fas fa-angle-double-left" title="Back"></i></a> -->
 	</div>
 	
 	<div class="card" style="text-align: left;">
 	  <div class="card-body">
-	    <h4 class="card-title" *ngIf="!subEdit">{{action}} <%-SchemaCamelName%></h4>    
+	    <h4 class="card-title" *ngIf="!embeddedView">{{action}} <%-SchemaCamelName%></h4>
 	    <form (ngSubmit)="onSubmit()" #editForm="ngForm">
 	    
 	     <div *ngIf="action == 'Edit'">

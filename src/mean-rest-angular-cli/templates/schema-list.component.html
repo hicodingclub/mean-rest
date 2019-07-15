@@ -1,19 +1,22 @@
 <div>
-	<div class="container search">
+	<div class="container search"><% if (listTitle) {%>
+		<div class="mt-3 mb-3">
+			<h3><%-listTitle%></h3>
+		</div><%}%><% if (!disableListSearch) {%>
 		<div class="row">
 			<div class="col-9">
-				<% if (!disableListSearch) {%><%_ include schema-search.bar.html %><%}%>
+				<%_ include schema-search.bar.html %>
 		    </div>
-			<div class="col-3">
+		</div><%}%>
+		<div class="row">
+			<div class="col">
 		        <div class="action-buttons">
-					<%if(api.includes("C")){%><a [routerLink]="['../new' ]" [skipLocationChange]="false" class="btn btn-outline-primary"><%-listActionButtons[0]%></a><%}%>
-					<%if(api.includes("D")){%><a *ngIf="list.length > 1" routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
+					<%if(api.includes("C") && listActionButtons[0]){%><a [routerLink]="['../new' ]" [skipLocationChange]="false" class="btn btn-outline-primary"><%-listActionButtons[0]%></a><%}%>
+					<%if(api.includes("D") && listActionButtons[1]){%><a *ngIf="list.length > 1" routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
 						[ngClass]="{'disabled': !isItemSelected()}"><%-listActionButtons[1]%></a><%}%>
 				</div>
 			</div>
 		</div>
-
-
 		<hr/>
 		<%_ let showRefreshIcon = true;%><% include schema-list.pagination.html %>
 	</div>
@@ -22,9 +25,20 @@
 		<span *ngIf="!loaded">Loading...</span>
 	</div>
 	<div *ngIf="list.length > 0"><%
-	let cardCanClick = api.includes('R') && listToDetail === 'click';
-	let cardHasLink = api.includes('R') && listToDetail === 'link';
-	%><% let view='list'; for (const viewType of listTypes) {%><%_if (viewType === 'list') {%>
+		let cardCanClick = api.includes('R') && listToDetail === 'click';
+		let clickToDetail = api.includes('R') && listToDetail === 'click';
+		let cardHasLink = api.includes('R') && listToDetail === 'link';
+
+		let clickToCheck = false;
+
+		let canUpdate = api.includes('U');
+		let canDelete = api.includes('D');
+		let canCheck = api.includes('D');
+
+		let embeddedEdit = false;
+
+	    let view='list'; 
+	for (const viewType of listTypes) {%><%_if (viewType === 'list') {%>
 <% include schema-list.view.list.html %><%}%><%_if (viewType === 'grid') {%>
 <% include schema-list.view.grid.html %><%}%><%_if (viewType === 'table') {%>
 <% include schema-list.view.table.html %><%}%>

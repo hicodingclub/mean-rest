@@ -42,7 +42,8 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
     if (field.type === "SchemaString" && field.editor) { %>
           this.textEditorMap['<%-schemaName%>Detail<%-Fn%>'] = {
             fieldName: '<%-fn%>'
-          };<% }}%>
+          };<% }}%><% if (detailType === 'term') {%>
+          this.actionType = 'term';<%}%>
   }
 
   ngOnInit() {

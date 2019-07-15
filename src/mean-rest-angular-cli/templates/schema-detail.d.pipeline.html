@@ -1,5 +1,5 @@
-<% if (detailPipelines.length > 0) {%>
-    <br/><%for (let p of detailPipelines) { %>
+<% if (detailActions.length > 0) {%>
+    <br/><%for (let p of detailActions) { %>
     <div class="row">
-        <button type="button" class="btn btn-primary"><%-p[0]%></button>
+        <button type="button" class="btn btn-primary" routerLink="<%-p[1]%>" [queryParams]="{<%-schemaName%>: detail['_id']}"><%-p[0]%></button>
     </div><%} }%>

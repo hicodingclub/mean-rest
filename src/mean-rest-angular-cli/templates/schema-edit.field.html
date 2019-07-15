@@ -455,22 +455,23 @@
                 <ng-template [ngIf]="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
                      <div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
                         {{element.value}}
-              <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
-          </div>
+                      <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
+                    </div>
                 </ng-template>
-          <span *ngIf="arraySelected('<%-fn%>')" 
-                class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
-                <i class="fas fa-times-circle" title="Clear"></i></span>
-        <button type="button" class="btn btn-light ml-3" (click)="onRefSelect('<%-fn%>')">
-            <i class="fas fa-plus"  title="Add"></i>
-        </button>
-                <!-- fake hidden input ngModel for directive to check the values-->
-            <input type="checkbox" name="Edit<%-Fn%>Selection" 
-               style="display:none"
-               id="Edit<%-Fn%>Selection"
-                 [(ngModel)]="detail['<%-fn%>']['selection'].length" 
-                 #Edit<%-Fn%>Selection="ngModel">
-          </div>
+                <span *ngIf="arraySelected('<%-fn%>')" 
+                      class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
+                      <i class="fas fa-times-circle" title="Clear"></i>
+                </span>
+                <button type="button" class="btn btn-light ml-3" (click)="onRefSelect('<%-fn%>')">
+                    <i class="fas fa-plus"  title="Add"></i>
+                </button>
+                      <!-- fake hidden input ngModel for directive to check the values-->
+                <input type="checkbox" name="Edit<%-Fn%>Selection" 
+                  style="display:none"
+                  id="Edit<%-Fn%>Selection"
+                    [(ngModel)]="detail['<%-fn%>']['selection'].length" 
+                    #Edit<%-Fn%>Selection="ngModel">
+            </div>
         <%_ } else { %>
           <div>Not supported yet.</div>
         <%_ } %>

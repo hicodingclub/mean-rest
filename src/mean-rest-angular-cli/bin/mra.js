@@ -93,9 +93,11 @@ var templates = {
   schemaSelectComponentHtml: ["../templates/schema-select.component.html", "select.component.html", "select component html file", 'W'],
   schemaListSubComponent: ["../templates/schema-list-sub.component.ts", "list-sub.component.ts", "list-sub component file", 'W'],
   schemaListSubComponentHtml: ["../templates/schema-list-sub.component.html", "list-sub.component.html", "list-sub component html file", 'W'],
-  schemaListHomeComponent: ["../templates/schema-list-home.component.ts", "list-home.component.ts", "list-home component file", 'W'],
-  schemaListHomeComponentHtml: ["../templates/schema-list-home.component.html", "list-home.component.html", "list-home component html file", 'W'],
-	
+  schemaListActSelComponent: ["../templates/schema-list-act-s.component.ts", "list-act-sel.component.ts", "list-act-sel component file", 'W'],
+  schemaListActSelComponentHtml: ["../templates/schema-list-act-s.component.html", "list-act-sel.component.html", "list-act-sel component html file", 'W'],
+  schemaListHomeComponent: ["../templates/schema-list-act-h.component.ts", "list-home.component.ts", "list-home component file", 'W'],
+  schemaListHomeComponentHtml: ["../templates/schema-list-act-h.component.html", "list-home.component.html", "list-home component html file", 'W'],
+
   schemaDetail: {
     'normal': [
       ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
@@ -116,6 +118,11 @@ var templates = {
       ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
       ["../templates/schema-detail-slide.component.html", "detail.component.html", "detail component html file", 'W'],
       ["../templates/schema-detail-slide.component.css", "detail.component.css", "detail component css file", 'W'],
+    ],
+    'term': [
+      ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
+      ["../templates/schema-detail-term.component.html", "detail.component.html", "detail component html file", 'W'],
+      ["../templates/schema-detail-term.component.css", "detail.component.css", "detail component css file", 'W'],
     ],
   },
 
@@ -267,10 +274,23 @@ var processFieldGroups = function(fieldGroups) {
   return fieldGroups;
 }
 var generateViewPicture = function(schemaName, viewStr, schema, validators, indexViewNames) {
+    const displayNames = {};
+    const re = /([^\s]+)\[([^\]]*)\]/g;  // handle "field[field displayName]"
+    const s = viewStr;
+    let m;
+    do {
+      m = re.exec(s);
+      if (m) {
+          displayNames[m[1]] = m[2];
+      }
+    } while (m);
+
+    const viewStrDisplayNameHandled = viewStr.replace(/\[[^\]]*\]/g, ' ');
+
     //process | in viewStr
     let fieldGroups = [];
-    if (viewStr.indexOf('|') > -1) {
-        let strGroups = viewStr.split('|');
+    if (viewStrDisplayNameHandled.indexOf('|') > -1) {
+        let strGroups = viewStrDisplayNameHandled.split('|');
         for (let str of strGroups) {
             let arr = str.match(/\S+/g);
             if (arr) {
@@ -279,13 +299,13 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
         }
     }
 
-    let viewDef = viewStr.replace(/\|/g, ' ').match(/\S+/g) || [];
+    let viewDef = viewStrDisplayNameHandled.replace(/\|/g, ' ').match(/\S+/g) || [];
     if (fieldGroups.length == 0) { //no grouping
         for (let e of viewDef) {
             fieldGroups.push([e]); //each element as a group
         }
     }
-    
+
     fieldGroups = processFieldGroups(fieldGroups);
     
     let view = [];
@@ -438,7 +458,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
       let fieldPicture = {
           fieldName: item,
           FieldName: capitalizeFirst(item),
-          displayName: camelToDisplay(item),
+          displayName: displayNames[item] || camelToDisplay(item),
           hidden: hidden,
           type: type,
           jstype: jstype,
@@ -473,6 +493,9 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
       if (type == 'Map') {
         //console.log("***schema", schema);
         //console.log("***Map", fieldPicture);
+      }
+      if (fieldPicture.fieldName === 'student') {
+        //console.log(fieldPicture.fieldName, fieldPicture);
       }
       view.push(fieldPicture);
       viewMap[item] = fieldPicture;
@@ -892,15 +915,19 @@ function main() {
 
     let detailType = 'normal';
     let listType = 'list';
+    let listTitle = '';
     let disableListSearch = false;
     let listToDetail = 'click';
     let defaultSortField, defaultSortOrder;
     let homeListNumber = 4;
-    let detailPipelines = []; //extra buttons that trigger other pipelines
+    let detailActions = []; //extra buttons that trigger other pipelines
     let detailActionButtons = ['Edit', 'New', 'Delete'];
     let listActionButtons = ['Create', 'Delete'];
     let detailRefBlackList = undefined;
     let detailRefName = {};
+
+    let selectActionViewType = 'dropdown';
+
     if (schemaDef.mraUI) {
       let mraUI = schemaDef.mraUI;
       switch (mraUI.detailType) {
@@ -912,6 +939,9 @@ function main() {
           break;
         case 'slide':
           detailType = 'slide';
+          break;
+        case 'term':
+          detailType = 'term';
           break;
         default:
           detailType = 'normal';
@@ -938,12 +968,13 @@ function main() {
         default:
           listToDetail = 'click';
       }
-
+      listTitle = mraUI.listTitle;
       disableListSearch = !!mraUI.disableListSearch;
       detailActionButtons = mraUI.detailActionButtons || detailActionButtons;
       listActionButtons = mraUI.listActionButtons || listActionButtons;
       detailRefBlackList = mraUI.detailRefBlackList || detailRefBlackList;
       detailRefName = mraUI.detailRefName || detailRefName;
+      selectActionViewType = mraUI.selectActionViewType || selectActionViewType;
 
       if (mraUI.defaultListSort) {
         const keys = Object.keys(mraUI.defaultListSort);
@@ -955,8 +986,8 @@ function main() {
       if (typeof mraUI.homeListNumber === 'number') {
         homeListNumber = mraUI.homeListNumber;
       }
-      if (mraUI.detailPipelines) {
-        detailPipelines = mraUI.detailPipelines;
+      if (mraUI.detailActions) {
+        detailActions = mraUI.detailActions;
       }
     }
     let listTypes = ['list', 'grid', 'table'];
@@ -967,6 +998,10 @@ function main() {
     let embeddedViewOnly = schemaDef.embeddedViewOnly? true: false;
     let viewName = schemaDef.name; //Display name on UI
     let api = schemaDef.api || "LCRUD"; //APIs exposed to front end ("LCRUD")
+    api = api.toUpperCase();
+
+    let actionViews = schemaDef.actionViews || ''; //extra views: H, S, ...
+    actionViews = actionViews.toUpperCase();
 
   	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
   	if (typeof views !== 'object' || !Array.isArray(views)) {
@@ -1098,7 +1133,7 @@ function main() {
 
   	let SchemaName = capitalizeFirst(schemaName);
   	let SchemaCamelName = viewName? viewName : capitalizeFirst(name);
-  	let schemaCamelName = lowerFirst(name);
+  	let schemaCamelName = lowerFirst(SchemaCamelName);
   	let schemaHasValidator = false;
   	
   	compositeEditView.forEach(function(x){ //validators:
@@ -1182,25 +1217,29 @@ function main() {
       permission: schemaAnyonePermission,
       embeddedViewOnly: embeddedViewOnly,
 
-      detailType: detailType, // normal, post, ...
-      listType: listType, // gird, table, list
-      listTypes: listTypes, //array of grid, table, list
-      listToDetail: listToDetail, // link, click, none
-      disableListSearch: disableListSearch,
-      listActionButtons: listActionButtons,
-      detailActionButtons: detailActionButtons,
-      detailRefName: detailRefName,
+      detailType, // normal, post, info, slide, term...
+      listType, // gird, table, list
+      listTypes, // array of ordered list type
+      listTitle, //array of grid, table, list
+      listToDetail, // link, click, none
+      disableListSearch,
+      listActionButtons,
+      detailActionButtons,
+      detailRefName,
 
-      defaultSortField: defaultSortField,
-      defaultSortFieldDisplay: defaultSortFieldDisplay,
-      defaultSortOrder: defaultSortOrder,
-      homeListNumber: homeListNumber,
-      detailPipelines: detailPipelines,
-      detailRefBlackList: detailRefBlackList,
+      defaultSortField,
+      defaultSortFieldDisplay,
+      defaultSortOrder,
+      homeListNumber,
+      detailActions,
+      detailRefBlackList,
 
-      generateView: generateView,
+      selectActionViewType,
+
+      generateView,
       
-      api: api,
+      api,
+      actionViews,
       refApi: {},
       
       fileServer: fileServer,
@@ -1324,9 +1363,13 @@ function main() {
     		generateSourceFile(schemaName, templates.schemaListSubComponent, schemaObj, subComponentDir);
     		generateSourceFile(schemaName, templates.schemaListSubComponentHtml, schemaObj, subComponentDir);
       }
-      if (schemaObj.generateView === 'public') { //generate home component for public
+      if (schemaObj.actionViews.includes('H')) { //generate home component
         generateSourceFile(schemaName, templates.schemaListHomeComponent, schemaObj, subComponentDir);
     		generateSourceFile(schemaName, templates.schemaListHomeComponentHtml, schemaObj, subComponentDir);
+      }
+      if (schemaObj.actionViews.includes('S')) { //generate home component
+        generateSourceFile(schemaName, templates.schemaListActSelComponent, schemaObj, subComponentDir);
+    		generateSourceFile(schemaName, templates.schemaListActSelComponentHtml, schemaObj, subComponentDir);
       }
   	}
 

@@ -355,3 +355,30 @@ div.badge-click:hover {
     width: 20rem;
     font-size: 1.25rem;
 }
+
+.list-selection {
+  max-width: 500px;
+  width: 90%;
+}
+
+.modal-back {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+
+  z-index: 2000;
+  background-color:rgba(0,0,0,0.4);
+}
+
+.modal-front {
+  position: fixed;
+
+  min-width: 500px;
+  width: 50%;
+
+  top:50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

@@ -46,6 +46,7 @@ export class <%-SchemaName%>Component extends BaseComponent {
       public location: Location,
       public view: ViewType ) {
         super(<%-schemaName%>Service, injector, router, route, location, view, itemCamelName);
+        this.schemaName = '<%-schemaName%>';
         <% if (schemaHasDate)  {%>this.dateFormat = '<%-dateFormat%>';
         this.timeFormat = '<%-timeFormat%>';<%}%>
         this.modulePath = '<%-moduleName%>';

@@ -3,7 +3,7 @@
       <% if (embeddedViewOnly) {%><div class="add-area">
         <a href="javascript:void(0)" (click)="onAdd()"><i class="fas fa-plus-square" title="Add"></i></a>
         <div *ngIf="isAdding">
-            <app-<%-schemaName%>-edit [initData]="parentData" (done)="onAddDone($event)"></app-<%-schemaName%>-edit>
+            <app-<%-schemaName%>-edit [initData]="parentData" [embeddedView]="true" (done)="onActionDone($event)"></app-<%-schemaName%>-edit>
         </div>
     </div><%}%><%}%>
 	

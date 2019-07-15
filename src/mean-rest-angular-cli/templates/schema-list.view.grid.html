@@ -3,13 +3,16 @@
 		<div class="grid-block" *ngFor="let detail of list;  let i = index">
 			<div class="card text-left h-100 <%if(cardCanClick){%>clickable-card<%}%> "
 				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >
-				<div class="grid-fields <%if(cardCanClick){%>pointer<%}%>" <%if(cardCanClick){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%>>
+				<div class="grid-fields <%if(cardCanClick){%>pointer<%}%>" <%if(clickToDetail){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%><%if(clickToCheck){%>(click)="onItemChecked(i)"<%}%> >
 			<%_ viewFields = briefView; %><%_ include schema-display.grid.html %>
-				</div><%if(api.includes("D") || api.includes("U")){%>
+				</div><%if(canUpdate || canDelete || canCheck){%>
 				<div class="card-action-icons">
-					<%if(api.includes("U")){%><a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>
-					<%if(api.includes("D")){%><a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
-					<%if(api.includes("D")){%><input *ngIf="list.length > 1" type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
+					<%if(canUpdate){%><% if (embeddedEdit) {%>
+						<a [routerLink]="['.']" [queryParamsHandling]="preserve" (click)="onEdit(detail._id)"><i class="fas fa-edit" title="Edit"></i></a><%} else {%>
+						<a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>
+					<%}%>
+					<%if(canDelete){%><a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
+					<%if(canCheck){%><input <%if( typeof isActSel === 'undefined' || !isActSel) {%>*ngIf="list.length > 1"<%}%> type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
 				</div><%}%>
 			</div>
 		</div>

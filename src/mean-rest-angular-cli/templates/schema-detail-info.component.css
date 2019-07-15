@@ -90,23 +90,6 @@ div.badge-click:hover {
   text-decoration: underline;
 }
 
-.grid-fields {
-  height: 100%;
-}
-.grid-head {
-  display: inline-flex;
-  width: 100%;
-  align-items: center;
-  /*width: 100%;*/
-  background-color: rgba(0, 0, 0, 0);
-
-}
-.grid-head-picture, .list-head-picture {
-  width: 50%;
-  height: 20rem;
-  background-color: #f1f1f1;
-}
-
 .transparent-border {
   border-color: rgba(0,0,0,0);
 }

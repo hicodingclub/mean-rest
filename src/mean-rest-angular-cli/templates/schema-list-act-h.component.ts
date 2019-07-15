@@ -7,12 +7,11 @@ import { <%-SchemaName%>ListComponent } from './<%-schemaName%>-list.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
 @Component({
-  selector: 'app-<%-schemaName%>-list-home',
+  selector: 'app-<%-schemaName%>-list-ex-h',
   templateUrl: './<%-schemaName%>-list-home.component.html',
   styleUrls: ['./<%-schemaName%>-list.component.css']
 })
 export class <%-SchemaName%>ListHomeComponent extends <%-SchemaName%>ListComponent implements OnInit {
-  private parentData = {};
   constructor(
       public <%-schemaName%>Service: <%-SchemaName%>Service,
       public injector: Injector,

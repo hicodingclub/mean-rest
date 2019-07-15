@@ -1,7 +1,19 @@
 <%
 	let cardCanClick = api.includes('R') && listToDetail === 'click';
+	let clickToDetail = api.includes('R') && listToDetail === 'click';
 	let cardHasLink = api.includes('R') && listToDetail === 'link';
-%><% let view='list';%><%_if (listType === 'list') {%>
+
+	let clickToCheck = false;
+
+	let canUpdate = api.includes('U');
+	let canDelete = api.includes('D');
+	let canCheck = api.includes('D');
+
+	let embeddedEdit = false;
+
+	let view='list';
+	
+	if (listType === 'list') {%>
 <% include schema-list.view.list.html %><%}%><% if (listType === 'grid') {%>
 <% include schema-list.view.grid.html %><%}%><% if (listType === 'table') {%>
 <% include schema-list.view.table.html %><%}%>
