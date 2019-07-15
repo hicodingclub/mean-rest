@@ -24,17 +24,20 @@ const processField = function(x) {
 
 var processViewStr = function(viewStr) {
   if (!viewStr) return viewStr;
+
+  const viewStr_displayName_handled = viewStr.replace(/\[[^\]]*\]/g, ' ');
+
   //1. remove virtical bar |, and split to array
-  let fields = viewStr.replace(/\|/g, ' ').match(/\S+/g)
+  let fields = viewStr_displayName_handled.replace(/\|/g, ' ').match(/\S+/g)
   //2. process each field
   fields = fields.map(x=>{
     const [f, hidden] = processField(x);
     return f;
   })
   //3. join to string
-  viewStr = fields.join(" ");
+  const newViewStr = fields.join(" ");
   
-  return viewStr;
+  return newViewStr;
 }
 
 const _setModuleName = function(name) {
