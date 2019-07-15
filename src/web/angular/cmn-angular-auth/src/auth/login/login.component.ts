@@ -59,7 +59,7 @@ export class LoginComponent implements OnInit {
                     this.servererror = false;
                     this.loading = false;
                     if (!this.loginPipeline) {
-                        this.router.navigate([returnUrl]);
+                        this.router.navigateByUrl(returnUrl);
                     } else {
                         this.router.navigate([this.loginPipeline]);
                     }
