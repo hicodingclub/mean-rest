@@ -55,7 +55,7 @@ export class BaseComponent implements BaseComponentInterface {
     public _detail:any = {}; //a clone and used to send/receive from next work
     public _extra:any = {}; //extra info.
     public id:string;
-    public subEdit = false; //a edit-sub component
+    public embeddedView = false; //a edit-sub component
     //for fields with enum values
     public enums:any = {};
     public stringFields = [];
@@ -80,12 +80,18 @@ export class BaseComponent implements BaseComponentInterface {
     public ItemCamelName: string;
     public itemName: string;
     public parentItem: string;
+    public schemaName: string;
 
     public refreshing: boolean = false;
 
     public commonService: MraCommonService;
 
     public loaded: boolean = false;
+
+    // actions (pipeline/composite)
+    public isDropdownList: boolean = false;
+    public dropdownItems: {displayName: string, id: string}[];
+    public actionType: string;
 
     constructor(
         public service: BaseService,
@@ -860,7 +866,7 @@ export class BaseComponent implements BaseComponentInterface {
         this.processSearchContext();
         //update the URL
         if (!this.isEmptyRoutingPath()) {
-            this.router.navigate(['.', {}], {relativeTo: this.route});//start from 1st page
+            this.router.navigate(['.', {}], {relativeTo: this.route, queryParamsHandling: 'preserve',});//start from 1st page
         }
         this.putToStorage("page", 1);//start from 1st page
         this.populateList();
@@ -889,9 +895,9 @@ export class BaseComponent implements BaseComponentInterface {
             new_page = cached_page;
             if (!this.isEmptyRoutingPath()) {
                 if (cached_page == 1)
-                this.router.navigate(['.', {}], {relativeTo: this.route, });//update the url
+                this.router.navigate(['.', {}], {relativeTo: this.route, queryParamsHandling: 'preserve',});//update the url
             else
-                this.router.navigate(['.', {page: cached_page}], {relativeTo: this.route, });//update the url
+                this.router.navigate(['.', {page: cached_page}], {relativeTo: this.route, queryParamsHandling: 'preserve',});//update the url
             }
         }
         else if (url_page) new_page = url_page;
@@ -903,6 +909,9 @@ export class BaseComponent implements BaseComponentInterface {
         this.service.getList(new_page, this.per_page, searchContext, this.listSortField, this.listSortOrder).subscribe(
           result => { 
             this.list = result.items.map(x=>this.formatDetail(x));
+            if (this.isDropdownList) {
+                this.dropdownItems = this.list.map(x=> { return {displayName: this.stringify(x), id: x._id}} );
+            }
             this.page = result.page;
             this.per_page = result.per_page;
             this.total_count = result.total_count;
@@ -980,14 +989,43 @@ export class BaseComponent implements BaseComponentInterface {
         }
     }
     
+    // for term and condition view
+    public termChecked: boolean = false;
+    public isTermChecked():boolean {
+        return this.termChecked;
+    }
+
     public onCheckAllChange():void {
         this.checkedItem = 
              Array.apply(null, Array(this.list.length)).
                 map(Boolean.prototype.valueOf,this.checkAll);
     }
     
+    public onItemChecked(i: number): void {
+        this.checkedItem[i] = !this.checkedItem[i];
+    }
+
     public isItemSelected():boolean {
-        return this.checkedItem.some((value)=>{return value;})
+        // single selection or multiple selection
+        return this.selectedId || this.checkedItem.some((value)=>{return value;})
+    }
+
+    public getSelectedItems():string[] {
+        if (this.selectedId) { //single selection
+            for (let itm of this.list) {
+                if (itm._id === this.selectedId) {
+                    return [itm]; 
+                }
+            }
+        }
+
+        const selectedItems = [];
+        for (let [indx, ckd] of this.checkedItem.entries()) {
+            if (ckd) {
+                selectedItems.push(this.list[indx]);
+            }
+        }
+        return selectedItems;
     }
 
     public onDeleteSelected():void {
@@ -1088,7 +1126,11 @@ export class BaseComponent implements BaseComponentInterface {
                 var snackBar = new SnackBar(snackBarConfig);
                 snackBar.show();
                 
-                this.router.navigate(['../../detail', this.id], {relativeTo: this.route});
+                if (this.embeddedView) {
+                    this.done.emit(true);
+                } else {
+                    this.router.navigate(['../../detail', this.id], {relativeTo: this.route});
+                }
             },
             this.onServiceError
           );
@@ -1096,7 +1138,7 @@ export class BaseComponent implements BaseComponentInterface {
       else {
           this.service.createOne(this._detail).subscribe(
             result => {
-                let action = this.subEdit? " added":" created.";
+                let action = this.embeddedView? " added":" created.";
 
                 var snackBarConfig: SnackBarConfig = {
                     content: this.ItemCamelName + action
@@ -1107,7 +1149,7 @@ export class BaseComponent implements BaseComponentInterface {
                 this.id = result["_id"];
                 this._detail = result;
 
-                if (this.subEdit) {
+                if (this.embeddedView) {
                     this.done.emit(true);
                 } else {
                     this.router.navigate(['../detail', this.id], {relativeTo: this.route});
@@ -1119,7 +1161,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     public editCancel(): void {
-        if (this.subEdit) {
+        if (this.embeddedView) {
             this.done.emit(false);
         } else {
             this.goBack();
@@ -1149,7 +1191,7 @@ export class BaseComponent implements BaseComponentInterface {
     public onDetailLinkClicked(id:string):void {
         this.clickedId = id; 
         if (this.modulePath) {
-            this.router.navigate([this.modulePath, this.itemName, 'detail', id]); // {relativeTo: this.getParentActivatedRouter() }
+            this.router.navigate([this.modulePath, this.schemaName, 'detail', id]); // {relativeTo: this.getParentActivatedRouter() }
         } else {
             this.router.navigate([this.itemName, 'detail', id], {relativeTo: this.getParentActivatedRouter() });
         }
@@ -1292,7 +1334,7 @@ export class BaseComponent implements BaseComponentInterface {
         } else {
             viewContainerRef.insert(componentRef.hostView);
         }
-        
+
         let componentInstance = <BaseComponentInterface>componentRef.instance;
         if (this.detail[fieldName]) {
             if (this.referenceFields.includes(fieldName)) {
@@ -1333,7 +1375,7 @@ export class BaseComponent implements BaseComponentInterface {
             }
         });
     }
-    
+
     public onRefShow(fieldName:string, action:string, id:string) {
         if (!id && this.detail[fieldName]) id = this.detail[fieldName]['_id'];
         if (!id) {
@@ -1601,6 +1643,8 @@ export class BaseComponent implements BaseComponentInterface {
     }
 
     /*** Any View - add new component in the current view*/
+    public parentData: any;
+    public parentId: any;
     public isAdding: boolean = false;
     public onAdd() {
         this.isAdding = true;
@@ -1608,8 +1652,15 @@ export class BaseComponent implements BaseComponentInterface {
     public toggleAdd() {
         this.isAdding = !this.isAdding;
     }
-    public onAddDone(result: boolean) {
+    public isEditing: boolean = false;
+    public onEdit(id:string) {
+        this.isEditing = true;
+        this.parentId = id;
+    }
+
+    public onActionDone(result: boolean) {
         this.isAdding = false;
+        this.isEditing = false;
         if (result) { //add successful. Re-populate the current list
           if (this.view == ViewType.LIST) {
             this.populateList();
