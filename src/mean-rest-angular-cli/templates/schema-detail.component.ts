@@ -37,12 +37,7 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
       public location: Location) {
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
                 <%-schemaName%>Service, injector, router, route, location, ViewType.DETAIL);
-<% let theView = detailView; let isEditView = false;%><%_ include schema-construct.component.ts %>
-<% for (let field of detailView) { let fn=field.fieldName, Fn=field.FieldName; 
-    if (field.type === "SchemaString" && field.editor) { %>
-          this.textEditorMap['<%-schemaName%>Detail<%-Fn%>'] = {
-            fieldName: '<%-fn%>'
-          };<% }}%><% if (detailType === 'term') {%>
+<% let theView = detailView; let isEditView = false;%><%_ include schema-construct.component.ts %><% if (detailType === 'term') {%>
           this.actionType = 'term';<%}%>
   }
 

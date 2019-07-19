@@ -1,5 +1,5 @@
 	<div class="listview" *ngIf="isShowListView('list')">
-		<div class="list-block" *ngFor="let detail of list;  let i = index">
+		<div class="list-block" *ngFor="let detail of list;  let i = index; let list_index = index;">
 			<hr *ngIf="i==0" class="list-diverder">
 			<div class="list-card text-left <%if(cardCanClick){%>clickable-card<%}%> "
 				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >

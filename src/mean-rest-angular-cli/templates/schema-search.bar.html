@@ -1,13 +1,13 @@
   			<%_ let hasStringFields = false; let stringFields = []; let noMoreSearchArea = true;
 			    for (let field of briefView){ 
-			        if(field.type == 'SchemaString') {hasStringFields = true; stringFields.push(field.fieldName);}
+			        if(field.type == 'SchemaString' && field.fieldName !== listCategoryField) {hasStringFields = true; stringFields.push(field.fieldName);}
 			        else {noMoreSearchArea = false;}
 			    }%>
 			<%_ if (hasStringFields) { %>
 			    <div class="input-group">
 	              <input type="search" class="form-control border border-secondary" id="<%-schemaName%>TextSearch" 
 						#<%-schemaName%>TextSearch [(ngModel)]="searchText"
-						(keyup.enter)="$event.target.blur();searchList();false"<% let newStringFields =  stringFields.filter(x => x != listCategoryField);%>
+						(keyup.enter)="$event.target.blur();searchList();false"
 					    placeholder="Search for <%for (let [idx,nm] of stringFields.entries()){%><%if (idx!=0) {%>, <%}%><%-nm%><%}%>"> 
 				  <div *ngIf="searchText" class="input-group-append icon-clear-inside">
 					<span >

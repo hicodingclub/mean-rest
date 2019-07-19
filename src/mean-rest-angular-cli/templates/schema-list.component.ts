@@ -8,7 +8,10 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
 <%if (schemaHasRef) {%>
 import { ComponentFactoryResolver } from '@angular/core';<%}%>
-
+<%if (schemaHasEditor) {%>
+import { QueryList, ViewChildren } from '@angular/core';
+import { MraRichTextShowDirective } from 'mean-rest-angular';<%}%>
+  
 @Component({
   selector: 'app-<%-schemaName%>-list',
   templateUrl: './<%-schemaName%>-list.component.html',
@@ -22,6 +25,8 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
   public searchObj:any;
   @Input()
   public categoryBy:string; //field name whose value is used as category
+  <%if (schemaHasEditor) {%>
+  @ViewChildren(MraRichTextShowDirective) textEditors: QueryList<MraRichTextShowDirective>;<%}%>
 
   constructor(
       <%_ if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>

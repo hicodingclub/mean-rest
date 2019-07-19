@@ -1,6 +1,6 @@
 
 	<div class="gridview" *ngIf="isShowListView('grid')">
-		<div class="grid-block" *ngFor="let detail of list;  let i = index">
+		<div class="grid-block" *ngFor="let detail of list;  let i = index; let list_index = index;">
 			<div class="card text-left h-100 <%if(cardCanClick){%>clickable-card<%}%> "
 				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >
 				<div class="grid-fields <%if(cardCanClick){%>pointer<%}%>" <%if(clickToDetail){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%><%if(clickToCheck){%>(click)="onItemChecked(i)"<%}%> >

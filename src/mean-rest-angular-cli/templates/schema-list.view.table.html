@@ -19,7 +19,7 @@
 	    	</tr>
 	    </thead>
 	    <tbody>
-	        <tr *ngFor="let detail of list;  let i = index" [ngClass]="{'clicked-row': clickedId==detail['_id']}">
+	        <tr *ngFor="let detail of list;  let i = index; let list_index = index;" [ngClass]="{'clicked-row': clickedId==detail['_id']}">
 	            <td scope="row" <%if(clickToDetail || cardHasLink){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%>>
 	            	{{(page-1)*per_page+i+1}}
 	            </td>

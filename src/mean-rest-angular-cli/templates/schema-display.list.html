@@ -21,7 +21,7 @@
     for (let [index, field] of otherFields.entries()){
         let fn = field.fieldName; let ft = field.type; let ref_link = true;
         %>
-        <div class="mr-3 d-inline-block">
+        <div *ngIf="detail['<%-fn%>']" class="mr-3 d-inline-block">
           <div class="d-inline-block"><label><%-field.displayName%>:</label></div>
           <div class="ml-3 d-inline-block"><% include schema-display.field.html %>
           </div>

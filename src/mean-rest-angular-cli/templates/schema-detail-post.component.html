@@ -13,7 +13,7 @@
 			}%>
 			<h6 class="card-subtitle mb-2 text-muted"><%
 				{ let view = 'detail'; field = detailView[2]; let fn = field.fieldName; let ft = field.type; let ref_link = true;%>
-				<% include schema-display.field.html %>, <%
+				<% include schema-display.field.html %> &nbsp;&nbsp;<%
 				}%><%
 				{ let view = 'detail'; field = detailView[3]; let fn = field.fieldName; let ft = field.type; let ref_link = true;%>
 				<% include schema-display.field.html %><%
