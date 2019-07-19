@@ -1,4 +1,5 @@
 const createError = require('http-errors');
+const mongoose = require('mongoose');
 
 const createRegex = function(obj) {
   //obj in {key: string} format
@@ -241,39 +242,67 @@ class RestController {
   getAll(req, res, next) {
     return this.searchAll(req, res, next, {});
   }
+
+  async getRefObjectsFromId(schm, idArray) {
+    const { name, schema, model, views, populates, owner } = this.loadContextVarsByName(schm.toLowerCase());
+    try {
+      let docs = await model.find(
+        {'_id': { $in: idArray.map(x => mongoose.Types.ObjectId(x)) }}
+      ).exec();
+      return docs;
+
+    } catch (err) {
+      throw err;
+    }
+
+  }
+
   async searchAll(req, res, next, searchContext) {
     const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
-    //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-    const briefView = views[0];
-    const populateArray = [];
-    const populateMap = {};
-    populates.briefView.forEach((p) => {
-      //an array, with [field, ref]
-      const fields = this.getPopulatesRefFields(p[1]);
-      if (fields != null) { //only push when the ref schema is found
-        populateArray.push({ path: p[0], select: fields });
-        populateMap[p[0]] = fields;
-      }
-    });
+
     let query = {};
     //get the query parameters ?a=b&c=d, but filter out unknown ones
     const PER_PAGE = 25, MAX_PER_PAGE = 1000;
     let __page = 1;
     let __per_page = PER_PAGE;
     let __sort, __order;
+    let __categoryBy, __categoryProvided;
     for (let prop in req.query) {
-      if (prop === '__page')
+      if (prop === '__page') {
         __page = parseInt(req.query[prop]);
-      else if (prop === '__per_page')
+      } else if (prop === '__per_page') {
         __per_page = parseInt(req.query[prop]);
-      else if (prop === '__sort')
+      } else if (prop === '__sort') {
         __sort = req.query[prop];
-      else if (prop === '__order')
+      } else if (prop === '__order') {
         __order = req.query[prop];
-      else if (prop in schema.paths) {
+      } else if (prop === '__categoryBy') {
+        __categoryBy = req.query[prop];
+      } else if (prop === '__categoryProvided') {
+        __categoryProvided = req.query[prop];
+      } else if (prop in schema.paths) {
         query[prop] = req.query[prop];
       }
     }
+
+    let __categoryFieldRef;
+  
+    //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+    const briefView = views[0];
+    const populateArray = [];
+    const populateMap = {};
+    populates.briefView.forEach((p) => {
+      //an array, with [field, ref]
+      if (p[0] === __categoryBy) {
+        __categoryFieldRef = p[1];
+      }
+      const fields = this.getPopulatesRefFields(p[1]);
+      if (fields != null) { //only push when the ref schema is found
+        populateArray.push({ path: p[0], select: fields });
+        populateMap[p[0]] = fields;
+      }
+    });
+
     let count = 0;
     if (searchContext) {
       //console.log("searchContext is ....", searchContext);
@@ -297,12 +326,42 @@ class RestController {
       //console.log("query is ....", query['$and'][0]['$or'], query['$and'][1]['$and']);
     }
     query = ownerPatch(query, owner, req);
+
+    let categories = [];
+    let categoryObjects = [];
+    if (__categoryBy && !__categoryProvided) {
+      // need to query DB to get the category first.
+      try {
+        categories = await model.find().distinct(__categoryBy).exec();
+
+        if (__categoryFieldRef) {
+          // it's an ref field
+          categories = await this.getRefObjectsFromId(__categoryFieldRef, categories);
+        }
+        categoryObjects = categories.map(x => {
+          const obj = {};
+          obj[__categoryBy] = x;
+          return obj;
+        });
+        categoryObjects = JSON.parse(JSON.stringify(categoryObjects));
+        categoryObjects = resultReducerForRef(categoryObjects, populateMap);
+
+        categories = categoryObjects.map(x => x[__categoryBy]);
+      } catch (err) {
+        return next(err);
+      }
+    }
+    if (!__categoryProvided && categories.length > 0) {
+      // take the first category as query filter
+      query[__categoryBy] = categories[0];
+    }
+
     try {
       count = await model.countDocuments(query).exec();
-    }
-    catch (err) {
+    } catch (err) {
       return next(err);
     }
+
     if (isNaN(__per_page) || __per_page <= 0)
       __per_page = PER_PAGE;
     else if (__per_page > MAX_PER_PAGE)
@@ -336,7 +395,9 @@ class RestController {
         total_pages: maxPageNum,
         page: __page,
         per_page: __per_page,
-        items: result
+        items: result,
+        categoryBy: __categoryBy,
+        categories: categoryObjects,
       };
       output = JSON.parse(JSON.stringify(output));
       output.items = resultReducerForRef(output.items, populateMap);
