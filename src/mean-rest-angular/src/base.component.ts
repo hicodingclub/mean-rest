@@ -676,7 +676,7 @@ export class BaseComponent implements BaseComponentInterface {
         if (detail["_id"]) this.commonService.putToStorage(detail["_id"], originalDetail);//cache it
         
         this.detail = this.formatDetail(detail);
-        this.extraFieldsUnload();//unload data to text editors, etc
+        this.extraFieldsUnload(this.detail);//unload data to text editors, etc
         if (action == 'edit') {
           this.extraInfoPopulate();//collect other info required for edit view
         }
@@ -733,7 +733,7 @@ export class BaseComponent implements BaseComponentInterface {
         detail => {            
             this.detail = this.formatDetail(detail);
             delete this.detail["_id"];
-            this.extraFieldsUnload();//unload data to text editors, etc
+            this.extraFieldsUnload(this.detail);//unload data to text editors, etc
             this.extraInfoPopulate();//collect other info required for create view
         },
         this.onServiceError
@@ -825,7 +825,7 @@ export class BaseComponent implements BaseComponentInterface {
         for (let field in d2) {
             if (this.stringFields.indexOf(field) >= 0 && field === this.categoryBy) { // put category field to "and"
                 let o = {};
-                0[field] = d[field];
+                o[field] = d[field];
                 andSearchContext.push(o);
             }
             if (this.stringFields.indexOf(field) == -1) {//string fields already put to orSearchContext
@@ -952,7 +952,10 @@ export class BaseComponent implements BaseComponentInterface {
         const categoryProvided = typeof this.selectedCategory === 'number'? true : false;
         this.service.getList(new_page, this.per_page, searchContext, this.listSortField, this.listSortOrder, this.categoryBy, categoryProvided).subscribe(
           result => { 
-            this.list = result.items.map(x=>this.formatDetail(x));
+            this.list = result.items.map(x=> {
+                let d = this.formatDetail(x);
+                return d;
+            });
             if (this.categoryBy && !categoryProvided) {
                 this.categories = result.categories.map(x=>this.formatDetail(x));
                 this.categoryDisplays = result.categories.map(x=>this.getFieldDisplayFromFormattedDetail(x, this.categoryBy));
@@ -1568,7 +1571,8 @@ export class BaseComponent implements BaseComponentInterface {
     public textEditors:any; //type of QueryList<T>
     public textEditorMap:any = {};
     
-    public extraFieldsUnload() {//from server
+    public extraFieldsUnload(detail: any) {//from server
+        /* content has been set to directive directly so this code snippet is obsolete
         if (this.textEditors) {
             this.textEditors.forEach(editor=>{
                 
@@ -1576,12 +1580,13 @@ export class BaseComponent implements BaseComponentInterface {
                 let validatorObj = this.textEditorMap[fieldName];
                 if (!validatorObj) return;
                 
-                let content = this.detail[validatorObj.fieldName]
+                let content = detail[validatorObj.fieldName]
                 if (content) editor.setContent(content);
             });
         }
+        */
     }
-        
+
     public extraFieldsLoad() {//to server
         let result = true;
         if (this.textEditors) {

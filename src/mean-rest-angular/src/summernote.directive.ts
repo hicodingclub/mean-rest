@@ -1,4 +1,4 @@
-import { ElementRef, Renderer2, Directive, Input} from '@angular/core';
+import { ElementRef, Renderer2, Directive, Input, OnInit, OnChanges} from '@angular/core';
 
 declare var $: any;
 
@@ -147,17 +147,22 @@ export class MraRichTextSelectDirective {
     $("#mrafullscreenHtml").html(html);
   }
 }
-
 @Directive({
     selector: '[mra-richtext-show]',
 })
-export class MraRichTextShowDirective {
+export class MraRichTextShowDirective implements OnChanges {
   @Input('mra-richtext-show') name: string;
+  @Input() index: number;
+  @Input() content: string;
   constructor(private el: ElementRef, private render: Renderer2) {
   }
-  
+
+  ngOnChanges() {
+    this.setContent(this.content);
+  }
+
   setContent(content:string) {
-    let id = Date.now();
+    let id = Date.now() + (Math.random()*1000).toFixed(0);
     var displayHtml = `
       <div id="mraeditordisplay` + id +`"></div>
     `;
