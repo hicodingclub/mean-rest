@@ -74,6 +74,10 @@ export class BaseComponent implements BaseComponentInterface {
     public listSortField: string;
     public listSortFieldDisplay: string;
     public listSortOrder: string; // 'asc', 'desc'
+    public categoryBy: string; // field whose value is used as category
+    public categories: [] = []; // stored categories
+    public categoryDisplays: string[] = []; //stored display name of categories
+    public selectedCategory: number = undefined; // index in categories
 
     public hiddenFields = []; //fields hide from view. Currrently used by "Add" view of edit-sub
 
@@ -629,7 +633,28 @@ export class BaseComponent implements BaseComponentInterface {
         detail = this.formatArrayFields(detail);
         detail = this.formatMapFields(detail);
         return detail;
-    }    
+    }
+
+    public stringifyField(field: any):string {
+        let str = '';
+
+        if (!field) return str;
+        if (typeof field === 'number' || typeof field === 'string' || typeof field === 'boolean' || typeof field === 'bigint') return String(field);
+        if (typeof field === 'object' && Array.isArray(field)) {
+            for (let e of field) {
+                str += ' | ' + this.stringifyField(e);
+            }
+            return str;
+        }
+        if (typeof field === 'object') {
+            return field.value || field._id || ''
+        }
+        return str;
+    }
+    public getFieldDisplayFromFormattedDetail(detail:any, fieldName:string):string {
+        if (typeof detail !== 'object') return '';
+        return this.stringifyField(detail[fieldName]);
+    }
     
     public deFormatDetail(detail:any ):any {
         let cpy = Util.clone(detail);
@@ -678,7 +703,7 @@ export class BaseComponent implements BaseComponentInterface {
             o[field] = searchObj[field];
             searchContext['$and'][1]['$and'].push(o);
         }
-        this.service.getList(1, 1, searchContext, null, null).subscribe(
+        this.service.getList(1, 1, searchContext, null, null, null, false).subscribe(
             result => {
                 let detail = {};
                 if (result.items && result.items.length >= 1) {
@@ -748,6 +773,13 @@ export class BaseComponent implements BaseComponentInterface {
           }          
         }
     }
+
+    public categorySelected(idx: number) {
+        let selectedValue = this.categories[idx];
+        this.selectedCategory = idx;
+
+        this.searchList();
+    }
   
     private equalTwoSearchContextArrays (arr1, arr2) {
       if (!arr1) arr1 = [];
@@ -771,12 +803,17 @@ export class BaseComponent implements BaseComponentInterface {
     public processSearchContext() {
         this.moreSearchOpened = false;
         let d = this.detail;
+    
+        if (typeof this.selectedCategory == 'number') {
+            d[this.categoryBy] = this.categories[this.selectedCategory][this.categoryBy];
+        }
+
         for (let s of this.stringFields) {
             d[s] = this.searchText;
         }
         let orSearchContext = [], andSearchContext = [];
         for (let field in d) {
-            if (typeof d[field] == 'string') {
+            if (typeof d[field] == 'string' && field !== this.categoryBy) { //this.categoryBy will be put to 'and' context
                 let o = {}
                 o[field] = d[field];
                 orSearchContext.push(o);
@@ -786,6 +823,11 @@ export class BaseComponent implements BaseComponentInterface {
         this.searchMoreDetail = []
         let d2 = this.deFormatDetail(d);//undefined field is deleted after this step
         for (let field in d2) {
+            if (this.stringFields.indexOf(field) >= 0 && field === this.categoryBy) { // put category field to "and"
+                let o = {};
+                0[field] = d[field];
+                andSearchContext.push(o);
+            }
             if (this.stringFields.indexOf(field) == -1) {//string fields already put to orSearchContext
                 let o = {}
                 let valueToShow;
@@ -809,8 +851,9 @@ export class BaseComponent implements BaseComponentInterface {
                 } else {
                     valueToShow = d[field];//take directoy from what we get 
                 }
-
-                this.searchMoreDetail.push([field, valueToShow]);
+                if (field !== this.categoryBy) { // don't show category field
+                    this.searchMoreDetail.push([field, valueToShow]);
+                }
                 andSearchContext.push(o);
             }
         }
@@ -904,11 +947,18 @@ export class BaseComponent implements BaseComponentInterface {
         else new_page = 1;
 
         searchContext = this.getFromStorage("searchContext");
-        this.loadUIFromCache();      
+        this.loadUIFromCache();
 
-        this.service.getList(new_page, this.per_page, searchContext, this.listSortField, this.listSortOrder).subscribe(
+        const categoryProvided = typeof this.selectedCategory === 'number'? true : false;
+        this.service.getList(new_page, this.per_page, searchContext, this.listSortField, this.listSortOrder, this.categoryBy, categoryProvided).subscribe(
           result => { 
             this.list = result.items.map(x=>this.formatDetail(x));
+            if (this.categoryBy && !categoryProvided) {
+                this.categories = result.categories.map(x=>this.formatDetail(x));
+                this.categoryDisplays = result.categories.map(x=>this.getFieldDisplayFromFormattedDetail(x, this.categoryBy));
+                this.selectedCategory = 0;
+            }
+
             if (this.isDropdownList) {
                 this.dropdownItems = this.list.map(x=> { return {displayName: this.stringify(x), id: x._id}} );
             }
