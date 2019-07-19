@@ -7,7 +7,7 @@
 			    <div class="input-group">
 	              <input type="search" class="form-control border border-secondary" id="<%-schemaName%>TextSearch" 
 						#<%-schemaName%>TextSearch [(ngModel)]="searchText"
-						(keyup.enter)="$event.target.blur();searchList();false"
+						(keyup.enter)="$event.target.blur();searchList();false"<% let newStringFields =  stringFields.filter(x => x != listCategoryField);%>
 					    placeholder="Search for <%for (let [idx,nm] of stringFields.entries()){%><%if (idx!=0) {%>, <%}%><%-nm%><%}%>"> 
 				  <div *ngIf="searchText" class="input-group-append icon-clear-inside">
 					<span >
@@ -33,7 +33,7 @@
 					<div class="card">
 						<div class="card-body">
 						<%_ briefView.forEach( (field) => { let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName;
-							if (field.type != 'SchemaString') {%> <%_ include schema-search.field.html %> 
+							if (field.type !== 'SchemaString' && fn !== listCategoryField) {%> <%_ include schema-search.field.html %> 
 						<%_ }}) %>
 						  <div class="action-buttons" style="margin-top: 10px;">
 								<button type="button" class="btn btn-outline-success" (click)="onSearchClear()">Reset</button>

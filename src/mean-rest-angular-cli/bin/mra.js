@@ -920,6 +920,8 @@ function main() {
     let listToDetail = 'click';
     let defaultSortField, defaultSortOrder;
     let homeListNumber = 4;
+    let listCategoryField = '';
+
     let detailActions = []; //extra buttons that trigger other pipelines
     let detailActionButtons = ['Edit', 'New', 'Delete'];
     let listActionButtons = ['Create', 'Delete'];
@@ -975,6 +977,7 @@ function main() {
       detailRefBlackList = mraUI.detailRefBlackList || detailRefBlackList;
       detailRefName = mraUI.detailRefName || detailRefName;
       selectActionViewType = mraUI.selectActionViewType || selectActionViewType;
+      listCategoryField = mraUI.listCategoryField || listCategoryField;
 
       if (mraUI.defaultListSort) {
         const keys = Object.keys(mraUI.defaultListSort);
@@ -1224,6 +1227,8 @@ function main() {
       listToDetail, // link, click, none
       disableListSearch,
       listActionButtons,
+      listCategoryField,
+
       detailActionButtons,
       detailRefName,
 

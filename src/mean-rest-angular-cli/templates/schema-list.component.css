@@ -382,3 +382,9 @@ div.badge-click:hover {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.category-nav {
+  background: linear-gradient(180deg, rgba(233,236,239,1) 0%, rgba(233,236,239,0.2) 80%);
+  padding: 1rem 0 0 0;
+  margin-bottom: 1rem;
+}

@@ -20,6 +20,8 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
 
   @Input()
   public searchObj:any;
+  @Input()
+  public categoryBy:string; //field name whose value is used as category
 
   constructor(
       <%_ if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
@@ -33,13 +35,14 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
 <% let theView = briefView; %><%_ include schema-construct.component.ts %>
 
           this.listViewFilter = '<%-listType%>';<% if (defaultSortField) { %>
-          this.setListSort('<%-defaultSortField%>', '<%-defaultSortFieldDisplay%>', '<%-defaultSortOrder%>');<%}%>
-          // this is to initialize the detail that will be used for search condition selection
-          const detail = this.searchObj || {};
-          this.detail = this.formatDetail(detail);
+          this.setListSort('<%-defaultSortField%>', '<%-defaultSortFieldDisplay%>', '<%-defaultSortOrder%>');<%}%><%if (listCategoryField) {%>
+          this.categoryBy = '<%-listCategoryField%>';<%}%>
   }
 
   ngOnInit() {
+      // this is to initialize the detail that will be used for search condition selection
+      const detail = this.searchObj || {};
+      this.detail = this.formatDetail(detail);
       this.populateList();
   }
 }
