@@ -88,10 +88,10 @@ var summerNoteConfig = {
 @Directive({
     selector: '[mra-richtext-select]',
 })
-export class MraRichTextSelectDirective {
+export class MraRichTextSelectDirective implements OnChanges {
   @Input('mra-richtext-select') name: string;
+  @Input() content:string;
 
-  content:string;
   private id;
   
   constructor(private el: ElementRef, private render: Renderer2) {
@@ -101,7 +101,7 @@ export class MraRichTextSelectDirective {
     let html = `
       <div id="richtext` + this.id +`">
       </div>
-      <div id="fullscreen` + this.id +`"></div>'
+      <div id="fullscreen` + this.id +`"></div>
       `; 
 
     if (!$('#mraeditorfullscreenCss').length) {
@@ -118,6 +118,10 @@ export class MraRichTextSelectDirective {
     }, 1);
   }
   
+  ngOnChanges() {
+    this.setContent(this.content);
+  }
+
   setContent(content:string) {
     this.content = content;
     if (this.content) {

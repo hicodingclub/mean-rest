@@ -80,6 +80,7 @@ export class BaseComponent implements BaseComponentInterface {
     public selectedCategory: number = undefined; // index in categories
 
     public hiddenFields = []; //fields hide from view. Currrently used by "Add" view of edit-sub
+    public viewHiddenFields = []; //fields hidden from view. Hidden is defined in schema view with ()
 
     public ItemCamelName: string;
     public itemName: string;
@@ -809,7 +810,9 @@ export class BaseComponent implements BaseComponentInterface {
         }
 
         for (let s of this.stringFields) {
-            d[s] = this.searchText;
+            if (s !== this.categoryBy) {
+                d[s] = this.searchText;
+            }            
         }
         let orSearchContext = [], andSearchContext = [];
         for (let field in d) {
