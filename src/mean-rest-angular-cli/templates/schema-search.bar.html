@@ -1,6 +1,9 @@
   			<%_ let hasStringFields = false; let stringFields = []; let noMoreSearchArea = true;
-			    for (let field of briefView){ 
-			        if(field.type == 'SchemaString' && field.fieldName !== listCategoryField) {hasStringFields = true; stringFields.push(field.fieldName);}
+			    for (let field of briefView){
+					if (field.hidden) continue;
+					if (field.fieldName === listCategoryField) continue;
+
+			        if(field.type == 'SchemaString') { hasStringFields = true; stringFields.push(field.fieldName);}
 			        else {noMoreSearchArea = false;}
 			    }%>
 			<%_ if (hasStringFields) { %>
@@ -32,9 +35,12 @@
 			    <div class="shadow" *ngIf="moreSearchOpened">
 					<div class="card">
 						<div class="card-body">
-						<%_ briefView.forEach( (field) => { let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName;
-							if (field.type !== 'SchemaString' && fn !== listCategoryField) {%> <%_ include schema-search.field.html %> 
-						<%_ }}) %>
+						<%_ briefView.forEach( (field) => {
+							if (field.hidden) return;
+							if (field.fieldName === listCategoryField) return;
+							let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName;
+							%> <%_ include schema-search.field.html %> 
+						<%_ }) %>
 						  <div class="action-buttons" style="margin-top: 10px;">
 								<button type="button" class="btn btn-outline-success" (click)="onSearchClear()">Reset</button>
 								<button type="button" class="btn btn-success" (click)="searchList()">Search</button>

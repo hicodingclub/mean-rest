@@ -1,9 +1,9 @@
 
 <% if (listTitle) {%>
-<div class="mt-3 mb-3">
+<div class="mt-4 mb-4">
 	<h3><%-listTitle%></h3>
 </div><%}%>
-<ul *ngIf="categoryBy" class="nav" class="nav nav-tabs category-nav">
+<ul *ngIf="categoryBy" class="nav nav-pills category-nav">
 	<li *ngFor="let ele of categoryDisplays; let idx = index;" class="nav-item" >
 		<a class="nav-link" [ngClass]="{'active': idx === selectedCategory }" [routerLink]="['.']" [queryParamsHandling]="preserve" (click)="categorySelected(idx)">{{ele}}</a>
 	</li>

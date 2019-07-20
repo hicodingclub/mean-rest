@@ -385,6 +385,6 @@ div.badge-click:hover {
 
 .category-nav {
   background: linear-gradient(180deg, rgba(233,236,239,1) 0%, rgba(233,236,239,0.2) 80%);
-  padding: 1rem 0 0 0;
+  padding: 1rem 20px 1rem 20px;
   margin-bottom: 1rem;
 }

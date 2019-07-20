@@ -1,6 +1,6 @@
 		<%const SearchAndSortThreshold = 6;
 		%><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {
-			let sortableFields = briefView.filter(x=>x.sortable);
+			let sortableFields = briefView.filter(x=>x.sortable&&!x.hidden&&x.fieldName!==listCategoryField);
 			if (sortableFields.length > 0) {
 			%>
 		<div class="row justify-content-end" *ngIf="list.length > <%-SearchAndSortThreshold%>">
@@ -8,11 +8,15 @@
 					<div class="dropdown" style="width: 100%;">
 						<button class="sort-dropdown btn btn-light btn-sm dropdown-toggle"
 							type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-							Sort: <span *ngIf="listSortField">{{listSortFieldDisplay}}</span>
-							<i *ngIf="listSortOrder === 'asc'" class="fas fa-arrow-up"></i>
-							<i *ngIf="listSortOrder === 'desc'" class="fas fa-arrow-down"></i>
+							Sort: <span *ngIf="listSortField && !viewHiddenFields.includes(listSortField)">{{listSortFieldDisplay}}
+									<i *ngIf="listSortOrder === 'asc'" class="fas fa-arrow-up"></i>
+									<i *ngIf="listSortOrder === 'desc'" class="fas fa-arrow-down"></i>
+							</span>
 						</button>
-						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><% for (let field of briefView) { if (field.sortable) {%>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><% for (let field of briefView) { 
+							if (field.hidden) continue;
+							if (field.fieldName === listCategoryField) continue;
+							if (field.sortable) {%>
 							<a class="dropdown-item pointer" (click)="setListSortAndRefresh('<%-field.fieldName%>', '<%-field.displayName%>', 'asc')"><%-field.FieldName%><i class="fas fa-arrow-up"></i></a>
 							<a class="dropdown-item pointer" (click)="setListSortAndRefresh('<%-field.fieldName%>', '<%-field.displayName%>', 'desc')"><%-field.FieldName%><i class="fas fa-arrow-down"></i></a><%} }%>
 						</div>

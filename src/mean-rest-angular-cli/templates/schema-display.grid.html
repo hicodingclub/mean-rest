@@ -4,6 +4,8 @@
       let otherFields = viewFields.filter(x => !x.picture && !x.isIndexField);%>
       <div class="card-header grid-head"><%
       for (let field of pictureFields){
+        if (field.hidden) continue;
+
         let fn = field.fieldName; let ft = field.type; let ref_link = true;
         %>
         <div class="grid-head-picture mr-1"><% include schema-display.field.html %>
@@ -12,6 +14,8 @@
         <div class="ml-1 d-inline-block">
           <h5><%
       for (let [index, field] of indexedFields.entries()){
+          if (field.hidden) continue;
+
           let fn = field.fieldName; let ft = field.type; let ref_link = true;
           %>
             <div class="mr-1 d-inline-block">
@@ -23,6 +27,8 @@
       </div>
       <div class="card-body"><%
       for (let [index, field] of otherFields.entries()){
+          if (field.hidden) continue;
+
           let fn = field.fieldName; let ft = field.type; let ref_link = true;
           %>
           <div *ngIf="detail['<%-fn%>']">

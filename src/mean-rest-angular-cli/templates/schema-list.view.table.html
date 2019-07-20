@@ -2,7 +2,9 @@
 	    <thead class="thead-light">
 	    	<tr>
 		        <th scope="col">#</th>
-<%_ for (let field of briefView){ if (field.sortable) { %>
+<%_ for (let field of briefView){
+				if (field.hidden) continue;
+				if (field.sortable) { %>
 				<th class="pointer" scope="col" (click)="toggleListSort('<%-field.fieldName%>', '<%-field.displayName%>')">
 					<%-field.displayName%>
 					<span *ngIf="listSortField === '<%-field.fieldName%>'">
@@ -23,7 +25,9 @@
 	            <td scope="row" <%if(clickToDetail || cardHasLink){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%>>
 	            	{{(page-1)*per_page+i+1}}
 	            </td>
-<%_ let view = 'list'; for (let field of briefView){ let fn = field.fieldName, ft = field.type; let ref_link = true; %>
+<%_ let view = 'list'; for (let field of briefView){ 
+				if (field.hidden) continue;
+				let fn = field.fieldName, ft = field.type; let ref_link = true; %>
 	            <td <%if(clickToDetail){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%><%if(clickToCheck){%>(click)="onItemChecked(i)" class="pointer"<%}%>>
 	            	<% include schema-display.field.html %>
 	            </td><%_ } %><%if(canDelete || canUpdate || canCheck){%>

@@ -9,7 +9,8 @@
 	          <div class="form-check-inline">
 		        <input type="radio" name="<%-sn%>Edit<%-Fn%>" 
 		        	class="form-check-input"
-		        	id="<%-sn%>Edit<%-Fn%><%-f%>" [value]="'<%-f%>'"
+					id="<%-sn%>Edit<%-Fn%><%-f%>" [value]="'<%-f%>'"
+					[(ngModel)]="detail['<%-fn%>']"
 		        	#<%-sn%>Edit<%-Fn%>="ngModel">
 		      	<span class="form-check-label"><%-f%></span>
 		      <%_ }) %>

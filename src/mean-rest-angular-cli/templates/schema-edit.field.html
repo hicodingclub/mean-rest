@@ -71,7 +71,7 @@
         <fieldset class="form-group">
           <label for="Edit<%-Fn%>"><%-fD%></label>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
-          <div mra-richtext-select="Edit<%-Fn%>"></div>
+          <div mra-richtext-select="Edit<%-Fn%>" [content]="detail['<%-fn%>']"></div>
           <div class="action-buttons" style="margin-top: 10px;">
             <button type="button" class="btn btn-outline-success" (click)="onEdtiorPreview('Edit<%-Fn%>')">Preview</button>
           </div>
