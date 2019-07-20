@@ -2,6 +2,7 @@
 			    for (let field of briefView){
 					if (field.hidden) continue;
 					if (field.fieldName === listCategoryField) continue;
+					if (field.picture) continue;
 
 			        if(field.type == 'SchemaString') { hasStringFields = true; stringFields.push(field.fieldName);}
 			        else {noMoreSearchArea = false;}
@@ -38,6 +39,7 @@
 						<%_ briefView.forEach( (field) => {
 							if (field.hidden) return;
 							if (field.fieldName === listCategoryField) return;
+							if (field.type == 'SchemaString') return;
 							let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName;
 							%> <%_ include schema-search.field.html %> 
 						<%_ }) %>

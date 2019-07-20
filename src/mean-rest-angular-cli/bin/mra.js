@@ -914,6 +914,7 @@ function main() {
     }
 
     let detailType = 'normal';
+    let detailTitle = '';
     let listType = 'list';
     let listTitle = '';
     let disableListSearch = false;
@@ -971,6 +972,7 @@ function main() {
           listToDetail = 'click';
       }
       listTitle = mraUI.listTitle;
+      detailTitle = mraUI.detailTitle;
       disableListSearch = !!mraUI.disableListSearch;
       detailActionButtons = mraUI.detailActionButtons || detailActionButtons;
       listActionButtons = mraUI.listActionButtons || listActionButtons;
@@ -1220,7 +1222,6 @@ function main() {
       permission: schemaAnyonePermission,
       embeddedViewOnly: embeddedViewOnly,
 
-      detailType, // normal, post, info, slide, term...
       listType, // gird, table, list
       listTypes, // array of ordered list type
       listTitle, //array of grid, table, list
@@ -1229,8 +1230,10 @@ function main() {
       listActionButtons,
       listCategoryField,
 
+      detailType, // normal, post, info, slide, term...
       detailActionButtons,
       detailRefName,
+      detailTitle,
 
       defaultSortField,
       defaultSortFieldDisplay,

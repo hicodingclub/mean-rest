@@ -1,3 +1,7 @@
+<% if (detailTitle) {%>
+<div class="mt-4 mb-4">
+	<h3><%-detailTitle%></h3>
+</div><%}%>
 <div class="detail" *ngIf="detail">
 	<%_ include schema-detail.d.actions.html %>
 	<div class="card text-left transparent-border ">
