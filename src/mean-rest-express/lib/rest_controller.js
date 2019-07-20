@@ -332,6 +332,9 @@ class RestController {
     if (__categoryBy && !__categoryProvided) {
       // need to query DB to get the category first.
       try {
+        let catQuery = {};
+        catQuery = ownerPatch(catQuery, owner, req);
+
         categories = await model.find().distinct(__categoryBy).exec();
 
         if (__categoryFieldRef) {
