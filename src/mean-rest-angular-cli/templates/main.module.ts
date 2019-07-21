@@ -28,6 +28,7 @@ import { <%-moduleName%>_server_root_uri } from '../<%-moduleName%>.conf';
   <%_ if (api.includes("L")) {%>import { <%-schm.SchemaName%>ListComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list.component';<%_ } %>
   <%_ if (api.includes("L") && schm.actionViews.includes('H')) {%>import { <%-schm.SchemaName%>ListHomeComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-home.component';<%_ } %>
   <%_ if (api.includes("L") && schm.actionViews.includes('S')) {%>import { <%-schm.SchemaName%>ListActSelComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-act-sel.component';<%_ } %>
+  <%_ if (api.includes("L") && schm.actionViews.includes('D')) {%>import { <%-schm.SchemaName%>ListActSldComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-act-sld.component';<%_ } %>
   <%_ if (api.includes("R")) {%>import { <%-schm.SchemaName%>DetailComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail.component';<%_ } %>
   <%_ if (api.includes("U") || api.includes("C")) {%>import { <%-schm.SchemaName%>EditComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-edit/<%-schm.schemaName%>-edit.component';<%_ } %>
 import { <%-schm.SchemaName%>Service } from './<%-schm.schemaName%>/<%-schm.schemaName%>.service';
@@ -60,6 +61,7 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     <% if (api.includes("L")) {%><%-schm.SchemaName%>ListComponent,<%}%>
     <% if (api.includes("L") && schm.actionViews.includes('H')) {%><%-schm.SchemaName%>ListHomeComponent,<%}%>
     <% if (api.includes("L") && schm.actionViews.includes('S')) {%><%-schm.SchemaName%>ListActSelComponent,<%}%>
+    <% if (api.includes("L") && schm.actionViews.includes('D')) {%><%-schm.SchemaName%>ListActSldComponent,<%}%>
     <% if (api.includes("R")) {%><%-schm.SchemaName%>DetailComponent,<%}%>
     <% if (api.includes("U") || api.includes("C")) {%><%-schm.SchemaName%>EditComponent,<%}%><%}%>
   <%_ referenceSchemas.forEach(function(reference){ let Ref = reference.Ref, api = reference.api; %>
@@ -84,6 +86,7 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     <% if (api.includes("L")) {%><%-schm.SchemaName%>ListComponent,<%}%>
     <% if (api.includes("L") && schm.actionViews.includes('H')) {%><%-schm.SchemaName%>ListHomeComponent,<%}%>
     <% if (api.includes("L") && schm.actionViews.includes('S')) {%><%-schm.SchemaName%>ListActSelComponent,<%}%>
+    <% if (api.includes("L") && schm.actionViews.includes('D')) {%><%-schm.SchemaName%>ListActSldComponent,<%}%>
     <% if (api.includes("R")) {%><%-schm.SchemaName%>DetailComponent,<%}%>
     <% if (api.includes("U") || api.includes("C")) {%><%-schm.SchemaName%>EditComponent,<%}%><%_ }%>
   <%_ referenceSchemas.forEach(function(reference){ let Ref = reference.Ref, api = reference.api; %>

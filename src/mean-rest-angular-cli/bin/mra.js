@@ -95,6 +95,8 @@ var templates = {
   schemaListSubComponentHtml: ["../templates/schema-list-sub.component.html", "list-sub.component.html", "list-sub component html file", 'W'],
   schemaListActSelComponent: ["../templates/schema-list-act-s.component.ts", "list-act-sel.component.ts", "list-act-sel component file", 'W'],
   schemaListActSelComponentHtml: ["../templates/schema-list-act-s.component.html", "list-act-sel.component.html", "list-act-sel component html file", 'W'],
+  schemaListActSldComponent: ["../templates/schema-list-act-sld.component.ts", "list-act-sld.component.ts", "list-act-sld component file", 'W'],
+  schemaListActSldComponentHtml: ["../templates/schema-list-act-sld.component.html", "list-act-sld.component.html", "list-act-sld component html file", 'W'],
   schemaListHomeComponent: ["../templates/schema-list-act-h.component.ts", "list-home.component.ts", "list-home component file", 'W'],
   schemaListHomeComponentHtml: ["../templates/schema-list-act-h.component.html", "list-home.component.html", "list-home component html file", 'W'],
 
@@ -1375,9 +1377,13 @@ function main() {
         generateSourceFile(schemaName, templates.schemaListHomeComponent, schemaObj, subComponentDir);
     		generateSourceFile(schemaName, templates.schemaListHomeComponentHtml, schemaObj, subComponentDir);
       }
-      if (schemaObj.actionViews.includes('S')) { //generate home component
+      if (schemaObj.actionViews.includes('S')) { //generate select component for pipeline/composite
         generateSourceFile(schemaName, templates.schemaListActSelComponent, schemaObj, subComponentDir);
     		generateSourceFile(schemaName, templates.schemaListActSelComponentHtml, schemaObj, subComponentDir);
+      }
+      if (schemaObj.actionViews.includes('D')) { //generate slides component
+        generateSourceFile(schemaName, templates.schemaListActSldComponent, schemaObj, subComponentDir);
+    		generateSourceFile(schemaName, templates.schemaListActSldComponentHtml, schemaObj, subComponentDir);
       }
   	}
 

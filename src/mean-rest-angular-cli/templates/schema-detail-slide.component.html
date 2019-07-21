@@ -9,9 +9,11 @@
 				let field1 = detailView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
 				let field2 = detailView[2]; let fn2 = field2.fieldName; let ft2 = field2.type;
 				let field3 = detailView[3]; let fn3 = field3.fieldName; let ft3 = field3.type;%>
-				<img src="{{detail['<%-fn0%>']}}" alt="{{detail['<%-fn1%>']}}">
+				<img src="{{detail['<%-fn0%>']}}" alt="">
 
 				<div class="carousel-caption d-none d-md-block">
+					<h3 class="mb-5">{{detail['<%-fn1%>']}}</h3>
+
 					<h5>{{detail['<%-fn2%>']}}</h5>
 					<p>{{detail['<%-fn3%>']}}</p>
 				</div>

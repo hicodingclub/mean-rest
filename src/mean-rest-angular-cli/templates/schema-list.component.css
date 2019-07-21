@@ -388,3 +388,9 @@ div.badge-click:hover {
   padding: 1rem 20px 1rem 20px;
   margin-bottom: 1rem;
 }
+
+.slide-image {
+  left: 50%;
+  transform: translate(-50%, 0);
+  position: relative;
+}
