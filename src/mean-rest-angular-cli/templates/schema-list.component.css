@@ -364,23 +364,26 @@ div.badge-click:hover {
 .modal-back {
   position: fixed;
   width: 100vw;
-  height: 100vh;
   top: 0;
   left: 0;
+  overflow-y: auto;
+  height: 100%;
+  min-height: 100vh;
 
   z-index: 2000;
   background-color:rgba(0,0,0,0.4);
 }
 
 .modal-front {
-  position: fixed;
+  position: relative;
 
   min-width: 500px;
   width: 50%;
 
-  top:50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, 0);
+  margin-top: 100px;
+  margin-bottom: 100px;
 }
 
 .category-nav {
