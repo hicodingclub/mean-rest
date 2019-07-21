@@ -1,23 +1,26 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnChanges, ViewChild } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
 import { Injector } from '@angular/core';
 
 import { <%-SchemaName%>ListComponent } from './<%-schemaName%>-list.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
+import { NgbCarousel } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-<%-schemaName%>-list-act-sld',
   templateUrl: './<%-schemaName%>-list-act-sld.component.html',
   styleUrls: ['./<%-schemaName%>-list.component.css'],
 })
-export class <%-SchemaName%>ListActSldComponent extends <%-SchemaName%>ListComponent implements OnInit {
+export class <%-SchemaName%>ListActSldComponent extends <%-SchemaName%>ListComponent implements OnInit, OnChanges {
   public titleFn: string;
   public subtitleFn: string;
   public descriptionFn: string;
   public picturelinkFn: string;
 
   public slidesId: string = Date.now().toString();
+
+  @ViewChild('carousel') carousel: NgbCarousel;
 
   constructor(
       public <%-schemaName%>Service: <%-SchemaName%>Service,
@@ -44,5 +47,11 @@ export class <%-SchemaName%>ListActSldComponent extends <%-SchemaName%>ListCompo
     this.detail = this.formatDetail(detail);
     this.searchDetailReady = true;
     this.searchList();
+  }
+
+  ngOnChanges() {
+    if (this.carousel) {
+      this.carousel.cycle();
+    }
   }
 }

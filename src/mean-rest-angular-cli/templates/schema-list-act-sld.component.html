@@ -1,4 +1,4 @@
-<ngb-carousel [pauseOnHover]="false">
+<ngb-carousel *ngIf="list&&list.length>0" [pauseOnHover]="false" #carousel>
 	<ng-template ngFor let-detail [ngForOf]="list" let-idx="index">
 		<ng-template ngbSlide>
 			<img src="{{detail[picturelinkFn]}}" alt="" class="slide-image">
