@@ -98,6 +98,12 @@ export class BaseComponent implements BaseComponentInterface {
     public dropdownItems: {displayName: string, id: string}[];
     public actionType: string;
 
+    // search bar
+    public searchDetailReady: boolean; // when search is provided by input data, instead of from search bar;
+    public searchText: string;
+    public searchMoreDetail: any;
+    public moreSearchOpened:boolean = false;
+
     constructor(
         public service: BaseService,
         public injector: Injector,
@@ -809,10 +815,12 @@ export class BaseComponent implements BaseComponentInterface {
             d[this.categoryBy] = this.categories[this.selectedCategory][this.categoryBy];
         }
 
-        for (let s of this.stringFields) {
-            if (s !== this.categoryBy) {
-                d[s] = this.searchText;
-            }            
+        if (!this.searchDetailReady) {
+            for (let s of this.stringFields) {
+                if (s !== this.categoryBy) {
+                    d[s] = this.searchText;
+                }
+            }
         }
         let orSearchContext = [], andSearchContext = [];
         for (let field in d) {
@@ -1553,9 +1561,6 @@ export class BaseComponent implements BaseComponentInterface {
     }
     
     //Search more in the list view
-    public searchText: string;
-    public searchMoreDetail: any;
-    public moreSearchOpened:boolean = false;
     toggleMoreSearch() {
         this.moreSearchOpened = !this.moreSearchOpened;
     }    
