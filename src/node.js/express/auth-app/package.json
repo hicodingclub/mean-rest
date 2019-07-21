@@ -1,6 +1,6 @@
 {
   "name": "mdds-express-auth-app",
-  "version": "0.6.0",
+  "version": "0.6.50",
   "description": "Model Driver Development Stack - authentication and authorization client for express application. Works with MDDS auth server to provide user login verification and access permission check.",
   "main": "index.js",
   "scripts": {

@@ -75,6 +75,6 @@ export class RegisterComponent implements OnInit {
     }
     cancel() {
       const routedFromUrl = this.authenticationService.getRoutedFromUrl();
-      this.router.navigate([routedFromUrl]);
+      this.router.navigateByUrl(routedFromUrl);
     }
 }
