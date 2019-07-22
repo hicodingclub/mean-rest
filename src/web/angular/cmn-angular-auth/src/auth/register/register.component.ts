@@ -37,8 +37,11 @@ export class RegisterComponent implements OnInit {
 
 
     ngOnInit() {
+        const phoneNumber = /^(\d+-?)+\d+$/;
         this.registerForm = this.formBuilder.group({
             username: ['', Validators.required],
+            email: ['', [Validators.email, Validators.required]],
+            phone: ['', Validators.pattern(phoneNumber)],
             password: ['', [Validators.required, Validators.minLength(6)]],
             password_conf: ['', [Validators.required, Validators.minLength(6)]]
         }, {validator: validatePasswords });
@@ -56,7 +59,14 @@ export class RegisterComponent implements OnInit {
         }
 
         this.loading = true;
-        this.authenticationService.register(this.registerForm.value)
+        const values = this.registerForm.value;
+        const o = {};
+        for (let p in values) { // remove empty string
+            if (!!values[p]) {
+                o[p] = values[p];
+            }
+        }
+        this.authenticationService.register(o)
             .pipe(first())
             .subscribe(
                 data => {
@@ -70,6 +80,7 @@ export class RegisterComponent implements OnInit {
                     // alert("Error login");
                     this.servererror = true;
                     this.serverText = error.error.error;
+                    this.serverText = this.serverText.replace('muser', 'User');
                     this.loading = false;
                 });
     }

@@ -35,6 +35,10 @@
 	background-color: rgb(120, 170, 110);
 }
 
+.user-name {
+	text-align: center;
+}
+
 .auth-icon-pop {
 	position: absolute;
 	z-index: 10;	
@@ -54,4 +58,8 @@
 	width: 100%;
 	font-style: italic;
 	text-align: center;
+}
+
+.pointer {
+	cursor: pointer;
 }

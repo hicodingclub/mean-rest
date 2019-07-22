@@ -4,3 +4,12 @@
     font-size: 80%;
     color: #dc3545;
 }
+
+label span {
+    color: #dc3545;
+}
+
+/*remove the red cross*/
+.form-control.is-invalid {
+    background-image: none;
+}
