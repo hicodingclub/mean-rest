@@ -219,7 +219,7 @@
                     <%if (field.required) {%>required<%}%>
                 <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
                   [(ngModel)]="detail['<%-fn%>']['date']" name="Edit<%-Fn%>"
-                  ngbDatepicker #Edit<%-Fn%>Date="ngbDatepicker" #Edit<%-Fn%>="ngModel">
+                  ngbDatepicker [minDate]="minDate" #Edit<%-Fn%>Date="ngbDatepicker" #Edit<%-Fn%>="ngModel">
             <div class="input-group-append">
               <button class="btn btn-outline-secondary" (click)="Edit<%-Fn%>Date.toggle()" type="button">
                 <i class="fas fa-calendar-alt"></i>

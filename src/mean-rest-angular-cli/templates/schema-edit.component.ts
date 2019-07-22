@@ -72,6 +72,7 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
     public embeddedView: boolean;
 
     public action:string;
+    public minDate = {year: (new Date()).getFullYear() - 100, month: 1, day: 1};
 
 <%if (schemaHasEditor) {%>
     @ViewChildren(MraRichTextSelectDirective) textEditors: QueryList<MraRichTextSelectDirective>;
