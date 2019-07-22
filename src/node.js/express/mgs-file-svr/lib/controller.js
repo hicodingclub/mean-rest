@@ -230,6 +230,10 @@ class FileController {
       id = fileName.replace('_thumbnail', '');
       thumbnail = true;
     }
+
+    res.setHeader("Cache-Control", "public, max-age=2592000");
+    res.setHeader("Expires", new Date(Date.now() + 2592000000).toUTCString());
+
     let dbExec = File.findById(id, function (err, doc) {
       if (err) {
         return next(err);
@@ -242,6 +246,7 @@ class FileController {
           if (err) {
             return next(err);
           }
+
           return res.send(data);
         });
       }
