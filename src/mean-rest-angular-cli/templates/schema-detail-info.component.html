@@ -1,6 +1,6 @@
 <div class="detail" *ngIf="detail">
 	<%_ include schema-detail.d.actions.html %>
-	<div class="card text-left transparent-border ">
+	<div class="card text-left transparent-border " [ngStyle]="style">
 	  <div class="grid-fields">
 		<div class="card-header grid-head"><%_{
 				let view='detail'; let largePicture=true;
