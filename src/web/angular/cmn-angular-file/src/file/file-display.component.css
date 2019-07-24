@@ -2,10 +2,17 @@
 */
 .thumbnail {
     overflow: hidden;
-    height: 6rem;
+    height: 3rem;
     background-color: #f1f1f1;
     width:100%;
     max-width: 12rem;
+}
+
+@media screen and (min-width: 500px) {
+    .thumbnail {
+        overflow: hidden;
+        height: 6rem;
+    }
 }
 
 .thumbnail-large {
