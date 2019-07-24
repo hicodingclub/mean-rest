@@ -61,9 +61,17 @@ tr th:first-child{
   background-color: rgba(0, 0, 0, 0.04);
 }
 .grid-head-picture, .list-head-picture {
-  width: 6rem;
-  height: 6rem;
+  width: 3rem;
+  height: 3rem;
   background-color: #f1f1f1;
+}
+
+@media screen and (min-width: 500px) {
+  .grid-head-picture, .list-head-picture {
+    width: 6rem;
+    height: 6rem;
+    background-color: #f1f1f1;
+  }
 }
 
 .listview {
@@ -85,13 +93,17 @@ tr th:first-child{
 
 .list-card {
   display: flex;
+  flex-flow: wrap;
   align-items: center;
   padding: 0.5rem;
 }
 
 .list-fields {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
+
+  min-width: 300px;
+  max-width: 85%;
 }
 
 .list-body-fields {
@@ -119,6 +131,9 @@ tr th:first-child{
   text-align: right;
   bottom: 0px;
   right: 0.5rem;
+
+  width: 100px;
+  margin-left: auto;
 }
 
 td input, .card-action-icons input {

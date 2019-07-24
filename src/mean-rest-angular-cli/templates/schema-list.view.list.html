@@ -3,10 +3,10 @@
 			<hr *ngIf="i==0" class="list-diverder">
 			<div class="list-card text-left <%if(cardCanClick){%>clickable-card<%}%> "
 				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >
-				<div class="list-fields w-75 <%if(cardCanClick){%>pointer<%}%>" <%if(clickToDetail){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%><%if(clickToCheck){%>(click)="onItemChecked(i)"<%}%> >
+				<div class="list-fields <%if(cardCanClick){%>pointer<%}%>" <%if(clickToDetail){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%><%if(clickToCheck){%>(click)="onItemChecked(i)"<%}%> >
 			<%_ let viewFields = briefView; %><%_ include schema-display.list.html %>
 				</div><%if(canDelete || canUpdate || canCheck) {%>
-				<div class="card-action-icons d-inline-block w-25">
+				<div class="card-action-icons d-inline-block">
 					<%if(canUpdate){%><% if (embeddedEdit) {%>
 						<a [routerLink]="['.']" [queryParamsHandling]="preserve" (click)="onEdit(detail._id)"><i class="fas fa-edit" title="Edit"></i></a><%} else {%>
 						<a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>

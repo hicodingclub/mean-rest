@@ -13,7 +13,7 @@
 
 	let view='list';
 	
-	if (listType === 'list') {%>
-<% include schema-list.view.list.html %><%}%><% if (listType === 'grid') {%>
-<% include schema-list.view.grid.html %><%}%><% if (listType === 'table') {%>
-<% include schema-list.view.table.html %><%}%>
+	for (const viewType of listTypes) {%><%_if (viewType === 'list') {%>
+	<% include schema-list.view.list.html %><%}%><%_if (viewType === 'grid') {%>
+	<% include schema-list.view.grid.html %><%}%><%_if (viewType === 'table') {%>
+	<% include schema-list.view.table.html %><%}%><%_ } %>
