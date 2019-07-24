@@ -104,6 +104,9 @@ export class BaseComponent implements BaseComponentInterface {
     public searchMoreDetail: any;
     public moreSearchOpened:boolean = false;
 
+    //windows width adjust for list (replace table view, which is not good for narrow screen)
+    public widowWidth: number = 600;
+
     constructor(
         public service: BaseService,
         public injector: Injector,
@@ -239,6 +242,15 @@ export class BaseComponent implements BaseComponentInterface {
         */
     }
     
+    public adjustListViewForWindowSize() {
+        this.widowWidth = window.innerWidth;
+        if (this.widowWidth < 600) {
+            if (this.listViewFilter === 'table') {
+                this.listViewFilter = 'list'; //use list instead
+            }
+        }
+    }
+
     public stringify(detail:any): string {
         let str = "";
         for (let fnm of this.indexFields) {
