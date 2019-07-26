@@ -1,7 +1,10 @@
     <%_{
       let pictureFields = viewFields.filter(x => x.picture);
       let indexedFields = viewFields.filter(x => !x.picture && x.isIndexField);
-      let otherFields = viewFields.filter(x => !x.picture && !x.isIndexField);%>
+      let otherFields = viewFields.filter(x => !x.picture && !x.isIndexField);
+      let otherFieldsName = otherFields.map(x=>x.fieldName);
+      
+      if (pictureFields.length > 0 || indexedFields.length > 0){%>
       <div class="card-header grid-head"><%
       for (let field of pictureFields){
         if (field.hidden) continue;
@@ -24,18 +27,20 @@
       }%>
           </h5>
         </div>
-      </div>
+      </div><%}%>
       <div class="card-body"><%
-      for (let [index, field] of otherFields.entries()){
-          if (field.hidden) continue;
-
-          let fn = field.fieldName; let ft = field.type; let ref_link = true;
-          %>
-          <div>
-            <div class="d-inline-block"><label><%-field.displayName%>:</label></div>
-            <div class="ml-3 d-inline-block"><% include schema-display.field.html %>
-            </div>
-          </div><%_ 
-      }%>
+      for (let fieldGrp of viewGrp) {
+          let fieldGrpProcessed = fieldGrp.filter(x=>otherFieldsName.includes(x.fieldName) && !x.hidden);
+          if (fieldGrpProcessed.length < 1) {
+            continue;
+          }%>
+          <div><%for (let field of fieldGrpProcessed) {
+            let fn = field.fieldName; let ft = field.type; let ref_link = true;
+            %>
+            <div class="d-inline-block mr-5" style="min-width: 200px;">
+                <div class="d-inline-block"><label><%-field.displayName%>:</label></div>
+                <div class="d-inline-block ml-3"><% include schema-display.field.html %></div>
+            </div><%}%>
+          </div><%}%>
       </div><%
     }%>

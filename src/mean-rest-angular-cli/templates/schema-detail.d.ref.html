@@ -1,14 +1,15 @@
 <% if (referred) {%>
     <br/>
     <ul class="nav nav-tabs">
-        <% for (let ref of referredBy) {
-                let refApi = ref[8]; 
-                let refName = ref[10]; 
-                let include = true; 
-                if (detailRefBlackList && detailRefBlackList.includes(refName)) {
-                    include = false;
-                } %>
-            <%if (refApi.includes("L") && include) {%><li class="nav-item">
+        <%for (let ref of referredBy) {
+            let refApi = ref[8]; 
+            let refName = ref[10]; 
+            let include = true; 
+            if (detailRefBlackList && detailRefBlackList.includes(refName)) {
+                continue;
+            } 
+
+            if (refApi.includes("L")) {%><li class="nav-item">
             <a [routerLink]="['./<%-ref[0]%>/list']"
                     class="nav-link" routerLinkActive="active"><%-ref[5]%></a>
         </li><%}%><%}%>
