@@ -23,8 +23,8 @@
 					</div>
 			</div>
 		</div><%} }%>
-		<div class="row">
-			<div class="col-3"><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {%>
+		<div class="d-flex justify-content-between">
+			<div><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {%>
 				<div *ngIf="list.length > 0">
 				<%_ for (const viewType of listTypes) { %><% if (viewType === 'table') { %>
 					<input type="radio" name="view-filter" id="table-view" class="view-radio"
@@ -40,38 +40,8 @@
 				</div>
 			<%_ } %>
 			</div>
-			<div class="col-6">
-			  <div *ngIf="total_pages > 1">
-				  <ul class="pagination justify-content-center">
-				    <li class="page-item"
-				            [ngClass]="{'disabled': page<=1}">
-				      <a class="page-link" routerLink="." (click)="onPreviousPage()"
-				         aria-label="Previous">
-				        <span aria-hidden="true">&laquo;</span>
-				        <span class="sr-only">Previous</span>
-				      </a>
-				    </li>
 
-				    <li *ngIf="left_more" class="page-item"><a class="page-link">...</a></li>
-
-				    <li *ngFor="let p of pages;  let i = index" class="page-item"
-				    		[ngClass]="{'active': p==page}">
-				    	<a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
-				    </li>
-
-				    <li *ngIf="right_more" class="page-item"><a class="page-link">...</a></li>
-				    <li class="page-item"
-				            [ngClass]="{'disabled': page>=total_pages}">
-				      <a class="page-link" routerLink="." (click)="onNextPage()"
-				         aria-label="Next">
-				        <span aria-hidden="true">&raquo;</span>
-				        <span class="sr-only">Next</span>
-				      </a>
-				    </li>
-				  </ul>
-			  </div>
-			</div>
-			<div class="col-3">
+			<div>
 				<div class="total_counts">
 					<span *ngIf="list.length > <%-SearchAndSortThreshold%>">Total: <b>{{total_count}}</b></span><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {
 					%><%if(api.includes("D")){%>
@@ -79,4 +49,36 @@
 					<a class="ml-3" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a><%}%>
 				</div>
 			</div>
+		</div>
+
+		<div class="d-flex justify-content-center mt-2">
+				<div *ngIf="total_pages > 1">
+					<ul class="pagination justify-content-center">
+						<li class="page-item"
+								[ngClass]="{'disabled': page<=1}">
+						<a class="page-link" routerLink="." (click)="onPreviousPage()"
+							aria-label="Previous">
+							<span aria-hidden="true">&laquo;</span>
+							<span class="sr-only">Previous</span>
+						</a>
+						</li>
+
+						<li *ngIf="left_more" class="page-item"><a class="page-link">...</a></li>
+
+						<li *ngFor="let p of pages;  let i = index" class="page-item"
+								[ngClass]="{'active': p==page}">
+							<a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
+						</li>
+
+						<li *ngIf="right_more" class="page-item"><a class="page-link">...</a></li>
+						<li class="page-item"
+								[ngClass]="{'disabled': page>=total_pages}">
+						<a class="page-link" routerLink="." (click)="onNextPage()"
+							aria-label="Next">
+							<span aria-hidden="true">&raquo;</span>
+							<span class="sr-only">Next</span>
+						</a>
+						</li>
+					</ul>
+				</div>
 		</div>
