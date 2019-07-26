@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
 import { Injector } from '@angular/core';
@@ -17,7 +17,7 @@ import { MraRichTextShowDirective } from 'mean-rest-angular';<%}%>
   templateUrl: './<%-schemaName%>-detail.component.html',
   styleUrls: ['./<%-schemaName%>-detail.component.css']
 })
-export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component implements OnInit {
+export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component implements OnInit, AfterViewInit {
   @Input() 
   public id:string;
   @Input()
@@ -53,6 +53,22 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
         this.populateDetailByFields(this.searchObj);
       } else {
         console.error("Routing error for detail view... no id...");
+        return;
       }
+  }
+
+  ngAfterViewInit() {
+    <%_for (let ref of referredBy) {
+      let refApi = ref[8]; 
+      let refName = ref[10]; 
+      if (detailRefBlackList && detailRefBlackList.includes(refName)) {
+          continue;
+      }
+      if (refApi.includes("L")) {%>
+    //Load first reference, by default
+    this.router.navigate(['./<%-ref[0]%>/list', {}], {relativeTo: this.route, queryParamsHandling: 'preserve',});<%
+        break;
+      }
+    }%>
   }
 }

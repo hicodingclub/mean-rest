@@ -29,4 +29,7 @@ export class <%-SchemaName%>DetailSubComponent extends <%-SchemaName%>DetailComp
       if (this.id) this.populateDetail(this.id);
       else console.error("Routing error for detail sub view... no id...");
     }
+
+    ngAfterViewInit() {
+    }
 }
