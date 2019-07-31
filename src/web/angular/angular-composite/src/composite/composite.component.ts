@@ -3,13 +3,16 @@ import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Injector, EventEmitter } from '@angular/core';
 
 import { Location } from '@angular/common';
-
-import { Observable } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { Output } from '@angular/core';
 
-export type compositeSteps = {
+export type compositeStep = {
     stepName: string,
+    errorMessage: string, //messages for possible error
+};
+export type compositeStepConfig = {
     stepTitle: string,
+
     stepComponent: any, 
     mandatory: boolean,
 
@@ -23,9 +26,7 @@ export type compositeSteps = {
     searchObj: any,
 
     submitFieldName: string, //mapping to the field in submit components
-
-    errorMessage: string, //messages for possible error
-}[];
+};
 export type submitComponent = {
     compoment: any,
     succeedUrl: string,
@@ -54,7 +55,9 @@ export class CompositeSubmitDirective {
 })
 export class CompositeComponent implements OnInit, AfterViewInit{
     @Input()
-    public steps: compositeSteps;
+    public steps: compositeStep[];
+    @Input()
+    public stepConfigs: compositeStepConfig[];
     @Input()
     public title: string;
     @Input()
@@ -63,9 +66,13 @@ export class CompositeComponent implements OnInit, AfterViewInit{
     public totalSteps: number = 0;
     public stepCompRef = [];
     public stepCompIns = [];
+    public stepCompEmitter = [];
     public submitCompRef;
     public errorMessages: boolean[] = [];
     public submitting = false;
+
+    @Output()
+    public componentEvents = new EventEmitter<any>();
 
     @ViewChildren(CompositeDirective)
     compositeDirectives: QueryList<CompositeDirective>;
@@ -90,59 +97,83 @@ export class CompositeComponent implements OnInit, AfterViewInit{
             console.warn("No composite directive for CompositeComponent.");
             return;
         }
+
         setTimeout(() => { //using a timer to trigger view changes in next round of change detection turn. Privent ExpressionChangedAfterItHasBeenCheckedError
             this.loadAllSteps();
         }, 10);
+
+        this.componentEvents.emit({ //telling parent we are ready to load steps
+            stepIndex: undefined,
+            message: {
+                type: 'ngAfterViewInit'
+            },
+        });
     }
 
-    loadAllSteps() {
-        this.compositeDirectives.forEach((directive, index, array) => {
-            const { stepTitle, stepComponent, mandatory, preSelectedId, searchObj, disableActionButtions} = this.steps[index];
+    reloadStep(index: number, stepConfig: compositeStepConfig) {
+        const directive = this.compositeDirectives.toArray()[index];
+        const { stepTitle, stepComponent, mandatory, preSelectedId, searchObj, disableActionButtions} = stepConfig;
 
-            let viewContainerRef = directive.viewContainerRef;
-            viewContainerRef.clear();
-    
-            let componentRef = this.stepCompRef[index]; // check if it is created already
-            if (!componentRef) {
-                let componentFactory = this.componentFactoryResolver.resolveComponentFactory(stepComponent);
-                componentRef = viewContainerRef.createComponent(componentFactory); // create and insert in one call
-                this.stepCompRef[index] = componentRef; // save it
-            } else {
-                viewContainerRef.insert(componentRef.hostView);
-            }
-    
-            let componentInstance = componentRef.instance;
-            this.stepCompIns[index] = componentInstance;
+        if (!stepComponent) return; //stop handling this step.
 
-            componentInstance.inputData = {
-                stepTitle,
-                preSelectedId,
-                mandatory,
-            };
-            componentInstance.searchObj = searchObj;
-            componentInstance.disableActionButtions = disableActionButtions;
-            if (index === 0) {
-                componentInstance.setFocus();
+        let viewContainerRef = directive.viewContainerRef;
+        viewContainerRef.clear();
+
+        let componentFactory = this.componentFactoryResolver.resolveComponentFactory(stepComponent);
+        let componentRef = viewContainerRef.createComponent(componentFactory); // create and insert in one call
+
+        let componentInstance: any = componentRef.instance;
+        this.stepCompIns[index] = componentInstance;
+
+        componentInstance.inputData = {
+            stepTitle,
+            preSelectedId,
+            mandatory,
+        };
+        componentInstance.searchObj = searchObj;
+        componentInstance.disableActionButtions = disableActionButtions;
+        if (index === 0) {
+            componentInstance.setFocus();
+        }
+        componentInstance.eventEmitter.subscribe((message) => {
+            if (message) {
+                const msg = {
+                    stepIndex: index,
+                    message,
+                }
+                this.componentEvents.emit(msg);
             }
         });
     }
 
+    loadAllSteps() {
+        for (let index = 0; index < this.compositeDirectives.length; index++) {
+            if (this.stepCompIns[index]) continue; //already loaded
+            if (!this.stepConfigs[index]) continue; //no configuration
+            this.reloadStep(index, this.stepConfigs[index]);
+        };
+    }
+
     allActionsReady(): boolean {
         let ready = true;
-        for(let [index, step] of this.steps.entries()) {
+        for(let [index, step] of this.stepConfigs.entries()) {
             this.errorMessages[index] = false; // no error
             if (step.mandatory) {
                 const instance = this.stepCompIns[index];
+                if (!instance) {
+                    return false;
+                }
                 if (instance.actionType === 'selection') {
                     let value = instance.getSelectedItems();
                     if (value.length === 0) {
                         this.errorMessages[index] = true;
                         ready = false;
+                        return false;
                     }
                 } else if (instance.actionType === 'term') {
                     if(!instance.isTermChecked()) {
                         this.errorMessages[index] = true;
-                        ready = false;
+                        return false;
                     }
                 }
             }
@@ -164,7 +195,7 @@ export class CompositeComponent implements OnInit, AfterViewInit{
         }
         let componentInstance = this.submitCompRef.instance;
         const initData = {};
-        for(let [index, step] of this.steps.entries()) {
+        for(let [index, step] of this.stepConfigs.entries()) {
             const instance = this.stepCompIns[index];
             let value;
             if (instance.actionType === 'selection') {

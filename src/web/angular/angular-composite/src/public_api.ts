@@ -1,3 +1,3 @@
 
-export { CompositeComponent, compositeSteps, submitComponent } from './composite/composite.component';
+export { CompositeComponent, compositeStep, compositeStepConfig, submitComponent } from './composite/composite.component';
 export { CompositeModule } from './composite/composite.module';

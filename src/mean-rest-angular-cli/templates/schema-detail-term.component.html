@@ -9,7 +9,7 @@
 			let view='detail'; let largePicture=false;
 			let field = detailView[1]; let fn = field.fieldName; let ft = field.type;;%>
 			<div>
-				<input class="mr-3" *ngIf="detail['<%-fn%>']" type="checkbox" [(ngModel)]="termChecked"/>				
+				<input class="mr-3" *ngIf="detail['<%-fn%>']" type="checkbox" [(ngModel)]="termChecked" (change)="onTermChecked()"/>				
 				<label><% include schema-display.field.html %>
 				</label>
 			</div><%_ }%>

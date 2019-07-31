@@ -3,7 +3,7 @@ import { Injector, EventEmitter } from '@angular/core';
 
 import { Location } from '@angular/common';
 
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import { ModalConfig, Modal} from './util.modal';
@@ -718,7 +718,10 @@ export class BaseComponent implements BaseComponentInterface {
           snackBar.show();
         }
         this.loaded = true;
-        this.eventEmitter.emit(this.detail);
+        this.eventEmitter.emit({
+            type: 'detail',
+            result: this.detail
+        });
     }
 
     public populateDetailByFields(searchObj: any):EventEmitter<any> {
@@ -996,7 +999,7 @@ export class BaseComponent implements BaseComponentInterface {
 
             if (this.categoryBy && !categoryProvided) {
                 this.categories = result.categories.map(x=>this.formatDetail(x));
-                this.categoryDisplays = result.categories.map(x=>this.getFieldDisplayFromFormattedDetail(x, this.categoryBy));
+                this.categoryDisplays = this.categories.map(x=>this.getFieldDisplayFromFormattedDetail(x, this.categoryBy));
                 this.selectedCategory = 0;
             }
 
@@ -1021,7 +1024,10 @@ export class BaseComponent implements BaseComponentInterface {
               let snackBar = new SnackBar(snackBarConfig);
               snackBar.show();
             }
-            this.eventEmitter.emit(this.list);
+            this.eventEmitter.emit({
+                type: 'list',
+                result: this.list
+            });
             this.loaded = true;
           },
           this.onServiceError
@@ -1102,15 +1108,25 @@ export class BaseComponent implements BaseComponentInterface {
     public isTermChecked():boolean {
         return this.termChecked;
     }
+    public onTermChecked(): void {
+        //no changing value because two binded already
+        this.eventEmitter.emit({
+            type: 'check',
+            result: this.termChecked,
+        })
+    }
 
     public onCheckAllChange():void {
         this.checkedItem = 
              Array.apply(null, Array(this.list.length)).
                 map(Boolean.prototype.valueOf,this.checkAll);
+        
+        this.onItemSelected();
     }
     
     public onItemChecked(i: number): void {
         this.checkedItem[i] = !this.checkedItem[i];
+        this.onItemSelected();
     }
 
     public isItemSelected():boolean {
@@ -1134,6 +1150,15 @@ export class BaseComponent implements BaseComponentInterface {
             }
         }
         return selectedItems;
+    }
+
+    // triggered by user selection from checkbox or dropdown list
+    public onItemSelected() {
+        //no changing value because already handled with other function or two way bindings
+        this.eventEmitter.emit({
+            type: 'selection',
+            result: this.getSelectedItems(),
+        })
     }
 
     public onDeleteSelected():void {

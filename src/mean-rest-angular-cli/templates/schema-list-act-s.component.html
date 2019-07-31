@@ -3,7 +3,9 @@
 <% if (selectActionViewType === 'dropdown') 
 {%><form>
 	<div class="form-group list-selection">
-		<select class="form-control" id="select<%-schemaName%>" [(ngModel)]="selectedId" name="elect<%-schemaName%>">
+		<select class="form-control" id="select<%-schemaName%>" [(ngModel)]="selectedId"
+			(change)="onItemSelected()"
+			name="elect<%-schemaName%>">
 			<option *ngFor="let ele of dropdownItems" [ngValue]="ele.id">{{ele.displayName}}</option>
 		</select>
 	</div>
