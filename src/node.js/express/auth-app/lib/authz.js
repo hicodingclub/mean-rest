@@ -208,6 +208,7 @@ const getOperation = function(req) {
   if (httpOperation == "GET") operation = 'R';
   else if (httpOperation == "PUT") operation = 'C';
   else if (httpOperation == "DELETE") operation = 'D';
+  else if (httpOperation == "POST" && originalUrl.includes('/mddsaction/export')) operation = 'R';
   else if (httpOperation == "POST") operation = 'U';
   
   return operation || "UNKOWN";
