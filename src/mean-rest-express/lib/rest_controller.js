@@ -14,6 +14,58 @@ const createRegex = function(obj) {
   return obj;
 };
 
+var capitalizeFirst = function(str) {
+	return str.charAt(0).toUpperCase() + str.substr(1);
+}
+
+var lowerFirst = function(str) {
+	return str.charAt(0).toLowerCase() + str.substr(1);
+}
+
+var camelToDisplay = function (str) {
+    // insert a space before all caps
+    words = [
+        'At', 'Around', 'By', 'After', 'Along', 'For', 
+        'From', 'Of', 'On', 'To', 'With', 'Without',
+        'And', 'Nor', 'But', 'Or', 'Yet', 'So',
+        'A', 'An', 'The'
+    ];
+    let  arr = str.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').match(/\S+/g);
+    arr = arr.map(x=>{
+        let y = capitalizeFirst(x);
+        if (words.includes(y)) y = lowerFirst(y);
+        return y;
+    });
+    return capitalizeFirst(arr.join(' '));
+}
+
+function getFieldValue(field) {
+  let t = typeof field;
+  switch(t) {
+    case 'string':
+    case 'boolean':
+    case 'number':
+      return String(field);
+      break;
+    case 'object':
+      if (Array.isArray(field)) {
+        let v = '';
+        for (let f of field) {
+          v += getFieldObject(f) + ' ';
+        }
+        return v;
+      }
+      let v = '';
+      for (let f in field) {
+        v += getFieldObject(field[f]);
+      }
+      return v;
+      break;
+    default:
+      return '';
+  }
+}
+
 const checkAndSetValue = function(obj, schema) {
   //obj in {item: value} format
   for (let item in obj) {
@@ -222,7 +274,7 @@ class RestController {
     let views = this.views_collection[ref.toLowerCase()]; //view registered with lowerCase
     if (!views) return null;
     //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-    return views[5]; //indexView
+    return [views[5], views[0]]; //indexView and birefView. Brief view is for association population
   };
 
   register(schemaName, schema, views, model, moduleName, ownerConfig) {
@@ -240,7 +292,7 @@ class RestController {
     };
   }
   getAll(req, res, next) {
-    return this.searchAll(req, res, next, {});
+    return this.searchAll(req, res, next, {}, false);
   }
 
   async getRefObjectsFromId(schm, idArray) {
@@ -257,7 +309,113 @@ class RestController {
 
   }
 
-  async searchAll(req, res, next, searchContext) {
+  getPopulateInfo(theView, morePopulateField) {
+    const populateArray = [];
+    const populateMap = {};
+    theView.forEach((p) => {
+      const fields = this.getPopulatesRefFields(p[1]);
+      //fields is [indexFields, briefFieds]
+      if (fields != null) { //only push when the ref schema is found
+        populateArray.push({ path: p[0], select: fields[0] }); //let's use indexFields for now
+        populateMap[p[0]] = morePopulateField === p[0] ? fields[1] : fields[0]; // use briefFields, or indexFields
+      }
+    });
+    return [populateArray, populateMap]; 
+  }
+
+  async exportAll(req, res, next) {
+    const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
+
+    let body = req.body;
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      }
+      catch (e) {
+        return next(createError(400, "Bad document in body."));
+      }
+    }
+    const searchContext = body;
+
+    let __asso = req.query['__asso'] || undefined;
+    let __ignore = req.query['__ignore'] || undefined;
+
+    const briefView = views[0];
+
+    //header field name for exported
+    let headers = briefView.split(' ');
+    let assoHeaders;
+    if ( __asso ) {
+      for (let p of populates.briefView) {
+        //an array, with [field, ref]
+        if (p[0] === __asso) {
+          let assoSchema = p[1];
+          const refViews = this.getPopulatesRefFields(assoSchema);
+
+          assoHeaders = refViews[1].split(' ');
+
+          headers = headers.filter(x => x !== __asso);
+          break;
+        }
+      }
+    }
+    if (__ignore) {
+      headers = headers.filter (x => x!== __ignore);
+    }
+    let combinedHeaders = headers.concat(assoHeaders);
+
+    let rows = [];
+  
+    const PER_PAGE = 500; //query 1000 each time
+    for (let p = 1; ; p++) {
+      req.query['__page'] = String(p);
+      req.query['__per_page'] = String(PER_PAGE);
+      try {
+        let output = await this.searchAll(req, res, next, searchContext, true); // set export parameter to true
+        if (!output.page) { // not expected result. must be next() called by searchAll. Just return it.
+          return output;
+        }
+        rows = rows.concat(output.items);
+
+        let { page, total_pages, total_count } = output;
+        if (page === total_pages) {
+          //done all query
+          break;
+        }
+
+      } catch (err) {
+        return next(err);
+      }
+    }
+
+    let combinedRows = [];
+    for (let r of rows) {
+      const ro = [];
+
+      for (let hf of headers) {
+        ro.push(getFieldValue(r[hf]));
+      }
+
+      let asf = r[__asso];
+      if (!Array.isArray(asf)) {
+        asf = [asf];
+      }
+      for (let as of asf) {
+        let asr = [];
+        for (let af of assoHeaders) {
+          asr.push(getFieldValue(as[af]));
+        }
+        combinedRows.push(ro.concat(asr));
+      }
+    }
+
+    console.log('combinedHeaders, ', combinedHeaders);
+    console.log('combinedRows, ', combinedRows);
+    return res.send(headers);
+
+  }
+
+  async searchAll(req, res, next, searchContext, expt) {
     const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
 
     let query = {};
@@ -267,6 +425,7 @@ class RestController {
     let __per_page = PER_PAGE;
     let __sort, __order;
     let __categoryBy, __categoryProvided;
+    let __asso;
     for (let prop in req.query) {
       if (prop === '__page') {
         __page = parseInt(req.query[prop]);
@@ -280,28 +439,26 @@ class RestController {
         __categoryBy = req.query[prop];
       } else if (prop === '__categoryProvided') {
         __categoryProvided = req.query[prop];
+      } else if (prop === '__asso') {
+        __asso = req.query[prop];
       } else if (prop in schema.paths) {
         query[prop] = req.query[prop];
       }
     }
 
     let __categoryFieldRef;
-  
-    //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-    const briefView = views[0];
-    const populateArray = [];
-    const populateMap = {};
-    populates.briefView.forEach((p) => {
+    for (let p of populates.briefView) {
       //an array, with [field, ref]
       if (p[0] === __categoryBy) {
         __categoryFieldRef = p[1];
+        break;
       }
-      const fields = this.getPopulatesRefFields(p[1]);
-      if (fields != null) { //only push when the ref schema is found
-        populateArray.push({ path: p[0], select: fields });
-        populateMap[p[0]] = fields;
-      }
-    });
+    }
+  
+    //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+    const briefView = views[0];
+
+    const [populateArray, populateMap] = this.getPopulateInfo(populates.briefView, __asso);
 
     let count = 0;
     if (searchContext) {
@@ -390,9 +547,10 @@ class RestController {
       //dbExec = dbExec.populate(p);
       dbExec = dbExec.populate(p.path); //only give the reference path. return everything
     }
-    dbExec.exec(function (err, result) {
-      if (err)
-        return next(err);
+
+    try {
+      let result = await dbExec.exec();
+      
       let output = {
         total_count: count,
         total_pages: maxPageNum,
@@ -405,23 +563,24 @@ class RestController {
       output = JSON.parse(JSON.stringify(output));
       output.items = resultReducerForRef(output.items, populateMap);
       output.items = resultReducerForView(output.items, briefView);
+
+      if (expt) {
+        return output; // export, return data to caller;
+      }
       return res.send(output);
-    });
+
+    } catch (err) {
+      return next(err);
+    }
   }
+
   getSamples(req, res, next, searchContext) {
     const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
     //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
     const briefView = views[0];
-    const populateArray = [];
-    const populateMap = {};
-    populates.briefView.forEach((p) => {
-      //an array, with [field, ref]
-      const fields = this.getPopulatesRefFields(p[1]);
-      if (fields != null) { //only push when the ref schema is found
-        populateArray.push({ path: p[0], select: fields });
-        populateMap[p[0]] = fields;
-      }
-    });
+
+    const [populateArray, populateMap] = this.getPopulateInfo(populates.briefView, null);
+
     let query = {};
     //get the query parameters ?a=b&c=d, but filter out unknown ones
     const PER_PAGE = 25, MAX_PER_PAGE = 1000;
@@ -519,16 +678,9 @@ class RestController {
     else {
       detailView = views[1];
     }
-    let populateArray = [];
-    let populateMap = {};
-    populates.detailView.forEach((p) => {
-      //an array, with [field, ref]
-      let fields = this.getPopulatesRefFields(p[1]);
-      if (fields != null) { //only push when the ref schema is found
-        populateArray.push({ path: p[0], select: fields });
-        populateMap[p[0]] = fields;
-      }
-    });
+
+    const [populateArray, populateMap] = this.getPopulateInfo(populates.detailView, null);
+
     let idParam = name + "Id";
     let id = req.params[idParam];
     //let dbExec = model.findById(id, detailView)
@@ -582,7 +734,7 @@ class RestController {
         break;
       case "/mddsaction/get":
         let searchContext = body;
-        this.searchAll(req, res, next, searchContext);
+        this.searchAll(req, res, next, searchContext, false);
         break;
       default:
         return next(createError(404, "Bad Action: " + action));

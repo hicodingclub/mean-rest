@@ -36,6 +36,9 @@ const RestRouter = function(restController, schemaName, authzFunc, api) {
     router.delete('/:' + idParam, restController.HardDeleteById.bind(restController));
     router.post('/mddsaction/delete', restController.PostActions.bind(restController));
   }
+  if (api.includes("E")) { //export
+    router.post('/mddsaction/export', restController.exportAll.bind(restController));
+  }
   return router;
 }
 
