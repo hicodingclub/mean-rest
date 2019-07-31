@@ -30,6 +30,7 @@ export class BaseComponent implements BaseComponentInterface {
 
     //For list and pagination
     public list:any[] = [];
+    public originalList:any[] = [];
         
     public majorUi = true;
     public modulePath:string;
@@ -60,7 +61,8 @@ export class BaseComponent implements BaseComponentInterface {
     public enums:any = {};
     public stringFields = [];
     public referenceFields: string[] = [];
-    public referenceFieldsMap = {};
+    public referenceFieldsMap = {}; // refField: refSchema
+    public referenceFieldsReverseMap = {}; // refSchema: refField
     public dateFields = [];
     public indexFields = [];
     public multiSelectionFields = [];
@@ -69,6 +71,8 @@ export class BaseComponent implements BaseComponentInterface {
     public fileFields = {}; //fieldName: {selectedFiles: [selected files]}
     public dateFormat = "MM/DD/YYYY";
     public timeFormat = "hh:mm:ss";
+
+    public briefFieldsInfo = []; //from base contructor. All breifFields
 
     public listViewFilter = 'table'; // list, or grid
     public listSortField: string;
@@ -107,6 +111,9 @@ export class BaseComponent implements BaseComponentInterface {
     //windows width adjust for list (replace table view, which is not good for narrow screen)
     public widowWidth: number = 600;
 
+    // to show more details of the associationed field (an object) from list view
+    public associationField;
+
     constructor(
         public service: BaseService,
         public injector: Injector,
@@ -119,8 +126,9 @@ export class BaseComponent implements BaseComponentInterface {
         this.ItemCamelName = itemCamelName.charAt(0).toUpperCase() + itemCamelName.substr(1);
         this.itemName = itemCamelName.toLowerCase();
         this.parentItem = this.getParentRouteItem();
-        this.commonService = injector.get(MraCommonService);
-        
+        if (injector) {
+            this.commonService = injector.get(MraCommonService);
+        }
     }
     
     public onServiceError(error:ServiceError):void {
@@ -646,12 +654,14 @@ export class BaseComponent implements BaseComponentInterface {
     /***End: handle array fields***/
   
     public formatDetail(detail:any ):any {
-        detail = this.formatReference(detail);
-        detail = this.formatDate(detail);
-        detail = this.formatArrayMultiSelection(detail);
-        detail = this.formatArrayFields(detail);
-        detail = this.formatMapFields(detail);
-        return detail;
+        let cpy = Util.clone(detail);
+
+        cpy = this.formatReference(cpy);
+        cpy = this.formatDate(cpy);
+        cpy = this.formatArrayMultiSelection(cpy);
+        cpy = this.formatArrayFields(cpy);
+        cpy = this.formatMapFields(cpy);
+        return cpy;
     }
 
     public stringifyField(field: any):string {
@@ -722,7 +732,8 @@ export class BaseComponent implements BaseComponentInterface {
             o[field] = searchObj[field];
             searchContext['$and'][1]['$and'].push(o);
         }
-        this.service.getList(1, 1, searchContext, null, null, null, false).subscribe(
+        let expt = false;
+        this.service.getList(1, 1, searchContext, null, null, null, false, null, expt, this.ignoreField).subscribe(
             result => {
                 let detail = {};
                 if (result.items && result.items.length >= 1) {
@@ -928,14 +939,14 @@ export class BaseComponent implements BaseComponentInterface {
         this.putToStorage("searchMoreDetail", this.searchMoreDetail);
         this.putToStorage("detail", this.detail);
     }
-    public searchList():void {
+    public searchList():EventEmitter<any>  {
         this.processSearchContext();
         //update the URL
         if (!this.isEmptyRoutingPath()) {
             this.router.navigate(['.', {}], {relativeTo: this.route, queryParamsHandling: 'preserve',});//start from 1st page
         }
         this.putToStorage("page", 1);//start from 1st page
-        this.populateList();
+        return this.populateList();
     }
     public loadUIFromCache():void {
         //Now let's reload the search condition to UI
@@ -973,12 +984,16 @@ export class BaseComponent implements BaseComponentInterface {
         this.loadUIFromCache();
 
         const categoryProvided = typeof this.selectedCategory === 'number'? true : false;
-        this.service.getList(new_page, this.per_page, searchContext, this.listSortField, this.listSortOrder, this.categoryBy, categoryProvided).subscribe(
+        let expt = false;
+        this.service.getList(new_page, this.per_page, searchContext, this.listSortField, this.listSortOrder, 
+            this.categoryBy, categoryProvided, this.associationField, expt, this.ignoreField).subscribe(
           result => { 
             this.list = result.items.map(x=> {
                 let d = this.formatDetail(x);
                 return d;
             });
+            this.originalList = result.items;
+
             if (this.categoryBy && !categoryProvided) {
                 this.categories = result.categories.map(x=>this.formatDetail(x));
                 this.categoryDisplays = result.categories.map(x=>this.getFieldDisplayFromFormattedDetail(x, this.categoryBy));
@@ -1065,6 +1080,23 @@ export class BaseComponent implements BaseComponentInterface {
         }
     }
     
+    public exportLink:string;
+    public ignoreField; // used for export (send to server)
+
+    public onExport(): void {
+        let searchContext = this.getFromStorage("searchContext");
+        this.loadUIFromCache();
+
+        const categoryProvided = typeof this.selectedCategory === 'number'? true : false;
+        let expt = true;
+        this.service.getList(0, 0, searchContext, this.listSortField, this.listSortOrder, this.categoryBy, categoryProvided, this.associationField, expt, this.ignoreField).subscribe(
+            result => {
+                this.exportLink = result.link;
+            },
+            this.onServiceError
+        );
+    }
+
     // for term and condition view
     public termChecked: boolean = false;
     public isTermChecked():boolean {
@@ -1664,6 +1696,9 @@ export class BaseComponent implements BaseComponentInterface {
     
     /*Parent router related*/
     public getParentRouteItem():string {
+        if (!this.route) {
+            return undefined;
+        }
         let routeSnapshot = this.route.snapshot;
         let parentItem;
         do {
@@ -1708,6 +1743,20 @@ export class BaseComponent implements BaseComponentInterface {
         } while (route)
         return this.route.root;
     }
+
+    public isChildRouterActivated():boolean {
+        if (!this.route) {
+            return undefined;
+        }
+        let routeSnapshot = this.route.snapshot;
+
+
+        if (routeSnapshot.firstChild) {
+            return true;
+        }
+        return false;
+    }
+
     public isEmptyRoutingPath():boolean {
         return this.route.snapshot.url.length === 0;
     }

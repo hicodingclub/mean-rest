@@ -46,7 +46,9 @@ export class BaseService {
         return list;
     }
 
-    getList(page:number, per_page:number, searchContext:any, sort:string, order:string, categoryBy:string, categoryProvided: boolean) {
+    getList(page:number, per_page:number, searchContext:any, sort:string, order:string, categoryBy:string, categoryProvided: boolean, associationField: string, 
+        expt: boolean, ignoreField: string) {
+
         let params = new HttpParams()
             .set('__page', page.toString())
             .set('__per_page', per_page.toString());
@@ -59,7 +61,13 @@ export class BaseService {
         if (categoryProvided) {
             params = params.set('__categoryProvided', 'y');
         }
+        if (associationField) {
+            params = params.set('__asso', associationField);
+        }
 
+        if (ignoreField) {
+            params = params.set('__ignore', ignoreField);
+        }
         let httpOptions = {
             params: params,
             headers: new HttpHeaders({ 'Accept': 'application/json' }),
@@ -73,7 +81,9 @@ export class BaseService {
                 );
         }
         httpOptions.params = httpOptions.params.set('action', "Search");
-        return this.http.post<any>(this.serviceUrl+ "mddsaction/get", searchContext, httpOptions)
+
+        const url = expt ? "mddsaction/export" : "mddsaction/get";
+        return this.http.post<any>(this.serviceUrl+ url, searchContext, httpOptions)
             .pipe(
                 catchError(this.errorResponseHandler)
             );
