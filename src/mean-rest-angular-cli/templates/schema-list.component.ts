@@ -54,4 +54,10 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
       this.detail = this.formatDetail(detail);
       this.populateList();
   }
+
+  static getInstance() {
+    //used by others to call some common functions
+    return new <%-SchemaName%>ListComponent(<%_ if (schemaHasRef) {%>null, <%}%>null, null, null, null, null);
+  }
 }
+

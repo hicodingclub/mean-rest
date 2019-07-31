@@ -5,7 +5,7 @@
     for (let field of pictureFields){
       if (field.hidden) continue;
 
-      let fn = field.fieldName; let ft = field.type; let ref_link = true;
+      let fn = field.fieldName; let ft = field.type;;
       %>
       <div class="list-head-picture mr-1 d-inline-block"><% include schema-display.field.html %>
       </div>
@@ -15,7 +15,7 @@
     for (let [index, field] of indexedFields.entries()){
         if (field.hidden) continue;
 
-        let fn = field.fieldName; let ft = field.type; let ref_link = true;
+        let fn = field.fieldName; let ft = field.type;;
         %>
           <div class="mr-1 d-inline-block">
             <% include schema-display.field.html %>
@@ -25,7 +25,7 @@
     for (let [index, field] of otherFields.entries()){
         if (field.hidden) continue;
 
-        let fn = field.fieldName; let ft = field.type; let ref_link = true;
+        let fn = field.fieldName; let ft = field.type;;
         %>
         <div *ngIf="detail['<%-fn%>']" class="mr-3 d-inline-block">
           <div class="d-inline-block"><label><%-field.displayName%>:</label></div>

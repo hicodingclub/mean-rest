@@ -10,7 +10,8 @@
     }
     if (refObjects.length > 0) {%>
           this.referenceFields = [<%for (let itm of refObjects) {%>'<%-itm[0]%>', <%}%>];
-          this.referenceFieldsMap = {<%for (let itm of refObjects) {%>'<%-itm[0]%>': '<%-itm[1]%>',<%}%>};<%}%>
+          this.referenceFieldsMap = {<%for (let itm of refObjects) {%>'<%-itm[0]%>': '<%-itm[1]%>',<%}%>};
+          this.referenceFieldsReverseMap = {<%for (let itm of refObjects) {%>'<%-itm[1]%>': '<%-itm[0]%>',<%}%>};<%}%>
 <%_ let dateObjects = [];
     for (let field of theView) { 
         if (field.type === "SchemaDate") dateObjects.push(field.fieldName);

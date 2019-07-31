@@ -65,8 +65,10 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
           continue;
       }
       if (refApi.includes("L")) {%>
-    //Load first reference, by default
-    this.router.navigate(['./<%-ref[0]%>/list', {}], {relativeTo: this.route, queryParamsHandling: 'preserve',});<%
+    //Load first reference, if not others activated
+    if (!this.isChildRouterActivated()) {
+      this.router.navigate(['./<%-ref[0]%>/list', {}], {relativeTo: this.route, queryParamsHandling: 'preserve',});
+    }<%
         break;
       }
     }%>

@@ -1,0 +1,18 @@
+<% if (detailTitle) {%>
+<div class="mt-4 mb-4">
+	<h3><%-detailTitle%></h3>
+</div><%}%>
+<div class="detail w-100" *ngIf="detail">
+	<div class="grid-fields">
+	<%_ viewFields = briefView; let viewGrp = briefViewGrp; let view='detail'; let largePicture=false;
+		let ref_link = false;
+	%><%_ include schema-display.asso.html %>
+	</div>
+
+	<%for (let asso of assoRoutes) {%>
+	<div *ngIf=" '<%-asso[0]%>' === associationSchema && '<%-asso[2]%>' === associationField">
+		<app-<%-asso[0]%>-list-asso [asso]="'<%-asso[2]%>'" ></app-<%-asso[0]%>-list-asso>
+	</div>
+	<%}%>
+
+</div>

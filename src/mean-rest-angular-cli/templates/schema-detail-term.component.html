@@ -3,11 +3,11 @@
 	<div class="card text-left transparent-border ">
 		<div class="info-term-text"><%_{
 			let view='detail'; let largePicture=false;
-			let field = detailView[0]; let fn = field.fieldName; let ft = field.type; let ref_link = true;%>
+			let field = detailView[0]; let fn = field.fieldName; let ft = field.type;;%>
 			<div><% include schema-display.field.html %>
 			</div><%_ }%><%_{
 			let view='detail'; let largePicture=false;
-			let field = detailView[1]; let fn = field.fieldName; let ft = field.type; let ref_link = true;%>
+			let field = detailView[1]; let fn = field.fieldName; let ft = field.type;;%>
 			<div>
 				<input class="mr-3" *ngIf="detail['<%-fn%>']" type="checkbox" [(ngModel)]="termChecked"/>				
 				<label><% include schema-display.field.html %>

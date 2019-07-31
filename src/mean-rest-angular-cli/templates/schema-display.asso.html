@@ -4,17 +4,9 @@
       let otherFields = viewFields.filter(x => !x.picture && !x.isIndexField);
       let otherFieldsName = otherFields.map(x=>x.fieldName);
       
-      if (pictureFields.length > 0 || indexedFields.length > 0){%>
-      <div class="card-header grid-head"><%
-      for (let field of pictureFields){
-        if (field.hidden) continue;
-
-        let fn = field.fieldName; let ft = field.type;;
-        %>
-        <div class="grid-head-picture mr-1"><% include schema-display.field.html %>
-        </div><%
-      }%>
-        <div class="ml-1 d-inline-block">
+      if (indexedFields.length > 0){%>
+      <div class="grid-head">
+          <div class="ml-1 d-inline-block">
           <h5><%
       for (let [index, field] of indexedFields.entries()){
           if (field.hidden) continue;
@@ -28,7 +20,7 @@
           </h5>
         </div>
       </div><%}%>
-      <div class="card-body"><%
+      <div><%
       for (let fieldGrp of viewGrp) {
           let fieldGrpProcessed = fieldGrp.filter(x=>otherFieldsName.includes(x.fieldName) && !x.hidden);
           if (fieldGrpProcessed.length < 1) {

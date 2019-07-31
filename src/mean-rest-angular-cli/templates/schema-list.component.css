@@ -303,6 +303,7 @@ margin-left: 1rem;
     
 .add-area {
     margin-left: 0.75rem;
+    margin-top: 1rem;
 }
 
 .badge-click {
@@ -411,4 +412,9 @@ div.badge-click:hover {
   left: 50%;
   transform: translate(-50%, 0);
   position: relative;
+}
+
+.asso-link {
+  font-style: italic;
+  font-size: 0.8rem;
 }

@@ -12,6 +12,9 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
   styleUrls: ['./<%-schemaName%>-list.component.css']
 })
 export class <%-SchemaName%>ListSubComponent extends <%-SchemaName%>ListComponent implements OnInit {
+  public parentSchema;
+  public parentItemId;
+
   constructor(
       public <%-schemaName%>Service: <%-SchemaName%>Service,
       public injector: Injector,
@@ -24,8 +27,13 @@ export class <%-SchemaName%>ListSubComponent extends <%-SchemaName%>ListComponen
   }
 
   ngOnInit() {
-      let ref = this.getParentRouteRefField();
-      let id = this.getParentRouteItemId();
+    
+      this.parentSchema = this.getParentRouteRefField();
+      let ref = this.referenceFieldsReverseMap[this.parentSchema];
+
+      this.parentItemId = this.getParentRouteItemId();
+      let id = this.parentItemId;
+
       this.detail = {};
 
       this.parentData = {};

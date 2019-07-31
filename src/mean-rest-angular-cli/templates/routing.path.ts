@@ -3,9 +3,11 @@
   <%_ if (api.includes("L")) {%>import { <%-schm.SchemaName%>ListComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list.component';<%}%>
   <%_ if (api.includes("R")) {%>import { <%-schm.SchemaName%>DetailComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail.component';<%}%>
   <%_ if (api.includes("U") || api.includes("C")) {%>import { <%-schm.SchemaName%>EditComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-edit/<%-schm.schemaName%>-edit.component';<%}%>
-    <%_ if (schm.schemaHasRef) {%>
-  <%_ if (api.includes("L")) {%>import { <%-schm.SchemaName%>ListSubComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-sub.component';<%}%>
-<%}%>
+  <%_ if (schm.schemaHasRef) {
+    if (api.includes("L")) {%>import { <%-schm.SchemaName%>ListSubComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-sub.component';<%}
+  }%><%_if (api.includes("R")) {
+    if (schm.assoRoutes.length > 0 ) {%>
+import { <%-schm.SchemaName%>AssoComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail-asso.component';<%} }%>
 <%_ }%>
 <%_ if (authRequired) {%>
 import { AuthGuard } from 'mdds-angular-auth';
@@ -33,6 +35,10 @@ export const <%-schm.schemaName%>RoutingPath = [
      if (!schm.permission.includes('U')) {%>, canActivate: [AuthGuard]<%}%>},<%}%>
     <% if (api.includes("C")) {%>{path: 'new', component: <%-schm.SchemaName%>EditComponent<%
      if (!schm.permission.includes('C')) {%>, canActivate: [AuthGuard]<%}%>},<%}%>
+    <%if (api.includes("R")) {
+        for (let r of schm.assoRoutes) {%>
+    {path: 'asso/:id/<%-r[0]%>/<%-r[2]%>', component: <%-schm.SchemaName%>AssoComponent<%
+      if (!schm.permission.includes('R')) {%>, canActivate: [AuthGuard]<%}%>},<%}%><%}%>
     <%if (api.includes("L")) {%>{path: '**', redirectTo: 'list', pathMatch: 'full'}<%}%>
 ];
 <%_ }%>

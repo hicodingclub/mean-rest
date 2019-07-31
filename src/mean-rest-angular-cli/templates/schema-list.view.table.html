@@ -27,7 +27,7 @@
 	            </td>
 <%_ let view = 'list'; for (let field of briefView){ 
 				if (field.hidden) continue;
-				let fn = field.fieldName, ft = field.type; let ref_link = true; %>
+				let fn = field.fieldName, ft = field.type;; %>
 	            <td <%if(clickToDetail){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%><%if(clickToCheck){%>(click)="onItemChecked(i)" class="pointer"<%}%>>
 	            	<% include schema-display.field.html %>
 	            </td><%_ } %><%if(canDelete || canUpdate || canCheck){%>

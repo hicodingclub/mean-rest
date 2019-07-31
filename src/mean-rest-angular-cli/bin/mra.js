@@ -93,6 +93,8 @@ var templates = {
   schemaSelectComponentHtml: ["../templates/schema-select.component.html", "select.component.html", "select component html file", 'W'],
   schemaListSubComponent: ["../templates/schema-list-sub.component.ts", "list-sub.component.ts", "list-sub component file", 'W'],
   schemaListSubComponentHtml: ["../templates/schema-list-sub.component.html", "list-sub.component.html", "list-sub component html file", 'W'],
+  schemaListAssoComponent: ["../templates/schema-list-asso.component.ts", "list-asso.component.ts", "list-asso component file", 'W'],
+  schemaListAssoComponentHtml: ["../templates/schema-list-asso.component.html", "list-asso.component.html", "list-asso component html file", 'W'],
   schemaListActSelComponent: ["../templates/schema-list-act-s.component.ts", "list-act-sel.component.ts", "list-act-sel component file", 'W'],
   schemaListActSelComponentHtml: ["../templates/schema-list-act-s.component.html", "list-act-sel.component.html", "list-act-sel component html file", 'W'],
   schemaListActSldComponent: ["../templates/schema-list-act-sld.component.ts", "list-act-sld.component.ts", "list-act-sld component file", 'W'],
@@ -127,6 +129,8 @@ var templates = {
       ["../templates/schema-detail-term.component.css", "detail.component.css", "detail component css file", 'W'],
     ],
   },
+  schemaDetailAssoComponent: ["../templates/schema-detail-asso.component.ts", "detail-asso.component.ts", "detail association component file", 'W'],
+  schemaDetailAssoComponentHtml: ["../templates/schema-detail-asso.component.html", "detail-asso.component.html", "detail association component html file", 'W'],
 
   schemaDetailSelComponent: ["../templates/schema-detail-sel.component.ts", "detail-sel.component.ts", "detail select component file", 'W'],
   schemaDetailSelComponentHtml: ["../templates/schema-detail-sel.component.html", "detail-sel.component.html", "detail select component html file", 'W'],
@@ -916,6 +920,8 @@ function main() {
       }
     }
 
+    let associations = schemaDef.associations || {};
+
     let detailType = 'normal';
     let detailTitle = '';
     let listType = 'list';
@@ -1252,6 +1258,8 @@ function main() {
       api,
       actionViews,
       refApi: {},
+      associations, // in the parent schema that needs to show associations
+      associationFor: [], //in the association schema itself
       
       fileServer: fileServer,
 
@@ -1309,6 +1317,48 @@ function main() {
     }
     schemaObj.referredBy = referenceMap.filter(x=>x[3]==schemaName);
       //Each item has [who (it), Who, which field, refer to me, Me, WhoCamel, MeCamel, isArray, its api, my api, its name] format
+
+
+    let assoRoutes = []; 
+
+    for (let ref of schemaObj.referredBy) {
+      let refApi = ref[8]; 
+      let refname = ref[0]; //ref all in lower case
+      let refName = ref[10]; //defined schema name
+      if (schemaObj.detailRefBlackList && schemaObj.detailRefBlackList.includes(refName)) {
+        continue;
+      }
+      if (!refApi.includes("L")) {
+        continue;
+      }
+      if (!schemaObj.associations[refName]) {
+        continue;
+      }
+      // refer to which schema(lower case), the schema's formal schema name, the asso filed, 
+      //    the Label text triggering the asso, my schemaName (lower case)
+      //    the assoField schema (lower case), the assoField SchemaName
+      let [assoField, assoText] = schemaObj.associations[refName];
+      let assoRecord = [refname, refName, assoField, assoText, schemaObj.schemaName];
+
+      let assocationSchema = schemaMap[ref[0]];
+
+      for (let field of assocationSchema.detailView) {
+        //find out the schema of the association schema
+        if (field.fieldName === assoField && field.ref) {
+          assoRecord.push(field.ref);
+          assoRecord.push(field.Ref);
+        } else {
+          assoRecord.push(null);
+          assoRecord.push(null);
+        }
+      }
+
+      assoRoutes.push(assoRecord);
+      // Put to the association schema object
+      assocationSchema.associationFor.push(assoRecord);
+    }
+
+    schemaObj.assoRoutes = assoRoutes;
   }
 
   let renderObj = {
@@ -1353,7 +1403,7 @@ function main() {
   }
   
   for (let key in schemaMap) {
-  	let schemaObj = renderObj.schemaMap[key];
+    let schemaObj = renderObj.schemaMap[key];
   	let componentDir = schemaObj.componentDir;
   	let schemaName = schemaObj.schemaName;
 
@@ -1372,7 +1422,12 @@ function main() {
         }
     	if (schemaObj.schemaHasRef) {
     		generateSourceFile(schemaName, templates.schemaListSubComponent, schemaObj, subComponentDir);
-    		generateSourceFile(schemaName, templates.schemaListSubComponentHtml, schemaObj, subComponentDir);
+        generateSourceFile(schemaName, templates.schemaListSubComponentHtml, schemaObj, subComponentDir);
+        
+        if (schemaObj.associationFor.length > 0) {
+      		generateSourceFile(schemaName, templates.schemaListAssoComponent, schemaObj, subComponentDir);
+          generateSourceFile(schemaName, templates.schemaListAssoComponentHtml, schemaObj, subComponentDir);
+        }
       }
       if (schemaObj.actionViews.includes('H')) { //generate home component
         generateSourceFile(schemaName, templates.schemaListHomeComponent, schemaObj, subComponentDir);
@@ -1398,12 +1453,16 @@ function main() {
     		generateSourceFile(schemaName, templates.schemaDetailSelComponentHtml, schemaObj, subComponentDir);
     		generateSourceFile(schemaName, templates.schemaDetailPopComponent, schemaObj, subComponentDir);
     		generateSourceFile(schemaName, templates.schemaDetailPopComponentHtml, schemaObj, subComponentDir);
-        }
+      }
     	if (schemaObj.schemaHasRef) {
     		(schemaName, templates.schemaListSubComponent, schemaObj, subComponentDir);
     		generateSourceFile(schemaName, templates.schemaDetailSubComponent, schemaObj, subComponentDir);
     		generateSourceFile(schemaName, templates.schemaDetailSubComponentHtml, schemaObj, subComponentDir);
-    	}
+      }
+      if (schemaObj.assoRoutes.length > 0) { // has association defined
+    		generateSourceFile(schemaName, templates.schemaDetailAssoComponent, schemaObj, subComponentDir);
+    		generateSourceFile(schemaName, templates.schemaDetailAssoComponentHtml, schemaObj, subComponentDir);
+      }
     }
 
     if (schemaObj.api.includes("U") || schemaObj.api.includes("C")) {

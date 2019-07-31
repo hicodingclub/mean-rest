@@ -38,14 +38,18 @@ export class <%-SchemaName%>Component extends BaseComponent {
     @ViewChild('<%-ModuleName%>Modal') public focusEl: ElementRef;<%}%>
 
     constructor(
-      <%_ if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
+      <% if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
       public <%-schemaName%>Service: <%-SchemaName%>Service,
       public injector: Injector,
       public router: Router,
       public route: ActivatedRoute,
       public location: Location,
       public view: ViewType ) {
+
         super(<%-schemaName%>Service, injector, router, route, location, view, itemCamelName);
+
+        <% include schema-base-construct.component.ts%>
+
         this.schemaName = '<%-schemaName%>';
         <% if (schemaHasDate)  {%>this.dateFormat = '<%-dateFormat%>';
         this.timeFormat = '<%-timeFormat%>';<%}%>
