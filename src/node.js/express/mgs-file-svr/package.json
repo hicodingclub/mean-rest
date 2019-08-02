@@ -1,6 +1,6 @@
 {
   "name": "mdds-mongoose-express-file-server",
-  "version": "0.7.1",
+  "version": "0.7.10",
   "description": "Model Driver Development Stack - File server which stores files in MongoDB through Mongoose.",
   "main": "index.js",
   "scripts": {
