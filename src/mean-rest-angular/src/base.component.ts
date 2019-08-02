@@ -1096,8 +1096,11 @@ export class BaseComponent implements BaseComponentInterface {
         const categoryProvided = typeof this.selectedCategory === 'number'? true : false;
         let expt = true;
         this.service.getList(0, 0, searchContext, this.listSortField, this.listSortOrder, this.categoryBy, categoryProvided, this.associationField, expt, this.ignoreField).subscribe(
-            result => {
-                this.exportLink = result.link;
+            data => {
+                // xlsx file returned
+                const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const url= window.URL.createObjectURL(blob);
+                window.open(url);
             },
             this.onServiceError
         );

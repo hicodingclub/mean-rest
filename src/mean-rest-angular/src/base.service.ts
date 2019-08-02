@@ -68,13 +68,24 @@ export class BaseService {
         if (ignoreField) {
             params = params.set('__ignore', ignoreField);
         }
-        let httpOptions = {
-            params: params,
-            headers: new HttpHeaders({ 'Accept': 'application/json' }),
-        };
+
+        let httpOptions;
+        if (expt) {
+            httpOptions = {
+                params,
+                headers: new HttpHeaders({'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+                responseType: 'blob' as 'blob',
+            };
+        } else {
+            httpOptions = {
+                params,
+                headers: new HttpHeaders({'Accept': 'application/json'}),
+                responseType: 'json' as 'json',
+            };
+        }
         
         if (!searchContext) {
-            return this.http.get<any>(this.serviceUrl, httpOptions)
+            return this.http.get(this.serviceUrl, httpOptions)
                 .pipe(
                     map(this.formatList),
                     catchError(this.errorResponseHandler)
@@ -83,7 +94,7 @@ export class BaseService {
         httpOptions.params = httpOptions.params.set('action', "Search");
 
         const url = expt ? "mddsaction/export" : "mddsaction/get";
-        return this.http.post<any>(this.serviceUrl+ url, searchContext, httpOptions)
+        return this.http.post(this.serviceUrl+ url, searchContext, httpOptions)
             .pipe(
                 catchError(this.errorResponseHandler)
             );
