@@ -411,8 +411,97 @@ class RestController {
 
     console.log('combinedHeaders, ', combinedHeaders);
     console.log('combinedRows, ', combinedRows);
-    return res.send(headers);
+    //return res.send(headers);
 
+    const excel = require('node-excel-export');
+
+    const styles = {
+      headerGray: {
+        fill: {
+          fgColor: {
+            rgb: 'D3D3D3FF'
+          }
+        },
+        font: {
+          color: {
+            rgb: '000000FF' // Blue fount
+          },
+          sz: 14,
+          bold: true,
+          underline: true
+        }
+      },
+      headerDark: {
+        fill: {
+          fgColor: {
+            rgb: 'FF000000'
+          }
+        },
+        font: {
+          color: {
+            rgb: 'FFFFFFFF'
+          },
+          sz: 14,
+          bold: true,
+          underline: true
+        }
+      },
+      cellPink: {
+        fill: {
+          fgColor: {
+            rgb: 'FFFFCCFF'
+          }
+        }
+      },
+      cellGreen: {
+        fill: {
+          fgColor: {
+            rgb: 'FF00FF00'
+          }
+        }
+      }
+    };
+
+    const heading = [[
+      {value: 'Class Student List', style: styles.headerGray}
+    ]];
+
+    const specifications = {};
+    for (let f of combinedHeaders) {
+      specifications[f] = {
+        displayName: f,
+        headerStyle: styles.headerGray,
+        width: '25', // width in chars (passed as string)
+      }
+    }
+
+    const dataset = combinedRows.map(x => {
+      const obj = {};
+      for (let [i, f] of combinedHeaders.entries()) {
+        obj[f] = x[i];
+      }
+      return obj;
+    });
+
+    // Create the excel report.
+    // This function will return Buffer
+    const report = excel.buildExport(
+      [ // <- Notice that this is an array. Pass multiple sheets to create multi sheet report
+        {
+          name: 'Report', // <- Specify sheet name (optional)
+          heading: heading, // <- Raw heading array (optional)
+          // merges: merges, // <- Merge cell ranges
+          specification: specifications, // <- Report specification
+          data: dataset // <-- Report data
+        }
+      ]
+    );
+
+    const fileName = `${name}-` + Date.now() + (Math.random() * 100).toFixed(2) + '.xlsx';
+
+    // You can then return this straight
+    res.attachment(`${fileName}.xlsx`); // This is sails.js specific (in general you need to set headers)
+    return res.send(report);
   }
 
   async searchAll(req, res, next, searchContext, expt) {

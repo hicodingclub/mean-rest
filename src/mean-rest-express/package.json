@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/LuckyBang/mean-rest#readme",
   "dependencies": {
+    "node-excel-export": "^1.4.4"
   },
   "peerDependencies": {
     "express": "^4.16.3",
