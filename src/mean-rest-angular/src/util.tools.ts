@@ -49,7 +49,7 @@ export class Util {
     return str;
   }
 
-  static gStringifyFields(detail:any, fields:string[]): string {
+  static gStringifyFields(detail:any, fields:string[]): string { //used for reference category only now
     let str = "";
     if (!str)  {
         for (let prop in detail) {
@@ -60,7 +60,7 @@ export class Util {
     }
     if (!str) str = detail["_id"]?detail["_id"]:"..."
     str = str.replace(/^\s+|\s+$/g, '')
-    if (str.length > 30) str = str.substr(0, 27) + '...';
+    // if (str.length > 30) str = str.substr(0, 27) + '...'; Don't restrict length here
     return str;
   }
 

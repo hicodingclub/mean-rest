@@ -796,6 +796,7 @@ class RestController {
     let id = req.params[idParam];
     //let dbExec = model.findById(id, detailView)
     let dbExec = model.findById(id); //return every thing for the document
+
     for (let pi = 0; pi < populateArray.length; pi++) {
       let p = populateArray[pi];
       //dbExec = dbExec.populate(p);
