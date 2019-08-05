@@ -43,7 +43,9 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
 
           this.listViewFilter = '<%-listType%>';<% if (defaultSortField) { %>
           this.setListSort('<%-defaultSortField%>', '<%-defaultSortFieldDisplay%>', '<%-defaultSortOrder%>');<%}%><%if (listCategoryField) {%>
-          this.categoryBy = '<%-listCategoryField%>';<%}%>
+          this.categoryBy = '<%-listCategoryField%>';<%}%><%if (listCategoryShowMore) {%>
+          this.listCategoryShowMore = '<%-listCategoryShowMore%>';<%}%>
+
   }
 
   ngOnInit() {

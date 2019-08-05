@@ -8,6 +8,9 @@
 		<a class="nav-link" [ngClass]="{'active': idx === selectedCategory }" [routerLink]="['.']" [queryParamsHandling]="preserve" (click)="categorySelected(idx)">{{ele}}</a>
 	</li>
 </ul>
+<div *ngIf="categoryBy && listCategoryShowMore && categoryMore.length > 0" class="mb-5">
+	{{categoryMore[selectedCategory]}}
+</div>
 
 <div>
 	<div class="container search"><% if (!disableListSearch) {%>

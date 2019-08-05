@@ -1,6 +1,7 @@
                 <%if(ft == 'ObjectId') { 
                     if (typeof ref_link === 'undefined') ref_link = true;
                     let ref_l = false;
+
                     if (refApi[field.ref] && refApi[field.ref].includes("R") && ref_link) {ref_l = true;}%>
                	  <%if (ref_l){%><a routerLink="."  (click)="onDisplayRefClicked('<%-fn%>', detail['<%-fn%>'], $event)"><%_}%>
 	            	{{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}}

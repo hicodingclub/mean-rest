@@ -36,8 +36,11 @@
 		        	<%-field.displayName%>
 		        </th><%_ } %>		        
                 <th scope="col" style="width:2rem;"></th>
-                <%_ if ( (!embeddedViewOnly && api.includes("R")) || (embeddedViewOnly && api.includes("D"))) {%>
-		        <th scope="col" style="width:2rem;"></th><%}%>
+                <%_ if ( (!embeddedViewOnly && api.includes("R")) || (embeddedViewOnly && api.includes("D"))) {
+					let width = '2rem';
+					if (!embeddedViewOnly && api.includes("R")) { width = '5rem';}
+					%>
+		        <th scope="col" style="width:<%-width%>;"></th><%}%>
 	        </tr>
 	    </thead>
 	    <tbody>
@@ -61,7 +64,7 @@
                 <%_ if ( (!embeddedViewOnly && api.includes("R")) || (embeddedViewOnly && api.includes("D"))) {%>
 	            <td>
                 <%_ if (!embeddedViewOnly && api.includes("R")) {%>
-	            	<a routerLink="." (click)="onDetailLinkClicked(detail['_id'])"><i class="fas fa-external-link-square-alt" title="View Details"></i></a>
+					<span class="read-more-in-table" (click)="onDetailLinkClicked(detail['_id'])">Detail <i class="fas fa-arrow-right" ></i></span>
                 <%_ } else if (embeddedViewOnly && api.includes("D")){%>
 	            	<a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a>
                 <%_ }%>

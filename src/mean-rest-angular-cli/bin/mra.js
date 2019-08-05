@@ -931,6 +931,7 @@ function main() {
     let defaultSortField, defaultSortOrder;
     let homeListNumber = 4;
     let listCategoryField = '';
+    let listCategoryShowMore = '';
 
     let detailActions = []; //extra buttons that trigger other pipelines
     let detailActionButtons = ['Edit', 'New', 'Delete'];
@@ -989,6 +990,7 @@ function main() {
       detailRefName = mraUI.detailRefName || detailRefName;
       selectActionViewType = mraUI.selectActionViewType || selectActionViewType;
       listCategoryField = mraUI.listCategoryField || listCategoryField;
+      listCategoryShowMore = mraUI.listCategoryShowMore || listCategoryShowMore;
 
       if (mraUI.defaultListSort) {
         const keys = Object.keys(mraUI.defaultListSort);
@@ -1144,6 +1146,12 @@ function main() {
         if (!compositeEditFields.includes(x.fieldName)) compositeEditBriefView.push(x);
       });
     }
+    if (api.includes("R")) { //also add the "Detailed" view for links on reference
+      let compositeEditFields = compositeEditBriefView.map( x => x.fieldName);
+      detailView.forEach(  function(x) {
+        if (!compositeEditFields.includes(x.fieldName)) compositeEditBriefView.push(x);
+      });
+    }
 
   	let SchemaName = capitalizeFirst(schemaName);
   	let SchemaCamelName = viewName? viewName : capitalizeFirst(name);
@@ -1238,6 +1246,7 @@ function main() {
       disableListSearch,
       listActionButtons,
       listCategoryField,
+      listCategoryShowMore,
 
       detailType, // normal, post, info, slide, term...
       detailActionButtons,
