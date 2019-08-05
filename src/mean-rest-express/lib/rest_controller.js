@@ -125,10 +125,15 @@ const fieldReducerForRef = function(refObj, indexFields) {
   return newRefObj;
 };
 
-const objectReducerForRef = function(obj, populateMap) {
-  if (typeof obj !== 'object' || obj == null) {
-    return obj;
+const objectReducerForRef = function(o, populateMap) {
+  if (typeof o !== 'object' || o == null) {
+    return o;
   }
+  let obj = {};
+  for (let p in o) {
+    obj[p] = o[p];
+  }
+
   for (let path in populateMap) {
     let fields = populateMap[path].match(/\S+/g); // \S matches no space characters.
     if (!fields) continue;
@@ -185,12 +190,14 @@ const resultReducerForRef = function (result, populateMap) {
   if (typeof result !== 'object' || result == null) { //array is also object
     return result;
   }
+
+  let r;
   if (Array.isArray(result)) {
-    result = result.map(obj=>objectReducerForRef(obj, populateMap));
+    r = result.map(obj=>objectReducerForRef(obj, populateMap));
   } else {
-    result = objectReducerForRef(result, populateMap);
+    r = objectReducerForRef(result, populateMap);
   }
-  return result;
+  return r;
 };
 
 const objectReducerForView  = function(obj, viewStr) {
@@ -513,7 +520,7 @@ class RestController {
     let __page = 1;
     let __per_page = PER_PAGE;
     let __sort, __order;
-    let __categoryBy, __categoryProvided;
+    let __categoryBy, __categoryProvided, __listCategoryShowMore;
     let __asso;
     for (let prop in req.query) {
       if (prop === '__page') {
@@ -526,6 +533,8 @@ class RestController {
         __order = req.query[prop];
       } else if (prop === '__categoryBy') {
         __categoryBy = req.query[prop];
+      } else if (prop === '__listCategoryShowMore') {
+        __listCategoryShowMore = req.query[prop];
       } else if (prop === '__categoryProvided') {
         __categoryProvided = req.query[prop];
       } else if (prop === '__asso') {
@@ -547,6 +556,7 @@ class RestController {
     //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
     const briefView = views[0];
 
+    // __asso will be populated with brief view
     const [populateArray, populateMap] = this.getPopulateInfo(populates.briefView, __asso);
 
     let count = 0;
@@ -574,6 +584,8 @@ class RestController {
     query = ownerPatch(query, owner, req);
 
     let categories = [];
+    let categoryObjectsIndex = [];
+    let categoryObjectsBrief = [];
     let categoryObjects = [];
     if (__categoryBy && !__categoryProvided) {
       // need to query DB to get the category first.
@@ -593,9 +605,18 @@ class RestController {
           return obj;
         });
         categoryObjects = JSON.parse(JSON.stringify(categoryObjects));
-        categoryObjects = resultReducerForRef(categoryObjects, populateMap);
+        // get the index population of the category fields
+        const [indexPopulateArray, indexPopulateMap] = this.getPopulateInfo(populates.briefView, null);
+        categoryObjectsIndex = resultReducerForRef(categoryObjects, indexPopulateMap);
+        categories = categoryObjectsIndex.map(x => x[__categoryBy]);
 
-        categories = categoryObjects.map(x => x[__categoryBy]);
+        // get the biref population of the category fields
+        if (__listCategoryShowMore) {
+          const [briefPopulateArray, briefPopulateMap] = this.getPopulateInfo(populates.briefView, __categoryBy);
+          categoryObjectsBrief = resultReducerForRef(categoryObjects, briefPopulateMap);
+          categoryObjectsBrief = categoryObjectsBrief.map(x => x[__categoryBy]);
+        }
+
       } catch (err) {
         return next(err);
       }
@@ -647,7 +668,8 @@ class RestController {
         per_page: __per_page,
         items: result,
         categoryBy: __categoryBy,
-        categories: categoryObjects,
+        categories: categoryObjectsIndex,
+        categoriesBrief: categoryObjectsBrief,
       };
       output = JSON.parse(JSON.stringify(output));
       output.items = resultReducerForRef(output.items, populateMap);
