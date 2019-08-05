@@ -79,7 +79,9 @@ export class BaseComponent implements BaseComponentInterface {
     public listSortFieldDisplay: string;
     public listSortOrder: string; // 'asc', 'desc'
     public categoryBy: string; // field whose value is used as category
+    public listCategoryShowMore: string = undefined; // show more info for the category (if category is ref)
     public categories: [] = []; // stored categories
+    public categoryMore: [] = []; //stored more details
     public categoryDisplays: string[] = []; //stored display name of categories
     public selectedCategory: number = undefined; // index in categories
 
@@ -736,7 +738,7 @@ export class BaseComponent implements BaseComponentInterface {
             searchContext['$and'][1]['$and'].push(o);
         }
         let expt = false;
-        this.service.getList(1, 1, searchContext, null, null, null, false, null, expt, this.ignoreField).subscribe(
+        this.service.getList(1, 1, searchContext, null, null, null, false, false, null, expt, this.ignoreField).subscribe(
             result => {
                 let detail = {};
                 if (result.items && result.items.length >= 1) {
@@ -942,7 +944,7 @@ export class BaseComponent implements BaseComponentInterface {
         this.putToStorage("searchMoreDetail", this.searchMoreDetail);
         this.putToStorage("detail", this.detail);
     }
-    public searchList():EventEmitter<any>  {
+    public  searchList():EventEmitter<any>  {
         this.processSearchContext();
         //update the URL
         if (!this.isEmptyRoutingPath()) {
@@ -987,9 +989,10 @@ export class BaseComponent implements BaseComponentInterface {
         this.loadUIFromCache();
 
         const categoryProvided = typeof this.selectedCategory === 'number'? true : false;
+        const listCategoryShowMore = typeof this.listCategoryShowMore? true : false;
         let expt = false;
         this.service.getList(new_page, this.per_page, searchContext, this.listSortField, this.listSortOrder, 
-            this.categoryBy, categoryProvided, this.associationField, expt, this.ignoreField).subscribe(
+            this.categoryBy, listCategoryShowMore, categoryProvided, this.associationField, expt, this.ignoreField).subscribe(
           result => { 
             this.list = result.items.map(x=> {
                 let d = this.formatDetail(x);
@@ -999,8 +1002,12 @@ export class BaseComponent implements BaseComponentInterface {
 
             if (this.categoryBy && !categoryProvided) {
                 this.categories = result.categories.map(x=>this.formatDetail(x));
-                this.categoryDisplays = this.categories.map(x=>this.getFieldDisplayFromFormattedDetail(x, this.categoryBy));
                 this.selectedCategory = 0;
+
+                //categories is a array of this.detail format with the this.categoryBy field only
+                this.categoryDisplays = this.categories.map(x=>this.getFieldDisplayFromFormattedDetail(x, this.categoryBy));
+                //categoriesBrief is array of object of the category ref
+                this.categoryMore = result.categoriesBrief.map(x=>Util.gStringifyFields(x, this.listCategoryShowMore.match(/\S+/g)));
             }
 
             if (this.isDropdownList) {
@@ -1060,7 +1067,7 @@ export class BaseComponent implements BaseComponentInterface {
     }
     public setListSortAndRefresh(field:string, fieldDisplay:string, order:string): void {
         let refresh = this.setListSort(field, fieldDisplay, order);
-        if (refresh) this.populateList();
+        if (refresh) this.searchList(); // call search list, instead of populate list, in case there are other search context.
     }
     public toggleListSort(field:string, fieldDisplay:string): void {
         if (field !== this.listSortField) {
@@ -1094,8 +1101,10 @@ export class BaseComponent implements BaseComponentInterface {
         this.loadUIFromCache();
 
         const categoryProvided = typeof this.selectedCategory === 'number'? true : false;
+        const listCategoryShowMore = typeof this.listCategoryShowMore? true : false;
+
         let expt = true;
-        this.service.getList(0, 0, searchContext, this.listSortField, this.listSortOrder, this.categoryBy, categoryProvided, this.associationField, expt, this.ignoreField).subscribe(
+        this.service.getList(0, 0, searchContext, this.listSortField, this.listSortOrder, this.categoryBy, listCategoryShowMore, categoryProvided, this.associationField, expt, this.ignoreField).subscribe(
             data => {
                 // xlsx file returned
                 const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

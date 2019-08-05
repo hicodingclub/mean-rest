@@ -34,4 +34,36 @@ export class Util {
     throw new Error("Unable to copy obj! Its type isn't supported.");
   }
 
+  static gStringify(detail:any): string {
+    let str = "";
+    if (!str)  {
+        for (let prop in detail) {
+            if (prop !== '_id' && typeof detail[prop] !=='undefined' && typeof detail[prop] !== 'object') {
+                str += " " + detail[prop];
+            }
+        }
+    }
+    if (!str) str = detail["_id"]?detail["_id"]:"..."
+    str = str.replace(/^\s+|\s+$/g, '')
+    if (str.length > 30) str = str.substr(0, 27) + '...';
+    return str;
+  }
+
+  static gStringifyFields(detail:any, fields:string[]): string {
+    let str = "";
+    if (!str)  {
+        for (let prop in detail) {
+            if (fields.includes(prop) && typeof detail[prop] !== 'undefined' && typeof detail[prop] !== 'object') {
+                str += " " + detail[prop];
+            }
+        }
+    }
+    if (!str) str = detail["_id"]?detail["_id"]:"..."
+    str = str.replace(/^\s+|\s+$/g, '')
+    if (str.length > 30) str = str.substr(0, 27) + '...';
+    return str;
+  }
+
 }
+
+

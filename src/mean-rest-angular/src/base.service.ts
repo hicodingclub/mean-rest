@@ -46,7 +46,8 @@ export class BaseService {
         return list;
     }
 
-    getList(page:number, per_page:number, searchContext:any, sort:string, order:string, categoryBy:string, categoryProvided: boolean, associationField: string, 
+    getList(page:number, per_page:number, searchContext:any, sort:string, order:string, categoryBy:string, 
+        listCategoryShowMore: boolean, categoryProvided: boolean, associationField: string, 
         expt: boolean, ignoreField: string) {
 
         let params = new HttpParams()
@@ -60,6 +61,9 @@ export class BaseService {
         }
         if (categoryProvided) {
             params = params.set('__categoryProvided', 'y');
+        }
+        if (listCategoryShowMore) {
+            params = params.set('__listCategoryShowMore', 'y');
         }
         if (associationField) {
             params = params.set('__asso', associationField);
