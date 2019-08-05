@@ -1,6 +1,6 @@
 {
   "name": "mdds-angular-composite",
-  "version": "0.7.10",
+  "version": "0.7.20",
   "description": "Augular Composite that compose multiple componennt to be a single page",
   "scripts": {
     "copy": "cp README.md dist;",
