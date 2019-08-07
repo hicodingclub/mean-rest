@@ -1,6 +1,6 @@
 {
   "name": "mdds-angular-auth",
-  "version": "0.7.20",
+  "version": "0.7.60",
   "description": "Augular Authentication and Authorization Module",
   "scripts": {
     "copy": "cp README.md dist;",

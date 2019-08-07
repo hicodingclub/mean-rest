@@ -27,9 +27,9 @@
 
         let fn = field.fieldName; let ft = field.type;;
         %>
-        <div *ngIf="detail['<%-fn%>']" class="mr-3 d-inline-block">
-          <div class="d-inline-block"><label><%-field.displayName%>:</label></div>
-          <div class="ml-3 d-inline-block"><% include schema-display.field.html %>
+        <div *ngIf="detail['<%-fn%>']" class="mr-3 d-inline-flex flex-wrap">
+          <div><label><%-field.displayName%>:</label></div>
+          <div class="ml-3"><% include schema-display.field.html %>
           </div>
         </div><%_  
     }%><% if (cardHasLink) {%>
