@@ -999,6 +999,7 @@ function main() {
       selectActionViewType = mraUI.selectActionViewType || selectActionViewType;
       listCategoryField = mraUI.listCategoryField || listCategoryField;
       listCategoryShowMore = mraUI.listCategoryShowMore || listCategoryShowMore;
+      homeListNumber = mraUI.homeListNumber || homeListNumber;
 
       if (mraUI.defaultListSort) {
         const keys = Object.keys(mraUI.defaultListSort);
