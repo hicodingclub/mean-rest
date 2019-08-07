@@ -613,8 +613,7 @@ class RestController {
         // get the biref population of the category fields
         if (__listCategoryShowMore) {
           const [briefPopulateArray, briefPopulateMap] = this.getPopulateInfo(populates.briefView, __categoryBy);
-          categoryObjectsBrief = resultReducerForRef(categoryObjects, briefPopulateMap);
-          categoryObjectsBrief = categoryObjectsBrief.map(x => x[__categoryBy]);
+          categoryObjectsBrief = resultReducerForRef(categoryObjects, briefPopulateMap).map(x => x[__categoryBy]);
         }
 
       } catch (err) {

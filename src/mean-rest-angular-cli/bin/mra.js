@@ -129,6 +129,9 @@ var templates = {
       ["../templates/schema-detail-term.component.css", "detail.component.css", "detail component css file", 'W'],
     ],
   },
+  schemaDetailShowFieldCompoment: ["../templates/schema-detail-show-field.component.ts", "detail-field.component.ts", "detail show field component file", 'W'],
+  schemaDetailShowFieldCompomentHtml: ["../templates/schema-detail-show-field.component.html", "detail-field.component.html", "detail show field component html file", 'W'],
+
   schemaDetailAssoComponent: ["../templates/schema-detail-asso.component.ts", "detail-asso.component.ts", "detail association component file", 'W'],
   schemaDetailAssoComponentHtml: ["../templates/schema-detail-asso.component.html", "detail-asso.component.html", "detail association component html file", 'W'],
 
@@ -180,6 +183,7 @@ var getPrimitiveField = function(fieldSchema) {
     let enumValues;
     let ref, Ref, RefCamel;
     let editor = false;
+    let textarea = false;
     let requiredField = false;
 
     let flagDate = false;
@@ -213,6 +217,8 @@ var getPrimitiveField = function(fieldSchema) {
             } else if (fieldSchema.options.mraType === 'file' ) {
               flagFile = true;
               flagSharable = !!fieldSchema.options.mraSharable;
+            } else if (fieldSchema.options.textarea == true) {
+              textarea = true;
             }
             break;
         case "SchemaBoolean":
@@ -245,7 +251,7 @@ var getPrimitiveField = function(fieldSchema) {
     }
 
     return [type, jstype, numberMin, numberMax, maxlength, minlength,  enumValues, 
-            ref, Ref, RefCamel, editor,
+            ref, Ref, RefCamel, editor, textarea,
             flagDate, flagRef, flagEditor, flagPicture, flagFile, flagSharable];
 }
 
@@ -344,6 +350,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
       let enumValues;
       let ref, Ref, RefCamel;
       let editor = false;
+      let textarea = false;
       let requiredField = false;
       let fieldDescription = false;
 
@@ -378,7 +385,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           case "ObjectId":
           case "SchemaDate":
               [type,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
-              ref, Ref, RefCamel, editor,
+              ref, Ref, RefCamel, editor, textarea,
               flagDate, flagRef, flagEditor, flagPicture, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema);
               if (flagDate) hasDate = true;
@@ -391,7 +398,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
               break;
           case "SchemaArray":
               [elementType,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
-              ref, Ref, RefCamel, editor,
+              ref, Ref, RefCamel, editor, textarea,
               flagDate, flagRef, flagEditor, flagPicture, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema.caster);
               //rewrite the default value for array
@@ -421,7 +428,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
               break;
           case "Map":
               [elementType,  jstype,  numberMin,  numberMax,  maxlength,  minlength,  enumValues, 
-              ref, Ref, RefCamel, editor,
+              ref, Ref, RefCamel, editor,  textarea,
               flagDate, flagRef, flagEditor, flagPicture, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema['$__schemaType']);
               //console.log("getPrimitiveField", getPrimitiveField(fieldSchema['$__schemaType']));
@@ -465,13 +472,14 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           fieldName: item,
           FieldName: capitalizeFirst(item),
           displayName: displayNames[item] || camelToDisplay(item),
-          hidden: hidden,
-          type: type,
-          jstype: jstype,
-          ref: ref,
-          Ref: Ref,
-          RefCamel: RefCamel,
-          editor: editor,
+          hidden,
+          type,
+          jstype,
+          ref,
+          Ref,
+          RefCamel,
+          editor,
+          textarea,
           picture: flagPicture, // a picture field
           file: flagFile, // a file field
           sharable: flagSharable, // picture or file is sharable
@@ -479,21 +487,21 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           required: requiredField,
           defaultValue: defaultValue,
           description: fieldDescription,
-          numberMin: numberMin,
-          numberMax: numberMax,
-          maxlength: maxlength,
-          minlength: minlength,
-          enumValues: enumValues,
+          numberMin,
+          numberMax,
+          maxlength,
+          minlength,
+          enumValues,
           validators: validatorArray,
 
           isIndexField: isIndexField,
-          sortable: sortable,
+          sortable,
 
           //for array and map
-          elementType: elementType,
-          elementUnique: elementUnique,
+          elementType,
+          elementUnique,
           //for map
-          mapKey: mapKey,
+          mapKey,
       }
 
       if (type == 'Map') {
@@ -1035,9 +1043,9 @@ function main() {
   		mkdir(".", componentDir)
   	}
   
-  	let subComponentDirs = [];
+    let subComponentDirs = [];
+    if (api.includes("R") || api.includes("L")) subComponentDirs.push(schemaName+'-detail');
     if (api.includes("L")) subComponentDirs.push(schemaName+'-list');
-    if (api.includes("R")) subComponentDirs.push(schemaName+'-detail');
     if (api.includes("C") || api.includes("U")) subComponentDirs.push(schemaName+'-edit');
     subComponentDirs.forEach( (subComponent) => {
   		let subComponentDir = path.join(componentDir, subComponent);
@@ -1196,6 +1204,22 @@ function main() {
       }
     }
 
+    let listCategoryRef;
+    if (listCategoryField) {
+      let fieldFound = false;
+      for (let i=0; i<briefView.length; i++) {
+        if (briefView[i].fieldName === listCategoryField) {
+          listCategoryRef = briefView[i].ref;
+          fieldFound = true;
+          break;
+        }
+      }
+      if (!fieldFound) {
+        console.log('listCategoryField field is not found in view definition. Ignore... ', listCategoryField);
+        listCategoryField = undefined;
+      }
+    }
+
   	let schemaObj = {
       name: name,
   		moduleName: moduleName,
@@ -1246,6 +1270,7 @@ function main() {
       disableListSearch,
       listActionButtons,
       listCategoryField,
+      listCategoryRef,
       listCategoryShowMore,
 
       detailType, // normal, post, info, slide, term...
@@ -1472,6 +1497,13 @@ function main() {
     		generateSourceFile(schemaName, templates.schemaDetailAssoComponent, schemaObj, subComponentDir);
     		generateSourceFile(schemaName, templates.schemaDetailAssoComponentHtml, schemaObj, subComponentDir);
       }
+    }
+
+    if (schemaObj.api.includes("R") || schemaObj.api.includes("L"))  {  //genearte filed show component
+      subComponentDir = path.join(componentDir, schemaName+'-detail');
+    	generateSourceFile(schemaName, templates.schemaDetail['normal'][2], schemaObj, subComponentDir); //generate css. reuse the normal one
+      generateSourceFile(schemaName, templates.schemaDetailShowFieldCompoment, schemaObj, subComponentDir);
+      generateSourceFile(schemaName, templates.schemaDetailShowFieldCompomentHtml, schemaObj, subComponentDir);
     }
 
     if (schemaObj.api.includes("U") || schemaObj.api.includes("C")) {

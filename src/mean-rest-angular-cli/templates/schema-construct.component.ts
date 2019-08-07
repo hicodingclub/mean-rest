@@ -63,3 +63,9 @@
     }
     if (viewHiddenFields.length > 0) {%>
           this.viewHiddenFields = [<%for (let fnm of viewHiddenFields) {%>'<%-fnm%>', <%}%>];<%}%>
+<%_ let textareaFields = [];
+    for (let field of theView) { 
+        if (field.textarea) textareaFields.push(field.fieldName);
+    }
+    if (textareaFields.length > 0) {%>
+          this.textareaFields = [<%for (let fnm of textareaFields) {%>'<%-fnm%>', <%}%>];<%}%>

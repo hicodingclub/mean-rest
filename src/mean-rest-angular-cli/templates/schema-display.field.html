@@ -47,7 +47,9 @@
                             if (typeof largePicture === 'undefined') isLarge = false; 
                             else isLarge = largePicture;%>
                     <file-display [downloadUrl]="detail['<%-fn%>']" [isLarge]="<%-isLarge%>"></file-display><%
-                        } else {%>
+                        } else if (field.textarea) {%>
+                    <div [innerHTML]="detail['<%-fn%>']"></div>
+                        <%} else {%>
                     {{detail['<%-fn%>']}}<%_
                         }%><%
                 } else {%>  {{detail['<%-fn%>']}} <%}%>

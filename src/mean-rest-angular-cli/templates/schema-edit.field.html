@@ -30,18 +30,19 @@
             </span> <%}%>
           </div>
         <%_ } else { %>
-          <div class="input-group">
-            <input type="text" class="form-control rounded" id="Edit<%-Fn%>" 
+          <div class="input-group"><%if (!field.textarea) {%>
+            <input type="text" class="form-control rounded" id="Edit<%-Fn%>" <%} else {%>
+            <textarea rows="8" class="form-control rounded" id="Edit<%-Fn%>"<%}%>
                     <%if (field.required) {%>required<%}%>
                     <%if (typeof field.minlength === 'number') {%>minlength="<%-field.minlength%>"<%}%>
                     <%if (typeof field.maxlength === 'number') {%>maxlength="<%-field.maxlength%>"<%}%>
                 <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
                     [(ngModel)]="detail['<%-fn%>']" name="Edit<%-Fn%>"
-                    #Edit<%-Fn%>="ngModel">
-                <div *ngIf="detail['<%-fn%>']" 
+                    #Edit<%-Fn%>="ngModel"><%if (field.textarea) {%></textarea><%}%>
+            <div *ngIf="detail['<%-fn%>']" 
                   class="input-group-append icon-clear-inside " (click)="clearValueFromDetail('<%-fn%>')">
                   <i class="fas fa-times-circle" title="Clear"></i>
-                </div>
+            </div>
           </div>
         <%_ } %>
           <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.pristine || Edit<%-Fn%>.errors.minlength"

@@ -100,6 +100,7 @@ margin-left: 0.5rem;
     position: relative;
     margin-left: -2rem;   /* text 1 + left 0.5 + right 0.5 = 2 rem*/
     border: 0;
+    height: 2rem;
 }
 
 .icon-clear-inside-sm {

@@ -69,6 +69,7 @@ export class BaseComponent implements BaseComponentInterface {
     public arrayFields = []; //element is [fieldName, elementType]
     public mapFields = []; //element is [fieldName, elementType, mapKey]
     public fileFields = {}; //fieldName: {selectedFiles: [selected files]}
+    public textareaFields = [];
     public dateFormat = "MM/DD/YYYY";
     public timeFormat = "hh:mm:ss";
 
@@ -279,6 +280,15 @@ export class BaseComponent implements BaseComponentInterface {
         return str;
     }
 
+    /***Start: handle textarea fields***/
+    public formatTextareaFields(detail: any): any {
+        for (let fnm of this.textareaFields) {
+            if (detail[fnm]) {
+                detail[fnm] = detail[fnm].replace(/\r\n/g, '<br/>').replace(/\n/g, '<br/>');
+            }
+        }
+        return detail;
+    }
     /***Start: handle reference fields***/
     public formatReferenceField(field: any, fieldName: string ):any {
         let id, value;
@@ -663,6 +673,7 @@ export class BaseComponent implements BaseComponentInterface {
         cpy = this.formatArrayMultiSelection(cpy);
         cpy = this.formatArrayFields(cpy);
         cpy = this.formatMapFields(cpy);
+        cpy = this.formatTextareaFields(cpy);
         return cpy;
     }
 
@@ -1007,7 +1018,7 @@ export class BaseComponent implements BaseComponentInterface {
                 //categories is a array of this.detail format with the this.categoryBy field only
                 this.categoryDisplays = this.categories.map(x=>this.getFieldDisplayFromFormattedDetail(x, this.categoryBy));
                 //categoriesBrief is array of object of the category ref
-                this.categoryMore = result.categoriesBrief.map(x=>Util.gStringifyFields(x, this.listCategoryShowMore.match(/\S+/g)));
+                this.categoryMore = result.categoriesBrief;
             }
 
             if (this.isDropdownList) {
