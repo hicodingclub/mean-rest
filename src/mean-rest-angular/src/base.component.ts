@@ -673,7 +673,6 @@ export class BaseComponent implements BaseComponentInterface {
         cpy = this.formatArrayMultiSelection(cpy);
         cpy = this.formatArrayFields(cpy);
         cpy = this.formatMapFields(cpy);
-        cpy = this.formatTextareaFields(cpy);
         return cpy;
     }
 
@@ -721,6 +720,8 @@ export class BaseComponent implements BaseComponentInterface {
         this.extraFieldsUnload(this.detail);//unload data to text editors, etc
         if (action == 'edit') {
           this.extraInfoPopulate();//collect other info required for edit view
+        } else {
+          this.detail = this.formatTextareaFields(this.detail);
         }
         if (this.refreshing) {
           this.refreshing = false;
