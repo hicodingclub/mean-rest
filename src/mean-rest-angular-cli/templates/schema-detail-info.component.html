@@ -1,8 +1,8 @@
 <div class="detail" *ngIf="detail">
 	<%_ include schema-detail.d.actions.html %>
-	<div class="card text-left transparent-border " [ngStyle]="style">
+	<div class="card text-left transparent-border " [ngStyle]="style['card']">
 	  <div class="grid-fields">
-		<div class="card-header grid-head"><%_{
+		<div class="card-header grid-head" [ngStyle]="style['card-header']"><%_{
 				let view='detail'; let largePicture=true;
 				let field = detailView[0]; let fn = field.fieldName; let ft = field.type;;%>
 		  <div *ngIf="detail['<%-fn%>']" class="grid-head-picture mr-5"><% include schema-display.field.html %>
@@ -11,17 +11,17 @@
 			<h2><%_{
 				let view='detail'; let largePicture=true;
 				let field = detailView[1]; let fn = field.fieldName; let ft = field.type;;%>
-			  <div class="mr-1 ml-2 mt-3 d-inline-block">
+			  <div class="mr-1 ml-2 mt-3 d-inline-block" [ngStyle]="style['header-field']">
 				<% include schema-display.field.html %>
 			  </div><%_}%>
 			</h2>
 		  </div>
 		</div>
-		<div class="card-body"><%_{
+		<div class="card-body" [ngStyle]="style['card-body']"><%_{
 			let view='detail'; let largePicture=true;
 			let field = detailView[2]; let fn = field.fieldName; let ft = field.type;;%>
 			<div>
-			  <h4 class="info-description-text"><% include schema-display.field.html %>
+			  <h4 class="info-description-text" [ngStyle]="style['body-field']"><% include schema-display.field.html %>
 			  </h4>
 			</div><%_ }%>
 		</div>
