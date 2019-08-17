@@ -56,7 +56,8 @@
           this.arrayFields = [<%for (let f of arrayFields) {%>['<%-f[0]%>', '<%-f[1]%>'],<%}%>];<%}
     if (arrayRefFields.length > 0) { 
         for (let itm of arrayRefFields) {%>
-          this.referenceFieldsMap['<%-itm[0]%>'] = '<%-itm[1]%>';<%}}%>
+          this.referenceFieldsMap['<%-itm[0]%>'] = '<%-itm[1]%>';
+          this.referenceFieldsReverseMap['<%-itm[1]%>'] = '<%-itm[0]%>';<%}}%>
 <%_ let viewHiddenFields = [];
     for (let field of theView) { 
         if (field.hidden) viewHiddenFields.push(field.fieldName);
