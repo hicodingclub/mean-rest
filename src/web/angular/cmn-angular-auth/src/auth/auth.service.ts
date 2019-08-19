@@ -158,6 +158,13 @@ export class AuthenticationService {
     return this.http.post<any>(this.authServerRootUri + '/register', userInfo, options);
   }
 
+  changePass(passInfo: any) {
+    const options = this.adminInterface ?
+    { params: new HttpParams().set('type', 'admin') } : {};
+
+    return this.http.post<any>(this.authServerRootUri + '/changepass', passInfo, options);
+  }
+
   loggedIn(user) {
     const authRecord: any = {
       userName: '',

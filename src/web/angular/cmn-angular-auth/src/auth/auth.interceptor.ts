@@ -12,7 +12,7 @@ import { Observable, BehaviorSubject, throwError, EMPTY } from 'rxjs';
 import { tap, catchError, switchMap, filter, take } from 'rxjs/operators';
 
 import { AuthenticationService } from './auth.service';
-import { AUTHENTICATION_LOGIN_PAGE_URI } from './tokens';
+import { AUTHENTICATION_AUTH_PAGE_ROOT_URI } from './tokens';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
@@ -24,7 +24,7 @@ export class TokenInterceptor implements HttpInterceptor {
   constructor(
     private router: Router,
     private authService: AuthenticationService,
-    @Inject(AUTHENTICATION_LOGIN_PAGE_URI) private loginPageUri: string
+    @Inject(AUTHENTICATION_AUTH_PAGE_ROOT_URI) private authPageRootUri: string
     ) {}
 
   addAuthHeader(request) {
@@ -39,6 +39,9 @@ export class TokenInterceptor implements HttpInterceptor {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    this.authPageRootUri = this.authPageRootUri.replace(/\/$/, ''); //remove trailing slash
+    const loginPageUri = this.authPageRootUri + '/login';
+
     return next.handle(this.addAuthHeader(request))
       .pipe(
         /*
@@ -80,7 +83,7 @@ export class TokenInterceptor implements HttpInterceptor {
                             // looks like this part will not hit
                             this.refreshTokenInProgress = false;
                             this.authService.setInterruptedUrl(this.router.url);
-                            this.router.navigate([this.loginPageUri]);
+                            this.router.navigate([loginPageUri]);
                             return EMPTY;
                         })
                 );
@@ -90,7 +93,7 @@ export class TokenInterceptor implements HttpInterceptor {
             // refreshToken failed. Go to login page.
             this.refreshTokenInProgress = false;
             this.authService.setInterruptedUrl(this.router.url);
-            this.router.navigate([this.loginPageUri]);
+            this.router.navigate([loginPageUri]);
           }
           return throwError(error);
         })

@@ -10,6 +10,7 @@ import { TokenInterceptor } from './auth.interceptor';
 import { AuthenticationComponent } from './auth.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import { ChangePassComponent } from './changepass/changepass.component';
 import { AuthGuard } from './auth.guard';
 import { AuthIconComponent } from './auth-icon/auth-icon.component';
 import { ClickElsewhereDirective } from './auth-icon/click-elsewhere.directive';
@@ -27,6 +28,7 @@ import { ClickElsewhereDirective } from './auth-icon/click-elsewhere.directive';
         AuthenticationComponent,
         LoginComponent,
         RegisterComponent,
+        ChangePassComponent,
         AuthIconComponent,
 
         ClickElsewhereDirective

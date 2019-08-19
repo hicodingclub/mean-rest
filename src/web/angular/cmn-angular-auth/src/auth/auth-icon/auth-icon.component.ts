@@ -2,7 +2,7 @@
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { AuthenticationService } from '../auth.service';
 
-import { AUTHENTICATION_LOGIN_PAGE_URI, AUTHENTICATION_DROPDOWN_ITEMS } from '../tokens';
+import { AUTHENTICATION_AUTH_PAGE_ROOT_URI, AUTHENTICATION_DROPDOWN_ITEMS } from '../tokens';
 import { DropdownItem } from './dropdown-item';
 
 @Component({
@@ -16,15 +16,22 @@ export class AuthIconComponent implements OnInit {
   public userName = 'Please login';
   public userNameShort = 'Please login';
 
+  public loginPageUri: string;
+  public changePassPageUri: string;
+
   constructor(
     private router: Router,
     private authService: AuthenticationService,
-    @Inject(AUTHENTICATION_LOGIN_PAGE_URI) private loginPageUri: string,
+    @Inject(AUTHENTICATION_AUTH_PAGE_ROOT_URI) private authPageRootUri: string,
     @Inject(AUTHENTICATION_DROPDOWN_ITEMS) public dropdownItems: DropdownItem[]) {
 
   }
 
   ngOnInit() {
+    this.authPageRootUri = this.authPageRootUri.replace(/\/$/, ''); //remove trailing slash
+    this.loginPageUri = this.authPageRootUri + '/login';
+    this.changePassPageUri = this.authPageRootUri + '/changepass';
+
     this.isAuthorized();
   }
 
@@ -75,6 +82,13 @@ export class AuthIconComponent implements OnInit {
     this.authService.setInterruptedUrl(state.url);
     this.popup = false;
     this.router.navigate([this.loginPageUri]);
+  }
+
+  public changePassword() {
+    const state: RouterStateSnapshot = this.router.routerState.snapshot;
+    this.authService.setInterruptedUrl(state.url);
+    this.popup = false;
+    this.router.navigate([this.changePassPageUri]);
   }
 
   public logout() {

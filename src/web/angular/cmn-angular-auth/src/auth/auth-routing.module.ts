@@ -4,6 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthenticationComponent } from './auth.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import { ChangePassComponent } from './changepass/changepass.component';
 
 const routes: Routes = [
   { path: 'auth', 
@@ -12,6 +13,7 @@ const routes: Routes = [
 
                 { path: "login",  component: LoginComponent },
                 { path: 'register', component: RegisterComponent },
+                { path: 'changepass', component: ChangePassComponent },
 
                 { path: '',  redirectTo: 'login', pathMatch: 'full' },
                 { path: '**', redirectTo: 'login' }
