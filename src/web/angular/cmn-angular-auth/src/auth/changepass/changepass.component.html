@@ -1,5 +1,5 @@
 <h2>Change Password</h2>
-<form *ngIf="!success" [formGroup]="form" (ngSubmit)="onSubmit()">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="form-group">
         <label for="password">Current Password&nbsp;<span>*</span></label>
         <input type="password" formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.password.errors }" />
@@ -32,7 +32,3 @@
   		{{serverText}}
     </div>
 </form>
-
-<div *ngIf="success" class="mt-5">
-    <h4>Your password has been changed successfully!</h4>
-</div>

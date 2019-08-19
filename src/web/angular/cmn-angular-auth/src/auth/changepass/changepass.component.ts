@@ -72,7 +72,7 @@ export class ChangePassComponent implements OnInit {
                 data => {
                     this.servererror = false;
                     this.loading = false;
-                    this.success = true;
+                    this.router.navigate(['../changedpass'], {relativeTo: this.route});
                 },
                 error => {
                     this.servererror = true;
