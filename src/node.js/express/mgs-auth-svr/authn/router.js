@@ -1,4 +1,5 @@
 const express = require('express');
+const createError = require('http-errors');
 
 const AuthnController = require('./controller')
 
@@ -65,6 +66,13 @@ const AuthnRouter = function(userDef, getUserRoleFunc) {
       setSchemaName,
       AuthnController.authRegister
     );
+
+    expressRouter.post("/changepass",
+      setSchemaName,
+      AuthnController.authLogin,
+      AuthnController.changePass
+    );
+
     //expressRouter = util.moveRouterStackTailToHead(expressRouter, 3);
     
     //not supported api

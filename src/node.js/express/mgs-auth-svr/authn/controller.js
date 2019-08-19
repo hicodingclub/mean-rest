@@ -28,7 +28,7 @@ AuthnController.authLogin = function(req, res, next) {
   let auth = authSchemas[authSchemaName];
   let model = auth.model;
   if (!model) {
-    return next(createError(400, "Authentication server not provisioned for your request."));
+    return next(createError(400, "Authentication server is not provisioned."));
   }
   
   let body = req.body;
@@ -58,7 +58,7 @@ AuthnController.authLogin = function(req, res, next) {
   }
 
   if (!userName || !password) {
-    return next(createError(400, "Bad login request: missing info."));
+    return next(createError(400, "Request is missing required information (user name, or password)."));
   }
 
   let query = {};
@@ -68,14 +68,14 @@ AuthnController.authLogin = function(req, res, next) {
       return next(err); 
     }
     if (!user) {
-      return next(createError(403, "Bad login request: User Name"));
+      return next(createError(403, "User does not exist."));
     }
     if (user.status !== 'Enabled') {
-      return next(createError(403, "Bad login request: User not enabled."));
+      return next(createError(403, "User is currently disabled."));
     }
     // test a matching password
     user.comparePassword(password, function(err, isMatch) {
-        if (err || !isMatch) return next(createError(403, "Bad login request: Password."));
+        if (err || !isMatch) return next(createError(403, "Password is incorrect."));
         req.muser = {
           "_id": user["_id"], 
           "userName": userName,
@@ -148,7 +148,7 @@ AuthnController.authRefresh = function(req, res, next) {
   let auth = authSchemas[authSchemaName];
   let model = auth.model;
   if (!model) {
-    return next(createError(400, "Authentication server not provisioned for your request."));
+    return next(createError(400, "Authentication server is not provisioned."));
   }
     
   let query = {};
@@ -173,7 +173,7 @@ AuthnController.authRegister = function(req, res, next) {
   let auth = authSchemas[authSchemaName];
   let model = auth.model;
   if (!model) {
-    return next(createError(400, "Authentication server not provisioned for you request."));
+    return next(createError(400, "Authentication server is not provisioned."));
   }
   
   let body = req.body;
@@ -214,7 +214,63 @@ AuthnController.authRegister = function(req, res, next) {
     }
     return res.send();
   }); 
-}
+};
+
+AuthnController.changePass = function(req, res, next) {
+  let authSchemaName = req.authSchemaName;
+  let auth = authSchemas[authSchemaName];
+  let model = auth.model;
+  if (!model) {
+    return next(createError(400, "Authentication server is not provisioned."));
+  }
+  
+  let body = req.body;
+  if (typeof body === "string") {
+      try {
+          body = JSON.parse(body);
+      } catch(e) {
+        return next(createError(400, "Bad request body."));
+      }
+  }
+  
+  let userName;
+  let fieldName;
+  let userNames = auth.userFields.split(' ');
+  for (let n of userNames) {
+    if (body[n]) {
+      fieldName = n;
+      userName = body[n];
+      break;
+    }
+  }
+
+  let password;
+  if (body['newPassword']) {
+      password = body['newPassword'];
+  }
+
+  if (!userName || !password) {
+    return next(createError(400, "Bad request: missing required information (user name or new password)."));
+  }
+
+  const query = {};
+  query[fieldName] = userName;
+
+  model.findOne(query, function (err, result) {
+    if (err) {
+      return next(err);
+    }
+    result[auth.passwordField] = password;
+
+    result.save(function (err, r) {
+      if (err) {
+        return next(err);
+      }
+      return res.send();
+    });
+  });
+
+};
 
 module.exports = AuthnController;
 
