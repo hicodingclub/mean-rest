@@ -8,7 +8,7 @@
 		<a class="nav-link" [ngClass]="{'active': idx === selectedCategory }" [routerLink]="['.']" [queryParamsHandling]="preserve" (click)="categorySelected(idx)">{{ele}}</a>
 	</li>
 </ul>
-<% if (listCategoryRef) {%>
+<% if (listCategoryRef && listCategoryShowMore) {%>
 <div *ngFor="let cat of categoryMore; let i = index;" class="ml-3 mb-5">
 	<div *ngIf="i === selectedCategory">
 		<app-<%-listCategoryRef%>-detail-field [showFieldsStr]="'<%-listCategoryShowMore%>'" [detailObj]="cat"></app-<%-listCategoryRef%>-detail-field>

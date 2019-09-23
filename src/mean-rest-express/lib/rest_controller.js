@@ -242,6 +242,7 @@ const ownerPatch = function (query, owner, req) {
     } else if (owner.type === 'user') {
       query.muser_id = req.muser._id;
     }
+
   }
   return query;
 }
@@ -302,11 +303,15 @@ class RestController {
     return this.searchAll(req, res, next, {}, false);
   }
 
-  async getRefObjectsFromId(schm, idArray) {
+  async getRefObjectsFromId(req, schm, idArray) {
     const { name, schema, model, views, populates, owner } = this.loadContextVarsByName(schm.toLowerCase());
+
+    let query = {'_id': { $in: idArray.map(x => mongoose.Types.ObjectId(x)) }};
+    query = ownerPatch(query, owner, req);
+
     try {
       let docs = await model.find(
-        {'_id': { $in: idArray.map(x => mongoose.Types.ObjectId(x)) }}
+        query
       ).exec();
       return docs;
 
@@ -593,11 +598,11 @@ class RestController {
         let catQuery = {};
         catQuery = ownerPatch(catQuery, owner, req);
 
-        categories = await model.find().distinct(__categoryBy).exec();
+        categories = await model.find(catQuery).distinct(__categoryBy).exec();
 
         if (__categoryFieldRef) {
           // it's an ref field
-          categories = await this.getRefObjectsFromId(__categoryFieldRef, categories);
+          categories = await this.getRefObjectsFromId(req, __categoryFieldRef, categories);
         }
         categoryObjects = categories.map(x => {
           const obj = {};

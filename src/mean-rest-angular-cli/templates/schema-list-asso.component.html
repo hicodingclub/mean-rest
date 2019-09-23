@@ -23,7 +23,7 @@
 	        </tr>
 	    </thead>
 	    <tbody>
-	      <ng-template ngFor let-detail [ngForOf]="list" let-i="index">
+	      <ng-template ngFor let-detail [ngForOf]="list" let-i="index" let-seq="0">
 			<ng-template ngFor let-assoObj [ngForOf]="assoCompObjects[i]" let-idx="index">
 
 	        <tr [ngClass]="{'clicked-row': clickedId==detail['_id']}"> <!-- *ngFor="let detail of list;  let i = index" -->
