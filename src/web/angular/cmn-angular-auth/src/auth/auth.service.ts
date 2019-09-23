@@ -164,7 +164,12 @@ export class AuthenticationService {
 
     return this.http.post<any>(this.authServerRootUri + '/changepass', passInfo, options);
   }
+  findPass(emailInfo: any) {
+    const options = this.adminInterface ?
+    { params: new HttpParams().set('type', 'admin') } : {};
 
+    return this.http.post<any>(this.authServerRootUri + '/findpass', emailInfo, options);
+  }
   loggedIn(user) {
     const authRecord: any = {
       userName: '',

@@ -6,6 +6,8 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { ChangePassComponent } from './changepass/changepass.component';
 import { ChangedPassComponent } from './changepass/changedpass.component';
+import { FindPassComponent } from './findpass/findpass.component';
+import { CheckEmailComponent } from './findpass/checkemail.component';
 
 const routes: Routes = [
   { path: 'auth', 
@@ -16,6 +18,8 @@ const routes: Routes = [
                 { path: 'register', component: RegisterComponent },
                 { path: 'changepass', component: ChangePassComponent },
                 { path: 'changedpass', component: ChangedPassComponent },
+                { path: 'findpass', component: FindPassComponent },
+                { path: 'checkemail', component: CheckEmailComponent },
 
                 { path: '',  redirectTo: 'login', pathMatch: 'full' },
                 { path: '**', redirectTo: 'login' }

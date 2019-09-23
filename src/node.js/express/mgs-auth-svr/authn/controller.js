@@ -9,6 +9,7 @@ let AuthnController = function() {
 
 const REFRESH_SECRETE = 'server refresh secret random';
 const ACCESS_SECRETE = 'server secret random';
+const EMAIL_RESET_SECRETE = 'server secret random for email reset';
 
 AuthnController.registerAuth = function(schemaName, schema, userFields, passwordField) {
   let a = {};
@@ -268,6 +269,54 @@ AuthnController.changePass = function(req, res, next) {
       }
       return res.send();
     });
+  });
+
+};
+
+AuthnController.findPass = function(req, res, next) {
+  let authSchemaName = req.authSchemaName;
+  let auth = authSchemas[authSchemaName];
+  let model = auth.model;
+  if (!model) {
+    return next(createError(400, "Authentication server is not provisioned."));
+  }
+  
+  let body = req.body;
+  if (typeof body === "string") {
+      try {
+          body = JSON.parse(body);
+      } catch(e) {
+        return next(createError(400, "Bad request body."));
+      }
+  }
+  
+  let email;
+  if (body['email']) {
+    email = body['email'];
+  }
+
+  if (!email) {
+    return next(createError(400, "Bad request: missing required information (email)."));
+  }
+
+  const query = {};
+  query['email'] = email;
+
+  model.findOne(query, function (err, result) {
+    if (err) {
+      return next(err);
+    }
+
+    let resetToken = jwt.sign(
+      {email}, 
+      EMAIL_RESET_SECRETE, 
+      {expiresIn: 60*60*24}
+    );
+
+    let r = {
+      resetToken,
+    }
+    return res.send(r);
   });
 
 };

@@ -73,6 +73,11 @@ const AuthnRouter = function(userDef, getUserRoleFunc) {
       AuthnController.changePass
     );
 
+    expressRouter.post("/findpass",
+      setSchemaName,
+      AuthnController.findPass
+    );
+
     //expressRouter = util.moveRouterStackTailToHead(expressRouter, 3);
     
     //not supported api
