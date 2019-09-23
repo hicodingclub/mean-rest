@@ -306,7 +306,9 @@ AuthnController.findPass = function(req, res, next) {
     if (err) {
       return next(err);
     }
-
+    if (!result) {
+      return next(createError(400, "Bad request: user not registered."));
+    }
     let resetToken = jwt.sign(
       {email}, 
       EMAIL_RESET_SECRETE, 
