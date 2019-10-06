@@ -1,0 +1,17 @@
+{
+  "name": "mdds-emailing",
+  "version": "0.0.1",
+  "description": "Send emails",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "emailing"
+  ],
+  "author": "xibin liu",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.533.0"
+  }
+}
