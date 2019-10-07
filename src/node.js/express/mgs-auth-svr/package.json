@@ -1,6 +1,6 @@
 {
   "name": "mdds-mongoose-express-auth-server",
-  "version": "0.7.61",
+  "version": "0.7.65",
   "description": "Model Driver Development Stack - authentication and authorization server for mongoose and express based application. It can be enabled to work as authentication, user profile managment, and authorization management servers.",
   "main": "index.js",
   "scripts": {
@@ -33,7 +33,8 @@
   "peerDependencies": {
     "express": "^4.16.3",
     "http-errors": "~1.6.2",
-    "mean-rest-express": "^0.5.9"
+    "mdds-emailing": "0.7.65",
+    "mean-rest-express": "0.7.65"
   },
   "devDependencies": {}
 }
