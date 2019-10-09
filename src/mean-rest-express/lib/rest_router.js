@@ -128,7 +128,6 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     if (schm) {
       const ownerConfig = schemaDef.owner || owner;
       schm.options.useSaveInsteadOfUpdate = true; //this is a special indicator to controller use save.
-      
       restController.register(schemaName, schm, views, model, moduleName, ownerConfig);
     }
     if (permissionStore && api) {

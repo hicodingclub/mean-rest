@@ -938,9 +938,10 @@ class RestController {
   }
   //Return a promise.
   ModelExecute(modelName, apiName, ...params) {
-    let model = this.model_collection[modelName];
+    const modelname = modelName.toLowerCase();
+    let model = this.model_collection[modelname];
     if (!model || !model[apiName]) {
-      let err = new Error(`model ${modelName} or mode API ${apiName} doesn't exit`);
+      let err = new Error(`model ${modelname} or mode API ${apiName} doesn't exit`);
       return new Promise(function (resolve, reject) {
         reject(err);
       });
@@ -952,9 +953,10 @@ class RestController {
     return dbExe.exec();
   }
   ModelExecute2(modelName, apis) {
-    let model = this.model_collection[modelName];
+    const modelname = modelName.toLowerCase();
+    let model = this.model_collection[modelname];
     if (!model) {
-      let err = new Error(`model ${modelName} or mode API ${apiName} doesn't exit`);
+      let err = new Error(`model ${modelname} or mode API ${apiName} doesn't exit`);
       return new Promise(function (resolve, reject) {
         reject(err);
       });
