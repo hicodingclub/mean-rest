@@ -42,14 +42,14 @@ class MddsEmailer {
     runDB();
   }
 
-  async sendEmailTemplate(to, templateTag) {
+  async sendEmailTemplate(to, templateTag, infoObj) {
     const router =  meanRestExpress.RestRouter(emailTemplateDef, 'internal-template-usage');
     const restController = router.restController;
 
     let template;
     let msg = '';
     await restController.ModelExecute(
-      "emailTempate",
+      "emailTemplate",
       "findOne",
       {tag: templateTag}//search criteria
     ).then(
@@ -68,6 +68,14 @@ class MddsEmailer {
       });
     }
 
+    let content = template.content;
+    for (const i in infoObj) {
+      const reg = new RegExp(`{{${i}}}`, 'g');
+      content = content.replace(reg, infoObj[i]);
+    }
+
+    content = content.replace(/http(s)?:\/\/(http(s)?:\/\/)/g, '$2');
+
     // Create sendEmail params 
     const params = {
       Destination: { /* required */
@@ -80,11 +88,11 @@ class MddsEmailer {
         Body: { /* required */
           Html: {
           Charset: "UTF-8",
-          Data: template.content,
+          Data: content,
           },
           Text: {
           Charset: "UTF-8",
-          Data: template.content,
+          Data: content,
           }
         },
         Subject: {
@@ -92,7 +100,7 @@ class MddsEmailer {
           Data: template.subject,
         }
         },
-      Source: template.from, /* required */
+      Source: template.fromEmail, /* required */
       /*
       ReplyToAddresses: [
         'EMAIL_ADDRESS',
