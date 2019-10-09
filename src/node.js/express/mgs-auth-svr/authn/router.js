@@ -2,6 +2,7 @@ const express = require('express');
 const createError = require('http-errors');
 
 const AuthnController = require('./controller')
+const { templates, commonInfo } = require('./mdds-emailing');
 
 const AuthnRouter = function(userDef, getUserRoleFunc) {
   let authModelCreated = false; 
@@ -19,6 +20,8 @@ const AuthnRouter = function(userDef, getUserRoleFunc) {
     authSchemaName = authn["authUserSchema"];
   }
 
+  const authnController = new AuthnController();
+
   let schemas = userDef.schemas;
   for (let schemaName in schemas) {
     let schemaDef = schemas[schemaName];
@@ -26,7 +29,7 @@ const AuthnRouter = function(userDef, getUserRoleFunc) {
 
     if (schemaName == authSchemaName) {
       let schm = schemaDef.schema;
-      AuthnController.registerAuth(authSchemaName, schemaDef.schema, 
+      authnController.registerAuth(authSchemaName, schemaDef.schema, 
               authUserFields, authPasswordField);
       authModelCreated = true;
       break;
@@ -48,34 +51,34 @@ const AuthnRouter = function(userDef, getUserRoleFunc) {
     expressRouter.post(
       "/login", 
       setSchemaName,
-      AuthnController.authLogin,
+      authnController.authLogin.bind(authnController),
       roleFunc,
-      AuthnController.generateToken
+      authnController.generateToken.bind(authnController)
     );
 
     expressRouter.post(
       "/refresh",
       setSchemaName,
-      AuthnController.verifyRefreshToken,
-      AuthnController.authRefresh,
+      authnController.verifyRefreshToken.bind(authnController),
+      authnController.authRefresh.bind(authnController),
       roleFunc,
-      AuthnController.generateToken
+      authnController.generateToken.bind(authnController)
     );
 
     expressRouter.post("/register",
       setSchemaName,
-      AuthnController.authRegister
+      authnController.authRegister.bind(authnController)
     );
 
     expressRouter.post("/changepass",
       setSchemaName,
-      AuthnController.authLogin,
-      AuthnController.changePass
+      authnController.authLogin.bind(authnController),
+      authnController.changePass.bind(authnController)
     );
 
     expressRouter.post("/findpass",
       setSchemaName,
-      AuthnController.findPass
+      authnController.findPass.bind(authnController)
     );
 
     //expressRouter = util.moveRouterStackTailToHead(expressRouter, 3);
@@ -98,6 +101,20 @@ const AuthnRouter = function(userDef, getUserRoleFunc) {
       res.json(e);
     });
 
+  }
+
+  expressRouter.setEmailer = function(emailer, info) {
+    if (!authnController.mmdsProperties) {
+      authnController.mmdsProperties = {};
+    }
+    emailer.populateTemplatesToDB(templates);
+
+    authnController.mmdsProperties.emailer = emailer;
+    authnController.mmdsProperties.emailerObj = commonInfo;
+
+    if (info) {
+      authnController.mmdsProperties.emailerObj = info;
+    }
   }
 
   return expressRouter;
