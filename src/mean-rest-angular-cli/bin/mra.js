@@ -908,7 +908,10 @@ function main() {
   
   	let views = schemaDef.views
     let mongooseSchema = schemaDef.schema;
-    let validators = schemaDef.schema.mddsValidators || schemaDef.validators;
+    let validators = schemaDef.validators;
+    if (schemaDef.schema && schemaDef.schema.mddsValidators) {
+      validators = schemaDef.schema.mddsValidators;
+    }
 
     if (!mongooseSchema) {
       console.log('No schema defined. Ignore', name)

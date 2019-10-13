@@ -1,6 +1,6 @@
 {
   "name": "mdds-emailing",
-  "version": "0.7.65",
+  "version": "0.7.100",
   "description": "Send emails",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,6 @@
     "aws-sdk": "^2.533.0"
   },
   "peerDependencies": {
-    "mean-rest-express": "0.7.65"
+    "mean-rest-express": "0.7.100"
   }
 }
