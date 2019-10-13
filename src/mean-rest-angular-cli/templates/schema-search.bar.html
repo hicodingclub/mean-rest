@@ -1,7 +1,9 @@
-  			<%_ let hasStringFields = false; let stringFields = []; let noMoreSearchArea = true;
+			  <%_ let hasStringFields = false; let stringFields = []; let noMoreSearchArea = true;
+			  	const listCategoryFields = listCategories.map(x=>x.listCategoryField);
+
 			    for (let field of briefView){
 					if (field.hidden) continue;
-					if (field.fieldName === listCategoryField) continue;
+					if (listCategoryFields.includes(field.fieldName)) continue;
 					if (field.picture) continue;
 
 			        if(field.type == 'SchemaString') { hasStringFields = true; stringFields.push(field.fieldName);}
@@ -38,7 +40,7 @@
 						<div class="card-body">
 						<%_ briefView.forEach( (field) => {
 							if (field.hidden) return;
-							if (field.fieldName === listCategoryField) return;
+							if (listCategoryFields.includes(field.fieldName)) return;
 							if (field.type == 'SchemaString') return;
 							let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName;
 							%> <%_ include schema-search.field.html %> 

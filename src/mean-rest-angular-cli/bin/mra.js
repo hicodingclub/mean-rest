@@ -938,8 +938,7 @@ function main() {
     let listToDetail = 'click';
     let defaultSortField, defaultSortOrder;
     let homeListNumber = 4;
-    let listCategoryField = '';
-    let listCategoryShowMore = '';
+    let listCategories = []; // object {listCategoryField:xxx, listCategoryShowMore: 'field...', listCategoryRef: 'xxxx'}
 
     let detailActions = []; //extra buttons that trigger other pipelines
     let detailActionButtons = ['Edit', 'New', 'Delete'];
@@ -997,8 +996,7 @@ function main() {
       detailRefBlackList = mraUI.detailRefBlackList || detailRefBlackList;
       detailRefName = mraUI.detailRefName || detailRefName;
       selectActionViewType = mraUI.selectActionViewType || selectActionViewType;
-      listCategoryField = mraUI.listCategoryField || listCategoryField;
-      listCategoryShowMore = mraUI.listCategoryShowMore || listCategoryShowMore;
+      listCategories = mraUI.listCategories || listCategories;
       homeListNumber = mraUI.homeListNumber || homeListNumber;
 
       if (mraUI.defaultListSort) {
@@ -1205,21 +1203,23 @@ function main() {
       }
     }
 
-    let listCategoryRef;
-    if (listCategoryField) {
+    const tempListCategories = [];
+    for (let cate of listCategories) {
       let fieldFound = false;
       for (let i=0; i<briefView.length; i++) {
-        if (briefView[i].fieldName === listCategoryField) {
-          listCategoryRef = briefView[i].ref;
+        if (briefView[i].fieldName === cate.listCategoryField) {
+          cate.listCategoryRef = briefView[i].ref;
           fieldFound = true;
           break;
         }
       }
       if (!fieldFound) {
-        console.log('listCategoryField field is not found in view definition. Ignore... ', listCategoryField);
-        listCategoryField = undefined;
+        console.log('listCategoryField field is not found in view definition. Ignore... ', cate.listCategoryField);
+        continue;
       }
+      tempListCategories.push(cate);
     }
+    listCategories = tempListCategories;
 
   	let schemaObj = {
       name: name,
@@ -1270,9 +1270,7 @@ function main() {
       listToDetail, // link, click, none
       disableListSearch,
       listActionButtons,
-      listCategoryField,
-      listCategoryRef,
-      listCategoryShowMore,
+      listCategories,
 
       detailType, // normal, post, info, slide, term...
       detailActionButtons,

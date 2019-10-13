@@ -337,6 +337,10 @@ div.badge-click:hover {
   display: none;
 }
 
+.list-title {
+  font-size: 1.5rem;
+}
+
 .sort-selection {
   min-width: 200px;
   position: relative;
@@ -345,6 +349,13 @@ div.badge-click:hover {
 .sort-dropdown {
   width: 100%;
   text-align: left;
+}
+
+.category2-dropdown {
+  width: 250px;
+  text-align: left;
+  font-size: 1.1rem;
+  color: #007bff;
 }
 
 .sort-selection i {

@@ -42,10 +42,11 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
 <% let theView = briefView; %><%_ include schema-construct.component.ts %>
 
           this.listViewFilter = '<%-listType%>';<% if (defaultSortField) { %>
-          this.setListSort('<%-defaultSortField%>', '<%-defaultSortFieldDisplay%>', '<%-defaultSortOrder%>');<%}%><%if (listCategoryField) {%>
-          this.categoryBy = '<%-listCategoryField%>';<%}%><%if (listCategoryShowMore) {%>
-          this.listCategoryShowMore = '<%-listCategoryShowMore%>';<%}%>
-
+          this.setListSort('<%-defaultSortField%>', '<%-defaultSortFieldDisplay%>', '<%-defaultSortOrder%>');<%}%>
+          <%_ const listCategoriesString = JSON.stringify(listCategories);%>
+          const listCategories = <%-listCategoriesString%>;
+          this.listCategory1 = listCategories[0] || {};
+          this.listCategory2 = listCategories[1] || {};
   }
 
   ngOnInit() {

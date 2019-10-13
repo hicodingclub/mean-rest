@@ -1,7 +1,8 @@
 		<div class="row justify-content-end mt-3">
 		<%const SearchAndSortThreshold = 2;
 		%><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {
-			let sortableFields = briefView.filter(x=>x.sortable&&!x.hidden&&x.fieldName!==listCategoryField);
+			const listCategoryFields = listCategories.map(x=>x.listCategoryField);
+			let sortableFields = briefView.filter(x=>x.sortable && !x.hidden && !listCategoryFields.includes(x.fieldName));
 			if (sortableFields.length > 0) {
 			%>
 			<div *ngIf="list.length > <%-SearchAndSortThreshold%>" class="sort-selection mr-5">
@@ -15,7 +16,7 @@
 						</button>
 						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><% for (let field of briefView) { 
 							if (field.hidden) continue;
-							if (field.fieldName === listCategoryField) continue;
+							if (listCategoryFields.includes(field.fieldName)) continue;
 							if (field.sortable) {%>
 							<a class="dropdown-item pointer" (click)="setListSortAndRefresh('<%-field.fieldName%>', '<%-field.displayName%>', 'asc')"><%-field.FieldName%><i class="fas fa-arrow-up"></i></a>
 							<a class="dropdown-item pointer" (click)="setListSortAndRefresh('<%-field.fieldName%>', '<%-field.displayName%>', 'desc')"><%-field.FieldName%><i class="fas fa-arrow-down"></i></a><%} }%>

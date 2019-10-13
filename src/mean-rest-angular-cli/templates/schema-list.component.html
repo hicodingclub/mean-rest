@@ -1,14 +1,32 @@
-
+<%_ let cate = listCategories[0] || {};
+	let { listCategoryField, listCategoryRef, listCategoryShowMore } = cate;
+	let cate2 = listCategories[1] || {};
+	let { listCategoryField2, listCategoryRef2, listCategoryShowMore2 } = cate2;
+%>
 <% if (listTitle) {%>
-<div class="mt-4 mb-4">
-	<h3><%-listTitle%></h3>
+<div class="mt-4 mb-4 d-flex">
+	<div class="list-title"><%-listTitle%></div> 
+	<div *ngIf="categoryDisplays2.length > 0" class="sort-selection ml-3">
+			<div class="dropdown" style="width: 100%;">
+				<button class="category2-dropdown btn btn-light btn-sm dropdown-toggle"
+					type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					{{categoryDisplays2[selectedCategory2 || 0]}}
+				</button>
+				<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+					<a *ngFor="let ele of categoryDisplays2; let idx = index;"  class="dropdown-item pointer" (click)="categorySelected2(idx)">{{ele}}</a>
+				</div>
+			</div>
+	</div>
+
 </div><%}%>
-<ul *ngIf="categoryBy" class="nav nav-pills category-nav">
+
+<ul *ngIf="listCategory1.listCategoryField" class="nav nav-pills category-nav">
 	<li *ngFor="let ele of categoryDisplays; let idx = index;" class="nav-item" >
 		<a class="nav-link" [ngClass]="{'active': idx === selectedCategory }" [routerLink]="['.']" [queryParamsHandling]="preserve" (click)="categorySelected(idx)">{{ele}}</a>
 	</li>
 </ul>
-<% if (listCategoryRef && listCategoryShowMore) {%>
+<%_ 
+if (listCategoryRef && listCategoryShowMore) {%>
 <div *ngFor="let cat of categoryMore; let i = index;" class="ml-3 mb-5">
 	<div *ngIf="i === selectedCategory">
 		<app-<%-listCategoryRef%>-detail-field [showFieldsStr]="'<%-listCategoryShowMore%>'" [detailObj]="cat"></app-<%-listCategoryRef%>-detail-field>
