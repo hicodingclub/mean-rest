@@ -79,12 +79,21 @@ export class BaseComponent implements BaseComponentInterface {
     public listSortField: string;
     public listSortFieldDisplay: string;
     public listSortOrder: string; // 'asc', 'desc'
-    public categoryBy: string; // field whose value is used as category
-    public listCategoryShowMore: string = undefined; // show more info for the category (if category is ref)
+
+    //{listCategoryField, listCategoryShowMore, listCategoryRef}
+    // listCategoryField: field used as category; listCategoryShowMore: show more info for the category (if category is ref)
+    public listCategory1; //sub category
+    public listCategory2; //top category
+    
     public categories: [] = []; // stored categories
     public categoryMore: [] = []; //stored more details
     public categoryDisplays: string[] = []; //stored display name of categories
     public selectedCategory: number = undefined; // index in categories
+
+    public categories2: [] = []; // stored categories
+    public categoryMore2: [] = []; //stored more details
+    public categoryDisplays2: string[] = []; //stored display name of categories
+    public selectedCategory2: number = undefined; // index in categories
 
     public hiddenFields = []; //fields hide from view. Currrently used by "Add" view of edit-sub
     public viewHiddenFields = []; //fields hidden from view. Hidden is defined in schema view with ()
@@ -750,7 +759,9 @@ export class BaseComponent implements BaseComponentInterface {
             searchContext['$and'][1]['$and'].push(o);
         }
         let expt = false;
-        this.service.getList(1, 1, searchContext, null, null, null, false, false, null, expt, this.ignoreField).subscribe(
+        this.service.getList(1, 1, searchContext, null, null, 
+            null, false, false, null, false, false, // categories
+            null, expt, this.ignoreField).subscribe(
             result => {
                 let detail = {};
                 if (result.items && result.items.length >= 1) {
@@ -822,8 +833,12 @@ export class BaseComponent implements BaseComponentInterface {
     }
 
     public categorySelected(idx: number) {
-        let selectedValue = this.categories[idx];
         this.selectedCategory = idx;
+
+        this.searchList();
+    }
+    public categorySelected2(idx: number) {
+        this.selectedCategory2 = idx;
 
         this.searchList();
     }
@@ -850,21 +865,30 @@ export class BaseComponent implements BaseComponentInterface {
     public processSearchContext() {
         this.moreSearchOpened = false;
         let d = this.detail;
+
+        const cate1 = this.listCategory1 || {}; //sub category
+        const cate2 = this.listCategory2 || {}; //top catetory
     
-        if (typeof this.selectedCategory == 'number') {
-            d[this.categoryBy] = this.categories[this.selectedCategory][this.categoryBy];
+        if (typeof this.selectedCategory == 'number' && cate1.listCategoryField) {
+            const field = cate1.listCategoryField;
+            d[field] = this.categories[this.selectedCategory][field];
+        }
+        if (typeof this.selectedCategory2 == 'number' && cate2.listCategoryField) {
+            const field = cate2.listCategoryField;
+            d[field] = this.categories2[this.selectedCategory2][field];
         }
 
+        const listCategoryFields = [cate1.listCategoryField, cate2.listCategoryField];
         if (!this.searchDetailReady) {
             for (let s of this.stringFields) {
-                if (s !== this.categoryBy) {
+                if (!listCategoryFields.includes(s)) {
                     d[s] = this.searchText;
                 }
             }
         }
         let orSearchContext = [], andSearchContext = [];
         for (let field in d) {
-            if (typeof d[field] == 'string' && field !== this.categoryBy) { //this.categoryBy will be put to 'and' context
+            if (typeof d[field] == 'string' && !listCategoryFields.includes(field)) { //listCategoryField will be put to 'and' context
                 let o = {}
                 o[field] = d[field];
                 orSearchContext.push(o);
@@ -874,7 +898,7 @@ export class BaseComponent implements BaseComponentInterface {
         this.searchMoreDetail = []
         let d2 = this.deFormatDetail(d);//undefined field is deleted after this step
         for (let field in d2) {
-            if (this.stringFields.indexOf(field) >= 0 && field === this.categoryBy) { // put category field to "and"
+            if (this.stringFields.indexOf(field) >= 0 && listCategoryFields.includes(field)) { // put category field to "and"
                 let o = {};
                 o[field] = d[field];
                 andSearchContext.push(o);
@@ -902,7 +926,7 @@ export class BaseComponent implements BaseComponentInterface {
                 } else {
                     valueToShow = d[field];//take directoy from what we get 
                 }
-                if (field !== this.categoryBy) { // don't show category field
+                if (!listCategoryFields.includes(field)) { // don't show category field
                     this.searchMoreDetail.push([field, valueToShow]);
                 }
                 andSearchContext.push(o);
@@ -1000,11 +1024,21 @@ export class BaseComponent implements BaseComponentInterface {
         searchContext = this.getFromStorage("searchContext");
         this.loadUIFromCache();
 
+        const cate1 = this.listCategory1 || {};
+        const cate2 = this.listCategory2 || {};
+
         const categoryProvided = typeof this.selectedCategory === 'number'? true : false;
-        const listCategoryShowMore = typeof this.listCategoryShowMore? true : false;
+        const listCategoryShowMore = typeof cate1.listCategoryShowMore? true : false;
+        const categoryProvided2 = typeof this.selectedCategory2 === 'number'? true : false;
+        const listCategoryShowMore2 = typeof cate2.listCategoryShowMore? true : false;
         let expt = false;
+
+        const listCategoryField = cate1.listCategoryField;
+        const listCategoryField2 = cate2.listCategoryField;
         this.service.getList(new_page, this.per_page, searchContext, this.listSortField, this.listSortOrder, 
-            this.categoryBy, listCategoryShowMore, categoryProvided, this.associationField, expt, this.ignoreField).subscribe(
+            listCategoryField, listCategoryShowMore, categoryProvided, 
+            listCategoryField2, listCategoryShowMore2, categoryProvided2,
+            this.associationField, expt, this.ignoreField).subscribe(
           result => { 
             this.list = result.items.map(x=> {
                 let d = this.formatDetail(x);
@@ -1012,14 +1046,23 @@ export class BaseComponent implements BaseComponentInterface {
             });
             this.originalList = result.items;
 
-            if (this.categoryBy && !categoryProvided) {
+            if (listCategoryField && !categoryProvided) {
                 this.categories = result.categories.map(x=>this.formatDetail(x));
                 this.selectedCategory = 0;
 
-                //categories is a array of this.detail format with the this.categoryBy field only
-                this.categoryDisplays = this.categories.map(x=>this.getFieldDisplayFromFormattedDetail(x, this.categoryBy));
+                //categories is a array of this.detail format with the listCategoryField field only
+                this.categoryDisplays = this.categories.map(x=>this.getFieldDisplayFromFormattedDetail(x, listCategoryField));
                 //categoriesBrief is array of object of the category ref
                 this.categoryMore = result.categoriesBrief;
+            }
+            if (listCategoryField2 && !categoryProvided2) {
+                this.categories2 = result.categories2.map(x=>this.formatDetail(x));
+                this.selectedCategory2 = 0;
+
+                //categories is a array of this.detail format with the listCategoryField field only
+                this.categoryDisplays2 = this.categories2.map(x=>this.getFieldDisplayFromFormattedDetail(x, listCategoryField2));
+                //categoriesBrief is array of object of the category ref
+                this.categoryMore2 = result.categoriesBrief2;
             }
 
             if (this.isDropdownList) {
@@ -1112,11 +1155,19 @@ export class BaseComponent implements BaseComponentInterface {
         let searchContext = this.getFromStorage("searchContext");
         this.loadUIFromCache();
 
+        const cate1 = this.listCategory1 || {};
+        const cate2 = this.listCategory2 || {};
+
         const categoryProvided = typeof this.selectedCategory === 'number'? true : false;
-        const listCategoryShowMore = typeof this.listCategoryShowMore? true : false;
+        const listCategoryShowMore = typeof cate1.listCategoryShowMore? true : false;
+        const categoryProvided2 = typeof this.selectedCategory2 === 'number'? true : false;
+        const listCategoryShowMore2 = typeof cate2.listCategoryShowMore? true : false;
 
         let expt = true;
-        this.service.getList(0, 0, searchContext, this.listSortField, this.listSortOrder, this.categoryBy, listCategoryShowMore, categoryProvided, this.associationField, expt, this.ignoreField).subscribe(
+        this.service.getList(0, 0, searchContext, this.listSortField, this.listSortOrder, 
+            cate1.listCategoryField, listCategoryShowMore, categoryProvided,
+            cate2.listCategoryField, listCategoryShowMore2, categoryProvided2,
+            this.associationField, expt, this.ignoreField).subscribe(
             data => {
                 // xlsx file returned
                 const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

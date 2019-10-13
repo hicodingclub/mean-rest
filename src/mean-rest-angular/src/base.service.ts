@@ -46,9 +46,10 @@ export class BaseService {
         return list;
     }
 
-    getList(page:number, per_page:number, searchContext:any, sort:string, order:string, categoryBy:string, 
-        listCategoryShowMore: boolean, categoryProvided: boolean, associationField: string, 
-        expt: boolean, ignoreField: string) {
+    getList(page:number, per_page:number, searchContext:any, sort:string, order:string,
+        categoryBy:string, listCategoryShowMore: boolean, categoryProvided: boolean, 
+        categoryBy2:string, listCategoryShowMore2: boolean, categoryProvided2: boolean,         
+        associationField: string, expt: boolean, ignoreField: string) {
 
         let params = new HttpParams()
             .set('__page', page.toString())
@@ -65,6 +66,16 @@ export class BaseService {
         if (listCategoryShowMore) {
             params = params.set('__listCategoryShowMore', 'y');
         }
+        if (categoryBy2) {
+            params = params.set('__categoryBy2', categoryBy2);
+        }
+        if (categoryProvided2) {
+            params = params.set('__categoryProvided2', 'y');
+        }
+        if (listCategoryShowMore2) {
+            params = params.set('__listCategoryShowMore2', 'y');
+        }
+
         if (associationField) {
             params = params.set('__asso', associationField);
         }
