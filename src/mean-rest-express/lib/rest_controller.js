@@ -526,6 +526,7 @@ class RestController {
     let __per_page = PER_PAGE;
     let __sort, __order;
     let __categoryBy, __categoryProvided, __listCategoryShowMore;
+    let __categoryBy2, __categoryProvided2, __listCategoryShowMore2;
     let __asso;
     for (let prop in req.query) {
       if (prop === '__page') {
@@ -542,6 +543,12 @@ class RestController {
         __listCategoryShowMore = req.query[prop];
       } else if (prop === '__categoryProvided') {
         __categoryProvided = req.query[prop];
+      } else if (prop === '__categoryBy2') {
+        __categoryBy2 = req.query[prop];
+      } else if (prop === '__listCategoryShowMore2') {
+        __listCategoryShowMore2 = req.query[prop];
+      } else if (prop === '__categoryProvided2') {
+        __categoryProvided2 = req.query[prop];
       } else if (prop === '__asso') {
         __asso = req.query[prop];
       } else if (prop in schema.paths) {
@@ -549,12 +556,13 @@ class RestController {
       }
     }
 
-    let __categoryFieldRef;
+    let __categoryFieldRef, __categoryFieldRef2;
     for (let p of populates.briefView) {
       //an array, with [field, ref]
       if (p[0] === __categoryBy) {
         __categoryFieldRef = p[1];
-        break;
+      } else if (p[0] === __categoryBy2) {
+        __categoryFieldRef2 = p[1];
       }
     }
   
@@ -588,47 +596,60 @@ class RestController {
     }
     query = ownerPatch(query, owner, req);
 
-    let categories = [];
-    let categoryObjectsIndex = [];
-    let categoryObjectsBrief = [];
-    let categoryObjects = [];
-    if (__categoryBy && !__categoryProvided) {
-      // need to query DB to get the category first.
-      try {
-        let catQuery = {};
-        catQuery = ownerPatch(catQuery, owner, req);
+    let categoriesAll = [[], []];
+    let categoryObjectsIndexAll = [[], []];
+    let categoryObjectsBriefAll = [[], []];
+    let categoryObjectsAll = [[], []];
 
-        categories = await model.find(catQuery).distinct(__categoryBy).exec();
+    const cateDef = [
+      {categoryBy: __categoryBy, categoryProvided: __categoryProvided, categoryFieldRef: __categoryFieldRef, },
+      {categoryBy: __categoryBy2, categoryProvided: __categoryProvided2, categoryFieldRef: __categoryFieldRef2, },
+    ];
+    for (let i=0; i<cateDef.length; i++) {
+      const cate = cateDef[i];
+      if (cate.categoryBy && !cate.categoryProvided) {
+        // need to query DB to get the category first.
+        try {
+          let catQuery = {};
+          catQuery = ownerPatch(catQuery, owner, req);
 
-        if (__categoryFieldRef) {
-          // it's an ref field
-          categories = await this.getRefObjectsFromId(req, __categoryFieldRef, categories);
+          categoriesAll[i] = await model.find(catQuery).distinct(cate.categoryBy).exec();
+  
+          categoriesAll[i].sort();
+          categoriesAll[i].reverse();
+
+          if (cate.categoryFieldRef) {
+            // it's an ref field
+            categoriesAll[i] = await this.getRefObjectsFromId(req, cate.categoryFieldRef, categoriesAll[i]);
+          }
+          categoryObjectsAll[i] = categoriesAll[i].map(x => {
+            const obj = {};
+            obj[cate.categoryBy] = x;
+            return obj;
+          });
+          categoryObjectsAll[i] = JSON.parse(JSON.stringify(categoryObjectsAll[i]));
+          // get the index population of the category fields
+          const [indexPopulateArray, indexPopulateMap] = this.getPopulateInfo(populates.briefView, null);
+          categoryObjectsIndexAll[i] = resultReducerForRef(categoryObjectsAll[i], indexPopulateMap);
+          categoriesAll[i] = categoryObjectsIndexAll[i].map(x => x[cate.categoryBy]);
+  
+          // get the biref population of the category fields
+          if (cate.listCategoryShowMore) {
+            const [briefPopulateArray, briefPopulateMap] = this.getPopulateInfo(populates.briefView, cate.categoryBy);
+            categoryObjectsBriefAll[i] = resultReducerForRef(categoryObjectsAll[i], briefPopulateMap).map(x => x[cate.categoryBy]);
+          }
+  
+        } catch (err) {
+          return next(err);
         }
-        categoryObjects = categories.map(x => {
-          const obj = {};
-          obj[__categoryBy] = x;
-          return obj;
-        });
-        categoryObjects = JSON.parse(JSON.stringify(categoryObjects));
-        // get the index population of the category fields
-        const [indexPopulateArray, indexPopulateMap] = this.getPopulateInfo(populates.briefView, null);
-        categoryObjectsIndex = resultReducerForRef(categoryObjects, indexPopulateMap);
-        categories = categoryObjectsIndex.map(x => x[__categoryBy]);
+      }
 
-        // get the biref population of the category fields
-        if (__listCategoryShowMore) {
-          const [briefPopulateArray, briefPopulateMap] = this.getPopulateInfo(populates.briefView, __categoryBy);
-          categoryObjectsBrief = resultReducerForRef(categoryObjects, briefPopulateMap).map(x => x[__categoryBy]);
-        }
-
-      } catch (err) {
-        return next(err);
+      if (!cate.categoryProvided && categoriesAll[i].length > 0) {
+        // take the first category as query filter
+        query[cate.categoryBy] = categoriesAll[i][0];
       }
     }
-    if (!__categoryProvided && categories.length > 0) {
-      // take the first category as query filter
-      query[__categoryBy] = categories[0];
-    }
+
 
     try {
       count = await model.countDocuments(query).exec();
@@ -672,8 +693,11 @@ class RestController {
         per_page: __per_page,
         items: result,
         categoryBy: __categoryBy,
-        categories: categoryObjectsIndex,
-        categoriesBrief: categoryObjectsBrief,
+        categories: categoryObjectsIndexAll[0],
+        categoriesBrief: categoryObjectsBriefAll[0],
+        categoryBy2: __categoryBy2,
+        categories2: categoryObjectsIndexAll[1],
+        categoriesBrief2: categoryObjectsBriefAll[1],
       };
       output = JSON.parse(JSON.stringify(output));
       output.items = resultReducerForRef(output.items, populateMap);
