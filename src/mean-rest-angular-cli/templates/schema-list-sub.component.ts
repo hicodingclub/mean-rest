@@ -23,7 +23,8 @@ export class <%-SchemaName%>ListSubComponent extends <%-SchemaName%>ListComponen
       public location: Location) {
         super(<%if (schemaHasRef) {%>null,<%}%> <%-schemaName%>Service, injector, router, route, location);
 
-        this.categoryBy = undefined; // no do query based on category for sub view;
+        this.listCategory1 = {}; // no do query based on category for sub view;
+        this.listCategory2 = {}; // no do query based on category for sub view;
   }
 
   ngOnInit() {

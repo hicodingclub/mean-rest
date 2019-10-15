@@ -20,7 +20,8 @@ export class <%-SchemaName%>ListHomeComponent extends <%-SchemaName%>ListCompone
       public location: Location) {
         super(<%if (schemaHasRef) {%>null,<%}%> <%-schemaName%>Service, injector, router, route, location);
         this.per_page = <%-homeListNumber%>;
-        this.categoryBy = undefined; // no do query based on category for home view;
+        this.listCategory1 = {}; // no do query based on category for home view;
+        this.listCategory2 = {}; // no do query based on category for home view;
   }
 
   ngOnInit() {
