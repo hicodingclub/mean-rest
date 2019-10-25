@@ -602,8 +602,8 @@ class RestController {
     let categoryObjectsAll = [[], []];
 
     const cateDef = [
-      {categoryBy: __categoryBy, categoryProvided: __categoryProvided, categoryFieldRef: __categoryFieldRef, },
-      {categoryBy: __categoryBy2, categoryProvided: __categoryProvided2, categoryFieldRef: __categoryFieldRef2, },
+      {categoryBy: __categoryBy, categoryProvided: __categoryProvided, categoryFieldRef: __categoryFieldRef, listCategoryShowMore: __listCategoryShowMore},
+      {categoryBy: __categoryBy2, categoryProvided: __categoryProvided2, categoryFieldRef: __categoryFieldRef2, listCategoryShowMore: __listCategoryShowMore2},
     ];
     for (let i=0; i<cateDef.length; i++) {
       const cate = cateDef[i];

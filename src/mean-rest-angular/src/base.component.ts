@@ -1048,7 +1048,9 @@ export class BaseComponent implements BaseComponentInterface {
 
             if (listCategoryField && !categoryProvided) {
                 this.categories = result.categories.map(x=>this.formatDetail(x));
-                this.selectedCategory = 0;
+                if (this.categories.length > 0) {
+                    this.selectedCategory = 0;
+                }
 
                 //categories is a array of this.detail format with the listCategoryField field only
                 this.categoryDisplays = this.categories.map(x=>this.getFieldDisplayFromFormattedDetail(x, listCategoryField));
@@ -1057,7 +1059,9 @@ export class BaseComponent implements BaseComponentInterface {
             }
             if (listCategoryField2 && !categoryProvided2) {
                 this.categories2 = result.categories2.map(x=>this.formatDetail(x));
-                this.selectedCategory2 = 0;
+                if (this.categories2.length > 0) {
+                    this.selectedCategory2 = 0;
+                }
 
                 //categories is a array of this.detail format with the listCategoryField field only
                 this.categoryDisplays2 = this.categories2.map(x=>this.getFieldDisplayFromFormattedDetail(x, listCategoryField2));

@@ -436,3 +436,15 @@ div.badge-click:hover {
   font-style: italic;
   font-size: 0.8rem;
 }
+
+.nohref-link {
+  color: #007bff !important;
+  cursor: pointer;
+}
+.nohref-link:hover {
+  color: #0056b3 !important;
+}
+
+.nohref-link.active, .nohref-link.active:hover {
+  color: #fff !important;
+} 
