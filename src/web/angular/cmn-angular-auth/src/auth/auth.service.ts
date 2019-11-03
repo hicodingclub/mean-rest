@@ -125,21 +125,29 @@ export class AuthenticationService {
     return authRecord['userName'];
   }
 
-  login(userName: string, password: string) {
+  login(userId: any, password: string) {
     const authRecord: any = {
-      userName: userName,
+      userName: userId.value,
       accessToken: '',
       refreshToken: '',
       displayName: ''
     };
+
     localStorage.setItem('mdds-auth-record', JSON.stringify(authRecord));
 
     const options = this.adminInterface ?
        { params: new HttpParams().set('type', 'admin') } : {};
     
+    const requestObj = { password: password };
+    if (userId.id === 'username') {
+      requestObj['username'] = userId.value;
+    } else if (userId.id === 'email') {
+      requestObj['email'] = userId.value;
+    }
+
     return this.http.post<any>(this.authServerRootUri + '/login',
-        { username: userName, password: password }, options
-      ).pipe(map(this.loggedIn));
+      requestObj, options
+    ).pipe(map(this.loggedIn));
   }
 
   register(userInfo: any) {

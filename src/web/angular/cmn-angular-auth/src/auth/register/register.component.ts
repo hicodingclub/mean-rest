@@ -38,8 +38,9 @@ export class RegisterComponent implements OnInit {
 
     ngOnInit() {
         const phoneNumber = /^(\d+-?)+\d+$/;
+        const userName = /^[A-Za-z]((?!(@)).)*$/;
         this.registerForm = this.formBuilder.group({
-            username: ['', Validators.required],
+            username: ['', [Validators.pattern(userName), Validators.required]],
             email: ['', [Validators.email, Validators.required]],
             phone: ['', Validators.pattern(phoneNumber)],
             password: ['', [Validators.required, Validators.minLength(6)]],

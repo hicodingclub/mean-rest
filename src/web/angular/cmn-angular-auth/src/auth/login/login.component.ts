@@ -52,7 +52,16 @@ export class LoginComponent implements OnInit {
         if (this.router.url === returnUrl) { returnUrl = '/'; } // home page
 
         this.loading = true;
-        this.authenticationService.login(this.f.username.value, this.f.password.value)
+
+        const userInput = this.f.username.value;
+        const userId = {
+            id: 'username',
+            value: userInput,
+        };
+        if (userInput.match(/@/)) {
+            userId['id'] = 'email';
+        }
+        this.authenticationService.login(userId, this.f.password.value)
             .pipe(first())
             .subscribe(
                 data => {

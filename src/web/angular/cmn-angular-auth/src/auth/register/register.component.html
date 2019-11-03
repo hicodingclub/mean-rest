@@ -4,6 +4,7 @@
         <label for="username">Username&nbsp;<span>*</span></label>
         <input type="text" formControlName="username" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" />
         <div *ngIf="submitted && f.username.errors" class="invalid-feedback">
+            <div *ngIf="f.username.errors.pattern">Username must start with an English letter, and not contain '@''.</div>
             <div *ngIf="f.username.errors.required">Username is required</div>
         </div>
     </div>
