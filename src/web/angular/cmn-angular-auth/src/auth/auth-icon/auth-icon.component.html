@@ -4,7 +4,7 @@
 		<span class="icon-text"><i class="fas fa-user"></i></span>
 	</div>
 
-    <div class="user-name">{{userNameShort}} <i *ngIf="isAuthorized()" class="fas fa-caret-square-down pointer" (click)="toggle($event)"></i></div>
+    <div class="user-name">{{userNameShort}} <i class="fas fa-caret-square-down pointer" (click)="toggle($event)"></i></div>
 
 	<div *ngIf="popup" class="auth-icon-pop" [ngStyle]="popupStyle">
 	  <div class="dropdown-menu pop-menu-container">
