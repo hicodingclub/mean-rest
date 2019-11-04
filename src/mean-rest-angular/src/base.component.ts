@@ -1025,9 +1025,8 @@ export class BaseComponent implements BaseComponentInterface {
             if (new_page !== 1) {
                 segmentParams = {page: new_page};
             }
+            this.router.navigate(['.', segmentParams], {relativeTo: this.route, queryParamsHandling: 'preserve',});//update the url
         }
-        // update URL
-        this.router.navigate(['.', segmentParams], {relativeTo: this.route, queryParamsHandling: 'preserve',});//update the url
 
         searchContext = this.getFromStorage("searchContext");
         this.loadUIFromCache();
