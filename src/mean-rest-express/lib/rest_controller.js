@@ -640,6 +640,9 @@ class RestController {
           const [indexPopulateArray, indexPopulateMap] = this.getPopulateInfo(populates.briefView, null);
           categoryObjectsIndexAll[i] = resultReducerForRef(categoryObjectsAll[i], indexPopulateMap);
           categoriesAll[i] = categoryObjectsIndexAll[i].map(x => x[cate.categoryBy]);
+          if (cate.categoryFieldRef) {
+            originCategoriesAll[i] = categoriesAll[i].map(x => x['_id']);
+          }
   
           // get the biref population of the category fields
           if (cate.listCategoryShowMore) {
@@ -652,6 +655,15 @@ class RestController {
         }
       }
 
+      console.log('originCategoriesAll[i]', originCategoriesAll[i])
+      if (typeof originCategoriesAll[i][0] == 'object') {
+        console.log('typeof originCategoriesAll[i][0]._id', typeof originCategoriesAll[i][0]._id);
+
+      }
+      console.log('typeof originCategoriesAll[i][0]', typeof originCategoriesAll[i][0]);
+      console.log('categoriesAll[i]', categoriesAll[i])
+      console.log('cate.categoryCand', cate.categoryCand)
+
       if (!cate.categoryProvided && originCategoriesAll[i].length > 0) {
         if (originCategoriesAll[i].includes(cate.categoryCand)) {
           // candidate found
@@ -660,8 +672,10 @@ class RestController {
           // take the first category as query filter
           query[cate.categoryBy] = originCategoriesAll[i][0];
         }
+        console.log('query[cate.categoryBy]', query[cate.categoryBy]);
       }
     }
+    console.log('query: ', query);
 
     try {
       count = await model.countDocuments(query).exec();
