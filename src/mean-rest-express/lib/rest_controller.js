@@ -525,8 +525,8 @@ class RestController {
     let __page = 1;
     let __per_page = PER_PAGE;
     let __sort, __order;
-    let __categoryBy, __categoryProvided, __listCategoryShowMore;
-    let __categoryBy2, __categoryProvided2, __listCategoryShowMore2;
+    let __categoryBy, __categoryProvided, __listCategoryShowMore, __categoryCand;
+    let __categoryBy2, __categoryProvided2, __listCategoryShowMore2, __categoryCand2;
     let __asso;
     for (let prop in req.query) {
       if (prop === '__page') {
@@ -541,12 +541,16 @@ class RestController {
         __categoryBy = req.query[prop];
       } else if (prop === '__listCategoryShowMore') {
         __listCategoryShowMore = req.query[prop];
+      } else if (prop === '__categoryCand') {
+        __categoryCand = req.query[prop];
       } else if (prop === '__categoryProvided') {
         __categoryProvided = req.query[prop];
       } else if (prop === '__categoryBy2') {
         __categoryBy2 = req.query[prop];
       } else if (prop === '__listCategoryShowMore2') {
         __listCategoryShowMore2 = req.query[prop];
+      } else if (prop === '__categoryCand2') {
+        __categoryCand2 = req.query[prop];
       } else if (prop === '__categoryProvided2') {
         __categoryProvided2 = req.query[prop];
       } else if (prop === '__asso') {
@@ -596,14 +600,17 @@ class RestController {
     }
     query = ownerPatch(query, owner, req);
 
+    let originCategoriesAll = [[], []];
     let categoriesAll = [[], []];
     let categoryObjectsIndexAll = [[], []];
     let categoryObjectsBriefAll = [[], []];
     let categoryObjectsAll = [[], []];
 
     const cateDef = [
-      {categoryBy: __categoryBy, categoryProvided: __categoryProvided, categoryFieldRef: __categoryFieldRef, listCategoryShowMore: __listCategoryShowMore},
-      {categoryBy: __categoryBy2, categoryProvided: __categoryProvided2, categoryFieldRef: __categoryFieldRef2, listCategoryShowMore: __listCategoryShowMore2},
+      {categoryBy: __categoryBy, categoryProvided: __categoryProvided, categoryFieldRef: __categoryFieldRef,
+        listCategoryShowMore: __listCategoryShowMore, categoryCand: __categoryCand},
+      {categoryBy: __categoryBy2, categoryProvided: __categoryProvided2, categoryFieldRef: __categoryFieldRef2,
+        listCategoryShowMore: __listCategoryShowMore2, categoryCand: __categoryCand2},
     ];
     for (let i=0; i<cateDef.length; i++) {
       const cate = cateDef[i];
@@ -612,15 +619,16 @@ class RestController {
         try {
           let catQuery = {};
           catQuery = ownerPatch(catQuery, owner, req);
-
-          categoriesAll[i] = await model.find(catQuery).distinct(cate.categoryBy).exec();
+ 
+          originCategoriesAll[i] = await model.find(catQuery).distinct(cate.categoryBy).exec(); // no objects
   
-          categoriesAll[i].sort();
-          categoriesAll[i].reverse();
+          originCategoriesAll[i].sort();
+          originCategoriesAll[i].reverse();
 
+          categoriesAll[i] = originCategoriesAll[i];
           if (cate.categoryFieldRef) {
             // it's an ref field
-            categoriesAll[i] = await this.getRefObjectsFromId(req, cate.categoryFieldRef, categoriesAll[i]);
+            categoriesAll[i] = await this.getRefObjectsFromId(req, cate.categoryFieldRef, originCategoriesAll[i]);
           }
           categoryObjectsAll[i] = categoriesAll[i].map(x => {
             const obj = {};
@@ -644,12 +652,16 @@ class RestController {
         }
       }
 
-      if (!cate.categoryProvided && categoriesAll[i].length > 0) {
-        // take the first category as query filter
-        query[cate.categoryBy] = categoriesAll[i][0];
+      if (!cate.categoryProvided && originCategoriesAll[i].length > 0) {
+        if (originCategoriesAll[i].includes(cate.categoryCand)) {
+          // candidate found
+          query[cate.categoryBy] = cate.categoryCand;
+        } else {
+          // take the first category as query filter
+          query[cate.categoryBy] = originCategoriesAll[i][0];
+        }
       }
     }
-
 
     try {
       count = await model.countDocuments(query).exec();
