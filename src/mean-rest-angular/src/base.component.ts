@@ -1023,7 +1023,7 @@ export class BaseComponent implements BaseComponentInterface {
         let segmentParams = {};
         if (!this.isEmptyRoutingPath()) {
             if (new_page !== 1) {
-                segmentParams = {page: cached_page};
+                segmentParams = {page: new_page};
             }
         }
         // update URL
