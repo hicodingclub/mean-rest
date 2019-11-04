@@ -85,13 +85,13 @@ export class BaseComponent implements BaseComponentInterface {
     public listCategory1; //sub category
     public listCategory2; //top category
     
-    public categories: [] = []; // stored categories
-    public categoryMore: [] = []; //stored more details
+    public categories = []; // stored categories
+    public categoryMore = []; //stored more details
     public categoryDisplays: string[] = []; //stored display name of categories
     public selectedCategory: number = undefined; // index in categories
 
-    public categories2: [] = []; // stored categories
-    public categoryMore2: [] = []; //stored more details
+    public categories2 = []; // stored categories
+    public categoryMore2 = []; //stored more details
     public categoryDisplays2: string[] = []; //stored display name of categories
     public selectedCategory2: number = undefined; // index in categories
 
@@ -760,7 +760,8 @@ export class BaseComponent implements BaseComponentInterface {
         }
         let expt = false;
         this.service.getList(1, 1, searchContext, null, null, 
-            null, false, false, null, false, false, // categories
+            null, false, false, null,
+            null, false, false, null,// categories
             null, expt, this.ignoreField).subscribe(
             result => {
                 let detail = {};
@@ -834,13 +835,13 @@ export class BaseComponent implements BaseComponentInterface {
 
     public categorySelected(idx: number) {
         this.selectedCategory = idx;
-
+        const category = this.categoryDisplays[idx];
         this.searchList();
     }
     public categorySelected2(idx: number) {
         this.selectedCategory2 = idx;
-
-        this.searchList();
+        const category = this.categoryDisplays2[idx];
+       this.searchList();
     }
   
     private equalTwoSearchContextArrays (arr1, arr2) {
@@ -868,16 +869,20 @@ export class BaseComponent implements BaseComponentInterface {
 
         const cate1 = this.listCategory1 || {}; //sub category
         const cate2 = this.listCategory2 || {}; //top catetory
-    
-        if (typeof this.selectedCategory == 'number' && cate1.listCategoryField) {
+            
+        if (cate1.listCategoryField) {
             const field = cate1.listCategoryField;
-            d[field] = this.categories[this.selectedCategory][field];
+            if (typeof this.selectedCategory == 'number') {
+                d[field] = this.categories[this.selectedCategory][field];
+            }
         }
-        if (typeof this.selectedCategory2 == 'number' && cate2.listCategoryField) {
+        if (cate2.listCategoryField) {
             const field = cate2.listCategoryField;
-            d[field] = this.categories2[this.selectedCategory2][field];
+            if (typeof this.selectedCategory2 == 'number') {
+                d[field] = this.categories2[this.selectedCategory2][field];
+            }
         }
-
+ 
         const listCategoryFields = [cate1.listCategoryField, cate2.listCategoryField];
         if (!this.searchDetailReady) {
             for (let s of this.stringFields) {
@@ -1008,18 +1013,21 @@ export class BaseComponent implements BaseComponentInterface {
 
         let url_page = parseInt(this.route.snapshot.paramMap.get('page'));
         let cached_page = parseInt(this.getFromStorage("page"));
-            
+
         if (cached_page) { 
             new_page = cached_page;
-            if (!this.isEmptyRoutingPath()) {
-                if (cached_page == 1)
-                this.router.navigate(['.', {}], {relativeTo: this.route, queryParamsHandling: 'preserve',});//update the url
-            else
-                this.router.navigate(['.', {page: cached_page}], {relativeTo: this.route, queryParamsHandling: 'preserve',});//update the url
-            }
         }
         else if (url_page) new_page = url_page;
         else new_page = 1;
+
+        let segmentParams = {};
+        if (!this.isEmptyRoutingPath()) {
+            if (new_page !== 1) {
+                segmentParams = {page: cached_page};
+            }
+        }
+        // update URL
+        this.router.navigate(['.', segmentParams], {relativeTo: this.route, queryParamsHandling: 'preserve',});//update the url
 
         searchContext = this.getFromStorage("searchContext");
         this.loadUIFromCache();
@@ -1027,17 +1035,22 @@ export class BaseComponent implements BaseComponentInterface {
         const cate1 = this.listCategory1 || {};
         const cate2 = this.listCategory2 || {};
 
+        let url_cate1 = this.route.snapshot.queryParams['cate'];
+        let url_cate2 = this.route.snapshot.queryParams['cate2'];
+
         const categoryProvided = typeof this.selectedCategory === 'number'? true : false;
         const listCategoryShowMore = typeof cate1.listCategoryShowMore? true : false;
+        const categoryCandidate = categoryProvided || !url_cate1 ? '' : url_cate1;
         const categoryProvided2 = typeof this.selectedCategory2 === 'number'? true : false;
         const listCategoryShowMore2 = typeof cate2.listCategoryShowMore? true : false;
+        const categoryCandidate2 = categoryProvided2 || !url_cate2? '' : url_cate2;
         let expt = false;
 
         const listCategoryField = cate1.listCategoryField;
         const listCategoryField2 = cate2.listCategoryField;
         this.service.getList(new_page, this.per_page, searchContext, this.listSortField, this.listSortOrder, 
-            listCategoryField, listCategoryShowMore, categoryProvided, 
-            listCategoryField2, listCategoryShowMore2, categoryProvided2,
+            listCategoryField, listCategoryShowMore, categoryProvided, categoryCandidate,
+            listCategoryField2, listCategoryShowMore2, categoryProvided2, categoryCandidate2,
             this.associationField, expt, this.ignoreField).subscribe(
           result => { 
             this.list = result.items.map(x=> {
@@ -1046,28 +1059,88 @@ export class BaseComponent implements BaseComponentInterface {
             });
             this.originalList = result.items;
 
-            if (listCategoryField && !categoryProvided) {
-                this.categories = result.categories.map(x=>this.formatDetail(x));
-                if (this.categories.length > 0) {
-                    this.selectedCategory = 0;
-                }
+            const cateGroup = [
+                {
+                    listCategoryField,
+                    categoryProvided,
+                    categories: result.categories,
+                    categoriesBrief: result.categoriesBrief,
+                    categoryCandidate,
 
-                //categories is a array of this.detail format with the listCategoryField field only
-                this.categoryDisplays = this.categories.map(x=>this.getFieldDisplayFromFormattedDetail(x, listCategoryField));
-                //categoriesBrief is array of object of the category ref
-                this.categoryMore = result.categoriesBrief;
-            }
-            if (listCategoryField2 && !categoryProvided2) {
-                this.categories2 = result.categories2.map(x=>this.formatDetail(x));
-                if (this.categories2.length > 0) {
-                    this.selectedCategory2 = 0;
-                }
+                    selectedCategoryName: '',
 
-                //categories is a array of this.detail format with the listCategoryField field only
-                this.categoryDisplays2 = this.categories2.map(x=>this.getFieldDisplayFromFormattedDetail(x, listCategoryField2));
-                //categoriesBrief is array of object of the category ref
-                this.categoryMore2 = result.categoriesBrief2;
+                    categoriesOut: this.categories,
+                    categoryDisplays: this.categoryDisplays,
+                    categoryMore: this.categoryMore,
+                    selectedCategory: this.selectedCategory,
+                },
+                {
+                    listCategoryField: listCategoryField2,
+                    categoryProvided: categoryProvided2,
+                    categories: result.categories2,
+                    categoriesBrief: result.categoriesBrief2,
+                    categoryCandidate: categoryCandidate2,
+
+                    selectedCategoryName: '',
+
+                    categoriesOut: this.categories2,
+                    categoryDisplays: this.categoryDisplays2,
+                    categoryMore: this.categoryMore2,
+                    selectedCategory: this.selectedCategory2,
+                }
+            ];
+            for (const c of cateGroup) {
+                if (c.listCategoryField && !c.categoryProvided) {
+                    c.categoriesOut = c.categories.map(x=>this.formatDetail(x));
+
+                    // categories is a array of this.detail format with the listCategoryField field only
+                    c.categoryDisplays = c.categoriesOut.map(x=>this.getFieldDisplayFromFormattedDetail(x, c.listCategoryField));
+                    // categoriesBrief is array of object of the category ref
+                    c.categoryMore = c.categoriesBrief;
+
+                    if (c.categoriesOut.length > 0) {
+                        let found = -1;
+                        for (let i = 0; i < c.categoriesOut.length; i++) {
+                            const ct = c.categoriesOut[i][c.listCategoryField];
+                            if ( (typeof ct === 'object' && ct["_id"] === c.categoryCandidate) || ct === c.categoryCandidate) {
+                                found = i;
+                                break;
+                            }
+                        }
+                        if (found >= 0) {
+                            c.selectedCategory = found;
+                        } else {
+                            c.selectedCategory = 0;
+                        }
+                    }
+                }
+                if (c.listCategoryField) {
+                    const ct = c.categoriesOut[c.selectedCategory][c.listCategoryField];
+                    if ( typeof ct === 'object' ) {
+                        c.selectedCategoryName = ct['_id'];
+                    } else {
+                        c.selectedCategoryName = ct;
+                    }
+                }
             }
+            this.categories = cateGroup[0].categoriesOut;
+            this.categoryMore = cateGroup[0].categoryMore;
+            this.selectedCategory = cateGroup[0].selectedCategory;
+            this.categoryDisplays = cateGroup[0].categoryDisplays;
+            this.categories2 = cateGroup[1].categoriesOut;
+            this.categoryMore2 = cateGroup[1].categoryMore;
+            this.selectedCategory2 = cateGroup[1].selectedCategory;
+            this.categoryDisplays2 = cateGroup[1].categoryDisplays;
+
+            
+            const queryParams = {};
+            if (cateGroup[0].selectedCategoryName) {
+                queryParams['cate'] = cateGroup[0].selectedCategoryName;
+            }
+            if (cateGroup[1].selectedCategoryName) {
+                queryParams['cate2'] = cateGroup[1].selectedCategoryName;
+            }
+            this.router.navigate(['.'], {relativeTo: this.route, queryParams: queryParams, queryParamsHandling: 'merge',});//update the url
 
             if (this.isDropdownList) {
                 this.dropdownItems = this.list.map(x=> { return {displayName: this.stringify(x), id: x._id}} );
@@ -1169,8 +1242,8 @@ export class BaseComponent implements BaseComponentInterface {
 
         let expt = true;
         this.service.getList(0, 0, searchContext, this.listSortField, this.listSortOrder, 
-            cate1.listCategoryField, listCategoryShowMore, categoryProvided,
-            cate2.listCategoryField, listCategoryShowMore2, categoryProvided2,
+            cate1.listCategoryField, listCategoryShowMore, categoryProvided, null,
+            cate2.listCategoryField, listCategoryShowMore2, categoryProvided2, null,
             this.associationField, expt, this.ignoreField).subscribe(
             data => {
                 // xlsx file returned
