@@ -1,6 +1,6 @@
 {
   "name": "mdds-angular-action-email",
-  "version": "0.7.106",
+  "version": "0.7.110",
   "description": "Angular action to send emails to parent component list or individual",
   "scripts": {
     "copy": "cp README.md dist;",
@@ -18,7 +18,7 @@
     "@angular/common": "^7.2.15",
     "@angular/core": "^7.2.1",
     "@angular/forms": "^7.2.15",
-    "mdds-angular-action-base": "^0.7.106",
+    "mdds-angular-action-base": "0.7.110",
     "ng-packagr": "^4.6.0"
   },
   "peerDependencies": {

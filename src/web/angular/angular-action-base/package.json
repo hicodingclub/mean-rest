@@ -1,6 +1,6 @@
 {
   "name": "mdds-angular-action-base",
-  "version": "0.7.106",
+  "version": "0.7.110",
   "description": "Angular base action, which can be inherited to develop other actions and embedded in list and detail view.",
   "scripts": {
     "copy": "cp README.md dist;",

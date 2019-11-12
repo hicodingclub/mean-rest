@@ -1,6 +1,6 @@
 {
   "name": "mdds-angular-composite",
-  "version": "0.7.106",
+  "version": "0.7.110",
   "description": "Augular Composite that compose multiple componennt to be a single page",
   "scripts": {
     "copy": "cp README.md dist;",
@@ -31,7 +31,7 @@
     "@angular/forms": "^7.2.1",
     "@angular/platform-browser": "^7.2.1",
     "@angular/router": "^7.2.1",
-    "mean-rest-angular": "0.7.106",
+    "mean-rest-angular": "0.7.110",
     "ng-packagr": "^4.6.0",
     "rxjs": "^6.3.3",
     "tsickle": "^0.34.0",
@@ -44,7 +44,7 @@
     "@angular/forms": "^7.2.1",
     "@angular/platform-browser": "^7.2.1",
     "@angular/router": "^7.2.1",
-    "mean-rest-angular": "0.7.106",
+    "mean-rest-angular": "0.7.110",
     "rxjs": "^6.3.3",
     "zone.js": "^0.8.28",
     "tsickle": "^0.34.0"
