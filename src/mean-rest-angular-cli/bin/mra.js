@@ -1148,7 +1148,8 @@ function main() {
         if (!editFields.includes(x.fieldName)) compositeEditView.push(x);
       });
     }
-  	
+    
+    // Edit + brief + detailed view
   	let compositeEditBriefView = compositeEditView.slice(); //do reference include for this view.
     if (api.includes("L") ) {
       let compositeEditFields = compositeEditBriefView.map( x => x.fieldName);
