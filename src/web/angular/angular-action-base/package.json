@@ -1,0 +1,25 @@
+{
+  "name": "mdds-angular-action-base",
+  "version": "0.7.106",
+  "description": "Angular base action, which can be inherited to develop other actions and embedded in list and detail view.",
+  "scripts": {
+    "copy": "cp README.md dist;",
+    "package": "./node_modules/.bin/ng-packagr -p package.json && npm run copy",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mdds",
+    "angular",
+    "action"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "@angular/core": "^7.2.1",
+    "ng-packagr": "^4.6.0"
+  },
+  "peerDependencies": {
+    "@angular/core": "^7.2.1"
+  },
+  "author": "xibin liu",
+  "license": "MIT"
+}
