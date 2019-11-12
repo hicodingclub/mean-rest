@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const meanRestExpress = require('mean-rest-express');
 
-const emailTemplateDef = require('./model');
+const emailSystemDef = require('./model');
 
 class MddsEmailer {
   constructor(configJsonFile) {
@@ -10,7 +10,7 @@ class MddsEmailer {
   }
 
   populateTemplatesToDB(templates) {
-    const router =  meanRestExpress.RestRouter(emailTemplateDef, 'internal-template-usage');
+    const router =  meanRestExpress.RestRouter(emailSystemDef, 'internal-template-usage');
     const restController = router.restController;
 
     function modelExecuteSuccess(taskStr) {
@@ -153,12 +153,12 @@ class MddsEmailer {
 }
 
 //used to manage the public access
-function GetEmailTemplateManageRouter(moduleName, authAppFuncs) {
-  const router =  meanRestExpress.RestRouter(emailTemplateDef, moduleName, authAppFuncs);
+function GetEmailingManageRouter(moduleName, authAppFuncs) {
+  const router =  meanRestExpress.RestRouter(emailSystemDef, moduleName, authAppFuncs);
   return router;
 }
 
 module.exports = {
-  GetEmailTemplateManageRouter,
+  GetEmailingManageRouter,
   MddsEmailer,
 };
