@@ -1,0 +1,52 @@
+.modal-back {
+  position: fixed;
+  width: 100vw;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  height: 100%;
+  min-height: 100vh;
+
+  z-index: 9;
+  background-color:rgba(0,0,0,0.4);
+}
+
+.modal-front {
+  background-color: white;
+  position: relative;
+
+  min-width: 300px;
+  width: 50%;
+
+  left: 50%;
+  transform: translate(-50%, 0);
+  margin-top: 100px;
+  margin-bottom: 100px;
+
+  text-align: left;
+  padding: 2rem 1rem 2rem 1rem;
+}
+
+.radio-choice {
+  margin-left: 2rem;
+}
+
+.radio-choice > input {
+  margin-right: 1rem;
+}
+
+.input-group > input {
+  width: 80%;
+  margin-left: 2rem;
+}
+
+.action-buttons-center {
+    width: 100%;
+    text-align: center;
+    margin-top: 2rem;
+    margin-bottom: 1.25rem;
+}
+.action-buttons-center > button {
+  display: inline-block;
+  margin-left: 2.5rem;
+}

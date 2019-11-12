@@ -1,0 +1,29 @@
+{
+  "name": "mdds-angular-action-email",
+  "version": "0.7.106",
+  "description": "Angular action to send emails to parent component list or individual",
+  "scripts": {
+    "copy": "cp README.md dist;",
+    "package": "./node_modules/.bin/ng-packagr -p package.json && npm run copy",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mdds",
+    "angular",
+    "action",
+    "email"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "@angular/common": "^7.2.15",
+    "@angular/core": "^7.2.1",
+    "@angular/forms": "^7.2.15",
+    "mdds-angular-action-base": "^0.7.106",
+    "ng-packagr": "^4.6.0"
+  },
+  "peerDependencies": {
+    "@angular/core": "^7.2.1"
+  },
+  "author": "xibin liu",
+  "license": "MIT"
+}
