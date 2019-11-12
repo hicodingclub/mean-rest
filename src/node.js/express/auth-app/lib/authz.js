@@ -199,6 +199,9 @@ const getOperation = function(req) {
   let operation;
   if (originalUrl.includes('/mddsaction/')) {
     if (originalUrl.includes('/mddsaction/get')) operation = 'R';
+    else if (originalUrl.includes('/mddsaction/export')) operation = 'R';
+    else if (originalUrl.includes('/mddsaction/emailing')) operation = 'R';
+
     else if (originalUrl.includes('/mddsaction/post')) operation = 'U';
     else if (originalUrl.includes('/mddsaction/delete')) operation = 'D';
     else if (originalUrl.includes('/mddsaction/put')) operation = 'C';
@@ -208,7 +211,6 @@ const getOperation = function(req) {
   if (httpOperation == "GET") operation = 'R';
   else if (httpOperation == "PUT") operation = 'C';
   else if (httpOperation == "DELETE") operation = 'D';
-  else if (httpOperation == "POST" && originalUrl.includes('/mddsaction/export')) operation = 'R';
   else if (httpOperation == "POST") operation = 'U';
   
   return operation || "UNKOWN";
