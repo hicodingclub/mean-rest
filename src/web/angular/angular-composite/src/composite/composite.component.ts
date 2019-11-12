@@ -1,10 +1,12 @@
-import { Component, Input, OnInit, AfterViewInit, ViewContainerRef,  Directive, ComponentFactoryResolver, QueryList, ViewChildren, ViewChild } from '@angular/core';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { Injector, EventEmitter } from '@angular/core';
-
-import { Location } from '@angular/common';
-import { switchMap } from 'rxjs/operators';
-import { Output } from '@angular/core';
+import {
+    Component, Directive,
+    Input, Output,
+    OnInit, AfterViewInit,
+    ViewContainerRef, ViewChildren, ViewChild,
+    ComponentFactoryResolver, QueryList,
+    EventEmitter,
+} from '@angular/core';
+import { Router } from '@angular/router';
 
 export type compositeStep = {
     stepName: string,
