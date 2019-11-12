@@ -49,7 +49,7 @@ export class BaseService {
     getList(page:number, per_page:number, searchContext:any, sort:string, order:string,
         categoryBy:string, listCategoryShowMore: boolean, categoryProvided: boolean, categoryCandidate: string,
         categoryBy2:string, listCategoryShowMore2: boolean, categoryProvided2: boolean, categoryCandidate2: string,   
-        associationField: string, expt: boolean, ignoreField: string) {
+        associationField: string, actionType: string, actionData: any, ignoreField: string) {
 
         let params = new HttpParams()
             .set('__page', page.toString())
@@ -90,7 +90,7 @@ export class BaseService {
         }
 
         let httpOptions;
-        if (expt) {
+        if (actionType === 'export') {
             httpOptions = {
                 params,
                 headers: new HttpHeaders({'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
@@ -113,8 +113,13 @@ export class BaseService {
         }
         httpOptions.params = httpOptions.params.set('action', "Search");
 
-        const url = expt ? "mddsaction/export" : "mddsaction/get";
-        return this.http.post(this.serviceUrl+ url, searchContext, httpOptions)
+        const at = actionType ? actionType : 'get';
+        const url = `mddsaction/${at}`;
+        const data = {
+            search: searchContext,
+            actionData: actionData,
+        }
+        return this.http.post(this.serviceUrl+ url, data, httpOptions)
             .pipe(
                 catchError(this.errorResponseHandler)
             );

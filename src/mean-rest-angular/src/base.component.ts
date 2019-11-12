@@ -758,11 +758,11 @@ export class BaseComponent implements BaseComponentInterface {
             o[field] = searchObj[field];
             searchContext['$and'][1]['$and'].push(o);
         }
-        let expt = false;
+        let actionType = 'get';
         this.service.getList(1, 1, searchContext, null, null, 
             null, false, false, null,
             null, false, false, null,// categories
-            null, expt, this.ignoreField).subscribe(
+            null, actionType, null, this.ignoreField).subscribe(
             result => {
                 let detail = {};
                 if (result.items && result.items.length >= 1) {
@@ -1005,6 +1005,29 @@ export class BaseComponent implements BaseComponentInterface {
         let detail = this.getFromStorage("detail");
         if (detail) this.detail = detail;
     }
+
+    public getCategoryInfo() {
+
+        const cate1 = this.listCategory1 || {};
+        const cate2 = this.listCategory2 || {};
+
+        const url_cate1 = this.route.snapshot.queryParams['cate'];
+        const url_cate2 = this.route.snapshot.queryParams['cate2'];
+
+        const categoryProvided = typeof this.selectedCategory === 'number'? true : false;
+        const listCategoryShowMore = typeof cate1.listCategoryShowMore? true : false;
+        const categoryCandidate = categoryProvided || !url_cate1 ? '' : url_cate1;
+        const categoryProvided2 = typeof this.selectedCategory2 === 'number'? true : false;
+        const listCategoryShowMore2 = typeof cate2.listCategoryShowMore? true : false;
+        const categoryCandidate2 = categoryProvided2 || !url_cate2? '' : url_cate2;
+        const listCategoryField = cate1.listCategoryField;
+        const listCategoryField2 = cate2.listCategoryField;
+
+        return {
+            cate1: [listCategoryField, listCategoryShowMore, categoryProvided, categoryCandidate],
+            cate2: [listCategoryField2, listCategoryShowMore2, categoryProvided2, categoryCandidate2],
+        };
+    }
     
     public populateList():EventEmitter<any> {
         //First let's handle page
@@ -1031,26 +1054,15 @@ export class BaseComponent implements BaseComponentInterface {
         searchContext = this.getFromStorage("searchContext");
         this.loadUIFromCache();
 
-        const cate1 = this.listCategory1 || {};
-        const cate2 = this.listCategory2 || {};
+        const cateInfo = this.getCategoryInfo();
+        // cate1: [listCategoryField, listCategoryShowMore, categoryProvided, categoryCandidate],
 
-        let url_cate1 = this.route.snapshot.queryParams['cate'];
-        let url_cate2 = this.route.snapshot.queryParams['cate2'];
+        let actionType = 'get';
 
-        const categoryProvided = typeof this.selectedCategory === 'number'? true : false;
-        const listCategoryShowMore = typeof cate1.listCategoryShowMore? true : false;
-        const categoryCandidate = categoryProvided || !url_cate1 ? '' : url_cate1;
-        const categoryProvided2 = typeof this.selectedCategory2 === 'number'? true : false;
-        const listCategoryShowMore2 = typeof cate2.listCategoryShowMore? true : false;
-        const categoryCandidate2 = categoryProvided2 || !url_cate2? '' : url_cate2;
-        let expt = false;
-
-        const listCategoryField = cate1.listCategoryField;
-        const listCategoryField2 = cate2.listCategoryField;
         this.service.getList(new_page, this.per_page, searchContext, this.listSortField, this.listSortOrder, 
-            listCategoryField, listCategoryShowMore, categoryProvided, categoryCandidate,
-            listCategoryField2, listCategoryShowMore2, categoryProvided2, categoryCandidate2,
-            this.associationField, expt, this.ignoreField).subscribe(
+            cateInfo.cate1[0], cateInfo.cate1[1], cateInfo.cate1[2], cateInfo.cate1[3],
+            cateInfo.cate2[0], cateInfo.cate2[1], cateInfo.cate2[2], cateInfo.cate2[3],
+            this.associationField, actionType, null, this.ignoreField).subscribe(
           result => { 
             this.list = result.items.map(x=> {
                 let d = this.formatDetail(x);
@@ -1060,11 +1072,11 @@ export class BaseComponent implements BaseComponentInterface {
 
             const cateGroup = [
                 {
-                    listCategoryField,
-                    categoryProvided,
+                    listCategoryField: cateInfo.cate1[0],
+                    categoryProvided: cateInfo.cate1[2],
                     categories: result.categories,
                     categoriesBrief: result.categoriesBrief,
-                    categoryCandidate,
+                    categoryCandidate: cateInfo.cate1[3],
 
                     selectedCategoryName: '',
 
@@ -1074,11 +1086,11 @@ export class BaseComponent implements BaseComponentInterface {
                     selectedCategory: this.selectedCategory,
                 },
                 {
-                    listCategoryField: listCategoryField2,
-                    categoryProvided: categoryProvided2,
+                    listCategoryField: cateInfo.cate2[0],
+                    categoryProvided: cateInfo.cate2[2],
                     categories: result.categories2,
                     categoriesBrief: result.categoriesBrief2,
-                    categoryCandidate: categoryCandidate2,
+                    categoryCandidate: cateInfo.cate2[3],
 
                     selectedCategoryName: '',
 
@@ -1231,24 +1243,38 @@ export class BaseComponent implements BaseComponentInterface {
         let searchContext = this.getFromStorage("searchContext");
         this.loadUIFromCache();
 
-        const cate1 = this.listCategory1 || {};
-        const cate2 = this.listCategory2 || {};
-
-        const categoryProvided = typeof this.selectedCategory === 'number'? true : false;
-        const listCategoryShowMore = typeof cate1.listCategoryShowMore? true : false;
-        const categoryProvided2 = typeof this.selectedCategory2 === 'number'? true : false;
-        const listCategoryShowMore2 = typeof cate2.listCategoryShowMore? true : false;
-
-        let expt = true;
+        const cateInfo = this.getCategoryInfo();
+        let actionType = 'export';
         this.service.getList(0, 0, searchContext, this.listSortField, this.listSortOrder, 
-            cate1.listCategoryField, listCategoryShowMore, categoryProvided, null,
-            cate2.listCategoryField, listCategoryShowMore2, categoryProvided2, null,
-            this.associationField, expt, this.ignoreField).subscribe(
+            cateInfo.cate1[0], cateInfo.cate1[1], cateInfo.cate1[2], cateInfo.cate1[3],
+            cateInfo.cate2[0], cateInfo.cate2[1], cateInfo.cate2[2], cateInfo.cate2[3],
+            this.associationField, actionType, null, this.ignoreField).subscribe(
             data => {
                 // xlsx file returned
                 const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                 const url= window.URL.createObjectURL(blob);
                 window.open(url);
+            },
+            this.onServiceError
+        );
+    }
+
+    public onActionBase(actionType, actionData, succMessage): void {
+        let searchContext = this.getFromStorage("searchContext");
+        this.loadUIFromCache();
+
+        const cateInfo = this.getCategoryInfo();
+
+        this.service.getList(0, 0, searchContext, this.listSortField, this.listSortOrder, 
+            cateInfo.cate1[0], cateInfo.cate1[1], cateInfo.cate1[2], cateInfo.cate1[3],
+            cateInfo.cate2[0], cateInfo.cate2[1], cateInfo.cate2[2], cateInfo.cate2[3],
+            this.associationField, actionType, actionData, this.ignoreField).subscribe(
+            data => {
+                const snackBarConfig: SnackBarConfig = {
+                    content: succMessage,
+                }
+                let snackBar = new SnackBar(snackBarConfig);
+                snackBar.show();
             },
             this.onServiceError
         );
@@ -1968,6 +1994,13 @@ export class BaseComponent implements BaseComponentInterface {
         } else {
             ; //do nothing
         }
+    }
+
+    /***general action handling from angular-action-base */
+    public onActionBaseEvent(event) {
+        // event in {actitonType, actionData, succMessage} format
+        const { actionType, actionData, succMessage } = event;
+        this.onActionBase(actionType, actionData, succMessage);
     }
     
     /*Date Range Selection */
