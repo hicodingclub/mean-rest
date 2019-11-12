@@ -36,8 +36,11 @@ const RestRouter = function(restController, schemaName, authzFunc, api) {
     router.delete('/:' + idParam, restController.HardDeleteById.bind(restController));
     router.post('/mddsaction/delete', restController.PostActions.bind(restController));
   }
-  if (api.includes("E")) { //export
+  if (api.includes("E")) { // export
     router.post('/mddsaction/export', restController.exportAll.bind(restController));
+  }
+  if (api.includes("M")) { // emailing
+    router.post('/mddsaction/emailing', restController.PostActions.bind(restController));
   }
   return router;
 }

@@ -300,7 +300,7 @@ class RestController {
     };
   }
   getAll(req, res, next) {
-    return this.searchAll(req, res, next, {}, false);
+    return this.searchAll(req, res, next, {}, 'get');
   }
 
   async getRefObjectsFromId(req, schm, idArray) {
@@ -318,7 +318,6 @@ class RestController {
     } catch (err) {
       throw err;
     }
-
   }
 
   getPopulateInfo(theView, morePopulateField) {
@@ -347,7 +346,7 @@ class RestController {
         return next(createError(400, "Bad document in body."));
       }
     }
-    const searchContext = body;
+    const searchContext = body ? body.search : {};
 
     let __asso = req.query['__asso'] || undefined;
     let __ignore = req.query['__ignore'] || undefined;
@@ -383,7 +382,7 @@ class RestController {
       req.query['__page'] = String(p);
       req.query['__per_page'] = String(PER_PAGE);
       try {
-        let output = await this.searchAll(req, res, next, searchContext, true); // set export parameter to true
+        let output = await this.searchAll(req, res, next, searchContext, 'export'); // set export parameter to true
         if (!output.page) { // not expected result. must be next() called by searchAll. Just return it.
           return output;
         }
@@ -516,7 +515,7 @@ class RestController {
     return res.send(report);
   }
 
-  async searchAll(req, res, next, searchContext, expt) {
+  async searchAll(req, res, next, searchContext, actionType) {
     const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
 
     let query = {};
@@ -655,15 +654,6 @@ class RestController {
         }
       }
 
-      console.log('originCategoriesAll[i]', originCategoriesAll[i])
-      if (typeof originCategoriesAll[i][0] == 'object') {
-        console.log('typeof originCategoriesAll[i][0]._id', typeof originCategoriesAll[i][0]._id);
-
-      }
-      console.log('typeof originCategoriesAll[i][0]', typeof originCategoriesAll[i][0]);
-      console.log('categoriesAll[i]', categoriesAll[i])
-      console.log('cate.categoryCand', cate.categoryCand)
-
       if (!cate.categoryProvided && originCategoriesAll[i].length > 0) {
         if (originCategoriesAll[i].includes(cate.categoryCand)) {
           // candidate found
@@ -672,10 +662,8 @@ class RestController {
           // take the first category as query filter
           query[cate.categoryBy] = originCategoriesAll[i][0];
         }
-        console.log('query[cate.categoryBy]', query[cate.categoryBy]);
       }
     }
-    console.log('query: ', query);
 
     try {
       count = await model.countDocuments(query).exec();
@@ -729,7 +717,7 @@ class RestController {
       output.items = resultReducerForRef(output.items, populateMap);
       output.items = resultReducerForView(output.items, briefView);
 
-      if (expt) {
+      if (actionType === 'export') {
         return output; // export, return data to caller;
       }
       return res.send(output);
@@ -899,8 +887,8 @@ class RestController {
         this.deleteManyByIds(req, res, next, ids);
         break;
       case "/mddsaction/get":
-        let searchContext = body;
-        this.searchAll(req, res, next, searchContext, false);
+        let searchContext = body? body.search : {};
+        this.searchAll(req, res, next, searchContext, 'get');
         break;
       default:
         return next(createError(404, "Bad Action: " + action));
