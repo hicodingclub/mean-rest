@@ -1,5 +1,5 @@
 {
-  "name": "@mdds/angular-pipeline",
+  "name": "@hicoder/angular-pipeline",
   "version": "0.6.0",
   "description": "Augular Pipeline that compose multiple componennt to be a pipeline",
   "scripts": {

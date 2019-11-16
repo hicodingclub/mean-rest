@@ -1,6 +1,7 @@
 #!/bin/sh
 
 
+install="N"
 publish="N"
 build="N"
 
@@ -10,6 +11,10 @@ do
 key="$1"
 
 case $key in
+    -i|--install)
+    install="Y"
+    shift # past value
+    ;;
     -p|--publish)
     publish="Y"
     shift # past value
@@ -27,7 +32,7 @@ done
 set -- "${POSITIONAL[@]}"
 
 if [ "$#" -ne 1 ]; then
-  echo "Usage: $0 -b|--build -p|--publish VERSION" >&2
+  echo "Usage: $0 -i|--install -b|--build -p|--publish VERSION" >&2
   exit 1
 fi
 
@@ -52,19 +57,19 @@ packages=(
 )
 
 dependencies=(
-  "@mdds/angular-core"
-  "@mdds/angular-cli"
-  "@mdds/angular-composite"
-  "@mdds/angular-auth"
-  "@mdds/angular-file"
-  "@mdds/angular-action-base"
-  "@mdds/angular-action-email"
-  "@mdds/angular-summernote"
-  "@mdds/express-auth-app"
-  "@mdds/express-emailing"
-  "@mdds/express-auth-server"
-  "@mdds/express-file-server"
-  "@mdds/express-core"
+  "@hicoder\/angular-core"
+  "@hicoder\/angular-cli"
+  "@hicoder\/angular-composite"
+  "@hicoder\/angular-auth"
+  "@hicoder\/angular-file"
+  "@hicoder\/angular-action-base"
+  "@hicoder\/angular-action-email"
+  "@hicoder\/angular-summernote"
+  "@hicoder\/express-auth-app"
+  "@hicoder\/express-emailing"
+  "@hicoder\/express-auth-server"
+  "@hicoder\/express-file-server"
+  "@hicoder\/express-core"
 );
 
 number=0
@@ -84,6 +89,11 @@ do
         sed -i '' -e "s/\"$dependent\":[[:space:]]*\".*\"/\"$dependent\": \"$VERSION\"/g" package.json
       done
 
+      if [ $install = "Y" ];then
+        rm -rf node_modules
+        npm install
+      fi
+
       if grep -q "@angular" package.json; then
         echo "	This is an angular package."
         if [ $build = "Y" ] || [ $publish = "Y" ];then
@@ -91,11 +101,11 @@ do
         fi
         if [ $publish = "Y" ];then
           cd dist
-          npm publish
+          npm publish --access=public
         fi
       else
         if [ $publish = "Y" ];then
-          npm publish
+          npm publish --access=public
         fi
       fi
     fi

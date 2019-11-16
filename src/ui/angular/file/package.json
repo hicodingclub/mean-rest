@@ -1,6 +1,6 @@
 {
-  "name": "@mdds/angular-file",
-  "version": "0.7.110",
+  "name": "@hicoder/angular-file",
+  "version": "0.7.121",
   "description": "Augular File Upload Module",
   "scripts": {
     "copy": "cp README.md dist;",

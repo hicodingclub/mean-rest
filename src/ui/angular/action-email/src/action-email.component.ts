@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
-import { ActionBase } from 'mdds-angular-action-base';
+import { ActionBase } from '@hicoder/angular-action-base';
 
 const validateInputs = function(form) {
     const emailInput = form.controls.emailInput.value

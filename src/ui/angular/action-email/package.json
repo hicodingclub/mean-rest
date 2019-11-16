@@ -1,6 +1,6 @@
 {
-  "name": "@mdds/angular-action-email",
-  "version": "0.7.110",
+  "name": "@hicoder/angular-action-email",
+  "version": "0.7.121",
   "description": "Angular action to send emails to parent component list or individual",
   "scripts": {
     "copy": "cp README.md dist;",
@@ -8,19 +8,20 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "mdds",
+    "hicoder",
     "angular",
     "action",
     "email"
   ],
   "dependencies": {
-    "@mdds/angular-action-base": "0.7.110"
+    "@hicoder/angular-action-base": "0.7.121"
   },
   "devDependencies": {
     "@angular/common": "^7.2.15",
     "@angular/core": "^7.2.1",
     "@angular/forms": "^7.2.15",
-    "ng-packagr": "^4.6.0"
+    "ng-packagr": "^4.6.0",
+    "typescript": "^3.2.4"
   },
   "peerDependencies": {
     "@angular/common": "^7.2.15",
