@@ -52,7 +52,7 @@ export class <%-SchemaName%>Directive<%-field.FieldName%> implements Validator {
 import { ComponentFactoryResolver } from '@angular/core';<%}%>
 <%if (schemaHasEditor) {%>
 import { QueryList, ViewChildren } from '@angular/core';
-import { MraRichTextSelectDirective } from 'mean-rest-angular';<%}%>
+import { MraRichTextSelectDirective } from '@hicoder/angular-core';<%}%>
 
 @Component({
   selector: 'app-<%-schemaName%>-edit',

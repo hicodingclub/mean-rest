@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { BaseService } from 'mean-rest-angular';
+import { BaseService } from '@hicoder/angular-core';
 
 const servicePath = '/<%-schemaName%>/';
 

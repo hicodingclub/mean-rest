@@ -12,9 +12,9 @@ import { DirectiveArrayRequired } from './<%-moduleName%>.directive';<%_ } %>
 <%_ if (hasRequiredMap) {%>
 import { DirectiveMapRequired } from './<%-moduleName%>.directive';<%_ } %>
 <%if (hasFileUpload) {%>
-import { FileUploadModule } from 'mdds-angular-file';<%}%>
+import { FileUploadModule } from '@hicoder/angular-file';<%}%>
 
-import { MraModule } from 'mean-rest-angular';
+import { MraModule } from '@hicoder/angular-core';
 
 import { <%-ModuleName%>RoutingModule } from './<%-moduleName%>-routing.module';
 import { <%-ModuleName%>Component } from './<%-moduleName%>.component';

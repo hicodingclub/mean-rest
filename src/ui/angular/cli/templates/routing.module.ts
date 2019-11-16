@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { RouteReuseStrategy } from '@angular/router';
 
-import { MraRouteReuseStrategy } from 'mean-rest-angular';
+import { MraRouteReuseStrategy } from '@hicoder/angular-core';
 
 import { <%-ModuleName%>Component } from './<%-moduleName%>.component';
 import { <%-ModuleName%>Routes } from '../<%-moduleName%>.conf';

@@ -10,7 +10,7 @@
 import { <%-schm.SchemaName%>AssoComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail-asso.component';<%} }%>
 <%_ }%>
 <%_ if (authRequired) {%>
-import { AuthGuard } from 'mdds-angular-auth';
+import { AuthGuard } from '@hicoder/angular-auth';
 <%}%>
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; if (schm.schemaHasRef) {%>
   <%_ if (api.includes("L")) {%>const <%-schm.schemaName%>SubPath = [

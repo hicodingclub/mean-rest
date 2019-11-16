@@ -10,7 +10,7 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 import { ComponentFactoryResolver } from '@angular/core';<%}%>
 <%if (schemaHasEditor) {%>
 import { QueryList, ViewChildren } from '@angular/core';
-import { MraRichTextShowDirective } from 'mean-rest-angular';<%}%>
+import { MraRichTextShowDirective } from '@hicoder/angular-core';<%}%>
   
 @Component({
   selector: 'app-<%-schemaName%>-list',
