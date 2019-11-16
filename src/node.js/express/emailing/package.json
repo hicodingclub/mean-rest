@@ -1,0 +1,20 @@
+{
+  "name": "@mdds/express-emailing",
+  "version": "0.7.110",
+  "description": "Send emails",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "emailing"
+  ],
+  "author": "xibin liu",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.533.0"
+  },
+  "peerDependencies": {
+    "@mdds/express-core": "0.7.110"
+  }
+}
