@@ -22,9 +22,10 @@ export type compositeStepConfig = {
     preSelectedId: string,
     multiSelect: boolean,
     // for detail view
-    disableActionButtions: boolean,
+    options: any,
 
     // both list and detail
+    id: string,
     searchObj: any,
 
     submitFieldName: string, //mapping to the field in submit components
@@ -114,7 +115,7 @@ export class CompositeComponent implements OnInit, AfterViewInit{
 
     reloadStep(index: number, stepConfig: compositeStepConfig) {
         const directive = this.compositeDirectives.toArray()[index];
-        const { stepTitle, stepComponent, mandatory, preSelectedId, searchObj, disableActionButtions} = stepConfig;
+        const { stepTitle, stepComponent, mandatory, preSelectedId, id, searchObj, options} = stepConfig;
 
         if (!stepComponent) return; //stop handling this step.
 
@@ -132,8 +133,15 @@ export class CompositeComponent implements OnInit, AfterViewInit{
             preSelectedId,
             mandatory,
         };
-        componentInstance.searchObj = searchObj;
-        componentInstance.disableActionButtions = disableActionButtions;
+        if (id) {
+            componentInstance.id = id;
+        }
+        if (searchObj) {
+            componentInstance.searchObj = searchObj;
+        }
+        if (options) {
+            componentInstance.options = options;
+        }
         if (index === 0) {
             componentInstance.setFocus();
         }
@@ -209,6 +217,8 @@ export class CompositeComponent implements OnInit, AfterViewInit{
                 }
             } else if (instance.actionType === 'term') {
                 value = instance.isTermChecked();
+            } else { // details?
+                value = instance.detail._id;
             }
             initData[step.submitFieldName] = value;
         }
