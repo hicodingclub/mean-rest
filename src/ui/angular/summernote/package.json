@@ -1,0 +1,35 @@
+{
+  "name": "@mdds/angular-summernote",
+  "version": "0.7.110",
+  "description": "Angular UI componenets for summernote.",
+  "scripts": {
+    "build": "./node_modules/.bin/tsc",
+    "copy": "cp README.md dist;",
+    "package": "./node_modules/.bin/ng-packagr -p package.json && npm run copy",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuckyBang/mean-rest.git"
+  },
+  "keywords": [
+    "Angular",
+    "MDDS",
+    "summernote"
+  ],
+  "author": "Xibin Liu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LuckyBang/mean-rest/issues"
+  },
+  "homepage": "https://github.com/LuckyBang/mean-rest#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@angular/core": "^7.2.1",
+    "ng-packagr": "^4.6.0",
+    "typescript": "^3.2.4"
+  },
+  "peerDependencies": {
+    "@angular/core": "^7.2.1"
+  }
+}
