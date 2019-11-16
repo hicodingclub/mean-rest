@@ -1,4 +1,4 @@
-const meanRestExpress = require('mean-rest-express')
+const meanRestExpress = require('@hicoder/express-core')
 
 const AuthzController = function() {
 }

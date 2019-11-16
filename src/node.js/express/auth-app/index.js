@@ -1,4 +1,4 @@
-const meanRestExpress = require('mean-rest-express');
+const meanRestExpress = require('@hicoder/express-core');
 const restController = meanRestExpress.restController;
 
 const verifyToken = require('./lib/authn');

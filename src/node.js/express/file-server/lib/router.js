@@ -2,7 +2,7 @@ const express = require('express');
 const createError = require('http-errors');
 const fileUpload = require('express-fileupload');
 
-const meanRestExpress = require('mean-rest-express');
+const meanRestExpress = require('@hicoder/express-core');
 
 const FileController = require('./controller')
 

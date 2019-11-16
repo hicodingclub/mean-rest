@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const meanRestExpress = require('mean-rest-express');
+const meanRestExpress = require('@hicoder/express-core');
 
 const emailSystemDef = require('./model');
 

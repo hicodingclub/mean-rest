@@ -1,7 +1,7 @@
 {
-  "name": "@mdds/express-mongoose-core",
-  "version": "0.7.110",
-  "description": "Restful API exposure middleware for Express and Mongoose based framework. Provide Rest API automatically based on Mongoose schema. It can also work with mean-rest-angular to develop end to end MEAN stack web applications.",
+  "name": "@hicoder/express-core",
+  "version": "0.7.120",
+  "description": "Restful API exposure middleware for Express and Mongoose based framework. Provide Rest API automatically based on Mongoose schema. It can also work with angular-core to develop end to end MEAN stack web applications.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -1,4 +1,4 @@
-const meanRestExpress = require('mean-rest-express')
+const meanRestExpress = require('@hicoder/express-core')
 const addPasswordHandlers = require('./authn/password_handler');
 const addPasswordHandlersToDef = function(authDef) {
   let authUserSchema, authPasswordField;
