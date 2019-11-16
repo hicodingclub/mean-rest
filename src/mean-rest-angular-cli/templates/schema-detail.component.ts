@@ -26,6 +26,8 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
   public disableActionButtions:boolean;
   @Input()
   public style: any; // {}
+  @Input()
+  public options: any; // {} uiOptions
 
 <%if (schemaHasEditor) {%>
   @ViewChildren(MraRichTextShowDirective) textEditors: QueryList<MraRichTextShowDirective>;<%}%>
@@ -45,6 +47,7 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
 
   ngOnInit() {
       this.style = this.style || {};
+      this.options = this.options || {};
       if (!this.id) this.id = this.route.snapshot.paramMap.get('id');
       if (this.id) {
         this.populateDetail(this.id);

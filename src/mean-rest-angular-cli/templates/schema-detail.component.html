@@ -1,15 +1,15 @@
 <% if (detailTitle) {%>
-<div class="mt-4 mb-4">
+<div class="mt-4 mb-4" *ngIf="!options['disableTitle']">
 	<h3><%-detailTitle%></h3>
 </div><%}%>
 <div class="detail" *ngIf="detail">
-	<%_ include schema-detail.d.actions.html %>
+	<div *ngIf="!options['disableActionButtions']"><%_ include schema-detail.d.actions.html %></div>
 	<div class="card text-left transparent-border ">
 		<div class="grid-fields">
 	<%_ viewFields = detailView; let viewGrp = detailViewGrp; let view='detail'; let largePicture=false;%><%_ include schema-display.detail.html %>
 		</div>
 	</div>
-	<%_ include schema-detail.d.pipeline.html %>
-	<%_ include schema-detail.d.ref.html %>
+	<div *ngIf="!options['disablePipeline']"><%_ include schema-detail.d.pipeline.html %></div>
+	<div *ngIf="!options['disableRefLink']"><%_ include schema-detail.d.ref.html %></div>
 </div>
 
