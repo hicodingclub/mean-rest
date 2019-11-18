@@ -37,7 +37,7 @@ const RestRouter = function(restController, schemaName, authzFunc, api) {
     router.post('/mddsaction/delete', restController.PostActions.bind(restController));
   }
   if (api.includes("E")) { // export
-    router.post('/mddsaction/export', restController.exportAll.bind(restController));
+    router.post('/mddsaction/export', restController.PostActions.bind(restController));
   }
   if (api.includes("M")) { // emailing
     router.post('/mddsaction/emailing', restController.PostActions.bind(restController));

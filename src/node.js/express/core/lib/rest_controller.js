@@ -334,8 +334,7 @@ class RestController {
     return [populateArray, populateMap]; 
   }
 
-  async exportAll(req, res, next) {
-    const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
+  async PostActionsAll(req, res, next, actionType) {
 
     let body = req.body;
     if (typeof body === "string") {
@@ -347,6 +346,46 @@ class RestController {
       }
     }
     const searchContext = body ? body.search : {};
+
+    let rows = [];
+  
+    const PER_PAGE = 500; //query 1000 each time
+    for (let p = 1; ; p++) {
+      req.query['__page'] = String(p);
+      req.query['__per_page'] = String(PER_PAGE);
+      try {
+        let output = await this.searchAll(req, res, next, searchContext, 'export'); // set export parameter to true
+        if (!output.page) { // not expected result. must be next() called by searchAll. Just return it.
+          return output;
+        }
+        rows = rows.concat(output.items);
+
+        let { page, total_pages, total_count } = output;
+        if (page === total_pages) {
+          //done all query
+          break;
+        }
+
+      } catch (err) {
+        return next(err);
+      }
+    }
+
+    if (actionType === "export") {
+      return this.exportAll(req, res, next, rows);
+    }
+    if (actionType === "emailing") {
+      return this.emailAll(req, res, next, rows);
+    }
+    return next(createError(400, `Action ${actionType} not supported.`));
+  }
+
+  emailAll(req, res, next, rows) {
+    return next(createError(400, "Action emailing not implemented."));
+  }
+
+  exportAll(req, res, next, rows) {
+    const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
 
     let __asso = req.query['__asso'] || undefined;
     let __ignore = req.query['__ignore'] || undefined;
@@ -375,30 +414,6 @@ class RestController {
     }
     let combinedHeaders = headers.concat(assoHeaders);
 
-    let rows = [];
-  
-    const PER_PAGE = 500; //query 1000 each time
-    for (let p = 1; ; p++) {
-      req.query['__page'] = String(p);
-      req.query['__per_page'] = String(PER_PAGE);
-      try {
-        let output = await this.searchAll(req, res, next, searchContext, 'export'); // set export parameter to true
-        if (!output.page) { // not expected result. must be next() called by searchAll. Just return it.
-          return output;
-        }
-        rows = rows.concat(output.items);
-
-        let { page, total_pages, total_count } = output;
-        if (page === total_pages) {
-          //done all query
-          break;
-        }
-
-      } catch (err) {
-        return next(err);
-      }
-    }
-
     let combinedRows = [];
     for (let r of rows) {
       const ro = [];
@@ -420,9 +435,9 @@ class RestController {
       }
     }
 
-    console.log('combinedHeaders, ', combinedHeaders);
-    console.log('combinedRows, ', combinedRows);
-    //return res.send(headers);
+    // console.log('combinedHeaders, ', combinedHeaders);
+    // console.log('combinedRows, ', combinedRows);
+    // return res.send(headers);
 
     const excel = require('node-excel-export');
 
@@ -474,7 +489,7 @@ class RestController {
     };
 
     const heading = [[
-      {value: 'Class Student List', style: styles.headerGray}
+      {value: `${name}`, style: styles.headerGray}
     ]];
 
     const specifications = {};
@@ -511,7 +526,7 @@ class RestController {
     const fileName = `${name}-` + Date.now() + (Math.random() * 100).toFixed(2) + '.xlsx';
 
     // You can then return this straight
-    res.attachment(`${fileName}.xlsx`); // This is sails.js specific (in general you need to set headers)
+    res.attachment(`${fileName}`); // This is sails.js specific (in general you need to set headers)
     return res.send(report);
   }
 
@@ -889,6 +904,12 @@ class RestController {
       case "/mddsaction/get":
         let searchContext = body? body.search : {};
         this.searchAll(req, res, next, searchContext, 'get');
+        break;
+      case "/mddsaction/export":
+        this.PostActionsAll(req, res, next, 'export');
+        break;
+      case "/mddsaction/emailing":
+        this.PostActionsAll(req, res, next, 'emailing');
         break;
       default:
         return next(createError(404, "Bad Action: " + action));
