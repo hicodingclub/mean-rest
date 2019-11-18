@@ -1,0 +1,17 @@
+.preview {
+    margin-top: 0.5rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.preview > span {
+    margin-left: 0.5rem;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.preview > svg {
+    cursor: pointer;
+}

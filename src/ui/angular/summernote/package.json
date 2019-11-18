@@ -26,10 +26,12 @@
   "dependencies": {},
   "devDependencies": {
     "@angular/core": "^7.2.1",
+    "@angular/forms": "^7.2.1",
     "ng-packagr": "^4.6.0",
     "typescript": "^3.2.4"
   },
   "peerDependencies": {
-    "@angular/core": "^7.2.1"
+    "@angular/core": "^7.2.1",
+    "@angular/forms": "^7.2.1"
   }
 }

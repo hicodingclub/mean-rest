@@ -1,2 +1,2 @@
-export { MddsAngularSummernoteModule } from './summernote.module';
-export { MraRichTextSelectDirective, MraRichTextShowDirective } from './summernote.directive';
+export { MddsRichtextEditorModule } from './summernote.module';
+export { MddsRichtextEditor } from './richtext.editor';

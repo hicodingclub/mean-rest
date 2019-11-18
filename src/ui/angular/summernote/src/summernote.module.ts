@@ -1,18 +1,16 @@
 import { NgModule } from '@angular/core';
 
-import { MraRichTextSelectDirective, MraRichTextShowDirective } from './summernote.directive';
+import { MddsRichtextEditor } from './richtext.editor';
 @NgModule({
   imports: [
   ],
   declarations: [
-    MraRichTextSelectDirective,
-    MraRichTextShowDirective
+    MddsRichtextEditor,
   ],
   exports: [
-    MraRichTextSelectDirective,
-    MraRichTextShowDirective
+    MddsRichtextEditor,
  ],
   providers: [
   ],
 })
-export class MddsAngularSummernoteModule { }
+export class MddsRichtextEditorModule { }
