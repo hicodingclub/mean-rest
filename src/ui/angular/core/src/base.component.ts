@@ -1251,9 +1251,32 @@ export class BaseComponent implements BaseComponentInterface {
             this.associationField, actionType, null, this.ignoreField).subscribe(
             data => {
                 // xlsx file returned
-                const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                const url= window.URL.createObjectURL(blob);
-                window.open(url);
+                let rawData = data;
+                let filename;
+                if (typeof data === 'object' && data.gotFileNameFromContentDisposition) { // got file name from Content-Disposition
+                    rawData = data.attachment;
+                    filename = data.filename;
+                }
+                // TODO: get type from content type
+                const blob = new Blob([rawData], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const downloadUrl= window.URL.createObjectURL(blob);
+    
+                if (filename) {
+                    // use HTML5 a[download] attribute to specify filename
+                    var a = document.createElement("a");
+                    // safari doesn't support this yet
+                    if (typeof a.download === 'undefined') {
+                        window.open(downloadUrl);
+                    } else {
+                        a.href = downloadUrl;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                    }
+                } else {
+                    window.open(downloadUrl);
+                }
+                setTimeout(function () { window.URL.revokeObjectURL(downloadUrl); }, 100); // cleanup temporary url blob
             },
             this.onServiceError
         );
@@ -1890,10 +1913,11 @@ export class BaseComponent implements BaseComponentInterface {
         return result;
     }
     onEdtiorPreview(editorName:string) {
-        if (this.textEditors)
+        if (this.textEditors) {
             this.textEditors.forEach( (editor) => {
                 if (editor.name == editorName) editor.preview();
             });
+        }
     }
     
     /*Parent router related*/

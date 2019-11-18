@@ -1,6 +1,6 @@
 import { Observable, throwError } from 'rxjs';
 import { catchError, map, filter, retry } from 'rxjs/operators';
-import { HttpClient, HttpHeaders,HttpParams, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders,HttpParams, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 export class ServiceError {
     status:number;
@@ -42,7 +42,26 @@ export class BaseService {
         return detail;
     }
     
-    protected formatList(list:any): any {
+    protected formatList(res:any): any {
+        let list = res;
+        if (res instanceof HttpResponse) {
+            const cd = res.headers.get('Content-Disposition');
+            if (cd && cd.startsWith('attachment;')) {
+                let filename;
+                const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                const matches = filenameRegex.exec(cd);
+                if (matches != null && matches[1]) { 
+                  filename = matches[1].replace(/['"]/g, '');
+                }
+                list = {
+                    gotFileNameFromContentDisposition: true,
+                    filename,
+                    attachment: res.body
+                }
+            } else {
+                list = res.body;
+            }
+        }
         return list;
     }
 
@@ -95,6 +114,7 @@ export class BaseService {
                 params,
                 headers: new HttpHeaders({'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
                 responseType: 'blob' as 'blob',
+                observe: 'response', // need to get response header
             };
         } else {
             httpOptions = {
@@ -121,6 +141,7 @@ export class BaseService {
         }
         return this.http.post(this.serviceUrl+ url, data, httpOptions)
             .pipe(
+                map(this.formatList),
                 catchError(this.errorResponseHandler)
             );
     }
