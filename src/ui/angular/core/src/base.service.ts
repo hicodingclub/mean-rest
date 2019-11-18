@@ -104,7 +104,7 @@ export class BaseService {
             };
         }
         
-        if (!searchContext) {
+        if (!searchContext && !actionData) {
             return this.http.get(this.serviceUrl, httpOptions)
                 .pipe(
                     map(this.formatList),
