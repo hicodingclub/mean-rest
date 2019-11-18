@@ -30,9 +30,16 @@
                         <div *ngIf="f.subject.errors.required">Please enter the email subject</div>
                     </div>
                 </div>
+
+
                 <div class="form-group input-group">
                     <label for="content">Email Content</label>
-                    <input type="text" formControlName="content" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.content.errors }" />
+                    <!--
+                    <input type="text" formControlName="content"  class="form-control" [ngClass]="{ 'is-invalid': submitted && f.content.errors }"/>-->
+
+                    <mdds-richtext-editor formControlName="content"  class="mdds-richtext-editor-content" 
+                        [ngClass]="{ 'is-invalid': submitted && f.content.errors }"></mdds-richtext-editor>
+
                     <div *ngIf="submitted && f.content.errors" class="invalid-feedback">
                         <div *ngIf="f.content.errors.required">Please enter the email content</div>
                     </div>

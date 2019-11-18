@@ -50,3 +50,21 @@
   display: inline-block;
   margin-left: 2.5rem;
 }
+
+.action-buttons {
+	width: 100%;
+	float:right; 
+	text-align: right;
+	margin-bottom: 1.25rem;
+}
+
+.mdds-richtext-editor-content {
+  width: 100%;
+}
+.mdds-richtext-editor-content~.invalid-feedback {
+  display: block;
+}
+
+.form-group > label {
+  font-weight: bold;
+}

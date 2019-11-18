@@ -13,20 +13,22 @@
     "action",
     "email"
   ],
-  "dependencies": {
-    "@hicoder/angular-action-base": "0.7.121"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@angular/common": "^7.2.15",
     "@angular/core": "^7.2.1",
     "@angular/forms": "^7.2.15",
+    "@hicoder/angular-action-base": "0.7.121",
+    "@hicoder/angular-summernote": "0.7.121",
     "ng-packagr": "^4.6.0",
     "typescript": "^3.2.4"
   },
   "peerDependencies": {
     "@angular/common": "^7.2.15",
     "@angular/core": "^7.2.1",
-    "@angular/forms": "^7.2.15"
+    "@angular/forms": "^7.2.15",
+    "@hicoder/angular-action-base": "0.7.121",
+    "@hicoder/angular-summernote": "0.7.121"
   },
   "author": "xibin liu",
   "license": "MIT"

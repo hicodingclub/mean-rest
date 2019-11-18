@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { first } from 'rxjs/operators';
 
 import { ActionBase } from '@hicoder/angular-action-base';
 
@@ -13,6 +13,7 @@ const validateInputs = function(form) {
     // clear errors
     form.controls.subject.setErrors(null);
     form.controls.content.setErrors(null);
+    form.controls.emailTemplate.setErrors(null);
     if (emailInput == 'template') {
         if (!emailTemplate) {
             form.controls.emailTemplate.setErrors({'required': true});
@@ -46,7 +47,6 @@ export class ActionEmail extends ActionBase implements OnInit {
             super();
         }
 
-
     ngOnInit() {
         this.emailForm = this.formBuilder.group({
             emailInput: ['template', [Validators.required]],
@@ -76,6 +76,7 @@ export class ActionEmail extends ActionBase implements OnInit {
 
     onSubmit() {
         this.submitted = true;
+
         // stop here if form is invalid
         if (this.emailForm.invalid) {
             return;

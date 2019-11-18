@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { MddsRichtextEditorModule } from '@hicoder/angular-summernote';
+
 import { ActionEmail } from './action-email.component';
 
 @NgModule({
@@ -9,6 +11,8 @@ import { ActionEmail } from './action-email.component';
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
+
+        MddsRichtextEditorModule,
     ],
     declarations: [
         ActionEmail,
