@@ -1,7 +1,7 @@
 {
-  "name": "@hicoder/angular-summernote",
-  "version": "0.7.121",
-  "description": "Angular UI componenets for summernote.",
+  "name": "@hicoder/angular-richtext",
+  "version": "0.7.130",
+  "description": "Angular UI componenets for richtext editor.",
   "scripts": {
     "build": "./node_modules/.bin/tsc",
     "copy": "cp README.md dist;",
