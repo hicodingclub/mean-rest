@@ -379,7 +379,7 @@ class RestController {
     return next(createError(400, `Action ${actionType} not supported.`));
   }
 
-  emailAll(req, res, next, rows) {
+  async emailAll(req, res, next, rows) {
     let body = req.body;
     if (typeof body === "string") {
       try {
