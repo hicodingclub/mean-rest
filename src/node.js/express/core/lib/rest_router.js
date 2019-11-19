@@ -180,6 +180,24 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     return res.json(e);
   });
 
+
+  expressRouter.setEmailer = function(emailer, info) {
+    if (!restController.mmdsProperties) {
+      restController.mmdsProperties = {};
+    }
+    // no predefined template at this time.
+    // emailer.populateTemplatesToDB(templates);
+
+    restController.mmdsProperties.emailer = emailer;
+
+    // no predefined object at this time.
+    restController.mmdsProperties.emailerObj = {};
+
+    if (info) {
+      restController.mmdsProperties.emailerObj = info;
+    }
+  }
+
   return expressRouter;
 }
 

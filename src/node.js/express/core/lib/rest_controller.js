@@ -335,7 +335,6 @@ class RestController {
   }
 
   async PostActionsAll(req, res, next, actionType) {
-
     let body = req.body;
     if (typeof body === "string") {
       try {
@@ -371,16 +370,60 @@ class RestController {
       }
     }
 
-    if (actionType === "export") {
+    if (actionType === "/mddsaction/export") {
       return this.exportAll(req, res, next, rows);
     }
-    if (actionType === "emailing") {
+    if (actionType === "/mddsaction/emailing") {
       return this.emailAll(req, res, next, rows);
     }
     return next(createError(400, `Action ${actionType} not supported.`));
   }
 
   emailAll(req, res, next, rows) {
+    let body = req.body;
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      }
+      catch (e) {
+        return next(createError(400, "Bad document in body."));
+      }
+    }
+    const actionData = body ? body.actionData : {};
+
+    const { emailInput, emailTemplate, subject, content} = actionData;
+
+    let badRequest = false;
+    if (emailInput == 'template') {
+        if (!emailTemplate) {
+            badRequest = true;
+        }
+    } else if (emailInput == 'compose') {
+        if (!subject || !content) {
+          badRequest = true;
+        }
+    } else {
+      badRequest = true;
+    }
+
+    if (badRequest) {
+      return next(createError(400, 'Bad action data for emailing'));
+    }
+
+    const { emailer, emailerObj } = this.mmdsProperties || {};
+
+    if (!emailer) {
+      return next(createError(503, 'Emailing service is not available'));
+    }
+
+    // filter emails and send
+    try {
+      const result = await emailer.sendEmailTemplate([email], tag, obj);
+      return res.send();
+    } catch (err2) {
+      return next(err2);
+    }
+
     return next(createError(400, "Action emailing not implemented."));
   }
 
@@ -905,14 +948,12 @@ class RestController {
         let searchContext = body? body.search : {};
         this.searchAll(req, res, next, searchContext, 'get');
         break;
-      case "/mddsaction/export":
-        this.PostActionsAll(req, res, next, 'export');
-        break;
-      case "/mddsaction/emailing":
-        this.PostActionsAll(req, res, next, 'emailing');
-        break;
       default:
-        return next(createError(404, "Bad Action: " + action));
+        if (action.startsWith('/mddsaction/')) {
+          this.PostActionsAll(req, res, next, action);
+        } else {
+          return next(createError(404, "Bad Action: " + action));
+        }
     }
   }
   deleteManyByIds(req, res, next, ids) {

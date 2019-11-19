@@ -344,8 +344,11 @@ class AuthnController {
       );
   
       let userName = 'user';
-      const { emailer, emailerObj } = this.mmdsProperties;
-  
+      const { emailer, emailerObj } = this.mmdsProperties || {};
+
+      if (!emailer) {
+        return next(createError(503, 'Emailing service is not available'));
+      }
       const tag = 'resetpassword';
       const obj = {
         userName,
