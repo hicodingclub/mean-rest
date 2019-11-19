@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { MddsRichtextEditorModule } from '@hicoder/angular-summernote';
+import { MddsRichtextEditorModule } from '@hicoder/angular-richtext';
 
 import { ActionEmail } from './action-email.component';
 
