@@ -448,3 +448,8 @@ div.badge-click:hover {
 .nohref-link.active, .nohref-link.active:hover {
   color: #fff !important;
 } 
+
+
+.list-check-box {
+  zoom: 1.35;
+}

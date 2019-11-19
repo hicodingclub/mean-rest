@@ -99,3 +99,7 @@ div.badge-click:hover {
   width: 70%;
   margin-left: 1rem;
 }
+
+.term-check {
+  zoom: 2;
+}

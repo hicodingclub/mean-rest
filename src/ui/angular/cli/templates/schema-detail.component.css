@@ -106,3 +106,13 @@ div.badge-click:hover {
 .transparent-border {
   border-color: rgba(0,0,0,0);
 }
+
+.info-term-text {
+  line-height: 2rem;
+  width: 70%;
+  margin-left: 1rem;
+}
+
+.term-check {
+  zoom: 2;
+}

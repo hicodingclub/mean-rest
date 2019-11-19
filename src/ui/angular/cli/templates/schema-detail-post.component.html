@@ -1,5 +1,5 @@
 <div class="detail" *ngIf="detail">
-	<%_ include schema-detail.d.actions.html %>
+	<div *ngIf="!options['disableActionButtions']"><%_ include schema-detail.d.actions.html %></div>
 	<div class="card transparent-border"><%
 		{ let view = 'detail'; let largePicture = true;
 		field = detailView[0]; let fn = field.fieldName; let ft = field.type;;%>
