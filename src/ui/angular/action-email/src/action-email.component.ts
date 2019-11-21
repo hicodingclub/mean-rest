@@ -1,19 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
 
 import { ActionBase } from '@hicoder/angular-action-base';
 
 const validateInputs = function(form) {
-    const emailInput = form.controls.emailInput.value
+    const emailFields = form.controls.emailFields.value; // [true, false, ...] checked box
+    const emailInput = form.controls.emailInput.value;
     const emailTemplate = form.controls.emailTemplate.value;
     const subject = form.controls.subject.value;
     const content = form.controls.content.value;
 
     // clear errors
+    form.controls.emailFields.setErrors(null);
     form.controls.subject.setErrors(null);
     form.controls.content.setErrors(null);
     form.controls.emailTemplate.setErrors(null);
+
+    if (emailFields.length > 0 && !emailFields.includes(true)) {
+        form.controls.emailFields.setErrors({'required': true});
+    }
     if (emailInput == 'template') {
         if (!emailTemplate) {
             form.controls.emailTemplate.setErrors({'required': true});
@@ -35,11 +41,12 @@ const validateInputs = function(form) {
     styleUrls: ['action-email.component.css']
 })
 export class ActionEmail extends ActionBase implements OnInit {
+    @Input() emailFields = [];
     showDialog = false;
     showTemplate = true;
     emailForm: FormGroup;
     submitted = false;
-    emailData = {};
+    emailData: any;
 
     constructor(
         private formBuilder: FormBuilder
@@ -48,7 +55,13 @@ export class ActionEmail extends ActionBase implements OnInit {
         }
 
     ngOnInit() {
+        let emailCheckboxArray = new FormArray([]);
+        for (let i = 0; i < this.emailFields.length; i++) {
+            const t = i == 0? true : false;
+            emailCheckboxArray.push(new FormControl(t));
+        }
         this.emailForm = this.formBuilder.group({
+            emailFields: emailCheckboxArray,
             emailInput: ['template', [Validators.required]],
             emailTemplate: ['', []],
             subject: ['', []],
@@ -63,6 +76,13 @@ export class ActionEmail extends ActionBase implements OnInit {
                 this.showTemplate = false;
             }
             this.emailData = data;
+            const emailFields = [];
+            for (let i = 0; i < this.emailFields.length; i++) {
+                if (data.emailFields[i]) {
+                    emailFields.push(this.emailFields[i][1]);
+                }
+            }
+            this.emailData.emailFields = emailFields;
         })
     }
 
@@ -73,6 +93,11 @@ export class ActionEmail extends ActionBase implements OnInit {
 
     // convenience getter for easy access to form fields
     get f() { return this.emailForm.controls; }
+
+    get ec() { 
+        const emailFields = <FormArray> this.emailForm.controls.emailFields;
+        return emailFields.controls; 
+    }
 
     onSubmit() {
         this.submitted = true;

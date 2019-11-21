@@ -3,16 +3,30 @@
 <div *ngIf="showDialog" class="modal-back">
     <div class="modal-front">
         <form [formGroup]="emailForm" (ngSubmit)="onSubmit()">
-            <label>How do you want to enter the email content?</label>
-            <div>
-                <label class="radio-choice">
-                    <input type="radio" value="template" formControlName="emailInput">
-                    <span>From Email Template</span>
-                </label>
-                <label class="radio-choice">
-                    <input type="radio" value="compose" formControlName="emailInput">
-                    <span>Compose Email Now</span>
-                </label>
+            <div *ngIf="emailFields.length > 0" class="form-group">
+                <label>Send emails to the following email recepients:</label>
+                <div class="email-recepients">
+                    <label  class="radio-checkbox" *ngFor="let control of ec; let i=index">
+                        <input type="checkbox" [formControl]="control" [disabled]="emailFields.length == 1">
+                        <span>{{emailFields[i][0]}}</span>
+                    </label>
+                </div>
+                <div *ngIf="submitted && f.emailFields.errors" class="invalid-feedback">
+                    <div *ngIf="f.emailFields.errors.required">Please select the email recepients.</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>How do you want to enter the email content?</label>
+                <div>
+                    <label class="radio-checkbox">
+                        <input type="radio" value="template" formControlName="emailInput">
+                        <span>From Email Template</span>
+                    </label>
+                    <label class="radio-checkbox">
+                        <input type="radio" value="compose" formControlName="emailInput">
+                        <span>Compose Email Now</span>
+                    </label>
+                </div>
             </div>
             <hr/>
             <div *ngIf="showTemplate" class="form-group input-group">

@@ -70,6 +70,7 @@ export class BaseComponent implements BaseComponentInterface {
     public mapFields = []; //element is [fieldName, elementType, mapKey]
     public fileFields = {}; //fieldName: {selectedFiles: [selected files]}
     public textareaFields = [];
+    public emailFields = []; // [displayName, fieldName]
     public dateFormat = "MM/DD/YYYY";
     public timeFormat = "hh:mm:ss";
 
