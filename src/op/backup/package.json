@@ -1,0 +1,22 @@
+{
+  "name": "op-webbackup",
+  "version": "0.5.0",
+  "description": "Backup web applications",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.578.0",
+    "command-line-args": "^5.1.1",
+    "command-line-usage": "^6.1.0",
+    "dotenv": "^8.2.0",
+    "moment": "^2.24.0",
+    "zip-folder": "^1.0.0"
+  },
+  "bin": {
+    "hc-backup": "index.js"
+  }
+}
