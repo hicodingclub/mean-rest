@@ -1,5 +1,5 @@
 {
-  "name": "op-webbackup",
+  "name": "@hicoder/op-webbackup",
   "version": "0.5.0",
   "description": "Backup web applications",
   "main": "index.js",
@@ -17,6 +17,6 @@
     "zip-folder": "^1.0.0"
   },
   "bin": {
-    "hc-backup": "index.js"
+    "hc-op-backup": "index.js"
   }
 }
