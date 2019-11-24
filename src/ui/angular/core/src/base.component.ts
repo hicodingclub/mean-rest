@@ -1283,7 +1283,7 @@ export class BaseComponent implements BaseComponentInterface {
         );
     }
 
-    public onActionBase(actionType, actionData, succMessage): void {
+    public onActionBase(actionType, actionData, succMessage, resultFields): void {
         let searchContext = this.getFromStorage("searchContext");
         this.loadUIFromCache();
 
@@ -1294,8 +1294,14 @@ export class BaseComponent implements BaseComponentInterface {
             cateInfo.cate2[0], cateInfo.cate2[1], cateInfo.cate2[2], cateInfo.cate2[3],
             this.associationField, actionType, actionData, this.ignoreField).subscribe(
             data => {
+                let additionalInfo = '';
+                if (resultFields && resultFields.length > 0) {
+                    for (let f of resultFields) {
+                        additionalInfo += ` ${f} ${data[f]};`
+                    }
+                }
                 const snackBarConfig: SnackBarConfig = {
-                    content: succMessage,
+                    content: `${succMessage} ${additionalInfo}`,
                 }
                 let snackBar = new SnackBar(snackBarConfig);
                 snackBar.show();
@@ -2024,8 +2030,8 @@ export class BaseComponent implements BaseComponentInterface {
     /***general action handling from angular-action-base */
     public onActionBaseEvent(event) {
         // event in {actitonType, actionData, succMessage} format
-        const { actionType, actionData, succMessage } = event;
-        this.onActionBase(actionType, actionData, succMessage);
+        const { actionType, actionData, succMessage, resultFields } = event;
+        this.onActionBase(actionType, actionData, succMessage, resultFields);
     }
     
     /*Date Range Selection */

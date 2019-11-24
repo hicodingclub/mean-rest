@@ -1031,6 +1031,10 @@ function main() {
     let viewName = schemaDef.name; //Display name on UI
     let api = schemaDef.api || "LCRUD"; //APIs exposed to front end ("LCRUD")
     api = api.toUpperCase();
+    let singleRecord = schemaDef.singleRecord || false;
+    if (singleRecord) {
+      // api.replace('L', '').replace('D', ''); //not allow list and delete for single record
+    }
 
     let actionViews = schemaDef.actionViews || ''; //extra views: H, S, ...
     actionViews = actionViews.toUpperCase();
@@ -1303,6 +1307,8 @@ function main() {
       refApi: {},
       associations, // in the parent schema that needs to show associations
       associationFor: [], //in the association schema itself
+
+      singleRecord,
       
       fileServer: fileServer,
 
