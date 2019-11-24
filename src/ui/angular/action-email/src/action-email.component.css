@@ -61,7 +61,7 @@
 .mdds-richtext-editor-content {
   width: 100%;
 }
-.mdds-richtext-editor-content~.invalid-feedback, .email-recepients~.invalid-feedback {
+.mdds-richtext-editor-content~.invalid-feedback, .email-recipients~.invalid-feedback {
   display: block;
 }
 

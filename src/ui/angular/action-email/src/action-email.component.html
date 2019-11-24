@@ -4,15 +4,15 @@
     <div class="modal-front">
         <form [formGroup]="emailForm" (ngSubmit)="onSubmit()">
             <div *ngIf="emailFields.length > 0" class="form-group">
-                <label>Send emails to the following email recepients:</label>
-                <div class="email-recepients">
+                <label>Send emails to the following email recipients:</label>
+                <div class="email-recipients">
                     <label  class="radio-checkbox" *ngFor="let control of ec; let i=index">
                         <input type="checkbox" [formControl]="control" [disabled]="emailFields.length == 1">
                         <span>{{emailFields[i][0]}}</span>
                     </label>
                 </div>
                 <div *ngIf="submitted && f.emailFields.errors" class="invalid-feedback">
-                    <div *ngIf="f.emailFields.errors.required">Please select the email recepients.</div>
+                    <div *ngIf="f.emailFields.errors.required">Please select the email recipients.</div>
                 </div>
             </div>
             <div class="form-group">

@@ -112,7 +112,8 @@ export class ActionEmail extends ActionBase implements OnInit {
         this.emitEvent({
             actionType: "emailing",
             actionData: this.emailData,
-            succMessage: "Email sent!"
+            succMessage: "Email sent!",
+            resultFields: ['success', 'fail'],
         });
         this.showDialog = false;
     }
