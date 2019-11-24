@@ -300,7 +300,7 @@ class RestController {
     };
   }
   getAll(req, res, next) {
-    return this.searchAll(req, res, next, {}, 'get');
+    return this.searchAll(req, res, next, {});
   }
 
   async getRefObjectsFromId(req, schm, idArray) {
@@ -353,7 +353,7 @@ class RestController {
       req.query['__page'] = String(p);
       req.query['__per_page'] = String(PER_PAGE);
       try {
-        let output = await this.searchAll(req, res, next, searchContext, 'export'); // set export parameter to true
+        let output = await this.searchAll(req, res, next, searchContext, true); // set furtherAction parameter to true
         if (!output.page) { // not expected result. must be next() called by searchAll. Just return it.
           return output;
         }
@@ -391,14 +391,14 @@ class RestController {
     }
     const actionData = body ? body.actionData : {};
 
-    const { emailInput, emailTemplate, subject, content} = actionData;
+    const { emailInput, emailTemplate, subject, content, emailFields } = actionData;
 
     let badRequest = false;
-    if (emailInput == 'template') {
+    if (emailInput === 'template') {
         if (!emailTemplate) {
             badRequest = true;
         }
-    } else if (emailInput == 'compose') {
+    } else if (emailInput === 'compose') {
         if (!subject || !content) {
           badRequest = true;
         }
@@ -416,15 +416,34 @@ class RestController {
       return next(createError(503, 'Emailing service is not available'));
     }
 
+    const recipients = [];
+    for (let i = 0; i < rows.length; i++) {
+      for (let j = 0; j < emailFields.length; j++) {
+        const emailField = emailFields[j];
+        const eml = rows[i][emailField];
+        if (eml) {
+          recipients.push(eml);
+        }
+      }
+    }
+   
     // filter emails and send
     try {
-      const result = await emailer.sendEmailTemplate([email], tag, obj);
-      return res.send();
+      let result;
+      if (emailInput === 'template') {
+        result = await emailer.sendEmailTemplate(recipients, emailTemplate, emailerObj || {});
+      } else {
+        result = await emailer.sendEmail(undefined, recipients, subject, content);
+      }
+      // result: {success: 1, fail: 0, errors: []}
+      const err = result.errors[0] || new Error(`Email send failed: unknown error.`);
+      if (result.success > 0) {
+        return res.send({success: result.success, fail: result.fail, error: err});
+      }
+      return next(err);
     } catch (err2) {
       return next(err2);
     }
-
-    return next(createError(400, "Action emailing not implemented."));
   }
 
   exportAll(req, res, next, rows) {
@@ -573,7 +592,7 @@ class RestController {
     return res.send(report);
   }
 
-  async searchAll(req, res, next, searchContext, actionType) {
+  async searchAll(req, res, next, searchContext, furtherAction) {
     const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
 
     let query = {};
@@ -772,12 +791,15 @@ class RestController {
         categoriesBrief2: categoryObjectsBriefAll[1],
       };
       output = JSON.parse(JSON.stringify(output));
+      if (furtherAction) {
+        //return un-reduced items
+        return output; // export, return data to caller;
+      }
+
       output.items = resultReducerForRef(output.items, populateMap);
       output.items = resultReducerForView(output.items, briefView);
 
-      if (actionType === 'export') {
-        return output; // export, return data to caller;
-      }
+
       return res.send(output);
 
     } catch (err) {
@@ -946,7 +968,7 @@ class RestController {
         break;
       case "/mddsaction/get":
         let searchContext = body? body.search : {};
-        this.searchAll(req, res, next, searchContext, 'get');
+        this.searchAll(req, res, next, searchContext);
         break;
       default:
         if (action.startsWith('/mddsaction/')) {
