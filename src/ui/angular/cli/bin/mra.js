@@ -333,6 +333,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
     let hasRequiredArray = false;
     let hasRequiredMap = false;
     let hasFileUpload = false;
+    let hasEmailing = false;
 
 	  for (let item of viewDef) {
 	    let hidden = false;
@@ -397,6 +398,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
               if (flagRef) hasRef = true;
               if (flagEditor) hasEditor = true;
               if (flagPicture || flagFile) hasFileUpload = true;
+              if (mraEmailRecipient) hasEmailing = true;
 
               sortable = true;
               if (flagEditor || flagPicture || flagFile) sortable = false;
@@ -561,7 +563,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
         if (arr.length > 0) viewGroups.push(arr);
     }
   	return [viewGroups, view, hasDate, hasRef, hasEditor, 
-  	        hasRequiredMultiSelection, hasRequiredArray, hasRequiredMap, hasFileUpload];
+  	        hasRequiredMultiSelection, hasRequiredArray, hasRequiredMap, hasFileUpload, hasEmailing];
 }
 
 const getLoginUserPermission = function(permission) {
@@ -888,6 +890,7 @@ function main() {
   let hasRequiredArray = false;
   let hasRequiredMap = false;
   let hasFileUpload = false;
+  let hasEmailing = false;
   let dateFormat = 'MM/DD/YYYY';
   if (config && config.dateFormat) dateFormat = config.dateFormat;
   let timeFormat = 'hh:mm:ss';
@@ -951,7 +954,8 @@ function main() {
 
     let detailActions = []; //extra buttons that trigger other pipelines
     let detailActionButtons = ['Edit', 'New', 'Delete'];
-    let listActionButtons = ['Create', 'Delete'];
+    let listActionButtons = ['Create', 'Delete', 'Send Email'];
+    
     let detailRefBlackList = undefined;
     let detailRefName = {};
 
@@ -1070,28 +1074,28 @@ function main() {
     //briefView, detailView, CreateView, EditView, SearchView, indexView]
 
     let [indexViewGrp, indexView, hasDate6, hasRef6, hasEditor6,
-      hasReqGrp6, hasReqArr6, hasReqMap6, hasFileUpload6] =
+      hasReqGrp6, hasReqArr6, hasReqMap6, hasFileUpload6, hasEmailing6] =
         generateViewPicture(name, views[5], mongooseSchema, validators, indexViewNames);
     for (let s of indexView) {
       indexViewNames.push(s.fieldName);
     }
 
     let [briefViewGrp, briefView, hasDate1, hasRef1, hasEditor1, 
-          hasReqGrp1, hasReqArr1, hasReqMap1, hasFileUpload1] =
+          hasReqGrp1, hasReqArr1, hasReqMap1, hasFileUpload1, hasEmailing1] =
             generateViewPicture(name, views[0], mongooseSchema, validators, indexViewNames);
     //console.log("***briefView", briefView);
     //console.log("***hasRef1", hasRef1);
     let [detailViewGrp, detailView, hasDate2, hasRef2, hasEditor2, 
-          hasReqGrp2, hasReqArr2, hasReqMap2, hasFileUpload2] = 
+          hasReqGrp2, hasReqArr2, hasReqMap2, hasFileUpload2, hasEmailing2] = 
             generateViewPicture(name, views[1], mongooseSchema, validators, indexViewNames);
     let [createViewGrp, createView, hasDate3, hasRef3, hasEditor3, 
-          hasReqGrp3, hasReqArr3, hasReqMap3, hasFileUpload3] =
+          hasReqGrp3, hasReqArr3, hasReqMap3, hasFileUpload3, hasEmailing3] =
             generateViewPicture(name, views[2], mongooseSchema, validators, indexViewNames);
     let [editViewGrp, editView, hasDate4, hasRef4, hasEditor4, 
-          hasReqGrp4, hasReqArr4, hasReqMap4, hasFileUpload4] =
+          hasReqGrp4, hasReqArr4, hasReqMap4, hasFileUpload4, hasEmailing4] =
             generateViewPicture(name, views[3], mongooseSchema, validators, indexViewNames);
     let [searchViewGrp, searchView, hasDate5, hasRef5, hasEditor5, 
-          hasReqGrp5, hasReqArr5, hasReqMap5, hasFileUpload5] =
+          hasReqGrp5, hasReqArr5, hasReqMap5, hasFileUpload5, hasEmailing5] =
             generateViewPicture(name, views[4], mongooseSchema, validators, indexViewNames);
 
   	let schemaHasDate = hasDate5 || hasDate6;
@@ -1101,16 +1105,19 @@ function main() {
     let schemaHasRequiredArray = false;
     let schemaHasRequiredMap = false;
     let schemaHasFileUpload = false;
+    let schemaHasEmailing = false;
     if (api.includes("L")) { // includes list view
       schemaHasDate = schemaHasDate || hasDate1;
       schemaHasRef = schemaHasRef || hasRef1;
       schemaHasFileUpload = schemaHasFileUpload || hasFileUpload1;
       schemaHasEditor = schemaHasEditor || hasEditor1;
+      schemaHasEmailing = schemaHasEmailing || hasEmailing1;
     }
     if (api.includes("R")) { // includes detail view
       schemaHasDate = schemaHasDate || hasDate2;
       schemaHasFileUpload = schemaHasFileUpload || hasFileUpload2;
       schemaHasEditor = schemaHasEditor || hasEditor2;
+      schemaHasEmailing = schemaHasEmailing || hasEmailing2;
     }
     if (api.includes("C")) { // includes CreateView
       schemaHasDate = schemaHasDate || hasDate3;
@@ -1137,6 +1144,7 @@ function main() {
     if (schemaHasRequiredArray) hasRequiredArray = true;
     if (schemaHasRequiredMap) hasRequiredMap = true;
     if (schemaHasFileUpload) hasFileUpload = true;
+    if (schemaHasEmailing) hasEmailing = true;
       
     //let detailFields = views[1].replace(/\|/g, ' ').match(/\S+/g) || [];
     let detailSubViewStr = views[1];
@@ -1145,7 +1153,7 @@ function main() {
   	  detailSubViewStr = detailSubViewStr.replace(i, '');
   	}
   	let [detailSubViewGrp, detailSubView, hasDate7, hasRef7, 
-          hasEditor7, hasReqGrp7, hasReqMap7, hasFileUpload7] =
+          hasEditor7, hasReqGrp7, hasReqMap7, hasFileUpload7, hasEmailing7] =
           generateViewPicture(name, detailSubViewStr, mongooseSchema, validators, indexViewNames);
 
     let compositeEditView = [];
@@ -1237,46 +1245,47 @@ function main() {
 
   	let schemaObj = {
       name: name,
-  		moduleName: moduleName,
-  		ModuleName: ModuleName,
-  		schemaName: schemaName,
+      moduleName: moduleName,
+      ModuleName: ModuleName,
+      schemaName: schemaName,
       SchemaName: SchemaName,
       SchemaCamelName: SchemaCamelName,
       schemaCamelName: schemaCamelName,
-  		apiBase: apiBase,
-  		briefView: briefView,
-  		detailView: detailView,
-  		createView: createView,
-  		editView: editView,
-  		searchView: searchView,
-  		indexView: indexView,
+      apiBase: apiBase,
+      briefView: briefView,
+      detailView: detailView,
+      createView: createView,
+      editView: editView,
+      searchView: searchView,
+      indexView: indexView,
       detailSubView: detailSubView,
           
-  		briefViewGrp: briefViewGrp,
-  		detailViewGrp: detailViewGrp,
-  		createViewGrp: createViewGrp,
-  		editViewGrp: editViewGrp,
-  		searchViewGrp: searchViewGrp,
-  		indexViewGrp: indexViewGrp,
+      briefViewGrp: briefViewGrp,
+      detailViewGrp: detailViewGrp,
+      createViewGrp: createViewGrp,
+      editViewGrp: editViewGrp,
+      searchViewGrp: searchViewGrp,
+      indexViewGrp: indexViewGrp,
       detailSubViewGrp: detailSubViewGrp,
-          
-  		compositeEditView: compositeEditView,
-  		compositeEditBriefView: compositeEditBriefView,
-  		mapFieldsRef: mapFieldsRef,
-  		
-  		componentDir: componentDir,
-  		dateFormat: dateFormat,
-  		timeFormat: timeFormat,
-  		schemaHasDate: schemaHasDate,
-  		schemaHasRef: schemaHasRef,
-      schemaHasEditor: schemaHasEditor,
-      schemaHasRequiredMultiSelection: schemaHasRequiredMultiSelection,
-      schemaHasRequiredArray: schemaHasRequiredArray,
-      schemaHasRequiredMap: schemaHasRequiredMap,
-      schemaHasFileUpload: schemaHasFileUpload,
-      schemaHasValidator: schemaHasValidator,
+
+      compositeEditView,
+      compositeEditBriefView,
+      mapFieldsRef,
+
+      componentDir,
+      dateFormat,
+      timeFormat,
+      schemaHasDate,
+      schemaHasRef,
+      schemaHasEditor,
+      schemaHasRequiredMultiSelection,
+      schemaHasRequiredArray,
+      schemaHasRequiredMap,
+      schemaHasFileUpload,
+      schemaHasEmailing,
+      schemaHasValidator,
       permission: schemaAnyonePermission,
-      embeddedViewOnly: embeddedViewOnly,
+      embeddedViewOnly,
 
       listType, // gird, table, list
       listTypes, // array of ordered list type
@@ -1301,7 +1310,7 @@ function main() {
       selectActionViewType,
 
       generateView,
-      
+
       api,
       actionViews,
       refApi: {},
@@ -1309,10 +1318,10 @@ function main() {
       associationFor: [], //in the association schema itself
 
       singleRecord,
-      
+
       fileServer: fileServer,
 
-  		FIELD_NUMBER_FOR_SELECT_VIEW: FIELD_NUMBER_FOR_SELECT_VIEW
+      FIELD_NUMBER_FOR_SELECT_VIEW: FIELD_NUMBER_FOR_SELECT_VIEW
   	}
   	//console.log("======schemaObj", schemaObj);
   	
@@ -1411,26 +1420,27 @@ function main() {
   }
 
   let renderObj = {
-  	moduleName: moduleName,
-  	ModuleName: ModuleName,
-    apiBase: apiBase,
-  	schemaMap: schemaMap,
-  	defaultSchema: defaultSchema,
-    validatorFields: validatorFields,
+  	moduleName,
+  	ModuleName,
+    apiBase,
+  	schemaMap,
+  	defaultSchema,
+    validatorFields,
     referenceSchemas: referenceObjSchemas, //schemas that are referred
-  	hasDate: hasDate,
-  	hasRef: hasRef,
-    hasEditor: hasEditor,
-    hasRequiredMultiSelection: hasRequiredMultiSelection,
-    hasRequiredArray: hasRequiredArray,
-    hasRequiredMap: hasRequiredMap,
-    hasFileUpload: hasFileUpload,
-  	dateFormat: dateFormat,
-    timeFormat: timeFormat,
-    authRequired: authRequired,
-    fileServer: fileServer,
+  	hasDate,
+  	hasRef,
+    hasEditor,
+    hasRequiredMultiSelection,
+    hasRequiredArray,
+    hasRequiredMap,
+    hasFileUpload,
+    hasEmailing,
+  	dateFormat,
+    timeFormat,
+    authRequired,
+    fileServer,
 
-    generateView: generateView,
+    generateView,
   }
   //console.log("***renderObj", renderObj);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);

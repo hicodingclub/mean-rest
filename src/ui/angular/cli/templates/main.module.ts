@@ -13,6 +13,8 @@ import { DirectiveArrayRequired } from './<%-moduleName%>.directive';<%_ } %>
 import { DirectiveMapRequired } from './<%-moduleName%>.directive';<%_ } %>
 <%if (hasFileUpload) {%>
 import { FileUploadModule } from '@hicoder/angular-file';<%}%>
+<%if (hasEmailing) {%>
+import { ActionEmailModule } from '@hicoder/angular-action-email';<%}%>
 
 import { MraModule } from '@hicoder/angular-core';
 
@@ -53,7 +55,8 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     FormsModule,<%_ if (hasDate) {%>
     NgbModule,<%}%>
     MraModule,<%if (hasFileUpload) {%>
-    FileUploadModule,<%}%>
+    FileUploadModule,<%}%><%if (hasEmailing) {%>
+    ActionEmailModule,<%}%>
 
     <%-ModuleName%>RoutingModule
   ],

@@ -85,7 +85,7 @@ const schemas = {
     views: [brief3, detail3, create3, edit3, textSearch3, index3],
     name: 'Email Settings',
     singleRecord: true, //single record for configuration
-    api: 'LRU',
+    api: 'LRU', // don't allow delete and create - single record
   },
   'emailLog': {
     schema: emailLogSchema,

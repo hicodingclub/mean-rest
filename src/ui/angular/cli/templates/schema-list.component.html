@@ -43,6 +43,8 @@ if (listCategoryRef && listCategoryShowMore) {%>
 		<div class="row">
 			<div class="col">
 		        <div class="action-buttons">
+					<%if(api.includes("M") && listActionButtons[2] && schemaHasEmailing){%><mdds-action-email *ngIf="emailFields.length > 0" [emailFields]="emailFields" (componentEvents)="onActionBaseEvent($event)"></mdds-action-email><%}%>
+
 					<%if(api.includes("C") && listActionButtons[0]){%><a [routerLink]="['../new' ]" [skipLocationChange]="false" class="btn btn-outline-primary"><%-listActionButtons[0]%></a><%}%>
 					<%if(api.includes("D") && listActionButtons[1]){%><a *ngIf="list.length > 1" routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
 						[ngClass]="{'disabled': !isItemSelected()}"><%-listActionButtons[1]%></a><%}%>
