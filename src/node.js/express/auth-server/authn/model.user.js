@@ -21,7 +21,8 @@ const userSchema = new Schema({
     index: { unique: true, sparse: true },
     //required: 'Email address is required',
     validate: [validateEmail, 'Please fill a valid email address'],
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address'], 
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address'],
+    mraEmailRecipient: true, // if this email can be used by sendEmail Action 
   },
   phone: {
     type: String,
@@ -31,7 +32,7 @@ const userSchema = new Schema({
   },
   status:    {type: String, enum: ['Enabled', 'Disabled', 'Pending'], default: 'Enabled'},
   since: { type: Date, default: Date.now },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
 });
 
 const userBrief = "username email phone since status";
@@ -45,7 +46,8 @@ const schemas = {
   "muser": {
     schema: userSchema,
     views: [userBrief, userDetail, userCreat, userEdit, userTextSearch, userIndex],
-    name: 'User'
+    name: 'User',
+    api: 'LRCUM', // M - email
   }
 };
 
@@ -55,17 +57,17 @@ const timeFormat = "hh:mm:ss";
 const config = {
   dateFormat: dateFormat,
   timeFormat: timeFormat,
-}
+};
 
 const authn = {
   authUserSchema: "muser",
   authUserFields: "username email phone",
-  authPasswordField: "password"
+  authPasswordField: "password",
 }
 
 const authz = {
   "module-authz": {"LoginUser": {"others": "", "own": "RU"}, "Anyone": ""},
-  "muser": {"LoginUser": {"others": "", "own": "RU"}, "Anyone": ""}
-}
+  "muser": {"LoginUser": {"others": "", "own": "RU"}, "Anyone": ""},
+};
 
-module.exports = {schemas: schemas, config: config, authn: authn, authz: authz}
+module.exports = {schemas: schemas, config: config, authn: authn, authz: authz};

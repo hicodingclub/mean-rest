@@ -58,7 +58,7 @@ export class ActionEmail extends ActionBase implements OnInit {
         let emailCheckboxArray = new FormArray([]);
         for (let i = 0; i < this.emailFields.length; i++) {
             const t = i == 0? true : false;
-            emailCheckboxArray.push(new FormControl({value: t, diabled: this.emailFields.length === 1}));
+            emailCheckboxArray.push(new FormControl(t));
         }
         this.emailForm = this.formBuilder.group({
             emailFields: emailCheckboxArray,

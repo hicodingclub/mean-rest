@@ -21,7 +21,8 @@ const accountSchema = new Schema({
     index: { unique: true, sparse: true },
     //required: 'Email address is required',
     validate: [validateEmail, 'Please fill a valid email address'],
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']    
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address'],
+    mraEmailRecipient: true, // if this email can be used by sendEmail Action 
   },
   phone: {
     type: String,
@@ -45,14 +46,15 @@ const schemas = {
   "maccount": {
     schema: accountSchema,
     views: [accountBrief, accountDetail, accountCreat, accountEdit, accountTextSearch, accountIndex],
-    name: 'Account'
-  }
+    name: 'Account',
+    api: 'LRCUDM', // M - email
+  },
 };
 
 const authn = {
   authUserSchema: "maccount",
   authUserFields: "username email phone",
-  authPasswordField: "password"
-}
+  authPasswordField: "password",
+};
 
-module.exports = {schemas: schemas, authn: authn}
+module.exports = {schemas: schemas, authn: authn};

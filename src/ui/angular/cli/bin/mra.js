@@ -433,6 +433,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
               // console.log("===casterConstructor:", fs.casterConstructor);
               // console.log("===validators:", fs.validators);
               break;
+          case 'SchemaMap':
           case "Map":
               [elementType,  jstype,  numberMin,  numberMax,  maxlength,  minlength,  enumValues, 
               ref, Ref, RefCamel, editor,  textarea,  mraEmailRecipient,
@@ -463,7 +464,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
               //console.log("***schema map: ", fieldSchema)
               break;
           default:
-              console.warn("Warning: Field type", type, "is not recoganized...");
+              console.warn(`Warning: Field type ${type} is not recoganized for field ${item}...`);
               ;
   			}
   		} else if (item in schema.virtuals) {
@@ -475,6 +476,13 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           console.warn("Warning: Field", item, "is not defined in schema", schemaName + ". Skipped...");
           continue;
       }
+
+      if (type == 'SchemaMap') {
+        type = 'Map';
+        //console.log("***schema", schema);
+        //console.log("***Map", fieldPicture);
+      }
+
       let fieldPicture = {
           fieldName: item,
           FieldName: capitalizeFirst(item),
@@ -512,10 +520,6 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           mapKey,
       }
 
-      if (type == 'Map') {
-        //console.log("***schema", schema);
-        //console.log("***Map", fieldPicture);
-      }
       if (fieldPicture.fieldName === 'student') {
         //console.log(fieldPicture.fieldName, fieldPicture);
       }
