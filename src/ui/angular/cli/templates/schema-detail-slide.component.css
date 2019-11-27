@@ -116,3 +116,7 @@ div.badge-click:hover {
   width: 70%;
   margin-left: 10%;
 }
+
+.slide-image {
+  width: 100%;
+}
