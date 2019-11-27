@@ -8,11 +8,11 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 import { NgbCarousel } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'app-<%-schemaName%>-list-act-sld',
-  templateUrl: './<%-schemaName%>-list-act-sld.component.html',
+  selector: 'app-<%-schemaName%>-list-widget-sld',
+  templateUrl: './<%-schemaName%>-list-widget-sld.component.html',
   styleUrls: ['./<%-schemaName%>-list.component.css'],
 })
-export class <%-SchemaName%>ListActSldComponent extends <%-SchemaName%>ListComponent implements OnInit, OnChanges {
+export class <%-SchemaName%>ListWidgetSldComponent extends <%-SchemaName%>ListComponent implements OnInit, OnChanges {
   public titleFn: string;
   public subtitleFn: string;
   public descriptionFn: string;

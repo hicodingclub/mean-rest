@@ -28,9 +28,9 @@ import { <%-moduleName%>_server_root_uri } from '../<%-moduleName%>.conf';
 // Import components for each schema
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api;%>
   <%_ if (api.includes("L")) {%>import { <%-schm.SchemaName%>ListComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list.component';<%_ } %>
-  <%_ if (api.includes("L") && schm.actionViews.includes('H')) {%>import { <%-schm.SchemaName%>ListHomeComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-home.component';<%_ } %>
-  <%_ if (api.includes("L") && schm.actionViews.includes('S')) {%>import { <%-schm.SchemaName%>ListActSelComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-act-sel.component';<%_ } %>
-  <%_ if (api.includes("L") && schm.actionViews.includes('D')) {%>import { <%-schm.SchemaName%>ListActSldComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-act-sld.component';<%_ } %>
+  <%_ if (api.includes('L')) { for (const widget of schm.listWidgets) {%>
+import { <%-schm.SchemaName%>ListWidget<%-widget[1]%>Component } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-widget-<%-widget[0]%>.component';
+  <%} }%>
   <%_ if (api.includes("R")) {%>import { <%-schm.SchemaName%>DetailComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail.component';<%_ } %>
   <%_ if (api.includes("R") || api.includes('L')) {%>import { <%-schm.SchemaName%>DetailFieldComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail-field.component';<%_ } %>
   <%_ if (api.includes("U") || api.includes("C")) {%>import { <%-schm.SchemaName%>EditComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-edit/<%-schm.schemaName%>-edit.component';<%_ } %>
@@ -65,9 +65,9 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     <% if (hasRef) {%><%-ModuleName%>RefSelectDirective,<%}%>
   <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; %>
     <% if (api.includes("L")) {%><%-schm.SchemaName%>ListComponent,<%}%>
-    <% if (api.includes("L") && schm.actionViews.includes('H')) {%><%-schm.SchemaName%>ListHomeComponent,<%}%>
-    <% if (api.includes("L") && schm.actionViews.includes('S')) {%><%-schm.SchemaName%>ListActSelComponent,<%}%>
-    <% if (api.includes("L") && schm.actionViews.includes('D')) {%><%-schm.SchemaName%>ListActSldComponent,<%}%>
+    <%_ if (api.includes('L')) { for (const widget of schm.listWidgets) {%>
+    <%-schm.SchemaName%>ListWidget<%-widget[1]%>Component,
+    <%} }%>
     <% if (api.includes("R")) {%><%-schm.SchemaName%>DetailComponent,<%}%>
     <%_ if (api.includes("R") || api.includes('L')) {%><%-schm.SchemaName%>DetailFieldComponent,<%_ } %>
     <% if (api.includes("U") || api.includes("C")) {%><%-schm.SchemaName%>EditComponent,<%}%>
@@ -93,9 +93,9 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     <%-ModuleName%>Component,
   <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; %>
     <% if (api.includes("L")) {%><%-schm.SchemaName%>ListComponent,<%}%>
-    <% if (api.includes("L") && schm.actionViews.includes('H')) {%><%-schm.SchemaName%>ListHomeComponent,<%}%>
-    <% if (api.includes("L") && schm.actionViews.includes('S')) {%><%-schm.SchemaName%>ListActSelComponent,<%}%>
-    <% if (api.includes("L") && schm.actionViews.includes('D')) {%><%-schm.SchemaName%>ListActSldComponent,<%}%>
+    <%_ if (api.includes('L')) { for (const widget of schm.listWidgets) {%>
+    <%-schm.SchemaName%>ListWidget<%-widget[1]%>Component,
+    <%} }%>
     <% if (api.includes("R")) {%><%-schm.SchemaName%>DetailComponent,<%}%>
     <%_ if (api.includes("R") || api.includes('L')) {%><%-schm.SchemaName%>DetailFieldComponent,<%_ } %>
     <% if (api.includes("U") || api.includes("C")) {%><%-schm.SchemaName%>EditComponent,<%}%>
@@ -121,8 +121,10 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     if (api.includes("L")) {%><%-Ref%>SelectComponent,<%}%><% 
     if (api.includes("R")) {%><%-Ref%>DetailPopComponent,<%}%><% 
     if (api.includes("R")) {%><%-Ref%>DetailSelComponent,<%}%><%_ }); %><%_}
-  %><%for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api;%><% 
-    if (api.includes("L") && schm.actionViews.includes('S')) {%><%-schm.SchemaName%>ListActSelComponent,<%}%><%
+  %><%for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api;%> 
+    <%_ if (api.includes('L')) { for (const widget of schm.listWidgets) {%>
+    <%-schm.SchemaName%>ListWidget<%-widget[1]%>Component,
+    <%} }%><%
     if (api.includes("R") && schm.detailType === 'term') {%><%-schm.SchemaName%>DetailComponent,<%}%><%
     if (api.includes("C") ) {%><%-schm.SchemaName%>EditComponent,<%}%><%}%>
   ]

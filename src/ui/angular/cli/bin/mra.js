@@ -95,12 +95,6 @@ var templates = {
   schemaListSubComponentHtml: ["../templates/schema-list-sub.component.html", "list-sub.component.html", "list-sub component html file", 'W'],
   schemaListAssoComponent: ["../templates/schema-list-asso.component.ts", "list-asso.component.ts", "list-asso component file", 'W'],
   schemaListAssoComponentHtml: ["../templates/schema-list-asso.component.html", "list-asso.component.html", "list-asso component html file", 'W'],
-  schemaListActSelComponent: ["../templates/schema-list-act-s.component.ts", "list-act-sel.component.ts", "list-act-sel component file", 'W'],
-  schemaListActSelComponentHtml: ["../templates/schema-list-act-s.component.html", "list-act-sel.component.html", "list-act-sel component html file", 'W'],
-  schemaListActSldComponent: ["../templates/schema-list-act-sld.component.ts", "list-act-sld.component.ts", "list-act-sld component file", 'W'],
-  schemaListActSldComponentHtml: ["../templates/schema-list-act-sld.component.html", "list-act-sld.component.html", "list-act-sld component html file", 'W'],
-  schemaListHomeComponent: ["../templates/schema-list-act-h.component.ts", "list-home.component.ts", "list-home component file", 'W'],
-  schemaListHomeComponentHtml: ["../templates/schema-list-act-h.component.html", "list-home.component.html", "list-home component html file", 'W'],
 
   schemaDetail: {
     'normal': [
@@ -1044,8 +1038,8 @@ function main() {
       // api.replace('L', '').replace('D', ''); //not allow list and delete for single record
     }
 
-    let actionViews = schemaDef.actionViews || ''; //extra views: H, S, ...
-    actionViews = actionViews.toUpperCase();
+    let listWidgets = schemaDef.listWidgets || []; //widgets: clean, sld, sel, ...
+    listWidgets = listWidgets.map(x => { return [x.toLowerCase(), capitalizeFirst(x)];});
 
   	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
   	if (typeof views !== 'object' || !Array.isArray(views)) {
@@ -1316,7 +1310,7 @@ function main() {
       generateView,
 
       api,
-      actionViews,
+      listWidgets,
       refApi: {},
       associations, // in the parent schema that needs to show associations
       associationFor: [], //in the association schema itself
@@ -1492,19 +1486,31 @@ function main() {
           generateSourceFile(schemaName, templates.schemaListAssoComponentHtml, schemaObj, subComponentDir);
         }
       }
-      if (schemaObj.actionViews.includes('H')) { //generate home component
-        generateSourceFile(schemaName, templates.schemaListHomeComponent, schemaObj, subComponentDir);
-    		generateSourceFile(schemaName, templates.schemaListHomeComponentHtml, schemaObj, subComponentDir);
+      for (const widget of schemaObj.listWidgets) {
+        const widgetname = widget[0];
+        const tsTemplate = `../templates/schema-list-widget-${widgetname}.component.ts`;
+        const htmlTemplate = `../templates/schema-list-widget-${widgetname}.component.html`;
+        if (!fs.existsSync(basedirFile(tsTemplate)) || !fs.existsSync(basedirFile(htmlTemplate))) {
+          console.log(`Error! template files for list widget "${widgetname}" don't exist! Ignore...`);
+          console.log(`    Expecting: ${tsTemplate} and ${htmlTemplate}`);
+          _exit(1);
+        }
+        const tsFile = [
+          tsTemplate,
+          `list-widget-${widgetname}.component.ts`,
+          `list-widget-${widgetname} component file`,
+          'W'
+        ];
+        const htmlFile = [
+          htmlTemplate,
+          `list-widget-${widgetname}.component.html`,
+          `list-widget-${widgetname} component html file`,
+          'W'
+        ];
+        generateSourceFile(schemaName, tsFile, schemaObj, subComponentDir);
+        generateSourceFile(schemaName, htmlFile, schemaObj, subComponentDir);
       }
-      if (schemaObj.actionViews.includes('S')) { //generate select component for pipeline/composite
-        generateSourceFile(schemaName, templates.schemaListActSelComponent, schemaObj, subComponentDir);
-    		generateSourceFile(schemaName, templates.schemaListActSelComponentHtml, schemaObj, subComponentDir);
-      }
-      if (schemaObj.actionViews.includes('D')) { //generate slides component
-        generateSourceFile(schemaName, templates.schemaListActSldComponent, schemaObj, subComponentDir);
-    		generateSourceFile(schemaName, templates.schemaListActSldComponentHtml, schemaObj, subComponentDir);
-      }
-  	}
+    }
 
     if (schemaObj.api.includes("R")) {
     	subComponentDir = path.join(componentDir, schemaName+'-detail');

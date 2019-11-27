@@ -7,11 +7,11 @@ import { <%-SchemaName%>ListComponent } from './<%-schemaName%>-list.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
 @Component({
-  selector: 'app-<%-schemaName%>-list-ex-h',
-  templateUrl: './<%-schemaName%>-list-home.component.html',
+  selector: 'app-<%-schemaName%>-list-widget-sel',
+  templateUrl: './<%-schemaName%>-list-widget-sel.component.html',
   styleUrls: ['./<%-schemaName%>-list.component.css']
 })
-export class <%-SchemaName%>ListHomeComponent extends <%-SchemaName%>ListComponent implements OnInit {
+export class <%-SchemaName%>ListWidgetSelComponent extends <%-SchemaName%>ListComponent implements OnInit {
   constructor(
       public <%-schemaName%>Service: <%-SchemaName%>Service,
       public injector: Injector,
@@ -19,13 +19,17 @@ export class <%-SchemaName%>ListHomeComponent extends <%-SchemaName%>ListCompone
       public route: ActivatedRoute,
       public location: Location) {
         super(<%if (schemaHasRef) {%>null,<%}%> <%-schemaName%>Service, injector, router, route, location);
-        this.per_page = <%-homeListNumber%>;
-        this.listCategory1 = {}; // no do query based on category for home view;
-        this.listCategory2 = {}; // no do query based on category for home view;
+
+        <%if (selectActionViewType === 'dropdown') { %>this.isDropdownList =  true;<%}%>
+        this.actionType = 'selection';
+        this.listViewFilter = '<%-selectActionViewType%>';
+        this.listCategory1 = {}; // no do query based on category for select view;
+        this.listCategory2 = {}; // no do query based on category for select view;
   }
 
   ngOnInit() {
-    this.adjustListViewForWindowSize();
+    this.inputData == this.inputData || {} // expect stepTitle, preSelectedId
+    this.selectedId = this.inputData.preSelectedId;
 
     const detail = this.searchObj || {};
     this.detail = this.formatDetail(detail);
