@@ -9,7 +9,7 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 @Component({
   selector: 'app-<%-schemaName%>-list-widget-sel',
   templateUrl: './<%-schemaName%>-list-widget-sel.component.html',
-  styleUrls: ['./<%-schemaName%>-list.component.css']
+  styleUrls: ['./<%-schemaName%>-list.component.css', './<%-schemaName%>-list-widget-sel.component.css']
 })
 export class <%-SchemaName%>ListWidgetSelComponent extends <%-SchemaName%>ListComponent implements OnInit {
   constructor(
@@ -31,8 +31,6 @@ export class <%-SchemaName%>ListWidgetSelComponent extends <%-SchemaName%>ListCo
     this.inputData == this.inputData || {} // expect stepTitle, preSelectedId
     this.selectedId = this.inputData.preSelectedId;
 
-    const detail = this.searchObj || {};
-    this.detail = this.formatDetail(detail);
-    this.searchList();
+    super.ngOnInit();
   }
 }

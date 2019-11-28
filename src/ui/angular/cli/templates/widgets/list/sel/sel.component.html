@@ -26,9 +26,9 @@
 	let view='list';
 
 	if (selectActionViewType === 'list') {%>
-<% include schema-list.view.list.html %><%}%><% if (selectActionViewType === 'grid') {%>
-<% include schema-list.view.grid.html %><%}%><% if (selectActionViewType === 'table') {%>
-<% include schema-list.view.table.html %><%}%>
+<% include ../../../schema-list.view.list.html %><%}%><% if (selectActionViewType === 'grid') {%>
+<% include ../../../schema-list.view.grid.html %><%}%><% if (selectActionViewType === 'table') {%>
+<% include ../../../schema-list.view.table.html %><%}%>
 <div class="add-area">
 	<a href="javascript:void(0)" (click)="onAdd()"><i class="fas fa-plus-square" title="Add"></i> Add a new <%-schemaCamelName%></a>
 	<div *ngIf="isAdding">

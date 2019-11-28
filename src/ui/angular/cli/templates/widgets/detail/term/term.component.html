@@ -1,20 +1,20 @@
 <div class="detail" *ngIf="detail">
-	<div *ngIf="!options['disableActionButtions']"><%_ include schema-detail.d.actions.html %></div>
+	<div *ngIf="!options['disableActionButtions']"><%_ include ../../../schema-detail.d.actions.html %></div>
 	<div class="card text-left transparent-border ">
 		<div class="info-term-text"><%_{
 			let view='detail'; let largePicture=false;
 			let field = detailView[0]; let fn = field.fieldName; let ft = field.type;;%>
-			<div><% include schema-display.field.html %>
+			<div><% include ../../../schema-display.field.html %>
 			</div><%_ }%><%_{
 			let view='detail'; let largePicture=false;
 			let field = detailView[1]; let fn = field.fieldName; let ft = field.type;;%>
 			<div class="mt-3">
 				<input class="term-check mr-3" *ngIf="detail['<%-fn%>']" type="checkbox" [(ngModel)]="termChecked" (change)="onTermChecked()"/>				
-				<label><% include schema-display.field.html %>
+				<label><% include ../../../schema-display.field.html %>
 				</label>
 			</div><%_ }%>
 		</div>
 	</div>
-	<%_ include schema-detail.d.pipeline.html %>
-	<%_ include schema-detail.d.ref.html %>
+	<%_ include ../../../schema-detail.d.pipeline.html %>
+	<%_ include ../../../schema-detail.d.ref.html %>
 </div>

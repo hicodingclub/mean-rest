@@ -31,6 +31,8 @@ import { <%-moduleName%>_server_root_uri } from '../<%-moduleName%>.conf';
   <%_ if (api.includes('L')) { for (const widget of schm.listWidgets) {%>
 import { <%-schm.SchemaName%>ListWidget<%-widget[1]%>Component } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-widget-<%-widget[0]%>.component';<%} }%>
   <%_ if (api.includes("R")) {%>import { <%-schm.SchemaName%>DetailComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail.component';<%_ } %>
+  <%_ if (api.includes('R')) { for (const widget of schm.detailWidgets) {%>
+    import { <%-schm.SchemaName%>DetailWidget<%-widget[1]%>Component } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail-widget-<%-widget[0]%>.component';<%} }%>
   <%_ if (api.includes("R") || api.includes('L')) {%>import { <%-schm.SchemaName%>DetailFieldComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail-field.component';<%_ } %>
   <%_ if (api.includes("U") || api.includes("C")) {%>import { <%-schm.SchemaName%>EditComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-edit/<%-schm.schemaName%>-edit.component';<%_ } %>
   <%_if (api.includes("R") && schm.assoRoutes.length > 0 ) {%>import { <%-schm.SchemaName%>AssoComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail-asso.component';<%}%>
@@ -67,6 +69,8 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     <%_ if (api.includes('L')) { for (const widget of schm.listWidgets) {%>
     <%-schm.SchemaName%>ListWidget<%-widget[1]%>Component,<%} }%>
     <% if (api.includes("R")) {%><%-schm.SchemaName%>DetailComponent,<%}%>
+    <%_ if (api.includes('R')) { for (const widget of schm.detailWidgets) {%>
+    <%-schm.SchemaName%>DetailWidget<%-widget[1]%>Component,<%} }%>
     <% if (api.includes("R") || api.includes('L')) {%><%-schm.SchemaName%>DetailFieldComponent,<%_ } %>
     <% if (api.includes("U") || api.includes("C")) {%><%-schm.SchemaName%>EditComponent,<%}%>
     <%_if (api.includes("R") && schm.assoRoutes.length > 0 ) {%><%-schm.SchemaName%>AssoComponent,<%}%><%}%>
@@ -94,6 +98,8 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     <%_ if (api.includes('L')) { for (const widget of schm.listWidgets) {%>
     <%-schm.SchemaName%>ListWidget<%-widget[1]%>Component,<%} }%>
     <% if (api.includes("R")) {%><%-schm.SchemaName%>DetailComponent,<%}%>
+    <%_ if (api.includes('R')) { for (const widget of schm.detailWidgets) {%>
+      <%-schm.SchemaName%>DetailWidget<%-widget[1]%>Component,<%} }%>
     <% if (api.includes("R") || api.includes('L')) {%><%-schm.SchemaName%>DetailFieldComponent,<%_ } %>
     <% if (api.includes("U") || api.includes("C")) {%><%-schm.SchemaName%>EditComponent,<%}%>
     <%_if (api.includes("R") && schm.assoRoutes.length > 0 ) {%><%-schm.SchemaName%>AssoComponent,<%}%><%_ }%>
@@ -121,11 +127,11 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     <%-Ref%>DetailPopComponent,<%}%><% 
     if (api.includes("R")) {%>
     <%-Ref%>DetailSelComponent,<%}%><%_ }); %><%_}%><%
-    for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api;%><%
-      if (api.includes('L')) { for (const widget of schm.listWidgets) {%>
+  for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api;%><%
+    if (api.includes('L')) { for (const widget of schm.listWidgets) {%>
     <%-schm.SchemaName%>ListWidget<%-widget[1]%>Component,<%} }%><%
-    if (api.includes("R") && schm.detailType === 'term') {%>
-    <%-schm.SchemaName%>DetailComponent,<%}%><%
+    if (api.includes("R")) { for (const widget of schm.detailWidgets) {%>
+    <%-schm.SchemaName%>DetailWidget<%-widget[1]%>Component,<%} }%><%
     if (api.includes("C") ) {%>
     <%-schm.SchemaName%>EditComponent,<%}%><%}%>
   ]

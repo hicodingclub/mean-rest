@@ -96,33 +96,12 @@ var templates = {
   schemaListAssoComponent: ["../templates/schema-list-asso.component.ts", "list-asso.component.ts", "list-asso component file", 'W'],
   schemaListAssoComponentHtml: ["../templates/schema-list-asso.component.html", "list-asso.component.html", "list-asso component html file", 'W'],
 
-  schemaDetail: {
-    'normal': [
-      ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
-      ["../templates/schema-detail.component.html", "detail.component.html", "detail component html file", 'W'],
-      ["../templates/schema-detail.component.css", "detail.component.css", "detail component css file", 'W'],
-    ],
-    'post': [
-      ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
-      ["../templates/schema-detail-post.component.html", "detail.component.html", "detail component html file", 'W'],
-      ["../templates/schema-detail-post.component.css", "detail.component.css", "detail component css file", 'W'],
-    ],
-    'info': [
-      ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
-      ["../templates/schema-detail-info.component.html", "detail.component.html", "detail component html file", 'W'],
-      ["../templates/schema-detail-info.component.css", "detail.component.css", "detail component css file", 'W'],
-    ],
-    'slide': [
-      ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
-      ["../templates/schema-detail-slide.component.html", "detail.component.html", "detail component html file", 'W'],
-      ["../templates/schema-detail-slide.component.css", "detail.component.css", "detail component css file", 'W'],
-    ],
-    'term': [
-      ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
-      ["../templates/schema-detail-term.component.html", "detail.component.html", "detail component html file", 'W'],
-      ["../templates/schema-detail-term.component.css", "detail.component.css", "detail component css file", 'W'],
-    ],
-  },
+  schemaDetail: [
+    ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
+    ["../templates/schema-detail.component.html", "detail.component.html", "detail component html file", 'W'],
+    ["../templates/schema-detail.component.css", "detail.component.css", "detail component css file", 'W'],
+  ],
+
   schemaDetailShowFieldCompoment: ["../templates/schema-detail-show-field.component.ts", "detail-field.component.ts", "detail show field component file", 'W'],
   schemaDetailShowFieldCompomentHtml: ["../templates/schema-detail-show-field.component.html", "detail-field.component.html", "detail show field component html file", 'W'],
 
@@ -960,23 +939,9 @@ function main() {
     let selectActionViewType = 'dropdown';
 
     if (schemaDef.mraUI) {
-      let mraUI = schemaDef.mraUI;
-      switch (mraUI.detailType) {
-        case 'post':
-          detailType = 'post';
-          break;
-        case 'info':
-          detailType = 'info';
-          break;
-        case 'slide':
-          detailType = 'slide';
-          break;
-        case 'term':
-          detailType = 'term';
-          break;
-        default:
-          detailType = 'normal';
-      }
+      const mraUI = schemaDef.mraUI;
+      detailType = mraUI.detailType || 'normal'; //post, info, slide, term, ...
+
       switch (mraUI.listType) {
         case 'grid':
           listType = 'grid';
@@ -1040,6 +1005,15 @@ function main() {
 
     let listWidgets = schemaDef.listWidgets || []; //widgets: clean, sld, sel, ...
     listWidgets = listWidgets.map(x => { return [x.toLowerCase(), capitalizeFirst(x)];});
+
+    let detailWidgets = schemaDef.detailWidgets || []; //widgets: clean, sld, sel, ...
+    detailWidgets = detailWidgets.map( x => x.toLowerCase() );
+    detailType = detailType.toLowerCase();
+    let DetailType = capitalizeFirst(detailType);
+    if (detailType !== 'normal' && !detailWidgets.includes(detailType)) {
+      detailWidgets.push(detailType);
+    }
+    detailWidgets = detailWidgets.map(x => { return [x.toLowerCase(), capitalizeFirst(x)];});
 
   	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
   	if (typeof views !== 'object' || !Array.isArray(views)) {
@@ -1294,6 +1268,7 @@ function main() {
       listCategories,
 
       detailType, // normal, post, info, slide, term...
+      DetailType,
       detailActionButtons,
       detailRefName,
       detailTitle,
@@ -1311,6 +1286,7 @@ function main() {
 
       api,
       listWidgets,
+      detailWidgets,
       refApi: {},
       associations, // in the parent schema that needs to show associations
       associationFor: [], //in the association schema itself
@@ -1488,11 +1464,17 @@ function main() {
       }
       for (const widget of schemaObj.listWidgets) {
         const widgetname = widget[0];
-        const tsTemplate = `../templates/schema-list-widget-${widgetname}.component.ts`;
-        const htmlTemplate = `../templates/schema-list-widget-${widgetname}.component.html`;
-        if (!fs.existsSync(basedirFile(tsTemplate)) || !fs.existsSync(basedirFile(htmlTemplate))) {
+        const tsTemplate = `../templates/widgets/list/${widgetname}/${widgetname}.component.ts`;
+        const htmlTemplate = `../templates/widgets/list/${widgetname}/${widgetname}.component.html`;
+        const cssTemplate = `../templates/widgets/list/${widgetname}/${widgetname}.component.css`;
+        if (!fs.existsSync(basedirFile(tsTemplate)) ||
+            !fs.existsSync(basedirFile(htmlTemplate)) ||
+            !fs.existsSync(basedirFile(cssTemplate))) {
           console.log(`Error! template files for list widget "${widgetname}" don't exist! Ignore...`);
-          console.log(`    Expecting: ${tsTemplate} and ${htmlTemplate}`);
+          console.log(`    Expecting:${tsTemplate} and ${htmlTemplate}`);
+          console.log(`       -- ${tsTemplate}`);
+          console.log(`       -- ${htmlTemplate}`);
+          console.log(`       -- ${cssTemplate}`);
           _exit(1);
         }
         const tsFile = [
@@ -1507,16 +1489,50 @@ function main() {
           `list-widget-${widgetname} component html file`,
           'W'
         ];
+        const cssFile = [
+          cssTemplate,
+          `list-widget-${widgetname}.component.css`,
+          `list-widget-${widgetname} component css file`,
+          'W'
+        ];
         generateSourceFile(schemaName, tsFile, schemaObj, subComponentDir);
         generateSourceFile(schemaName, htmlFile, schemaObj, subComponentDir);
+        generateSourceFile(schemaName, cssFile, schemaObj, subComponentDir);
       }
     }
 
     if (schemaObj.api.includes("R")) {
-    	subComponentDir = path.join(componentDir, schemaName+'-detail');
-    	generateSourceFile(schemaName, templates.schemaDetail[schemaObj.detailType][0], schemaObj, subComponentDir);
-    	generateSourceFile(schemaName, templates.schemaDetail[schemaObj.detailType][1], schemaObj, subComponentDir);
-    	generateSourceFile(schemaName, templates.schemaDetail[schemaObj.detailType][2], schemaObj, subComponentDir);
+      subComponentDir = path.join(componentDir, schemaName+'-detail');
+
+    	generateSourceFile(schemaName, templates.schemaDetail[0], schemaObj, subComponentDir);
+    	generateSourceFile(schemaName, templates.schemaDetail[1], schemaObj, subComponentDir);
+      generateSourceFile(schemaName, templates.schemaDetail[2], schemaObj, subComponentDir);
+
+      for (const widget of schemaObj.detailWidgets) {
+        const widgetname = widget[0];
+        const detailTs = [
+          `../templates/widgets/detail/${widgetname}/${widgetname}.component.ts`,
+          `detail-widget-${widgetname}.component.ts`,
+          `detail widget ${widgetname} component file`,
+          'W'
+        ];
+        const detailHtml = [
+          `../templates/widgets/detail/${widgetname}/${widgetname}.component.html`,
+          `detail-widget-${widgetname}.component.html`,
+          `detail widget ${widgetname} component html file`,
+          'W'
+        ];
+        const detailCss = [
+          `../templates/widgets/detail/${widgetname}/${widgetname}.component.css`,
+          `detail-widget-${widgetname}.component.css`,
+          `detail widget ${widgetname} component css file`,
+          'W'
+        ];
+        generateSourceFile(schemaName, detailTs, schemaObj, subComponentDir);
+        generateSourceFile(schemaName, detailHtml, schemaObj, subComponentDir);
+        generateSourceFile(schemaName, detailCss, schemaObj, subComponentDir);
+      }
+
     	if (referenceSchemas.indexOf(schemaName) != -1) { //referenced by others, provide select component
     		generateSourceFile(schemaName, templates.schemaDetailSelComponent, schemaObj, subComponentDir);
     		generateSourceFile(schemaName, templates.schemaDetailSelComponentHtml, schemaObj, subComponentDir);
@@ -1536,7 +1552,7 @@ function main() {
 
     if (schemaObj.api.includes("R") || schemaObj.api.includes("L"))  {  //genearte filed show component
       subComponentDir = path.join(componentDir, schemaName+'-detail');
-    	generateSourceFile(schemaName, templates.schemaDetail['normal'][2], schemaObj, subComponentDir); //generate css. reuse the normal one
+    	generateSourceFile(schemaName, templates.schemaDetail[2], schemaObj, subComponentDir); //generate css. reuse the normal one
       generateSourceFile(schemaName, templates.schemaDetailShowFieldCompoment, schemaObj, subComponentDir);
       generateSourceFile(schemaName, templates.schemaDetailShowFieldCompomentHtml, schemaObj, subComponentDir);
     }

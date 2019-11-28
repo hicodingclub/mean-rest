@@ -1,32 +1,32 @@
 <div class="detail" *ngIf="detail">
-	<div *ngIf="!options['disableActionButtions']"><%_ include schema-detail.d.actions.html %></div>
+	<div *ngIf="!options['disableActionButtions']"><%_ include ../../../schema-detail.d.actions.html %></div>
 	<div class="card transparent-border"><%
 		{ let view = 'detail'; let largePicture = true;
 		field = detailView[0]; let fn = field.fieldName; let ft = field.type;;%>
 		<div class="post-head-picture" *ngIf="detail['<%-fn%>']">
-			<% include schema-display.field.html %>
+			<% include ../../../schema-display.field.html %>
 		</div><%
 		}%>
 		<div class="card-body"><%
 			{ let view = 'detail'; field = detailView[1]; let fn = field.fieldName; let ft = field.type;;%>
-			<h3 class="card-title"><% include schema-display.field.html %></h3><%
+			<h3 class="card-title"><% include ../../../schema-display.field.html %></h3><%
 			}%>
 			<h6 class="card-subtitle mb-2 text-muted"><%
 				{ let view = 'detail'; field = detailView[2]; let fn = field.fieldName; let ft = field.type;;%>
-				<% include schema-display.field.html %> &nbsp;&nbsp;<%
+				<% include ../../../schema-display.field.html %> &nbsp;&nbsp;<%
 				}%><%
 				{ let view = 'detail'; field = detailView[3]; let fn = field.fieldName; let ft = field.type;;%>
-				<% include schema-display.field.html %><%
+				<% include ../../../schema-display.field.html %><%
 				}%>
 			</h6>
 
 			<div class="card-text"><%
 				{ let view = 'detail'; field = detailView[4]; let fn = field.fieldName; let ft = field.type;;%>
-					<% include schema-display.field.html %><%
+					<% include ../../../schema-display.field.html %><%
 				}%>
 			</div>
 		</div>
 	</div>
-	<%_ include schema-detail.d.pipeline.html %>
-    <%_ include schema-detail.d.ref.html %>
+	<%_ include ../../../schema-detail.d.pipeline.html %>
+    <%_ include ../../../schema-detail.d.ref.html %>
 </div>

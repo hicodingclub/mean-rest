@@ -9,7 +9,7 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 @Component({
   selector: 'app-<%-schemaName%>-list-widget-clean',
   templateUrl: './<%-schemaName%>-list-widget-clean.component.html',
-  styleUrls: ['./<%-schemaName%>-list.component.css']
+  styleUrls: ['./<%-schemaName%>-list.component.css', './<%-schemaName%>-list-widget-clean.component.css']
 })
 export class <%-SchemaName%>ListWidgetCleanComponent extends <%-SchemaName%>ListComponent implements OnInit {
   constructor(
@@ -25,10 +25,6 @@ export class <%-SchemaName%>ListWidgetCleanComponent extends <%-SchemaName%>List
   }
 
   ngOnInit() {
-    this.adjustListViewForWindowSize();
-
-    const detail = this.searchObj || {};
-    this.detail = this.formatDetail(detail);
-    this.searchList();
+      super.ngOnInit();
   }
 }

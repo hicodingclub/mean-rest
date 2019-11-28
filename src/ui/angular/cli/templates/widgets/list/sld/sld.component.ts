@@ -10,7 +10,7 @@ import { NgbCarousel } from '@ng-bootstrap/ng-bootstrap';
 @Component({
   selector: 'app-<%-schemaName%>-list-widget-sld',
   templateUrl: './<%-schemaName%>-list-widget-sld.component.html',
-  styleUrls: ['./<%-schemaName%>-list.component.css'],
+  styleUrls: ['./<%-schemaName%>-list.component.css', './<%-schemaName%>-list-widget-sld.component.css'],
 })
 export class <%-SchemaName%>ListWidgetSldComponent extends <%-SchemaName%>ListComponent implements OnInit, OnChanges {
   public titleFn: string;
@@ -42,11 +42,9 @@ export class <%-SchemaName%>ListWidgetSldComponent extends <%-SchemaName%>ListCo
     this.subtitleFn = this.inputData[1];
     this.descriptionFn = this.inputData[2];
     this.picturelinkFn = this.inputData[3];
-
-    const detail = this.searchObj || {};
-    this.detail = this.formatDetail(detail);
     this.searchDetailReady = true;
-    this.searchList();
+
+    super.ngOnInit();
   }
 
   ngOnChanges() {
