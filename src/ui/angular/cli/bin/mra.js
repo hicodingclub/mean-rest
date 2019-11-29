@@ -89,8 +89,8 @@ var templates = {
   schemaListComponent: ["../templates/schema-list.component.ts", "list.component.ts", "list component file", 'W'],
   schemaListComponentHtml: ["../templates/schema-list.component.html", "list.component.html", "list component html file", 'W'],
   schemaListComponentCss: ["../templates/schema-list.component.css", "list.component.css", "list component css file", 'W'],
-  schemaSelectComponent: ["../templates/schema-select.component.ts", "select.component.ts", "select component file", 'W'],
-  schemaSelectComponentHtml: ["../templates/schema-select.component.html", "select.component.html", "select component html file", 'W'],
+  schemaSelectComponent: ["../templates/schema-list-select.component.ts", "list-select.component.ts", "list select component file", 'W'],
+  schemaSelectComponentHtml: ["../templates/schema-list-select.component.html", "list-select.component.html", "list select component html file", 'W'],
   schemaListSubComponent: ["../templates/schema-list-sub.component.ts", "list-sub.component.ts", "list-sub component file", 'W'],
   schemaListSubComponentHtml: ["../templates/schema-list-sub.component.html", "list-sub.component.html", "list-sub component html file", 'W'],
   schemaListAssoComponent: ["../templates/schema-list-asso.component.ts", "list-asso.component.ts", "list-asso component file", 'W'],
@@ -922,6 +922,7 @@ function main() {
     let detailType = 'normal';
     let detailTitle = '';
     let listType = 'list';
+    let listSelectType = 'normal';
     let listTitle = '';
     let disableListSearch = false;
     let listToDetail = 'click';
@@ -954,6 +955,9 @@ function main() {
         default:
           listType = 'list';
       }
+
+      listSelectType = mraUI.listSelectType || 'normal';
+
       switch (mraUI.listToDetail) {
         case 'none':
           listToDetail = 'none';
@@ -1005,6 +1009,15 @@ function main() {
 
     let listWidgets = schemaDef.listWidgets || []; //widgets: clean, sld, sel, ...
     listWidgets = listWidgets.map(x => { return [x.toLowerCase(), capitalizeFirst(x)];});
+
+    let listSelectWidgets = schemaDef.listSelectWidgets || [];
+    listSelectWidgets = listSelectWidgets.map( x => x.toLowerCase );
+    listSelectType = listSelectType.toLowerCase();
+    let ListSelectType = capitalizeFirst(listSelectType);
+    if (listSelectType != 'normal' && !listSelectWidgets.includes(listSelectWidgets)) {
+      listSelectWidgets.push(listSelectType);
+    }
+    listSelectWidgets = listSelectWidgets.map(x => {return [x.toLowerCase(), capitalizeFirst(x)];})
 
     let detailWidgets = schemaDef.detailWidgets || []; //widgets: clean, sld, sel, ...
     detailWidgets = detailWidgets.map( x => x.toLowerCase() );
@@ -1261,6 +1274,8 @@ function main() {
 
       listType, // gird, table, list
       listTypes, // array of ordered list type
+      listSelectType,
+      ListSelectType,
       listTitle, //array of grid, table, list
       listToDetail, // link, click, none
       disableListSearch,
@@ -1286,8 +1301,11 @@ function main() {
 
       api,
       listWidgets,
+      listSelectWidgets,
       detailWidgets,
+
       refApi: {},
+      refListSelectType: {},
       associations, // in the parent schema that needs to show associations
       associationFor: [], //in the association schema itself
 
@@ -1324,6 +1342,7 @@ function main() {
     value.push(refObj.name); //its name
 
     refObj.refApi[value[3]] = schemaObj.api;
+    refObj.refListSelectType[value[3]] = [schemaObj.listSelectType, schemaObj.ListSelectType];
     value[5] = refObj.SchemaCamelName;
     if (refObj.name in schemaObj.detailRefName) {
       value[5] = schemaObj.detailRefName[refObj.name];
@@ -1341,6 +1360,9 @@ function main() {
       for (let obj of referenceObjSchemas) {
         if (obj.ref == schemaName) {
           obj.api = schemaObj.api; //assign api to the referenceSchema
+          obj.listSelectType = schemaObj.listSelectType;
+          obj.ListSelectType = schemaObj.ListSelectType;
+          obj.listSelectWidgets = schemaObj.listSelectWidgets;
         }
       }
     }
@@ -1451,8 +1473,33 @@ function main() {
     	generateSourceFile(schemaName, templates.schemaListComponentCss, schemaObj, subComponentDir);
     	if (referenceSchemas.indexOf(schemaName) != -1) { //referenced by others, provide select component
     		generateSourceFile(schemaName, templates.schemaSelectComponent, schemaObj, subComponentDir);
-    		generateSourceFile(schemaName, templates.schemaSelectComponentHtml, schemaObj, subComponentDir);
+        generateSourceFile(schemaName, templates.schemaSelectComponentHtml, schemaObj, subComponentDir);
+        
+        for (const widget of schemaObj.listSelectWidgets) {
+          const widgetname = widget[0];
+          const ts = [
+            `../templates/widgets/list-select/${widgetname}/${widgetname}.component.ts`,
+            `list-select-${widgetname}.component.ts`,
+            `detail widget ${widgetname} component file`,
+            'W'
+          ];
+          const html = [
+            `../templates/widgets/list-select/${widgetname}/${widgetname}.component.html`,
+            `list-select-${widgetname}.component.html`,
+            `detail widget ${widgetname} component html file`,
+            'W'
+          ];
+          const css = [
+            `../templates/widgets/list-select/${widgetname}/${widgetname}.component.css`,
+            `list-select-${widgetname}.component.css`,
+            `detail widget ${widgetname} component css file`,
+            'W'
+          ];
+          generateSourceFile(schemaName, ts, schemaObj, subComponentDir);
+          generateSourceFile(schemaName, html, schemaObj, subComponentDir);
+          generateSourceFile(schemaName, css, schemaObj, subComponentDir);
         }
+      }
     	if (schemaObj.schemaHasRef) {
     		generateSourceFile(schemaName, templates.schemaListSubComponent, schemaObj, subComponentDir);
         generateSourceFile(schemaName, templates.schemaListSubComponentHtml, schemaObj, subComponentDir);

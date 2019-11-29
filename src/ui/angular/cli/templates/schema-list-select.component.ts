@@ -7,11 +7,11 @@ import { <%-SchemaName%>ListComponent } from './<%-schemaName%>-list.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
 @Component({
-  selector: 'app-<%-schemaName%>-select',
-  templateUrl: './<%-schemaName%>-select.component.html',
+  selector: 'app-<%-schemaName%>-list-select',
+  templateUrl: './<%-schemaName%>-list-select.component.html',
   styleUrls: ['./<%-schemaName%>-list.component.css']
 })
-export class <%-SchemaName%>SelectComponent extends <%-SchemaName%>ListComponent
+export class <%-SchemaName%>ListSelectComponent extends <%-SchemaName%>ListComponent
         implements OnInit {
     @Input() inputData;
     @Output() outputData;

@@ -113,7 +113,7 @@
                   [(ngModel)]="detail['<%-fn%>']" name="Edit<%-Fn%>"
                   #Edit<%-Fn%>="ngModel">
               <div style="display: inline-block; width: 80%;" >
-                  <file-upload [(downloadUrl)]="detail['<%-fn%>']"></file-upload>
+                  <file-select [(downloadUrl)]="detail['<%-fn%>']"></file-select>
               </div>
               <span *ngIf="detail['<%-fn%>']" 
                 class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">

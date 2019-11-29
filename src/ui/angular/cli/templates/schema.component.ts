@@ -15,19 +15,21 @@ import { ElementRef } from '@angular/core';<%}%>
 import { ComponentFactoryResolver } from '@angular/core';
 import { <%-ModuleName%>RefSelectDirective } from '../<%-moduleName%>.component';
     <%_ for (let field of compositeEditBriefView) { 
-        if (field.Ref) {%>
+        if (field.Ref) { const listSelTypeRef = refListSelectType[field.ref][0]; const ListSelTypeRef = refListSelectType[field.ref][1];%>
   <%_ if (refApi[field.ref].includes("R")) {%>import { <%-field.Ref%>DetailSelComponent } from '../<%-field.ref%>/<%-field.ref%>-detail/<%-field.ref%>-detail-sel.component';<%}%>
   <%_ if (refApi[field.ref].includes("R")) {%>import { <%-field.Ref%>DetailPopComponent } from '../<%-field.ref%>/<%-field.ref%>-detail/<%-field.ref%>-detail-pop.component';<%}%>
-  <%_ if (refApi[field.ref].includes("L")) {%>import { <%-field.Ref%>SelectComponent } from '../<%-field.ref%>/<%-field.ref%>-list/<%-field.ref%>-select.component';<%}%><%}}%>
+  <%_ if (refApi[field.ref].includes("L")) {%><%if (listSelTypeRef === 'normal') {
+      %>import { <%-field.Ref%>ListSelectComponent } from '../<%-field.ref%>/<%-field.ref%>-list/<%-field.ref%>-list-select.component';<%} else {
+      %>import { <%-field.Ref%>ListSelect<%-ListSelTypeRef%>Component } from '../<%-field.ref%>/<%-field.ref%>-list/<%-field.ref%>-list-select-<%-listSelTypeRef%>.component';<%}%><%}%><%}}%>
 <%}%>
 
 export class <%-SchemaName%>Component extends BaseComponent {
 <%if (schemaHasRef) {%>
     public selectComponents = {
   <%_ for (let field of compositeEditBriefView) { 
-      if (field.Ref) {%>
+      if (field.Ref) {const listSelTypeRef = refListSelectType[field.ref][0]; const ListSelTypeRef = refListSelectType[field.ref][1];%>
       '<%-field.fieldName%>': {
-          <% if (refApi[field.ref].includes("R")) {%>'select-type':<%-field.Ref%>SelectComponent,<%}%>
+          <% if (refApi[field.ref].includes("R")) {%>'select-type': <%if (listSelTypeRef === 'normal') {%><%-field.Ref%>ListSelectComponent<%} else {%><%-field.Ref%>ListSelect<%-ListSelTypeRef%>Component<%}%>,<%}%>
           <% if (refApi[field.ref].includes("R")) {%>'select-detail-type': <%-field.Ref%>DetailSelComponent,<%}%>
           <% if (refApi[field.ref].includes("L")) {%>'pop-detail-type': <%-field.Ref%>DetailPopComponent,<%}%>
           'componentRef': null},<%}}%>

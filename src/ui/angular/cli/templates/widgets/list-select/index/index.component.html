@@ -1,0 +1,49 @@
+<div class="select-model show" (keyup.esc)="uiOnEscapeKey()" tabindex="0" #<%-ModuleName%>Modal>
+  <div class="select-model-content">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select {{ItemCamelName}}</h5>
+        <button type="button" class="close" aria-label="Close" (click)="uiCloseModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+<!--  model body starts -->
+
+	<div class="container search">
+		<div class="row">
+			<div class="col-9">
+				<%_ let noMoreSearchArea = true; %> <%_ include ../../../schema-search.bar.html %>
+			</div>
+			<div class="col-3">
+			</div>
+		</div>
+		<hr/>
+	</div>
+	
+	<div class="d-flex align-items-start flex-wrap list-items">
+		<div *ngFor="let detail of list;  let i = index" 
+			[ngClass]="{'clicked-row': detail['_id']==clickedId}" (click)="selectItemSelected(i)"  class="m-2 badge badge-secondary pointer">
+
+	<%_ let view='list'; for (let field of indexView.slice(0,FIELD_NUMBER_FOR_SELECT_VIEW)){ 
+			let fn = field.fieldName, ft = field.type; let ref_link = false; %>
+			<span><% include ../../../schema-display.field.html %>
+			</span><%_ } %>
+		</div>
+	</div>
+
+	<div class="container">
+		<% include ../../../schema-list.pagination.html %>
+	</div>
+	
+
+<!--  model body ends -->
+
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div> 
+
