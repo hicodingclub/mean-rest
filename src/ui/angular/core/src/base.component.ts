@@ -23,6 +23,8 @@ export enum ViewType {
 
 export {ServiceError};
 
+const MddsUncategorized = 'MddsUncategorized';
+
 export class BaseComponent implements BaseComponentInterface {
     public objectKeys = Object.keys;
   
@@ -70,6 +72,7 @@ export class BaseComponent implements BaseComponentInterface {
     public mapFields = []; //element is [fieldName, elementType, mapKey]
     public fileFields = {}; //fieldName: {selectedFiles: [selected files]}
     public textareaFields = [];
+    public requiredFields = []; // collection of required fields. used by category field to check of "other" need to present
     public emailFields = []; // [displayName, fieldName]
     public dateFormat = "MM/DD/YYYY";
     public timeFormat = "hh:mm:ss";
@@ -308,7 +311,7 @@ export class BaseComponent implements BaseComponentInterface {
             if (refDetail && (typeof refDetail == 'object')) field = refDetail;
             else {
                 id = field;
-                field = {'_id': id};
+                field = {'_id': id, 'value': id};
             }
         } else if (field && (typeof field == 'object') ) {
             id = field['_id'];
@@ -318,7 +321,7 @@ export class BaseComponent implements BaseComponentInterface {
             }
             referIndex = referIndex.replace(/^\s+|\s+$/g, '');
             if (referIndex.length >= 20) referIndex = referIndex.substring(0, 20) + "...";
-            field = {'_id': id, 'value': referIndex? referIndex: fieldName};
+            field = {'_id': id, 'value': referIndex? referIndex: id};
         } else {//not defined
             field = {'_id': id, 'value': value};
         }
@@ -902,26 +905,23 @@ export class BaseComponent implements BaseComponentInterface {
         }
         
         this.searchMoreDetail = []
-        let d2 = this.deFormatDetail(d);//undefined field is deleted after this step
+        let d2 = this.deFormatDetail(d);// undefined field is deleted after this step.
         for (let field in d2) {
+            let oValue;
             if (this.stringFields.indexOf(field) >= 0 && listCategoryFields.includes(field)) { // put category field to "and"
-                let o = {};
-                o[field] = d[field];
-                andSearchContext.push(o);
-            }
-            if (this.stringFields.indexOf(field) == -1) {//string fields already put to orSearchContext
-                let o = {}
+                oValue = d[field];
+            } else if (this.stringFields.indexOf(field) == -1) { //string fields already put to orSearchContext
                 let valueToShow;
 
-                o[field] = d2[field];
+                oValue = d2[field];
 
                 if (this.multiSelectionFields.includes(field)) {
-                    o[field] = {$in: d2[field]}; //use $in for or, and $all for and
+                    oValue = {$in: d2[field]}; //use $in for or, and $all for and
 
                     let t = this.formatArrayMultiSelectionField(d2[field], this.enums[field]);
                     valueToShow = t.value;
                 } else if (this.arrayFields.some(x=>x[0] == field)) {                  
-                    o[field] = {$in: d2[field]}; //use $in for or, and $all for and
+                    oValue = {$in: d2[field]}; //use $in for or, and $all for and
                   
                     valueToShow = d[field]['value'];
                 } else if (this.dateFields.includes(field)) {
@@ -930,13 +930,18 @@ export class BaseComponent implements BaseComponentInterface {
                 } else if (this.referenceFields.includes(field)) {
                     valueToShow = valueToShow = d[field]['value'];
                 } else {
-                    valueToShow = d[field];//take directoy from what we get 
+                    valueToShow = d[field];//take directly from what we get 
                 }
                 if (!listCategoryFields.includes(field)) { // don't show category field
                     this.searchMoreDetail.push([field, valueToShow]);
                 }
-                andSearchContext.push(o);
             }
+            if ( oValue === MddsUncategorized ) {
+                oValue = null;
+            }
+            let o ={};
+            o[field] = oValue;
+            andSearchContext.push(o);
         }
         //Handle date range selection. These fields are not in d2, because field.date is undefined.
         for (let prop of this.dateFields) {
@@ -1103,10 +1108,24 @@ export class BaseComponent implements BaseComponentInterface {
             ];
             for (const c of cateGroup) {
                 if (c.listCategoryField && !c.categoryProvided) {
+                    if (!this.requiredFields.includes(c.listCategoryField)) {
+                        const fakeObj = {};
+                        fakeObj[c.listCategoryField] = MddsUncategorized;
+                        c.categories.push(fakeObj);
+                        c.categoriesBrief.push({'_id': MddsUncategorized});
+                    }
+
                     c.categoriesOut = c.categories.map(x=>this.formatDetail(x));
 
                     // categories is a array of this.detail format with the listCategoryField field only
-                    c.categoryDisplays = c.categoriesOut.map(x=>this.getFieldDisplayFromFormattedDetail(x, c.listCategoryField));
+                    c.categoryDisplays = c.categoriesOut.map(x=> {
+                        let display = this.getFieldDisplayFromFormattedDetail(x, c.listCategoryField);
+                        if (display === MddsUncategorized) {
+                            display = 'Uncategorized';
+                        }
+                        return display;
+                    });
+
                     // categoriesBrief is array of object of the category ref
                     c.categoryMore = c.categoriesBrief;
 
@@ -1871,7 +1890,7 @@ export class BaseComponent implements BaseComponentInterface {
         */
     }
 
-    public extraFieldsLoad() {//to server
+    public extraFieldsLoad() { // to server
         let result = true;
         if (this.textEditors) {
             let array = this.textEditors.toArray();

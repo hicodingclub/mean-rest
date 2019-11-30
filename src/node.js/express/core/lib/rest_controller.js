@@ -1,6 +1,8 @@
 const createError = require('http-errors');
 const mongoose = require('mongoose');
 
+const MddsUncategorized = 'MddsUncategorized';
+
 const createRegex = function(obj) {
   //obj in {key: string} format
   for (let prop in obj) {
@@ -102,10 +104,14 @@ const checkAndSetValue = function(obj, schema) {
       } else if (type == 'SchemaString') {
         let userInput = obj[item];
 
-        obj[item] = new RegExp(
-          // Escape all special characters 
-          userInput.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"),
-          'i');
+        if (userInput) {
+          userInput = new RegExp(
+            // Escape all special characters 
+            userInput.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"),
+            'i');
+        }
+        
+        obj[item] = userInput;
       }
     }
   }
@@ -734,7 +740,11 @@ class RestController {
       if (!cate.categoryProvided && originCategoriesAll[i].length > 0) {
         if (originCategoriesAll[i].includes(cate.categoryCand)) {
           // candidate found
+
           query[cate.categoryBy] = cate.categoryCand;
+        } else if (cate.categoryCand === MddsUncategorized) {
+          // uncategorized request from front end. use null.
+          query[cate.categoryBy] = null;
         } else {
           // take the first category as query filter
           query[cate.categoryBy] = originCategoriesAll[i][0];
