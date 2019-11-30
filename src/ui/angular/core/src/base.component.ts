@@ -90,11 +90,13 @@ export class BaseComponent implements BaseComponentInterface {
     public listCategory2; //top category
     
     public categories = []; // stored categories
+    public categoriesCounts = []; // categories counts
     public categoryMore = []; //stored more details
     public categoryDisplays: string[] = []; //stored display name of categories
     public selectedCategory: number = undefined; // index in categories
 
     public categories2 = []; // stored categories
+    public categoriesCounts2 = []; // categories counts
     public categoryMore2 = []; //stored more details
     public categoryDisplays2: string[] = []; //stored display name of categories
     public selectedCategory2: number = undefined; // index in categories
@@ -1081,6 +1083,7 @@ export class BaseComponent implements BaseComponentInterface {
                     listCategoryField: cateInfo.cate1[0],
                     categoryProvided: cateInfo.cate1[2],
                     categories: result.categories,
+                    categoriesCounts: result.categoriesCounts,
                     categoriesBrief: result.categoriesBrief,
                     categoryCandidate: cateInfo.cate1[3],
 
@@ -1088,6 +1091,7 @@ export class BaseComponent implements BaseComponentInterface {
 
                     categoriesOut: this.categories,
                     categoryDisplays: this.categoryDisplays,
+                    categoriesCountsOut: this.categoriesCounts,
                     categoryMore: this.categoryMore,
                     selectedCategory: this.selectedCategory,
                 },
@@ -1095,6 +1099,7 @@ export class BaseComponent implements BaseComponentInterface {
                     listCategoryField: cateInfo.cate2[0],
                     categoryProvided: cateInfo.cate2[2],
                     categories: result.categories2,
+                    categoriesCounts: result.categoriesCounts2,
                     categoriesBrief: result.categoriesBrief2,
                     categoryCandidate: cateInfo.cate2[3],
 
@@ -1102,6 +1107,7 @@ export class BaseComponent implements BaseComponentInterface {
 
                     categoriesOut: this.categories2,
                     categoryDisplays: this.categoryDisplays2,
+                    categoriesCountsOut: this.categoriesCounts2,
                     categoryMore: this.categoryMore2,
                     selectedCategory: this.selectedCategory2,
                 }
@@ -1116,6 +1122,7 @@ export class BaseComponent implements BaseComponentInterface {
                     }
 
                     c.categoriesOut = c.categories.map(x=>this.formatDetail(x));
+                    c.categoriesCountsOut = c.categoriesCounts;
 
                     // categories is a array of this.detail format with the listCategoryField field only
                     c.categoryDisplays = c.categoriesOut.map(x=> {
@@ -1155,10 +1162,12 @@ export class BaseComponent implements BaseComponentInterface {
                 }
             }
             this.categories = cateGroup[0].categoriesOut;
+            this.categoriesCounts = cateGroup[0].categoriesCountsOut;
             this.categoryMore = cateGroup[0].categoryMore;
             this.selectedCategory = cateGroup[0].selectedCategory;
             this.categoryDisplays = cateGroup[0].categoryDisplays;
             this.categories2 = cateGroup[1].categoriesOut;
+            this.categoriesCounts2 = cateGroup[1].categoriesCountsOut;
             this.categoryMore2 = cateGroup[1].categoryMore;
             this.selectedCategory2 = cateGroup[1].selectedCategory;
             this.categoryDisplays2 = cateGroup[1].categoryDisplays;

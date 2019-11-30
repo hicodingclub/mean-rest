@@ -325,7 +325,24 @@ class RestController {
       throw err;
     }
   }
+  async getRefObjectsAll(req, schm) {
+    const { name, schema, model, views, populates, owner } = this.loadContextVarsByName(schm.toLowerCase());
 
+    let query = {};
+    query = ownerPatch(query, owner, req);
+
+    try {
+      // TODO: handle large number of documents...
+      let docs = await model.find(
+        query
+      ).exec();
+      return docs;
+
+    } catch (err) {
+      throw err;
+    }
+  }
+  
   getPopulateInfo(theView, morePopulateField) {
     const populateArray = [];
     const populateMap = {};
@@ -683,7 +700,9 @@ class RestController {
     query = ownerPatch(query, owner, req);
 
     let originCategoriesAll = [[], []];
-    let categoriesAll = [[], []];
+    let categoriesAll = [[], []]; // all reference documents that are used by this model
+    let categoriesDocumentsAll = [[], []]; // all documents from referenc collection (used and not used)
+    let categoriesCounts = [[], []]; // document counts based on categories
     let categoryObjectsIndexAll = [[], []];
     let categoryObjectsBriefAll = [[], []];
     let categoryObjectsAll = [[], []];
@@ -703,6 +722,19 @@ class RestController {
           catQuery = ownerPatch(catQuery, owner, req);
  
           originCategoriesAll[i] = await model.find(catQuery).distinct(cate.categoryBy).exec(); // no objects
+
+          const aggregatePipes = [{ $match: catQuery}, {$group : {_id: `$${cate.categoryBy}`, count:{$sum:1}}}];
+          let cateCounts = await model.aggregate(aggregatePipes).exec();
+          cateCounts = JSON.parse(JSON.stringify(cateCounts));
+          const cateCountsObj = {};
+          for (const c of cateCounts) {
+            let k = c['_id'];
+            if ( k === null ) k = MddsUncategorized;
+            cateCountsObj[k] = c['count'];
+          }
+          /*[ { _id: 5de16d0db8c1b52671ff717f, count: 1 },
+              { _id: null, count: 64 },
+              { _id: 5de17192518aa428ae761e70, count: 1 } ]*/
   
           originCategoriesAll[i].sort();
           originCategoriesAll[i].reverse();
@@ -711,12 +743,19 @@ class RestController {
           if (cate.categoryFieldRef) {
             // it's an ref field
             categoriesAll[i] = await this.getRefObjectsFromId(req, cate.categoryFieldRef, originCategoriesAll[i]);
+            categoriesDocumentsAll[i] = await this.getRefObjectsAll(req, cate.categoryFieldRef);
+
+            const tempIds = categoriesAll[i].map(x => x['_id'].toString());
+            categoriesDocumentsAll[i] = categoriesDocumentsAll[i].filter(x => !tempIds.includes(x['_id'].toString())); // remove duplicate ones
+
+            categoriesAll[i] = categoriesAll[i].concat(categoriesDocumentsAll[i]); // merge
           }
           categoryObjectsAll[i] = categoriesAll[i].map(x => {
             const obj = {};
             obj[cate.categoryBy] = x;
             return obj;
           });
+
           categoryObjectsAll[i] = JSON.parse(JSON.stringify(categoryObjectsAll[i]));
           // get the index population of the category fields
           const [indexPopulateArray, indexPopulateMap] = this.getPopulateInfo(populates.briefView, null);
@@ -725,12 +764,18 @@ class RestController {
           if (cate.categoryFieldRef) {
             originCategoriesAll[i] = categoriesAll[i].map(x => x['_id']);
           }
-  
+          for (const c of originCategoriesAll[i]) {
+            categoriesCounts[i].push(cateCountsObj[c] || 0);
+          }
+          categoriesCounts[i].push(cateCountsObj[MddsUncategorized] || 0);
+
           // get the biref population of the category fields
           if (cate.listCategoryShowMore) {
             const [briefPopulateArray, briefPopulateMap] = this.getPopulateInfo(populates.briefView, cate.categoryBy);
             categoryObjectsBriefAll[i] = resultReducerForRef(categoryObjectsAll[i], briefPopulateMap).map(x => x[cate.categoryBy]);
           }
+
+          // db.someCollection.aggregate([{ $match: { age: { $gte: 21 }}}, {"$group" : {_id:"$source", count:{$sum:1}}} ])
   
         } catch (err) {
           return next(err);
@@ -795,9 +840,11 @@ class RestController {
         items: result,
         categoryBy: __categoryBy,
         categories: categoryObjectsIndexAll[0],
+        categoriesCounts: categoriesCounts[0],
         categoriesBrief: categoryObjectsBriefAll[0],
         categoryBy2: __categoryBy2,
         categories2: categoryObjectsIndexAll[1],
+        categoriesCounts2: categoriesCounts[1],
         categoriesBrief2: categoryObjectsBriefAll[1],
       };
       output = JSON.parse(JSON.stringify(output));

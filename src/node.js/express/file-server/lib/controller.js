@@ -6,10 +6,10 @@ const sizeOf = require('image-size')
 const fs = require('fs');
 
 const schemas = require('../model/schema');
-const fileSchema = schemas.fileSchema;
-const fileLabelsSchema = schemas.fileLabelsSchema;
+const { fileSchema, fileGroupSchema} = schemas;
+
 const File = mongoose.model('mfile', fileSchema);
-const FileLabels = mongoose.model('mfilelabels', fileLabelsSchema);
+const FileGroup = mongoose.model('mfilegroup', fileGroupSchema);
 
 const sOptions = {
 };

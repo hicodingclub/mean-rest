@@ -1,22 +1,20 @@
 const schema = require('./schema');
 
-const fileSchema = schema.fileSchema;
-const fB = 'name type labels size link uploaded hasThumbnail';
-const fD = 'name type labels size link uploaded hasThumbnail';
-const fC = 'name labels';
-const fE = 'name labels';
+const { fileSchema, fileGroupSchema } = schema;
+
+const fB = 'name type group labels size link createdAt hasThumbnail';
+const fD = 'name type group labels size link createdAt hasThumbnail';
+const fC = 'name group labels';
+const fE = 'name group labels';
 const fTS = 'name labels';  // fields that can make text search on.
 const fI = 'name';
-
-const fileLabelsSchema = schema.fileLabelsSchema
   
-const lB = 'label';
-const lD = 'label created';
-const lC = 'label';
-const lE = 'label';
+const lB = 'name';
+const lD = 'name createdAt';
+const lC = 'name';
+const lE = 'name';
 const lTS = '';  // fields that can make text search on.
-const lI = 'label';
-
+const lI = 'name';
 
 
 const dateFormat = 'MM/DD/YYYY';
@@ -27,11 +25,25 @@ const schemas = {
      schema: fileSchema,
      views: [fB, fD, fC, fE, fTS, fI],
      api: 'LU',  // api exposed by rest controller
+     name: 'Picture',
+     mraUI: {
+      listCategories: [
+        {
+          listCategoryField: 'group',
+          showCategoryCounts: true,
+          showEmptyCategory: false,
+        },
+      ],
+     },
   },
-  'mfilelabels': {
-     schema: fileLabelsSchema,
+  'mfilegroup': {
+     schema: fileGroupSchema,
      views: [lB, lD, lC, lE, lTS, lI],
-     api: 'L', // api exposed by rest controller
+     api: 'LRCU', // api exposed by rest controller
+     name: 'Picture Group',
+     mraUI: {
+      listSelectType: 'index',
+     },
   },
   'upload': {},
   'download': {},
