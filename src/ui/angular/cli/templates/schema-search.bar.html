@@ -13,7 +13,7 @@
 			    <div class="input-group">
 	              <input type="search" class="form-control border border-secondary" id="<%-schemaName%>TextSearch" 
 						#<%-schemaName%>TextSearch [(ngModel)]="searchText"
-						(keyup.enter)="$event.target.blur();searchList();false"
+						(keydown.enter)="$event.target.blur();searchList();false"
 					    placeholder="Search for <%for (let [idx,nm] of stringFields.entries()){%><%if (idx!=0) {%>, <%}%><%-nm%><%}%>"> 
 				  <div *ngIf="searchText" class="input-group-append icon-clear-inside">
 					<span >

@@ -67,9 +67,13 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
     @Input()
     public initData: any; //some fields has data already. eg: {a: b}. Used for add
     @Output()
-    public done = new EventEmitter<boolean>();
+    public doneData = new EventEmitter<boolean>();
+    @Output()
+    public done = new EventEmitter<any>();
     @Input()
     public embeddedView: boolean;
+    @Input()
+    public embedMode: string; // parent to tell the action - create
 
     public action:string;
     public minDate = {year: (new Date()).getFullYear() - 100, month: 1, day: 1};
@@ -107,6 +111,10 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
     }
 
     ngOnInit() {
+      if (this.embedMode == 'create') { // parent ask to create
+        this.action="Create";
+        this.getDetailData();
+      } else {
         if (!this.id) this.id = this.route.snapshot.paramMap.get('id');
         if (this.id) {
             this.action="Edit";
@@ -117,31 +125,37 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
             if (!this.cid) this.cid = this.route.snapshot.queryParamMap.get('cid');
             if (this.cid) {
                 this.populateDetailFromCopy(this.cid);
-            } else if (this.initData) {
-                this.action="Add";
-                let detail = {
-                    <% createView.forEach( (field) => { 
-                      let fn = field.fieldName;let fdv = field.defaultValue;
-                      if ( typeof(fdv) !== 'undefined') {
-                        %><%-fn%>: <%-JSON.stringify(fdv)%>,<%_}
-                    }); %>
-                };
-                for (let prop in this.initData) {
-                    detail[prop] = this.initData[prop];
-                    this.hiddenFields.push(prop);
-                }
-                this.detail = this.formatDetail(detail);
             } else {
-                let detail = {
-                    <% createView.forEach( (field) => { 
-                      let fn = field.fieldName;let fdv = field.defaultValue;
-                      if ( typeof(fdv) !== 'undefined') {
-                        %><%-fn%>: <%-JSON.stringify(fdv)%>,<%_}
-                    }); %>
-                };
-                this.detail = this.formatDetail(detail);
+              this.getDetailData();
             }
         }
+      }
     }
 
+    getDetailData() {
+      if (this.initData) {
+        this.action="Add";
+        let detail = {
+            <% createView.forEach( (field) => { 
+              let fn = field.fieldName;let fdv = field.defaultValue;
+              if ( typeof(fdv) !== 'undefined') {
+                %><%-fn%>: <%-JSON.stringify(fdv)%>,<%_}
+            }); %>
+        };
+        for (let prop in this.initData) {
+            detail[prop] = this.initData[prop];
+            this.hiddenFields.push(prop);
+        }
+        this.detail = this.formatDetail(detail);
+      } else {
+          let detail = {
+              <% createView.forEach( (field) => { 
+                let fn = field.fieldName;let fdv = field.defaultValue;
+                if ( typeof(fdv) !== 'undefined') {
+                  %><%-fn%>: <%-JSON.stringify(fdv)%>,<%_}
+              }); %>
+          };
+          this.detail = this.formatDetail(detail);
+      }
+    }
 }

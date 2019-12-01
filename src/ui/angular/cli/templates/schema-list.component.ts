@@ -31,7 +31,7 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
   @ViewChildren(MraRichTextShowDirective) textEditors: QueryList<MraRichTextShowDirective>;<%}%>
 
   constructor(
-      <%_ if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
+      <% if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
       public <%-schemaName%>Service: <%-SchemaName%>Service,
       public injector: Injector,
       public router: Router,
