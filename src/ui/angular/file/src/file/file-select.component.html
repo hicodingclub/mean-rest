@@ -1,0 +1,14 @@
+<div style="width: 100%;">
+  <div class="display-file">
+    <div class="thumbnail">
+        <img *ngIf="downloadUrl" src="{{downloadUrl}}_thumbnail">
+        <i *ngIf="!downloadUrl" class="far fa-image"></i>
+    </div>
+  </div>
+
+  <div class="select-file">
+    <button type="button" class="btn btn-link ml-2" (click)="selectFileList()">Select</button>
+  </div>
+</div>
+
+<ng-template mdds-file-select></ng-template>

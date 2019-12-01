@@ -1,0 +1,120 @@
+.edit {
+	width: 75%;
+	margin: 0 auto;
+}
+
+fieldset > .form-control, .input-group, .form-check, .alert {
+	width: 90%
+}
+
+.action-buttons {
+	width: 100%;
+	float:right; 
+	text-align: right;
+	margin-bottom: 1.25rem;
+}
+.action-buttons .btn {
+	display: inline-block;
+	margin-left: 2.5rem;
+}
+.action-buttons .fa-angle-double-left {
+	float: left;
+	display: inline-block;
+	margin-left: 2.5rem;
+	margin-top:  0.75rem
+}
+
+.action-buttons-center {
+	width: 100%;
+	float:right; 
+	text-align: center;
+	margin-bottom: 1.25rem;
+}
+.action-buttons-center .btn {
+	display: inline-block;
+	margin-left: 2.5rem;
+}
+
+
+.card-title {
+	text-align: center;
+}
+
+.card span {
+	margin-left: 1rem;
+}
+
+.form-group > label {
+    font-weight: bold;
+	font-size: 1rem;
+}
+
+/*
+.ng-valid[required], .ng-valid.required  {
+  border-left: 5px solid #42A948; /* green *
+}
+*/
+/*
+.ng-valid:not(form) {
+  border-left: 5px solid #42A948; /* green *
+}
+*/
+
+.ng-invalid:not(form)  {
+  border-left: 5px solid #a94442; /* red */
+}
+
+.input-group-append .btn-outline-secondary {
+	border: 1px solid #ced4da;
+    border-radius: .25rem;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.ref-badge {
+  border: 1px solid #eceff3; /*rgba(0,0,0,.125); */
+  background-color: #eceff3;
+}
+
+.icon-search, .icon-clear {
+  z-index: 1;
+  pointer-events: auto;
+  cursor: pointer;
+  
+  margin-left: 1rem;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.input-group > span {
+margin-left: 0.5rem;
+}
+
+.icon-clear-inside {
+    z-index: 3;
+    vertical-align: middle;
+    padding: 0.75rem 0.5rem 0rem 0.5rem;
+    cursor: pointer;
+    position: relative;
+    margin-left: -2rem;   /* text 1 + left 0.5 + right 0.5 = 2 rem*/
+    border: 0;
+    height: 2rem;
+}
+
+.icon-clear-inside-sm {
+    z-index: 3;
+    cursor: pointer;
+    position: absolute;
+    margin: auto;
+    bottom: 0;
+    top: 0;
+    right: 1.5rem;
+    height: 1.5rem;
+}
+
+.icon-clear-badge {
+	cursor: pointer;
+	margin-left: 1rem;
+}

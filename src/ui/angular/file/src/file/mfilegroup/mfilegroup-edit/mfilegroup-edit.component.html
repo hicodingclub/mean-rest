@@ -1,0 +1,96 @@
+<div class="edit" *ngIf="detail">
+	<div *ngIf="!embeddedView" class="action-buttons">
+        <!-- <a href="javascript:void(0)" (click)="goBack()" ><i class="fas fa-angle-double-left" title="Back"></i></a> -->
+	</div>
+	
+	<div class="card" style="text-align: left;">
+	  <div class="card-body">
+	    <h4 class="card-title" *ngIf="!embeddedView">{{action}} Picture Group</h4>
+	    <form (ngSubmit)="onSubmit()" #editForm="ngForm">
+	    
+	     <div *ngIf="action == 'Edit'">
+<div *ngIf="!hiddenFields.includes('name')">
+
+        <fieldset class="form-group">
+          <label for="EditName">Name</label>
+          
+
+          <div class="input-group">
+            <input type="text" class="form-control rounded" id="EditName" 
+                    required
+                    
+                    
+                 
+                    [(ngModel)]="detail['name']" name="EditName"
+                    #EditName="ngModel">
+            <div *ngIf="detail['name']" 
+                  class="input-group-append icon-clear-inside " (click)="clearValueFromDetail('name')">
+                  <i class="fas fa-times-circle" title="Clear"></i>
+            </div>
+          </div>
+
+          <div [hidden]="EditName.valid || EditName.pristine || EditName.errors.minlength"
+           class="alert alert-danger">
+
+            <div *ngIf="EditName.errors && EditName.errors.required">
+              Name is required.
+              </div>
+ 
+
+          </div>
+        
+        </fieldset>
+
+    
+</div>
+
+         </div>	
+	     <div *ngIf="action == 'Create' || action == 'Add' ">
+<div *ngIf="!hiddenFields.includes('name')">
+
+        <fieldset class="form-group">
+          <label for="EditName">Name</label>
+          
+
+          <div class="input-group">
+            <input type="text" class="form-control rounded" id="EditName" 
+                    required
+                    
+                    
+                 
+                    [(ngModel)]="detail['name']" name="EditName"
+                    #EditName="ngModel">
+            <div *ngIf="detail['name']" 
+                  class="input-group-append icon-clear-inside " (click)="clearValueFromDetail('name')">
+                  <i class="fas fa-times-circle" title="Clear"></i>
+            </div>
+          </div>
+
+          <div [hidden]="EditName.valid || EditName.pristine || EditName.errors.minlength"
+           class="alert alert-danger">
+
+            <div *ngIf="EditName.errors && EditName.errors.required">
+              Name is required.
+              </div>
+ 
+
+          </div>
+        
+        </fieldset>
+
+    
+</div>
+
+         </div>	
+         
+		<div class="action-buttons-center">
+	     	<button type="submit" class="btn btn-success" 
+     			[disabled]="!editForm.form.valid">Submit</button>
+	     	<button class="btn btn-outline-success" 
+     			type="button" (click)="editCancel()">Cancel</button>
+		</div>
+	    </form>
+	  </div>
+	</div>
+</div>
+

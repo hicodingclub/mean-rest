@@ -1,18 +1,8 @@
-﻿import { Component, Inject, EventEmitter, Input, Output, ViewChild, Pipe, PipeTransform } from '@angular/core';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+﻿import { Component, Inject, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 
 import { forkJoin } from 'rxjs';
 
 import { MddsFileUploadService, uploadStatus} from './file-upload.service';
-import { FILE_DOWNLOAD_URI } from './tokens';
-
-@Pipe({ name: 'SafeUrlPipe'})
-export class SafeUrlPipe implements PipeTransform  {
-  constructor(private sanitized: DomSanitizer) {}
-  transform(value: string) {
-    return this.sanitized.bypassSecurityTrustResourceUrl(value);
-  }
-}
 
 @Component({
     selector: 'file-upload',
@@ -75,7 +65,7 @@ export class FileUploadComponent {
       this.uploading = true;
     
       // start the upload and save the progress map
-      this.progress = this.uploadService.upload(this.files);
+      this.progress = this.uploadService.upload(this.files, null);
     
       // convert the progress map into an array
       let allProgressObservables = [];

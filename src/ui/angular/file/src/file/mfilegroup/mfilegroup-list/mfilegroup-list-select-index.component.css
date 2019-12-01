@@ -1,0 +1,15 @@
+.page-link {
+	padding: 0.25rem 0.5rem;
+}
+
+.pagination li {
+    min-width: 2rem;
+}
+
+.list-items {
+	min-height: 120px;
+}
+
+.total_counts {
+    padding-top: 0rem;
+}
