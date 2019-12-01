@@ -145,8 +145,20 @@ class FileController {
     if (file.truncated) { //file size > limit
       return next(createError(400, "File size is over the limit: " + file.Name));
     }
+
+    let fileName, groupName;
+    try {
+      const nameStructure = JSON.parse(decodeURI(file.name));
+      fileName = nameStructure.name;
+      groupName = nameStructure.group;
+    } catch (e) {
+      fileName = file.name;
+      groupName = null;
+    }
+
     let fo = {
-      name: file.name,
+      name: fileName,
+      group: groupName,
       type: file.mimetype,
       size: file.size,
       md5: file.md5,
