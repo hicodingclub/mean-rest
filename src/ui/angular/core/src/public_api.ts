@@ -1,4 +1,5 @@
 export { ViewType, BaseComponent } from './base.component';
+export { MddsUncategorized } from './base.component';
 export { BaseComponentInterface } from './base.interface';
 export { ServiceError, BaseService } from './base.service';
 export { MraCommonService } from './common.service';

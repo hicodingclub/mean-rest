@@ -23,7 +23,7 @@ export enum ViewType {
 
 export {ServiceError};
 
-const MddsUncategorized = 'MddsUncategorized';
+export const MddsUncategorized = 'MddsUncategorized';
 
 export class BaseComponent implements BaseComponentInterface {
     public objectKeys = Object.keys;
@@ -131,6 +131,9 @@ export class BaseComponent implements BaseComponentInterface {
 
     // to show more details of the associationed field (an object) from list view
     public associationField;
+
+    // options to control UI logic
+    public options: any = {};
 
     constructor(
         public service: BaseService,
@@ -1052,7 +1055,7 @@ export class BaseComponent implements BaseComponentInterface {
         else new_page = 1;
 
         let segmentParams = {};
-        if (!this.isEmptyRoutingPath()) {
+        if (!this.isEmptyRoutingPath() && this.majorUi) {
             if (new_page !== 1) {
                 segmentParams = {page: new_page};
             }
@@ -1172,15 +1175,16 @@ export class BaseComponent implements BaseComponentInterface {
             this.selectedCategory2 = cateGroup[1].selectedCategory;
             this.categoryDisplays2 = cateGroup[1].categoryDisplays;
 
-            
-            const queryParams = {};
-            if (cateGroup[0].selectedCategoryName) {
-                queryParams['cate'] = cateGroup[0].selectedCategoryName;
+            if (this.majorUi) {
+                const queryParams = {};
+                if (cateGroup[0].selectedCategoryName) {
+                    queryParams['cate'] = cateGroup[0].selectedCategoryName;
+                }
+                if (cateGroup[1].selectedCategoryName) {
+                    queryParams['cate2'] = cateGroup[1].selectedCategoryName;
+                }
+                this.router.navigate(['.'], {relativeTo: this.route, queryParams: queryParams, queryParamsHandling: 'merge',});//update the url
             }
-            if (cateGroup[1].selectedCategoryName) {
-                queryParams['cate2'] = cateGroup[1].selectedCategoryName;
-            }
-            this.router.navigate(['.'], {relativeTo: this.route, queryParams: queryParams, queryParamsHandling: 'merge',});//update the url
 
             if (this.isDropdownList) {
                 this.dropdownItems = this.list.map(x=> { return {displayName: this.stringify(x), id: x._id}} );
@@ -1194,6 +1198,8 @@ export class BaseComponent implements BaseComponentInterface {
             this.checkedItem = 
                 Array.apply(null, Array(this.list.length)).map(Boolean.prototype.valueOf,false);
             this.checkAll = false;
+
+            this.clearSelectItemCandidate();
             
             if (this.refreshing) {
               this.refreshing = false;
@@ -1495,6 +1501,7 @@ export class BaseComponent implements BaseComponentInterface {
                 snackBar.show();
                 
                 if (this.embeddedView) {
+                    this.doneData.emit(result);
                     this.done.emit(true);
                 } else {
                     this.router.navigate(['../../detail', this.id], {relativeTo: this.route});
@@ -1518,6 +1525,7 @@ export class BaseComponent implements BaseComponentInterface {
                 this._detail = result;
 
                 if (this.embeddedView) {
+                    this.doneData.emit(result);
                     this.done.emit(true);
                 } else {
                     this.router.navigate(['../detail', this.id], {relativeTo: this.route});
@@ -1678,7 +1686,7 @@ export class BaseComponent implements BaseComponentInterface {
     public refSelectDirective:any;
     public selectComponents:any; //{fieldName: component-type} format
     public componentFactoryResolver: any; //injected by extended class, if needed.
-    public componentSubscription
+    public componentSubscription;
     public onRefSelect(fieldName:string) {
         if (!this.refSelectDirective) {
           console.warn("No reference directive for field: ", fieldName);
@@ -1814,6 +1822,7 @@ export class BaseComponent implements BaseComponentInterface {
     public inputData;
     public outputData;
     public done:any;
+    public doneData: any; // embedded view to emit data
     public focusEl; //ElementRef
     setFocus() {
         if (this.focusEl)
@@ -1828,15 +1837,28 @@ export class BaseComponent implements BaseComponentInterface {
     }
 
     public selectedId = null;
+
+    selectItemCandidate(num:number) {
+        let detail = this.list[num];
+        this.selectedId = detail['_id'];
+    }
+    // triggered when there is a change of page or search condition
+    clearSelectItemCandidate() {
+        this.selectedId = undefined;
+    }
+    selectItemConfirmed() {
+        let detail = this.list.find(x => x['_id'] == this.selectedId);
+        this.outputData = {action: "selected", 
+                            value: {"_id": this.selectedId, "value": this.stringify(detail)},
+                            detail: detail
+                          };
+        this.done.emit(true);
+    }
     selectItemSelected(num:number) {
         let detail = this.list[num];
         this.selectedId = detail['_id'];
         this.clickedId = detail['_id'];
-        this.outputData = {action: "selected", 
-                            value: {"_id": detail["_id"], "value": this.stringify(detail)},
-                            detail: detail
-                          };
-        this.done.emit(true);
+        this.selectItemConfirmed();
     }
     
     detailSelSelected() {
