@@ -43,11 +43,11 @@ BASEDIR=$PWD
 packages=(
   "/ui/angular/cli"
   "/ui/angular/auth"
-  "/ui/angular/file"
   "/ui/angular/richtext"
   "/ui/angular/action-base"
   "/ui/angular/action-email"
   "/ui/angular/core"
+  "/ui/angular/file"
   "/ui/angular/composite"
   "/node.js/express/core" 
   "/node.js/express/emailing"
