@@ -1,9 +1,9 @@
 /* Show pictures in list/grid view
 */
-.thumbnail， .thumbnail-local {
-    overflow: hidden;
-    width:100%;
-    width: 100%;
+.thumbnail, .thumbnail-local {
+        overflow: hidden;
+        height:100%;
+        width: 100%;
 }
 
 .thumbnail img, .thumbnail-local img {

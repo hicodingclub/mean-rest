@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/angular-richtext",
-  "version": "0.8.0",
+  "version": "0.8.20",
   "description": "Angular UI componenets for richtext editor.",
   "scripts": {
     "build": "./node_modules/.bin/tsc",

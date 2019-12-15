@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/angular-composite",
-  "version": "0.8.0",
+  "version": "0.8.20",
   "description": "Augular Composite that compose multiple componennt to be a single page",
   "scripts": {
     "copy": "cp README.md dist;",
@@ -34,7 +34,7 @@
     "ng-packagr": "^4.6.0",
     "rxjs": "^6.3.3",
     "tsickle": "^0.34.0",
-    "typescript": "3.1.6",
+    "typescript": "^3.2.4",
     "zone.js": "^0.8.28"
   },
   "peerDependencies": {
@@ -43,7 +43,7 @@
     "@angular/forms": "^7.2.1",
     "@angular/platform-browser": "^7.2.1",
     "@angular/router": "^7.2.1",
-    "@hicoder/angular-core": "0.8.0",
+    "@hicoder/angular-core": "0.8.20",
     "rxjs": "^6.3.3",
     "zone.js": "^0.8.28",
     "tsickle": "^0.34.0"

@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/angular-auth",
-  "version": "0.8.0",
+  "version": "0.8.20",
   "description": "Augular Authentication and Authorization Module",
   "scripts": {
     "copy": "cp README.md dist;",
@@ -33,9 +33,9 @@
     "@angular/router": "^7.2.1",
     "ng-packagr": "^4.6.0",
     "rxjs": "^6.3.3",
-    "zone.js": "^0.8.28",
     "tsickle": "^0.34.0",
-    "typescript": "^3.2.4"
+    "typescript": "^3.2.4",
+    "zone.js": "^0.8.28"
   },
   "peerDependencies": {
     "@angular/common": "^7.2.1",

@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/angular-action-base",
-  "version": "0.8.0",
+  "version": "0.8.20",
   "description": "Angular base action, which can be inherited to develop other actions and embedded in list and detail view.",
   "scripts": {
     "build": "./node_modules/.bin/tsc",
