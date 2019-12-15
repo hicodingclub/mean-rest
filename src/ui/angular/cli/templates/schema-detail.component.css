@@ -102,13 +102,16 @@ div.badge-click:hover {
   flex-grow: 0;
   flex-shrink: 0;
   flex-basis: 6rem;
+  height: 6rem;
 
   margin-right: 0.5rem;
+  overflow: hidden;
 }
 
 @media screen and (min-width: 500px) {
   .grid-head-picture {
     flex-basis: 8rem;
+    height: 6rem;
   }
 }
 
