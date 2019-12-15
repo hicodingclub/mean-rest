@@ -3,6 +3,7 @@
       if (!field.editor && !field.picture && !field.file) { %>
         <fieldset class="form-group">
           <label for="Edit<%-Fn%>"><%-fD%></label>
+          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
         <%_ if (field.enumValues) { %>
           <div class="form-check"
@@ -71,6 +72,7 @@
       <%_ } else if (field.editor) { %>
         <fieldset class="form-group">
           <label for="Edit<%-Fn%>"><%-fD%></label>
+          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
           <div mra-richtext-select="Edit<%-Fn%>" [content]="detail['<%-fn%>']"></div>
           <div class="action-buttons" style="margin-top: 10px;">
@@ -97,9 +99,10 @@
             </div><%}%>        
           </div>
         </fieldset>
-      <%_ } else if (field.picture) { %>
+      <%_ } else if (field.picture) {%>
         <fieldset class="form-group">
           <label for="Edit<%-Fn%>"><%-fD%></label>
+          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
           <div class="form-check"
               <%_ if (field.required) {%>
@@ -113,7 +116,7 @@
                   [(ngModel)]="detail['<%-fn%>']" name="Edit<%-Fn%>"
                   #Edit<%-Fn%>="ngModel">
               <div style="display: inline-block; width: 80%;" >
-                  <file-select [(downloadUrl)]="detail['<%-fn%>']"></file-select>
+                  <file-select [(downloadUrl)]="detail['<%-fn%>']" [aspectRatio]="<%-field.aspectRatio%>"></file-select>
               </div>
               <span *ngIf="detail['<%-fn%>']" 
                 class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
@@ -133,6 +136,7 @@
     <%_ } else if (field.type === "SchemaBoolean") { %>
         <fieldset class="form-group">
           <label for="Edit<%-Fn%>"><%-fD%></label>
+          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
           <div class="form-check"
             <%_ if (field.required) {%>
@@ -180,6 +184,7 @@
     <%_ } else if (field.type === "SchemaNumber") { %>
         <fieldset class="form-group">
           <label for="Edit<%-Fn%>"><%-fD%></label>
+          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
           <input type="number" class="form-control" id="Edit<%-Fn%>" 
                   <%if (typeof field.numberMin === 'number') {%>minnumber="<%-field.numberMin%>" min="<%-field.numberMin%>"<%}%>
@@ -214,6 +219,7 @@
     <%_ } else if (field.type === "SchemaDate") { %>
         <fieldset class="form-group">
           <label for="Edit<%-Fn%>"><%-fD%> </label> <span> ({{dateFormat}})</span>
+          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
           <div class="input-group">
             <input class="form-control" id="Edit<%-Fn%>" placeholder="{{dateFormat}}"
@@ -248,6 +254,7 @@
     <%_ } else if (field.type === "ObjectId") { %>
         <fieldset class="form-group">
           <label for="Edit<%-Fn%>"><%-fD%> </label>
+          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
           <!-- <a class="icon-search" [routerLink]="['.']" (click)="onRefSelect('<%-field.fieldName%>')"><i class="fas fa-list" title="Search"></i></a>  -->
           <div class="input-group">
@@ -279,6 +286,7 @@
     <%_ } else if (field.type === "Map") { %>
           <fieldset class="form-group">
           <label for="Edit<%-Fn%>"><%-fD%></label>
+          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
         <%_ if (field.elementType === "SchemaString") { %>
             <div class="form-check"
@@ -363,6 +371,7 @@
     <%_ } else if (field.type === "SchemaArray") { %>
           <fieldset class="form-group">
           <label for="Edit<%-Fn%>"><%-fD%></label>
+          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
         <%_ if (field.elementType === "SchemaString" && field.enumValues && field.elementUnique) { %>
             <div class="form-check"
@@ -487,6 +496,7 @@
     <%_ } else { %>
           <fieldset class="form-group">
           <label for="Edit<%-Fn%>"><%-fD%></label>
+          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
           <div>Not supported yet.</div>
         </fieldset>

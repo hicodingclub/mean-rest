@@ -1,7 +1,9 @@
-import { Component, OnInit, Input, Output, Directive, EventEmitter } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, Output, Directive, EventEmitter } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
 import { Injector } from '@angular/core';
+
+declare const $: any;
 
 import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
@@ -59,7 +61,7 @@ import { MraRichTextSelectDirective } from '@hicoder/angular-core';<%}%>
   templateUrl: './<%-schemaName%>-edit.component.html',
   styleUrls: ['./<%-schemaName%>-edit.component.css']
 })
-export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component implements OnInit {        
+export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component implements OnInit, AfterViewInit {        
     @Input() 
     public id: string;
     @Input()
@@ -130,6 +132,11 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
             }
         }
       }
+    }
+
+    ngAfterViewInit() {
+      // Initialize all tooltips
+      $('[data-toggle="tooltip"]').tooltip();
     }
 
     getDetailData() {

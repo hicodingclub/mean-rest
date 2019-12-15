@@ -8,10 +8,10 @@
 
         let fn = field.fieldName; let ft = field.type;;
         %>
-        <div class="grid-head-picture mr-1"><% include schema-display.field.html %>
+        <div class="grid-head-picture"><% include schema-display.field.html %>
         </div><%
       }%>
-        <div class="ml-1 d-inline-block">
+        <div>
           <h5><%
       for (let [index, field] of indexedFields.entries()){
           if (field.hidden) continue;

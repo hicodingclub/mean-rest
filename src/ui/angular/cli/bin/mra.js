@@ -165,6 +165,7 @@ var getPrimitiveField = function(fieldSchema) {
     let flagRef = false;
     let flagEditor = false;
     let flagPicture = false;
+    let aspectRatio;
     let flagFile = false;
     let flagSharable = false;
 
@@ -189,7 +190,8 @@ var getPrimitiveField = function(fieldSchema) {
             }	else if (fieldSchema.options.mraType === 'picture') {
               flagPicture = true;
               flagSharable = !!fieldSchema.options.mraSharable;
-            } else if (fieldSchema.options.mraType === 'file' ) {
+              aspectRatio = fieldSchema.options.aspectRatio;
+            }	else if (fieldSchema.options.mraType === 'file' ) {
               flagFile = true;
               flagSharable = !!fieldSchema.options.mraSharable;
             } else if (fieldSchema.options.textarea == true) {
@@ -229,7 +231,7 @@ var getPrimitiveField = function(fieldSchema) {
 
     return [type, jstype, numberMin, numberMax, maxlength, minlength,  enumValues, 
             ref, Ref, RefCamel, editor, textarea, mraEmailRecipient,
-            flagDate, flagRef, flagEditor, flagPicture, flagFile, flagSharable];
+            flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable];
 }
 
 var processField = function(x) {
@@ -332,11 +334,13 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
       let requiredField = false;
       let mraEmailRecipient = false;
       let fieldDescription = false;
+      let importantInfo = false;
 
       let flagDate = false;
       let flagRef = false;
       let flagEditor = false;
       let flagPicture = false;
+      let aspectRatio;
       let flagFile = false;
       let flagSharable = false;
   
@@ -356,6 +360,9 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
         if (fieldSchema.options.description) {//scope of map key defined
           fieldDescription = fieldSchema.options.description;
         }
+        if (fieldSchema.options.important) {//scope of map key defined
+          importantInfo = fieldSchema.options.important;
+        }
   
   			switch(type) {
           case "SchemaString":
@@ -365,7 +372,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           case "SchemaDate":
               [type,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
               ref, Ref, RefCamel, editor, textarea, mraEmailRecipient,
-              flagDate, flagRef, flagEditor, flagPicture, flagFile, flagSharable]
+              flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema);
               if (flagDate) hasDate = true;
               if (flagRef) hasRef = true;
@@ -379,7 +386,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           case "SchemaArray":
               [elementType,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
               ref, Ref, RefCamel, editor, textarea, mraEmailRecipient,
-              flagDate, flagRef, flagEditor, flagPicture, flagFile, flagSharable]
+              flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema.caster);
               //rewrite the default value for array
               let defaultInput = fieldSchema.options.default;
@@ -410,7 +417,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           case "Map":
               [elementType,  jstype,  numberMin,  numberMax,  maxlength,  minlength,  enumValues, 
               ref, Ref, RefCamel, editor,  textarea,  mraEmailRecipient,
-              flagDate, flagRef, flagEditor, flagPicture, flagFile, flagSharable]
+              flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema['$__schemaType']);
               //console.log("getPrimitiveField", getPrimitiveField(fieldSchema['$__schemaType']));
               //rewrite the default value for array
@@ -470,12 +477,14 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           textarea, // big text input
           mraEmailRecipient, // an email field an can receive email
           picture: flagPicture, // a picture field
+          aspectRatio: aspectRatio,
           file: flagFile, // a file field
           sharable: flagSharable, // picture or file is sharable
           //TODO: required could be a function
           required: requiredField,
           defaultValue: defaultValue,
           description: fieldDescription,
+          important: importantInfo,
           numberMin,
           numberMax,
           maxlength,
@@ -1008,25 +1017,25 @@ function main() {
     }
 
     let listWidgets = schemaDef.listWidgets || []; //widgets: clean, sld, sel, ...
-    listWidgets = listWidgets.map(x => { return [x.toLowerCase(), capitalizeFirst(x)];});
+    listWidgets = listWidgets.map(x => { return [x, capitalizeFirst(x)];});
 
     let listSelectWidgets = schemaDef.listSelectWidgets || [];
-    listSelectWidgets = listSelectWidgets.map( x => x.toLowerCase );
-    listSelectType = listSelectType.toLowerCase();
+    listSelectWidgets = listSelectWidgets.map( x => x );
+    listSelectType = listSelectType;
     let ListSelectType = capitalizeFirst(listSelectType);
     if (listSelectType != 'normal' && !listSelectWidgets.includes(listSelectWidgets)) {
       listSelectWidgets.push(listSelectType);
     }
-    listSelectWidgets = listSelectWidgets.map(x => {return [x.toLowerCase(), capitalizeFirst(x)];})
+    listSelectWidgets = listSelectWidgets.map(x => {return [x, capitalizeFirst(x)];})
 
     let detailWidgets = schemaDef.detailWidgets || []; //widgets: clean, sld, sel, ...
-    detailWidgets = detailWidgets.map( x => x.toLowerCase() );
-    detailType = detailType.toLowerCase();
+    detailWidgets = detailWidgets.map( x => x);
+    detailType = detailType;
     let DetailType = capitalizeFirst(detailType);
     if (detailType !== 'normal' && !detailWidgets.includes(detailType)) {
       detailWidgets.push(detailType);
     }
-    detailWidgets = detailWidgets.map(x => { return [x.toLowerCase(), capitalizeFirst(x)];});
+    detailWidgets = detailWidgets.map(x => { return [x, capitalizeFirst(x)];});
 
   	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
   	if (typeof views !== 'object' || !Array.isArray(views)) {

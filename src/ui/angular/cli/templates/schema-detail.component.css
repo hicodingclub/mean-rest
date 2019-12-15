@@ -92,15 +92,24 @@ div.badge-click:hover {
   height: 100%;
 }
 .grid-head {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   /*width: 100%;
   background-color: rgba(0, 0, 0, 0.04);*/
 }
-.grid-head-picture, .list-head-picture {
-  width: 6rem;
-  height: 6rem;
-  background-color: #f1f1f1;
+
+.grid-head-picture {
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 6rem;
+
+  margin-right: 0.5rem;
+}
+
+@media screen and (min-width: 500px) {
+  .grid-head-picture {
+    flex-basis: 8rem;
+  }
 }
 
 .transparent-border {

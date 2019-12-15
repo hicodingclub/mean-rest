@@ -7,10 +7,10 @@
 
       let fn = field.fieldName; let ft = field.type;;
       %>
-      <div class="list-head-picture mr-1 d-inline-block"><% include schema-display.field.html %>
+      <div class="list-head-picture"><% include schema-display.field.html %>
       </div>
     <%}%>
-      <div class="list-body-fields ml-1 d-inline-block">
+      <div class="list-body-fields">
         <h5><%
     for (let [index, field] of indexedFields.entries()){
         if (field.hidden) continue;

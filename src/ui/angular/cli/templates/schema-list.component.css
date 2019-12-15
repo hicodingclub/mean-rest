@@ -55,22 +55,22 @@ tr th:first-child{
   height: 100%;
 }
 .grid-head {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   width: 100%;
   background-color: rgba(0, 0, 0, 0.04);
 }
 .grid-head-picture, .list-head-picture {
-  width: 3rem;
-  height: 3rem;
-  background-color: #f1f1f1;
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 6rem;
+
+  margin-right: 0.5rem;
 }
 
 @media screen and (min-width: 500px) {
-  .grid-head-picture, .list-head-picture {
-    width: 6rem;
-    height: 6rem;
-    background-color: #f1f1f1;
+  .list-head-picture {
+    flex-basis: 8rem;
   }
 }
 
@@ -99,7 +99,7 @@ tr th:first-child{
 }
 
 .list-fields {
-  display: inline-flex;
+  display: flex;
   align-items: flex-start;
 
   min-width: 300px;
