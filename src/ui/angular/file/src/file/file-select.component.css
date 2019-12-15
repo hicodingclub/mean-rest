@@ -1,27 +1,18 @@
 /* Show pictures in list/grid view
 */
-.thumbnail {
+.thumbnail， .thumbnail-local {
     overflow: hidden;
-    height: 6rem;
     width:100%;
-    max-width: 12rem;
-    background-color: #a39f9f;
-}
-
-.thumbnail-local {
-    overflow: hidden;
-    height: 4rem;
-    max-width: 8rem;
-    width:100%;
-    background-color: #f1f1f1;
+    width: 100%;
 }
 
 .thumbnail img, .thumbnail-local img {
-    height: 100%;
     left: 50%;
     position: relative;
     transform: translateX(-50%);
     padding: 1px;
+
+    height: auto;
 }
 
 .thumbnail i {

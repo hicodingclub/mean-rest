@@ -54,6 +54,7 @@ import { SafeUrlPipe } from './pipes';
         FileUploadComponent,
         FileDisplayComponent,
         FileSelectComponent,
+        SafeUrlPipe,
     ],
     providers: [
         MddsFileUploadService,

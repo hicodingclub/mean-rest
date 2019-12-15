@@ -2,35 +2,11 @@
 */
 .thumbnail {
     overflow: hidden;
-    height: 3rem;
-    background-color: #f1f1f1;
     width:100%;
-    max-width: 12rem;
-}
-
-@media screen and (min-width: 500px) {
-    .thumbnail {
-        overflow: hidden;
-        height: 6rem;
-    }
-}
-
-.thumbnail-large {
-    overflow: hidden;
     height: 100%;
-    width:100%;
 }
 
-.thumbnail-img {
-    height: 100%;
-    left: 50%;
-    position: relative;
-    transform: translateX(-50%);
-    padding: 1px;
-}
-
-.thumbnail i {
-    font-size: 6rem;
+.thumbnail img {
     left: 50%;
     position: relative;
     transform: translateX(-50%);

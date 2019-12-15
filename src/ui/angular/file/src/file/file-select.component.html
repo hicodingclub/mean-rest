@@ -1,7 +1,7 @@
 <div style="width: 100%;">
   <div class="display-file">
     <div class="thumbnail">
-        <img *ngIf="downloadUrl" src="{{downloadUrl}}_thumbnail">
+        <img *ngIf="downloadUrl" [src]="getDownloadUrl() | SafeUrlPipe">
         <i *ngIf="!downloadUrl" class="far fa-image"></i>
     </div>
   </div>

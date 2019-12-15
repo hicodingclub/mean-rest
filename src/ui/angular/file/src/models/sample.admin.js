@@ -27,7 +27,7 @@ const schemas = {
      views: [fB, fD, fC, fE, fTS, fI],
      api: 'LU',  // api exposed by rest controller
      name: 'Picture',
-     listWidgets: ['gallery'],
+     listWidgets: ['galleryBottomTitle'],
      mraUI: {
       listCategories: [
         {
