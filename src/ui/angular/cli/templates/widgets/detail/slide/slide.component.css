@@ -7,7 +7,7 @@
 }
 .action-buttons {
 	width: 100%;
-	float:right; 
+	float: none; 
 	text-align: right;
 	margin-bottom: 1.25rem;
 }
@@ -119,4 +119,30 @@ div.badge-click:hover {
 
 .slide-image {
   width: 100%;
+}
+
+.carousel-caption-h3 {
+  font-size: 1.25rem;
+}
+
+.carousel-caption-h5 {
+  font-size: 0.75rem;
+}
+
+.carousel-caption-p {
+  display: none;
+}
+
+@media screen and  (min-width: 768px) {
+  .carousel-caption-h3 {
+    font-size: 1.75rem;
+  }
+  
+  .carousel-caption-h5 {
+    font-size: 1.25rem;
+  }
+  
+  .carousel-caption-p {
+    display: block;
+  }  
 }

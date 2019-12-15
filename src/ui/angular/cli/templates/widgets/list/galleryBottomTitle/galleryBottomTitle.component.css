@@ -1,7 +1,7 @@
 .galleryView {
   display: flex;
   flex-wrap: wrap;
-  justify-content: left;
+  justify-content: space-around;
 
   /*
   border-top: 1px solid #dee2e6;
@@ -29,28 +29,15 @@
 .grid-fields {
   height: 100%;
 }
-.grid-head {
-  display: inline-flex;
-  align-items: center;
+
+.grid-head-picture {
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.04);
-}
-.grid-head-picture, .list-head-picture {
-  width: 3rem;
-  height: 3rem;
-  background-color: #f1f1f1;
+  height: 6rem;
+  background-color: unset;
 }
 
-@media screen and (min-width: 500px) {
-  .grid-head-picture {
-    width: 100%;
-    height: 6rem;
-    background-color: #f1f1f1;
-  }
-
-  .grid-head-picture-large {
-    height: 12rem;
-  }
+.grid-head-picture-large {
+  height: 12rem;
 }
 
 .clicked-row {
@@ -59,7 +46,23 @@
   box-shadow: 0 0 0 2px #44B549;
 }
 
-.grid-picture-name {
+.grid-picture-title {
   font-size: 0.75rem;
   margin: 2px;
 }
+
+.grid-picture-title-large {
+  font-size: 1rem;
+  margin: 2px;
+}
+
+.grid-picture-subtitle {
+  font-size: 0.5rem;
+  margin: 2px;
+}
+
+.grid-picture-subtitle-large {
+  font-size: 0.75rem;
+  margin: 2px;
+}
+

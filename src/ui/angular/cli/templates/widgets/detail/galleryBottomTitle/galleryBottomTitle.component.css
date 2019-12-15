@@ -1,0 +1,6 @@
+
+<% include ../../list/galleryBottomTitle/galleryBottomTitle.component.css %>
+
+.action-buttons {
+    float: unset;
+}
