@@ -11,6 +11,8 @@ const { fileSchema, fileGroupSchema} = schemas;
 const File = mongoose.model('mfile', fileSchema);
 const FileGroup = mongoose.model('mfilegroup', fileGroupSchema);
 
+const MddsFileCrop= "mdds-file-crop";
+
 const sOptions = {
 };
 const configs = {
@@ -32,6 +34,17 @@ const dbSOption = {
 }
 */
 
+const create_random = function(){
+  let dt = new Date().getTime();
+  // const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+  const random = 'xxxxxxxx';
+  const result = random.replace(/[xy]/g, function(c) {
+      const r = (dt + Math.random()*16)%16 | 0;
+      dt = Math.floor(dt/16);
+      return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+  });
+  return result;
+}
 const getOptionByName = function(moduleName) {
   return sOptions[moduleName] || defaultSOption;
 };
@@ -116,11 +129,6 @@ class FileController {
           throw "File Server: please provide 'linkRoot' for storage type " + option.storage;
         }
         break;
-      case 'db':
-        if (!("linkRoot" in option)) {
-          throw "File Server: please provide 'linkRoot' for storage type " + option.storage;
-        }
-        break;
       default:
         console.error("File Server: storage type is not supported:", option.storage);
     }
@@ -156,6 +164,8 @@ class FileController {
       groupName = null;
     }
 
+    const skipDb = groupName === MddsFileCrop ? true : false;
+
     let fo = {
       name: fileName,
       group: groupName,
@@ -178,25 +188,27 @@ class FileController {
     if (owner && owner.enable) {
       fo = ownerPatch(fo, owner, req);
     }
-    if (sOption && sOption.storage == 'db') {
-      fo.data = file.data;
-      fo.thumbnail = thumbnail;
-    }
     if (fileID) {
       fo._id = fileID;
       filter._id = fileID;
     } 
     try {
       let savedDoc;
-      if (fileID) {
-        await File.update(filter, fo, {upsert: true, setDefaultsOnInsert: true});
+      if (skipDb) {
         savedDoc = fo;
-        savedDoc._id = filter._id;
+        savedDoc['_id'] = `${fo.group}-${fo.name}-${create_random()}`;
       } else {
-        savedDoc = await File.create(fo);
+        // save or update DB record
+        if (fileID) {
+          await File.update(filter, fo, {upsert: true, setDefaultsOnInsert: true});
+          savedDoc = fo;
+          savedDoc._id = filter._id;
+        } else {
+          savedDoc = await File.create(fo);
+        }
       }
 
-      let doc = {
+      const doc = {
         _id: savedDoc._id,
         name: savedDoc.name,
         type: savedDoc.type,
@@ -206,26 +218,26 @@ class FileController {
       if (sOption && sOption.storage == 'fs') {
         StoreToFileSystem(file, doc._id.toString(), sOption.directory, (err, result) => {
           if (err) {
-            File.findByIdAndDelete(doc._id).exec();
+            if (!skipDb) {
+              File.findByIdAndDelete(doc._id).exec();
+            }
             return next(err);
           }
           StoreThumbnailToFileSystem(thumbnail, doc._id.toString() + '_thumbnail', sOption.directory, (err, result) => {
             if (err) {
-              File.findByIdAndDelete(doc._id).exec();
+              if (!skipDb) {
+                File.findByIdAndDelete(doc._id).exec();
+              }
               return next(err);
             }
             savedDoc.link = sOption.linkRoot + '/download/' + doc._id.toString();
-            savedDoc.save();
+            if (!skipDb) {
+              savedDoc.save();
+            }
             doc.link = savedDoc.link;
             return res.send(doc);
           });
         });
-      }
-      else if (sOption && sOption.storage == 'db') {
-        savedDoc.link = sOption.linkRoot + '/download/' + doc._id.toString();
-        savedDoc.save();
-        doc.link = savedDoc.link;
-        return res.send(doc);
       }
     } catch (err) {
       return next(err);
@@ -238,52 +250,63 @@ class FileController {
     let fileName = req.params["fileID"];
     let id = fileName;
     let thumbnail = false;
-    if (fileName.includes('_thumbnail')) {
-      id = fileName.replace('_thumbnail', '');
+    if (fileName.endsWith('_thumbnail')) {
+      id = fileName.replace(/_thumbnail$/, '');
       thumbnail = true;
     }
-
+    let skipDb = false;
+    if (fileName.startsWith(MddsFileCrop)) {
+      skipDb = true;
+    }
     res.setHeader("Cache-Control", "public, max-age=2592000");
     res.setHeader("Expires", new Date(Date.now() + 2592000000).toUTCString());
 
-    let dbExec = File.findById(id, function (err, doc) {
-      if (err) {
-        return next(err);
-      }
-      if (thumbnail && !doc.hasThumbnail) {
-        return next(createError(404, "File not found."));
-      }
-      if (sOption && sOption.storage == 'fs') {
-        LoadFromFileSystem(fileName, sOption.directory, (err, data) => {
-          if (err) {
-            return next(err);
-          }
-
-          return res.send(data);
-        });
-      }
-      else if (sOption && sOption.storage == 'db') {
-        if (thumbnail) {
-          return res.send(doc.thumbnail);
+    function loadAll(filename, directory) {
+      LoadFromFileSystem(filename, directory, (err, data) => {
+        if (err) {
+          return next(err);
         }
-        return res.send(doc.data);
+
+        return res.send(data);
+      });
+    }
+
+    if (!skipDb) {
+      File.findById(id, function (err, doc) {
+        if (err) {
+          return next(err);
+        }
+        if (thumbnail && !doc.hasThumbnail) {
+          return next(createError(404, "File not found."));
+        }
+        if (sOption && sOption.storage == 'fs') {
+          loadAll(fileName, sOption.directory);
+        }
+      });
+    } else {
+      if (sOption && sOption.storage == 'fs') {
+        loadAll(fileName, sOption.directory);
       }
-    });
+    }
+
   }
   static Delete(req, res, next) {
     let moduleName = req.mddsModuleName;
     let sOption = getOptionByName(moduleName);
     let id = req.params["fileID"];
-    File.findByIdAndDelete(id).exec(function (err, result) {
-      if (err) {
-        return next(err);
-      }
+
+    let skipDb = false;
+    if (fileName.startsWith(MddsFileCrop)) {
+      skipDb = true;
+    }
+
+    function deleteAll(docId, directory, hasThumbnail) {
       if (sOption && sOption.storage === 'fs') {
-        DeleteFromFileSystem(doc._id.toString(), sOption.directory, true, (err) => {
+        DeleteFromFileSystem(docId.toString(), directory, true, (err) => {
           if (err) {
             return next(err);
           }
-          DeleteFromFileSystem(doc._id.toString() + '_thumbnail', sOption.directory, doc.hasThumbnail, (err) => {
+          DeleteFromFileSystem(docId.toString() + '_thumbnail', directory, hasThumbnail, (err) => {
             if (err) {
               return next(err);
             }
@@ -291,10 +314,18 @@ class FileController {
           });
         });
       }
-      else if (sOption && sOption.storage === 'db') {
-        return res.send();
-      }
-    });
+    }
+
+    if (!skipDb) {
+      File.findByIdAndDelete(id).exec(function (err, result) {
+        if (err) {
+          return next(err);
+        }
+        deleteAll(doc._id, sOption.directory, doc.hasThumbnail);
+      });
+    } else {
+      deleteAll(id, sOption.directory, true);
+    }
   }
 }
 

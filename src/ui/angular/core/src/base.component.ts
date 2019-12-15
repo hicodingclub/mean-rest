@@ -1839,6 +1839,9 @@ export class BaseComponent implements BaseComponentInterface {
     public selectedId = null;
 
     selectItemCandidate(num:number) {
+        if (typeof num !== 'number') {
+            return;
+        }
         let detail = this.list[num];
         this.selectedId = detail['_id'];
     }
@@ -1855,6 +1858,9 @@ export class BaseComponent implements BaseComponentInterface {
         this.done.emit(true);
     }
     selectItemSelected(num:number) {
+        if (typeof num !== 'number') {
+            return;
+        }
         let detail = this.list[num];
         this.selectedId = detail['_id'];
         this.clickedId = detail['_id'];

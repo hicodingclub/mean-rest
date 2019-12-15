@@ -22,6 +22,7 @@ const emailTemplateSchema = new Schema({
   content: { type: String, editor: true, required: true },
   tag: { type: String, required: true, unique: true },
 }, {timestamps: true});
+emailTemplateSchema.index({ tag: 1 }, {unique: true}); // schema level
 
 const brief = 'templateName fromEmail subject tag';
 const detail = 'templateName fromEmail subject content tag';
