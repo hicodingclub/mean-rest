@@ -1,0 +1,32 @@
+﻿<div class='auth-icon-container' (libClickElsewhere)="closePopup()">
+
+	<div class="auth-icon" [ngClass]="{'auth-icon-active': isAuthorized()}" (click)="toggle($event)">
+		<span class="icon-text"><i class="fas fa-user"></i></span>
+	</div>
+
+    <div class="user-name">{{userNameShort}} <i class="fas fa-caret-square-down pointer" (click)="toggle($event)"></i></div>
+
+	<div *ngIf="popup" class="auth-icon-pop" [ngStyle]="popupStyle">
+	  <div class="dropdown-menu pop-menu-container">
+	  	<label class="login-name">{{userName}}</label>
+	  
+	  	<div class="dropdown-divider"></div>
+	    <ng-container *ngIf="isAuthorized(); else notAuthorized">
+			<a class="dropdown-item btn pointer" *ngFor="let item of dropdownItems; let i = index;" (click)="dropdownItemClicked(i)">
+				{{item.displayName}}
+			</a>
+		    
+			<div class="dropdown-divider"></div>
+
+			<a class="dropdown-item btn pointer" (click)="changePassword()">Change Password</a>
+
+			<div class="dropdown-divider"></div>
+
+		    <a class="dropdown-item btn pointer" (click)="logout()">Logout</a>
+		</ng-container>
+	    <ng-template #notAuthorized>		    
+		    <a class="dropdown-item btn pointer" (click)="login()">Login</a>
+		</ng-template>
+	  </div>
+    </div>
+</div>

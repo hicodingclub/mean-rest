@@ -1,0 +1,292 @@
+
+
+
+<ul *ngIf="listCategory1.listCategoryField" class="nav nav-pills category-nav">
+	<li *ngFor="let ele of categoryDisplays; let idx = index;" class="nav-item" >
+		<a *ngIf=" listCategory1.showEmptyCategory || (!listCategory1.showEmptyCategory && categoriesCounts[idx] > 0)"
+			class="nav-link" [ngClass]="{'active': idx === selectedCategory }" [routerLink]="['.']" queryParamsHandling="preserve" (click)="categorySelected(idx)">
+				{{ele}} <span *ngIf="listCategory1.showCategoryCounts">({{categoriesCounts[idx]}})</span>
+		</a>
+	</li>
+</ul>
+
+
+<div>
+	<div class="container search">
+		<div class="row">
+			<div class="col-9">
+
+
+			    <div class="input-group">
+	              <input type="search" class="form-control border border-secondary" id="mfilegroupTextSearch" 
+						#mfilegroupTextSearch [(ngModel)]="searchText"
+						(keyup.enter)="$event.target.blur();searchList();false"
+					    placeholder="Search for name"> 
+				  <div *ngIf="searchText" class="input-group-append icon-clear-inside">
+					<span >
+					    <i class="fas fa-times-circle" (click)="onSearchTextClear()" title="Clear"></i>
+				    </span>
+				  </div>
+				  <div class="input-group-append">
+				    <button type="button" class="btn btn-outline-secondary" (click)="searchList()"><i class="fas fa-search"></i></button>
+				  </div>
+				</div>
+			
+
+			
+
+		    </div>
+		</div>
+		<div class="row">
+			<div class="col">
+		        <div class="action-buttons">
+					
+
+					<a [routerLink]="['../new' ]" [skipLocationChange]="false" class="btn btn-outline-primary">Create</a>
+					
+				</div>
+			</div>
+		</div>
+		<hr/>
+		<div class="row justify-content-end mt-3">
+		
+			<div *ngIf="list.length > 2" class="sort-selection mr-5">
+					<div class="dropdown" style="width: 100%;">
+						<button class="sort-dropdown btn btn-light btn-sm dropdown-toggle"
+							type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							Sort: <span *ngIf="listSortField && !viewHiddenFields.includes(listSortField)">{{listSortFieldDisplay}}
+									<i *ngIf="listSortOrder === 'asc'" class="fas fa-arrow-up"></i>
+									<i *ngIf="listSortOrder === 'desc'" class="fas fa-arrow-down"></i>
+							</span>
+						</button>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+							<a class="dropdown-item pointer" (click)="setListSortAndRefresh('name', 'Name', 'asc')">Name<i class="fas fa-arrow-up"></i></a>
+							<a class="dropdown-item pointer" (click)="setListSortAndRefresh('name', 'Name', 'desc')">Name<i class="fas fa-arrow-down"></i></a>
+						</div>
+					</div>
+			</div>
+			
+		</div>
+		<div class="d-flex justify-content-between">
+			<div>
+				<div *ngIf="list.length > 0">
+
+					<input type="radio" name="view-filter" id="list-view" class="view-radio"
+						(click)="setListViewFilter('list')" [checked]="isShowListView('list')">
+					<label for="list-view"><i class="fa fa-th-list"></i></label>
+
+					<input type="radio" name="view-filter" id="grid-view" class="view-radio"
+						(click)="setListViewFilter('grid')" [checked]="isShowListView('grid')">
+						<label for="grid-view"><i class="fa fa-th"></i></label>
+
+					<input type="radio" name="view-filter" id="table-view" class="view-radio"
+						(click)="setListViewFilter('table')" [checked]="isShowListView('table')">
+						<label for="table-view"><i class="fa fa-list-alt"></i></label>
+
+				</div>
+
+			</div>
+
+			<div>
+				<div class="total_counts">
+					<span *ngIf="list.length > 2">Total: <b>{{totalCount}}</b></span>
+					<a class="ml-3" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a>
+				</div>
+			</div>
+		</div>
+
+		<div class="d-flex justify-content-center mt-2">
+				<div *ngIf="totalPages > 1">
+					<ul class="pagination justify-content-center">
+						<li class="page-item"
+								[ngClass]="{'disabled': page<=1}">
+						<a class="page-link" routerLink="." (click)="onPreviousPage()"
+							aria-label="Previous">
+							<span aria-hidden="true">&laquo;</span>
+							<span class="sr-only">Previous</span>
+						</a>
+						</li>
+
+						<li *ngIf="leftMore" class="page-item"><a class="page-link">...</a></li>
+
+						<li *ngFor="let p of pages;  let i = index" class="page-item"
+								[ngClass]="{'active': p==page}">
+							<a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
+						</li>
+
+						<li *ngIf="rightMore" class="page-item"><a class="page-link">...</a></li>
+						<li class="page-item"
+								[ngClass]="{'disabled': page>=totalPages}">
+						<a class="page-link" routerLink="." (click)="onNextPage()"
+							aria-label="Next">
+							<span aria-hidden="true">&raquo;</span>
+							<span class="sr-only">Next</span>
+						</a>
+						</li>
+					</ul>
+				</div>
+		</div>
+
+	</div>
+	<div class="no-records" *ngIf="list.length === 0">
+		<span *ngIf="loaded">No records found.</span>
+		<span *ngIf="!loaded">Loading...</span>
+	</div>
+	<div *ngIf="list.length > 0">
+	<div class="listview" *ngIf="isShowListView('list')">
+		<div class="list-block" *ngFor="let detail of list;  let i = index; let list_index = index;">
+			<hr *ngIf="i==0" class="list-diverder">
+			<div class="list-card text-left clickable-card "
+				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >
+				<div class="list-fields pointer" (click)="onDetailLinkClicked(detail['_id'])" >
+
+      <div class="list-body-fields ml-1 d-inline-block">
+        <h5>
+          <div class="mr-1 d-inline-block">
+                            
+                    {{detail['name']}}
+
+          </div>
+        </h5>
+      </div>
+
+				</div>
+				<div class="card-action-icons d-inline-block">
+					
+						<a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a>
+					
+					
+					
+				</div>
+			</div>
+			<hr class="list-diverder">
+		</div>
+	</div>
+
+
+
+	<div class="gridview" *ngIf="isShowListView('grid')">
+		<div class="grid-block" *ngFor="let detail of list;  let i = index; let list_index = index;">
+			<div class="card text-left h-100 clickable-card "
+				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >
+				<div class="grid-fields pointer" (click)="onDetailLinkClicked(detail['_id'])" >
+
+      <div class="card-header grid-head">
+        <div class="ml-1 d-inline-block">
+          <h5>
+            <div class="mr-1 d-inline-block">
+                              
+                    {{detail['name']}}
+
+            </div>
+          </h5>
+        </div>
+      </div>
+      <div class="card-body">
+      </div>
+
+				</div>
+				<div class="card-action-icons">
+					
+						<a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a>
+					
+					
+					
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<table *ngIf="isShowListView('table')" class="table table-bordered table-hover">
+	    <thead class="thead-light">
+	    	<tr>
+		        <th scope="col">#</th>
+
+				<th class="pointer" scope="col" (click)="toggleListSort('name', 'Name')">
+					Name
+					<span *ngIf="listSortField === 'name'">
+						<i *ngIf="listSortOrder === 'asc'" class="fas fa-arrow-up th-sort-arrow"></i>
+						<i *ngIf="listSortOrder === 'desc'" class="fas fa-arrow-down th-sort-arrow"></i>
+					</span>
+				</th><th scope="col" style="width:3.8rem;"></th>
+	    	</tr>
+	    </thead>
+	    <tbody>
+	        <tr *ngFor="let detail of list;  let i = index; let list_index = index;" [ngClass]="{'clicked-row': clickedId==detail['_id']}">
+	            <td scope="row" (click)="onDetailLinkClicked(detail['_id'])"  class="pointer read-more">
+	            	{{(page-1)*perPage+i+1}}
+	            </td>
+
+	            <td (click)="onDetailLinkClicked(detail['_id'])"  class="pointer">
+	            	                
+                    {{detail['name']}}
+
+	            </td>
+	            <td>
+					
+						<a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a>
+					
+	            	
+					
+					
+	            </td>
+	        </tr>
+	    </tbody>
+	</table>
+
+
+	</div>
+	<div class="container">
+		<div class="row justify-content-end mt-3">
+		
+			
+		</div>
+		<div class="d-flex justify-content-between">
+			<div>
+			</div>
+
+			<div>
+				<div class="total_counts">
+					<span *ngIf="list.length > 2">Total: <b>{{totalCount}}</b></span>
+				</div>
+			</div>
+		</div>
+
+		<div class="d-flex justify-content-center mt-2">
+				<div *ngIf="totalPages > 1">
+					<ul class="pagination justify-content-center">
+						<li class="page-item"
+								[ngClass]="{'disabled': page<=1}">
+						<a class="page-link" routerLink="." (click)="onPreviousPage()"
+							aria-label="Previous">
+							<span aria-hidden="true">&laquo;</span>
+							<span class="sr-only">Previous</span>
+						</a>
+						</li>
+
+						<li *ngIf="leftMore" class="page-item"><a class="page-link">...</a></li>
+
+						<li *ngFor="let p of pages;  let i = index" class="page-item"
+								[ngClass]="{'active': p==page}">
+							<a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
+						</li>
+
+						<li *ngIf="rightMore" class="page-item"><a class="page-link">...</a></li>
+						<li class="page-item"
+								[ngClass]="{'disabled': page>=totalPages}">
+						<a class="page-link" routerLink="." (click)="onNextPage()"
+							aria-label="Next">
+							<span aria-hidden="true">&raquo;</span>
+							<span class="sr-only">Next</span>
+						</a>
+						</li>
+					</ul>
+				</div>
+		</div>
+
+	</div>
+	
+</div>
+
+

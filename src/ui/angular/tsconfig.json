@@ -1,0 +1,70 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "es2015",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2018",
+      "dom"
+    ],
+    "paths": {
+      "core": [
+        "dist/core"
+      ],
+      "core/*": [
+        "dist/core/*"
+      ],
+      "auth": [
+        "dist/auth"
+      ],
+      "auth/*": [
+        "dist/auth/*"
+      ],
+      "action-base": [
+        "dist/action-base"
+      ],
+      "action-base/*": [
+        "dist/action-base/*"
+      ],
+      "action-email": [
+        "dist/action-email"
+      ],
+      "action-email/*": [
+        "dist/action-email/*"
+      ],
+      "composite": [
+        "dist/composite"
+      ],
+      "composite/*": [
+        "dist/composite/*"
+      ],
+      "file": [
+        "dist/file"
+      ],
+      "file/*": [
+        "dist/file/*"
+      ],
+      "richtext": [
+        "dist/richtext"
+      ],
+      "richtext/*": [
+        "dist/richtext/*"
+      ]
+    }
+  },
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true
+  }
+}

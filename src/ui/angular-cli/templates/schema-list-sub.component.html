@@ -1,0 +1,85 @@
+<div>
+	<div class="add-area d-flex">
+		<%_ if (api.includes("C")) {%>
+		<% if (embeddedViewOnly) {%><div class=" mr-5">
+			<a class="pointer" routerLink="." (click)="onAdd()"><i class="fas fa-plus-square" title="Add"></i> Add</a>
+		</div><%}%><%}%>
+		<div class="d-flex ml-auto">
+			<%_ for (let assoRecord of associationFor) { %>
+			<div *ngIf="parentSchema === '<%-assoRecord[4]%>'" class="mr-3">
+				<a class="pointer asso-link" [routerLink]="['../../../../asso/' + parentItemId + '/<%-schemaName%>/<%-assoRecord[2]%>']"><%-assoRecord[3]%></a>
+			</div>
+			<%}%>
+		</div>
+	</div>
+	<%_ if (api.includes("C")) {%>
+		<% if (embeddedViewOnly) {%>
+	<div *ngIf="isAdding">
+		<app-<%-schemaName%>-edit [initData]="parentData" [embeddedView]="true" (done)="onActionDone($event)"></app-<%-schemaName%>-edit>
+	</div><%}%><%}%>
+	
+	<div *ngIf="list.length === 0" class="no-records">
+		<span *ngIf="loaded">No records found.</span>
+		<span *ngIf="!loaded">Loading...</span>
+	</div>
+	<div class="container search">
+		<% include schema-list.pagination.html %>
+	</div>
+	<table *ngIf="list.length > 0" class="table">
+	    <thead>
+	    	<tr>
+		        <th scope="col">#</th>
+<%_ for (let field of briefView){
+			if (field.hidden) continue;
+			%>
+		        <th <%_if (field.ref) {%> *ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem" <%}%> scope="col">
+		        	<%-field.displayName%>
+		        </th><%_ } %>		        
+                <th scope="col" style="width:2rem;"></th>
+                <%_ if ( (!embeddedViewOnly && api.includes("R")) || (embeddedViewOnly && api.includes("D"))) {
+					let width = '2rem';
+					if (!embeddedViewOnly && api.includes("R")) { width = '5rem';}
+					%>
+		        <th scope="col" style="width:<%-width%>;"></th><%}%>
+	        </tr>
+	    </thead>
+	    <tbody>
+	      <ng-template ngFor let-detail [ngForOf]="list" let-i="index">
+	        <tr [ngClass]="{'clicked-row': clickedId==detail['_id']}"> <!-- *ngFor="let detail of list;  let i = index" -->
+	            <td scope="row">{{(page-1)*perPage+i+1}}</td>
+<%_ let view = 'list'; for (let field of briefView){
+			if (field.hidden) continue;
+			let fn = field.fieldName, ft = field.type;; %>
+	            <td <%_if (field.ref) {%> *ngIf="referenceFieldsMap['<%-fn%>'] != parentItem" <%}%> >
+	            	<% include schema-display.field.html %>
+                </td><%_ } %>
+	            <td>
+                    <%_ if (detailSubView.length != 0) {%>
+                    	<%if(api.includes("R")){%>
+			        <span class="pointer" (click)="toggleCheckedItem(i)">
+			            <i *ngIf="!checkedItem[i]" class="fas fa-caret-down" title="More"></i>
+			            <i *ngIf="checkedItem[i]" class="fas fa-caret-up" title="Less"></i>
+			        </span><%}%><%}%>
+                </td>
+                <%_ if ( (!embeddedViewOnly && api.includes("R")) || (embeddedViewOnly && api.includes("D"))) {%>
+	            <td>
+                <%_ if (!embeddedViewOnly && api.includes("R")) {%>
+					<span class="read-more-in-table" (click)="onDetailLinkClicked(detail['_id'])">Detail <i class="fas fa-arrow-right" ></i></span>
+                <%_ } else if (embeddedViewOnly && api.includes("D")){%>
+	            	<a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a>
+                <%_ }%>
+                </td><%}%>
+	        </tr>
+	        <%_ let colspan = briefView.length %><%if(api.includes("R")){%>
+	        <tr *ngIf="checkedItem[i]" >
+	        	<td colspan="<%-colspan%>"><app-<%-schemaName%>-detail-sub [inputData]="detail['_id']"></app-<%-schemaName%>-detail-sub></td>
+	        </tr><%}%>
+	      </ng-template>
+	    </tbody>
+	</table>
+	
+	<div class="container">
+		<% include schema-list.pagination.html %>
+	</div>
+	
+</div>

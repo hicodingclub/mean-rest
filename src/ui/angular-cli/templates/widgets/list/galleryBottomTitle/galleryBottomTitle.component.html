@@ -1,0 +1,24 @@
+
+	<div class="galleryView">
+		<div class="grid-block"  [ngClass]="{'grid-block-large': options['largePicture']}" *ngFor="let detail of list;  let i = index; let list_index = index;">
+
+			<div class="text-left h-100"
+				[ngClass]="{'clickable-card pointer': options['canSelect'], 'clicked-row': selectedId === detail['_id']}" >
+				<div class="grid-fields" (click)="selectItemCandidate(i)" >
+
+					<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}">                
+								<lib-mdds-file-display [downloadUrl]="detail[pictureLink]" [isLarge]="options['largePicture']"></lib-mdds-file-display>
+					</div>
+					<div *ngIf="options['showTitle']" class="text-center">
+						<div class="grid-picture-title" [ngClass]="{'grid-picture-title-large': options['largePicture']}">		
+							{{detail[title]}}
+						</div>
+						<div *ngIf = "subTitle" class="grid-picture-subtitle" [ngClass]="{'grid-picture-subtitle-large': options['largePicture']}">		
+							{{detail[subTitle]}}
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>

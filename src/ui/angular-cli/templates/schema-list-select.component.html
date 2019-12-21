@@ -1,0 +1,66 @@
+<div class="select-model show" (keyup.esc)="uiOnEscapeKey()" tabindex="0" #<%-ModuleName%>Modal>
+  <div class="select-model-content">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Select {{ItemCamelName}}</h5>
+        <button type="button" class="close" aria-label="Close" (click)="uiCloseModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+<!--  model body starts -->
+
+	<div class="container search">
+		<div class="row">
+			<div class="col-9">
+				<%_ let noMoreSearchArea = true; %> <%_ include schema-search.bar.html %>
+			</div>
+			<div class="col-3">
+			</div>
+		</div>
+		<hr/>
+		<% include schema-list.pagination.html %>
+	</div>
+	
+	<table class="table table-bordered table-hover">
+	    <thead class="thead-light">
+	    	<tr>
+		        <th scope="col">#</th>
+<%_ for (let field of briefView.slice(0,FIELD_NUMBER_FOR_SELECT_VIEW)){ %>
+		        <th scope="col"><%-field.displayName%></th><%_ } %>
+	            <%_ if (api.includes("R")) { %>
+		        <th></th><%}%>      
+	        </tr>
+	    </thead>
+	    <tbody>
+	        <tr *ngFor="let detail of list;  let i = index" 
+	        	[ngClass]="{'clicked-row': detail['_id']==clickedId}" >
+	            <td scope="row" (click)="selectItemSelected(i)"  class="pointer">{{(page-1)*perPage+i+1}}</td>
+<%_ let view='list'; for (let field of briefView.slice(0,FIELD_NUMBER_FOR_SELECT_VIEW)){ 
+				let fn = field.fieldName, ft = field.type; let ref_link = false; %>
+	            <td (click)="selectItemSelected(i)"  class="pointer"><% include schema-display.field.html %>
+	            </td><%_ } %>
+	            <%_ if (api.includes("R")) { %>
+	            <td><a routerLink="." class="btn" 
+	                 [ngClass]="{'btn-primary': detail['_id']==selectedId, 'btn-outline-primary': detail['_id']!==selectedId}"
+	            	 (click)="selectViewDetail(i)">View Details</a>
+	            </td><%}%>
+	        </tr>
+	    </tbody>
+	</table>
+	
+	<div class="container">
+		<% include schema-list.pagination.html %>
+	</div>
+	
+
+<!--  model body ends -->
+
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div> 
+
