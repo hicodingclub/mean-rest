@@ -187,13 +187,13 @@
           <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
           <input type="number" class="form-control" id="Edit<%-Fn%>" 
-                  <%if (typeof field.numberMin === 'number') {%>minnumber="<%-field.numberMin%>" min="<%-field.numberMin%>"<%}%>
-                  <%if (typeof field.numberMax === 'number') {%>maxnumber="<%-field.numberMax%>" max="<%-field.numberMax%>"<%}%>
+                  <%if (typeof field.numberMin === 'number') {%>libMddsMinNumber="<%-field.numberMin%>" min="<%-field.numberMin%>"<%}%>
+                  <%if (typeof field.numberMax === 'number') {%>libMddsMaxNumber="<%-field.numberMax%>" max="<%-field.numberMax%>"<%}%>
                   <%if (field.required) {%>required<%}%>
               <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
                   [(ngModel)]="detail['<%-fn%>']" name="Edit<%-Fn%>"
                   #Edit<%-Fn%>="ngModel">
-          <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.pristine || Edit<%-Fn%>.errors.minnumber"
+          <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.pristine || Edit<%-Fn%>.errors.libMddsMinNumber"
            class="alert alert-danger">
             <%_if (field.required) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.required">
@@ -204,15 +204,15 @@
                 {{Edit<%-Fn%>.errors.<%-sn%>Directive<%-Fn%>}}
             </div><%}%> 
             <%_if (typeof field.numberMax === 'number') {%>
-            <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.maxnumber">
-              <%-Fn%> must be no greater than <%-field.numberMax%>
+            <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.libMddsMaxNumber">
+              <%-Fn%> must not be greater than <%-field.numberMax%>
             </div><%}%>
           </div>
           <%_if (typeof field.numberMin === 'number') {%>
-          <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.untouched || !Edit<%-Fn%>.errors.minnumber"
+          <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.untouched || !Edit<%-Fn%>.errors.libMddsMinNumber"
            class="alert alert-danger">
-            <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.minnumber">
-              <%-Fn%> must be no less than <%-field.numberMin%>
+            <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.libMddsMinNumber">
+              <%-Fn%> must not be less than <%-field.numberMin%>
             </div>
           </div><%}%>
         </fieldset>

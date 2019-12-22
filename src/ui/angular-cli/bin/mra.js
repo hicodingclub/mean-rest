@@ -229,7 +229,7 @@ var getPrimitiveField = function(fieldSchema) {
             ;
     }
 
-    return [type, jstype, numberMin, numberMax, maxlength, minlength,  enumValues, 
+    return [type, jstype, numberMin, numberMax, maxlength, minlength,  enumValues,
             ref, Ref, RefCamel, editor, textarea, mraEmailRecipient,
             flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable];
 }
@@ -370,7 +370,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           case "SchemaNumber":
           case "ObjectId":
           case "SchemaDate":
-              [type,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
+              [type,  jstype,  numberMin,  numberMax,  maxlength, minlength,  enumValues,
               ref, Ref, RefCamel, editor, textarea, mraEmailRecipient,
               flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema);
@@ -384,7 +384,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
               if (flagEditor || flagPicture || flagFile) sortable = false;
               break;
           case "SchemaArray":
-              [elementType,  jstype,  numberMin,  numberMax,  numberMax,  minlength,  enumValues, 
+              [elementType,  jstype,  numberMin,  numberMax,  maxlength,  minlength,  enumValues,
               ref, Ref, RefCamel, editor, textarea, mraEmailRecipient,
               flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema.caster);
@@ -415,7 +415,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
               break;
           case 'SchemaMap':
           case "Map":
-              [elementType,  jstype,  numberMin,  numberMax,  maxlength,  minlength,  enumValues, 
+              [elementType,  jstype,  numberMin,  numberMax,  maxlength,  minlength,  enumValues,
               ref, Ref, RefCamel, editor,  textarea,  mraEmailRecipient,
               flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema['$__schemaType']);
