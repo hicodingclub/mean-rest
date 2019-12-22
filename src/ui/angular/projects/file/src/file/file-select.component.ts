@@ -5,7 +5,7 @@ import { MddsBaseComponentInterface } from '@hicoder/angular-core';
 
 import { MfileListWidgetGalleryComponent } from './mfile/mfile-list/mfile-list-widget-gallery.component'
 @Directive({
-  selector: '[libFileSelect]',
+  selector: '[libMddsFileSelect]',
 })
 export class MddsFileSelectDirective {
   constructor(public viewContainerRef: ViewContainerRef) { }
