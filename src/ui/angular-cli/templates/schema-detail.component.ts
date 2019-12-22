@@ -10,7 +10,7 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 import { ComponentFactoryResolver } from '@angular/core';<%}%>
 <%if (schemaHasEditor) {%>
 import { QueryList, ViewChildren } from '@angular/core';
-import { MraRichTextShowDirective } from '@hicoder/angular-core';<%}%>
+import { MddsRichTextShowDirective } from '@hicoder/angular-core';<%}%>
 
 @Component({
   selector: 'app-<%-schemaName%>-detail',
@@ -30,7 +30,7 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
   public options: any; // {} uiOptions
 
 <%if (schemaHasEditor) {%>
-  @ViewChildren(MraRichTextShowDirective) textEditors: QueryList<MraRichTextShowDirective>;<%}%>
+  @ViewChildren(MddsRichTextShowDirective) textEditors: QueryList<MddsRichTextShowDirective>;<%}%>
 
   constructor(
       <%if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>

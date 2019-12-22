@@ -10,7 +10,7 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 import { ComponentFactoryResolver } from '@angular/core';<%}%>
 <%if (schemaHasEditor) {%>
 import { QueryList, ViewChildren } from '@angular/core';
-import { MraRichTextShowDirective } from '@hicoder/angular-core';<%}%>
+import { MddsRichTextShowDirective } from '@hicoder/angular-core';<%}%>
   
 @Component({
   selector: 'app-<%-schemaName%>-list',
@@ -28,7 +28,7 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
   @Input()
   public categoryBy:string; //field name whose value is used as category
   <%if (schemaHasEditor) {%>
-  @ViewChildren(MraRichTextShowDirective) textEditors: QueryList<MraRichTextShowDirective>;<%}%>
+  @ViewChildren(MddsRichTextShowDirective) textEditors: QueryList<MddsRichTextShowDirective>;<%}%>
 
   constructor(
       <% if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
