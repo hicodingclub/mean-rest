@@ -204,6 +204,7 @@ const getOperation = function(req) {
 
     else if (originalUrl.includes('/mddsaction/post')) operation = 'U';
     else if (originalUrl.includes('/mddsaction/delete')) operation = 'D';
+    else if (originalUrl.includes('/mddsaction/archive')) operation = 'A';
     else if (originalUrl.includes('/mddsaction/put')) operation = 'C';
   }
   if (operation) return operation;

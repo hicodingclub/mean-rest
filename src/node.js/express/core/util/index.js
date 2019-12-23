@@ -24,11 +24,6 @@ const moveRouterStackTailForward = function(router, num) {
   return router;
 }
 
-module.exports = {
-  moveRouterStackTailToHead: moveRouterStackTailToHead,
-  moveRouterStackTailForward: moveRouterStackTailForward
-  
-}
 
 const randomString = function(length) {
   let text = "";
@@ -38,4 +33,11 @@ const randomString = function(length) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
 
   return text;
+}
+
+const archiveDocument = require('./mongo-archive');
+module.exports = {
+  moveRouterStackTailToHead,
+  moveRouterStackTailForward,
+  archiveDocument,
 }

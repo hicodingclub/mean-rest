@@ -217,7 +217,11 @@ const objectReducerForView  = function(obj, viewStr) {
   if (!fields) return obj;
 
   let newObj = {};
-  newObj["_id"] = obj["_id"];
+  newObj['_id'] = obj['_id'];
+  if ('archived' in obj) {
+    newObj['archived'] = obj['archived']; // keep archived
+  }
+
   for (let path of fields) {
     if (path in obj) newObj[path] = obj[path];
   }
@@ -1018,10 +1022,19 @@ class RestController {
       }
     }
     let action = req.path;
+    let ids;
     switch (action) {
       case "/mddsaction/delete":
-        let ids = body;
+        ids = body
         this.deleteManyByIds(req, res, next, ids);
+        break;
+      case "/mddsaction/archive":
+        ids = body;
+        this.archiveManyByIds(req, res, next, ids);
+        break;
+      case "/mddsaction/unarchive":
+        ids = body;
+        this.unarchiveManyByIds(req, res, next, ids);
         break;
       case "/mddsaction/get":
         let searchContext = body? body.search : {};
@@ -1044,6 +1057,24 @@ class RestController {
         }
         return res.send();
       });
+  }
+  archiveManyByIds(req, res, next, ids) {
+    const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
+    model.archive({ "_id": { $in: ids }}, function(err, result) {
+      if (err) {
+        return next(err);
+      }
+      return res.send();
+    });
+  }
+  unarchiveManyByIds(req, res, next, ids) {
+    const { name, schema, model, views, populates, owner } = this.loadContextVars(req);
+    model.unarchive({ "_id": { $in: ids }}, function(err, result) {
+      if (err) {
+        return next(err);
+      }
+      return res.send();
+    });
   }
   Create(req, res, next) {
     const { name, schema, model, views, populates, owner } = this.loadContextVars(req);

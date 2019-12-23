@@ -12,7 +12,7 @@
 			<%}%>
 		</div>
 	</div>
-	<%_ if (api.includes("C")) {%>
+	<%_ if (api.includes('C')) {%>
 		<% if (embeddedViewOnly) {%>
 	<div *ngIf="isAdding">
 		<app-<%-schemaName%>-edit [initData]="parentData" [embeddedView]="true" (done)="onActionDone($event)"></app-<%-schemaName%>-edit>
@@ -34,13 +34,18 @@
 			%>
 		        <th <%_if (field.ref) {%> *ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem" <%}%> scope="col">
 		        	<%-field.displayName%>
-		        </th><%_ } %>		        
+		        </th><%_ } %>      
                 <th scope="col" style="width:2rem;"></th>
-                <%_ if ( (!embeddedViewOnly && api.includes("R")) || (embeddedViewOnly && api.includes("D"))) {
-					let width = '2rem';
-					if (!embeddedViewOnly && api.includes("R")) { width = '5rem';}
+				<%_ let putDelete = embeddedViewOnly && api.includes('D');
+					let putRead = !embeddedViewOnly && api.includes('R');
+					let putArchive = embeddedViewOnly && api.includes('A');
+					let lastColumnWidth = 0;
+					if (putDelete) { lastColumnWidth += 2;}
+					if (putArchive) { lastColumnWidth += 2;}
+					if (putRead) { lastColumnWidth = 5;}
+					if (lastColumnWidth) {
 					%>
-		        <th scope="col" style="width:<%-width%>;"></th><%}%>
+		        <th scope="col" style="width: <%-lastColumnWidth%>rem;"></th><%}%>
 	        </tr>
 	    </thead>
 	    <tbody>
@@ -55,19 +60,19 @@
                 </td><%_ } %>
 	            <td>
                     <%_ if (detailSubView.length != 0) {%>
-                    	<%if(api.includes("R")){%>
+                    	<%if(api.includes('R')){%>
 			        <span class="pointer" (click)="toggleCheckedItem(i)">
 			            <i *ngIf="!checkedItem[i]" class="fas fa-caret-down" title="More"></i>
 			            <i *ngIf="checkedItem[i]" class="fas fa-caret-up" title="Less"></i>
 			        </span><%}%><%}%>
                 </td>
-                <%_ if ( (!embeddedViewOnly && api.includes("R")) || (embeddedViewOnly && api.includes("D"))) {%>
-	            <td>
-                <%_ if (!embeddedViewOnly && api.includes("R")) {%>
-					<span class="read-more-in-table" (click)="onDetailLinkClicked(detail['_id'])">Detail <i class="fas fa-arrow-right" ></i></span>
-                <%_ } else if (embeddedViewOnly && api.includes("D")){%>
-	            	<a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a>
-                <%_ }%>
+                <%_ if (lastColumnWidth) {%>
+	            <td><%_ if (putRead) {%>
+					<span class="read-more-in-table" (click)="onDetailLinkClicked(detail['_id'])">Detail <i class="fas fa-arrow-right" ></i></span><%_ }
+				if (putDelete) {%>
+	            	<a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%_ }
+				if (putArchive) {%>
+					<a routerLink="." (click)="onArchive(detail['_id'], i)"><i class="fa fa-archive" title="Archive"></i></a><%_ }%>
                 </td><%}%>
 	        </tr>
 	        <%_ let colspan = briefView.length %><%if(api.includes("R")){%>

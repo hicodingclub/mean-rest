@@ -38,8 +38,8 @@ var basedirFile = function(relativePath) {
 	return path.join(__dirname, relativePath);
 }
 var generatedFile = function(outputDir, prefix, outputFile) {
-	if (!prefix) prefix = ""; 
-	if(prefix !== "" && !outputFile.startsWith('.')) prefix += '-';
+	if (!prefix) prefix = ''; 
+	if(prefix !== '' && !outputFile.startsWith('.')) prefix += '-';
 	return path.join(outputDir, prefix + outputFile);
 }
 var capitalizeFirst = function(str) {
@@ -70,55 +70,55 @@ var camelToDisplay = function (str) {
 var templates = {
 	//key:[template_file, output_file_suffix, description, write_options]
   //write_options: W: write, A: append
-  conf: ["../templates/conf.ts", ".conf.ts", "module conf file", 'A'],
+  conf: ['../templates/conf.ts', '.conf.ts', 'module conf file', 'A'],
         
-  mainModule: ["../templates/main.module.ts", ".module.ts", "main module file", 'W'],
-  mainComponent: ["../templates/main.component.ts", ".component.ts", "main component file", 'W'],
-  mainComponentHtml: ["../templates/main.component.html", ".component.html", "main component html file", 'W'],
-  mainComponentCss: ["../templates/main.component.css", ".component.css", "main component css file", 'W'],
-  mainDirective: ["../templates/main.directive.ts", ".directive.ts", "main directive file", 'W'],
-  tokens: ["../templates/tokens.ts", ".tokens.ts", "module token file", 'W'],
+  mainModule: ['../templates/main.module.ts', '.module.ts', 'main module file', 'W'],
+  mainComponent: ['../templates/main.component.ts', '.component.ts', 'main component file', 'W'],
+  mainComponentHtml: ['../templates/main.component.html', '.component.html', 'main component html file', 'W'],
+  mainComponentCss: ['../templates/main.component.css', '.component.css', 'main component css file', 'W'],
+  mainDirective: ['../templates/main.directive.ts', '.directive.ts', 'main directive file', 'W'],
+  tokens: ['../templates/tokens.ts', '.tokens.ts', 'module token file', 'W'],
 	
-  routingModule: ["../templates/routing.module.ts", "routing.module.ts", "routing module file", 'W'],
-  routingPath: ["../templates/routing.path.ts", "routing.path.ts", "routing path file", 'W'],
+  routingModule: ['../templates/routing.module.ts', 'routing.module.ts', 'routing module file', 'W'],
+  routingPath: ['../templates/routing.path.ts', 'routing.path.ts', 'routing path file', 'W'],
 	
 	
-  schemaBaseService: ["../templates/schema.base.service.ts", ".base.service.ts", "base service file", 'W'],
-  schemaService: ["../templates/schema.service.ts", ".service.ts", "service file", 'W'],
-  schemaComponent: ["../templates/schema.component.ts", ".component.ts", "component file", 'W'],
-  schemaListComponent: ["../templates/schema-list.component.ts", "list.component.ts", "list component file", 'W'],
-  schemaListComponentHtml: ["../templates/schema-list.component.html", "list.component.html", "list component html file", 'W'],
-  schemaListComponentCss: ["../templates/schema-list.component.css", "list.component.css", "list component css file", 'W'],
-  schemaSelectComponent: ["../templates/schema-list-select.component.ts", "list-select.component.ts", "list select component file", 'W'],
-  schemaSelectComponentHtml: ["../templates/schema-list-select.component.html", "list-select.component.html", "list select component html file", 'W'],
-  schemaListSubComponent: ["../templates/schema-list-sub.component.ts", "list-sub.component.ts", "list-sub component file", 'W'],
-  schemaListSubComponentHtml: ["../templates/schema-list-sub.component.html", "list-sub.component.html", "list-sub component html file", 'W'],
-  schemaListAssoComponent: ["../templates/schema-list-asso.component.ts", "list-asso.component.ts", "list-asso component file", 'W'],
-  schemaListAssoComponentHtml: ["../templates/schema-list-asso.component.html", "list-asso.component.html", "list-asso component html file", 'W'],
+  schemaBaseService: ['../templates/schema.base.service.ts', '.base.service.ts', 'base service file', 'W'],
+  schemaService: ['../templates/schema.service.ts', '.service.ts', 'service file', 'W'],
+  schemaComponent: ['../templates/schema.component.ts', '.component.ts', 'component file', 'W'],
+  schemaListComponent: ['../templates/schema-list.component.ts', 'list.component.ts', 'list component file', 'W'],
+  schemaListComponentHtml: ['../templates/schema-list.component.html', 'list.component.html', 'list component html file', 'W'],
+  schemaListComponentCss: ['../templates/schema-list.component.css', 'list.component.css', 'list component css file', 'W'],
+  schemaSelectComponent: ['../templates/schema-list-select.component.ts', 'list-select.component.ts', 'list select component file', 'W'],
+  schemaSelectComponentHtml: ['../templates/schema-list-select.component.html', 'list-select.component.html', 'list select component html file', 'W'],
+  schemaListSubComponent: ['../templates/schema-list-sub.component.ts', 'list-sub.component.ts', 'list-sub component file', 'W'],
+  schemaListSubComponentHtml: ['../templates/schema-list-sub.component.html', 'list-sub.component.html', 'list-sub component html file', 'W'],
+  schemaListAssoComponent: ['../templates/schema-list-asso.component.ts', 'list-asso.component.ts', 'list-asso component file', 'W'],
+  schemaListAssoComponentHtml: ['../templates/schema-list-asso.component.html', 'list-asso.component.html', 'list-asso component html file', 'W'],
 
   schemaDetail: [
-    ["../templates/schema-detail.component.ts", "detail.component.ts", "detail component file", 'W'],
-    ["../templates/schema-detail.component.html", "detail.component.html", "detail component html file", 'W'],
-    ["../templates/schema-detail.component.css", "detail.component.css", "detail component css file", 'W'],
+    ['../templates/schema-detail.component.ts', 'detail.component.ts', 'detail component file', 'W'],
+    ['../templates/schema-detail.component.html', 'detail.component.html', 'detail component html file', 'W'],
+    ['../templates/schema-detail.component.css', 'detail.component.css', 'detail component css file', 'W'],
   ],
 
-  schemaDetailShowFieldCompoment: ["../templates/schema-detail-show-field.component.ts", "detail-field.component.ts", "detail show field component file", 'W'],
-  schemaDetailShowFieldCompomentHtml: ["../templates/schema-detail-show-field.component.html", "detail-field.component.html", "detail show field component html file", 'W'],
+  schemaDetailShowFieldCompoment: ['../templates/schema-detail-show-field.component.ts', 'detail-field.component.ts', 'detail show field component file', 'W'],
+  schemaDetailShowFieldCompomentHtml: ['../templates/schema-detail-show-field.component.html', 'detail-field.component.html', 'detail show field component html file', 'W'],
 
-  schemaDetailAssoComponent: ["../templates/schema-detail-asso.component.ts", "detail-asso.component.ts", "detail association component file", 'W'],
-  schemaDetailAssoComponentHtml: ["../templates/schema-detail-asso.component.html", "detail-asso.component.html", "detail association component html file", 'W'],
+  schemaDetailAssoComponent: ['../templates/schema-detail-asso.component.ts', 'detail-asso.component.ts', 'detail association component file', 'W'],
+  schemaDetailAssoComponentHtml: ['../templates/schema-detail-asso.component.html', 'detail-asso.component.html', 'detail association component html file', 'W'],
 
-  schemaDetailSelComponent: ["../templates/schema-detail-sel.component.ts", "detail-sel.component.ts", "detail select component file", 'W'],
-  schemaDetailSelComponentHtml: ["../templates/schema-detail-sel.component.html", "detail-sel.component.html", "detail select component html file", 'W'],
-  schemaDetailPopComponent: ["../templates/schema-detail-pop.component.ts", "detail-pop.component.ts", "detail pop component file", 'W'],
-  schemaDetailPopComponentHtml: ["../templates/schema-detail-pop.component.html", "detail-pop.component.html", "detail pop component html file", 'W'],
-  schemaDetailSubComponent: ["../templates/schema-detail-sub.component.ts", "detail-sub.component.ts", "detail sub component file", 'W'],
-  schemaDetailSubComponentHtml: ["../templates/schema-detail-sub.component.html", "detail-sub.component.html", "detail sub component html file", 'W'],
+  schemaDetailSelComponent: ['../templates/schema-detail-sel.component.ts', 'detail-sel.component.ts', 'detail select component file', 'W'],
+  schemaDetailSelComponentHtml: ['../templates/schema-detail-sel.component.html', 'detail-sel.component.html', 'detail select component html file', 'W'],
+  schemaDetailPopComponent: ['../templates/schema-detail-pop.component.ts', 'detail-pop.component.ts', 'detail pop component file', 'W'],
+  schemaDetailPopComponentHtml: ['../templates/schema-detail-pop.component.html', 'detail-pop.component.html', 'detail pop component html file', 'W'],
+  schemaDetailSubComponent: ['../templates/schema-detail-sub.component.ts', 'detail-sub.component.ts', 'detail sub component file', 'W'],
+  schemaDetailSubComponentHtml: ['../templates/schema-detail-sub.component.html', 'detail-sub.component.html', 'detail sub component html file', 'W'],
 	
-  schemaEditComponent: ["../templates/schema-edit.component.ts", "edit.component.ts", "edit component file", 'W'],
-  schemaEditComponentHtml: ["../templates/schema-edit.component.html", "edit.component.html", "edit component html file", 'W'],
-  schemaEditComponentCss: ["../templates/schema-edit.component.css", "edit.component.css", "edit component css file", 'W'],
-  mraCss: ["../templates/mean-express-angular.css", "mean-express-angular.css", "mean-rest-angular css file", 'W'],
+  schemaEditComponent: ['../templates/schema-edit.component.ts', 'edit.component.ts', 'edit component file', 'W'],
+  schemaEditComponentHtml: ['../templates/schema-edit.component.html', 'edit.component.html', 'edit component html file', 'W'],
+  schemaEditComponentCss: ['../templates/schema-edit.component.css', 'edit.component.css', 'edit component css file', 'W'],
+  mraCss: ['../templates/mean-express-angular.css', 'mean-express-angular.css', 'mean-rest-angular css file', 'W'],
 }
 
 const PredefinedPatchFields = {
@@ -133,10 +133,10 @@ var generateSourceFile = function(keyname, template, renderObj, outputDir) {
 	let description = template[2];
 	let options = template[3];
 
-	//console.info('Generating %s for "%s"...', description, keyname);
+	//console.info('Generating %s for '%s'...', description, keyname);
   	ejs.renderFile(templateFile, renderObj, renderOptions, (err, str) => {
 		if (err) {
-			console.error("ERROR! Error happens when generating %s for %s: %s", description, keyname, err);
+			console.error('ERROR! Error happens when generating %s for %s: %s', description, keyname, err);
 			return
 		}
 		if (options == 'W') {
@@ -172,12 +172,12 @@ var getPrimitiveField = function(fieldSchema) {
     type = fieldSchema.constructor.name;
 
     switch(type) {
-        case "SchemaString":
-            jstype = "string";
+        case 'SchemaString':
+            jstype = 'string';
             if ( typeof(defaultValue) !== 'undefined') {
-                defaultValue = "'" + defaultValue + "'";
+                defaultValue = '\'' + defaultValue + '\'';
             }
-            //console.log("fieldSchema.validators", fieldSchema.validators)
+            //console.log('fieldSchema.validators', fieldSchema.validators)
             if (fieldSchema.validators)
                 fieldSchema.validators.forEach((val) => {
                     if (val.type == 'maxlength' && typeof val.maxlength === 'number') maxlength = val.maxlength;
@@ -200,19 +200,19 @@ var getPrimitiveField = function(fieldSchema) {
               mraEmailRecipient = true;
             }
             break;
-        case "SchemaBoolean":
-            jstype = "boolean";
+        case 'SchemaBoolean':
+            jstype = 'boolean';
             break;
-        case "SchemaNumber":
-            jstype = "number";
+        case 'SchemaNumber':
+            jstype = 'number';
             if (fieldSchema.validators)
                 fieldSchema.validators.forEach((val) => {
                     if (val.type == 'min' && typeof val.min === 'number') numberMin = val.min;
                     if (val.type == 'max' && typeof val.max === 'number') numberMax = val.max;
                 });
             break;
-        case "ObjectId":
-            jstype = "string";
+        case 'ObjectId':
+            jstype = 'string';
             if (fieldSchema.options.ref) {
                 RefCamel = capitalizeFirst(fieldSchema.options.ref)
                 ref = fieldSchema.options.ref.toLowerCase();
@@ -220,12 +220,12 @@ var getPrimitiveField = function(fieldSchema) {
                 flagRef = true;
             }
             break;
-        case "SchemaDate":
-            jstype = "string";
+        case 'SchemaDate':
+            jstype = 'string';
             flagDate = true;
             break;
         default:
-            console.warn("Warning: Field type", type, "is not recoganized...");
+            console.warn('Warning: Field type', type, 'is not recoganized...');
             ;
     }
 
@@ -266,7 +266,7 @@ var processFieldGroups = function(fieldGroups) {
 }
 var generateViewPicture = function(schemaName, viewStr, schema, validators, indexViewNames) {
     const displayNames = {};
-    const re = /([^\s]+)\[([^\]]*)\]/g;  // handle "field[field displayName]"
+    const re = /([^\s]+)\[([^\]]*)\]/g;  // handle 'field[field displayName]'
     const s = viewStr;
     let m;
     do {
@@ -365,11 +365,11 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
         }
   
   			switch(type) {
-          case "SchemaString":
-          case "SchemaBoolean":
-          case "SchemaNumber":
-          case "ObjectId":
-          case "SchemaDate":
+          case 'SchemaString':
+          case 'SchemaBoolean':
+          case 'SchemaNumber':
+          case 'ObjectId':
+          case 'SchemaDate':
               [type,  jstype,  numberMin,  numberMax,  maxlength, minlength,  enumValues,
               ref, Ref, RefCamel, editor, textarea, mraEmailRecipient,
               flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable]
@@ -383,7 +383,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
               sortable = true;
               if (flagEditor || flagPicture || flagFile) sortable = false;
               break;
-          case "SchemaArray":
+          case 'SchemaArray':
               [elementType,  jstype,  numberMin,  numberMax,  maxlength,  minlength,  enumValues,
               ref, Ref, RefCamel, editor, textarea, mraEmailRecipient,
               flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable]
@@ -408,18 +408,18 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
 
               //let fs = fieldSchema;
               //console.log(fs);
-              //console.log("===fieldSchema.options.default:", fieldSchema.options.default);
-              // console.log("===caster.validators:", fs.caster.validators);
-              // console.log("===casterConstructor:", fs.casterConstructor);
-              // console.log("===validators:", fs.validators);
+              //console.log('===fieldSchema.options.default:', fieldSchema.options.default);
+              // console.log('===caster.validators:', fs.caster.validators);
+              // console.log('===casterConstructor:', fs.casterConstructor);
+              // console.log('===validators:', fs.validators);
               break;
           case 'SchemaMap':
-          case "Map":
+          case 'Map':
               [elementType,  jstype,  numberMin,  numberMax,  maxlength,  minlength,  enumValues,
               ref, Ref, RefCamel, editor,  textarea,  mraEmailRecipient,
               flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema['$__schemaType']);
-              //console.log("getPrimitiveField", getPrimitiveField(fieldSchema['$__schemaType']));
+              //console.log('getPrimitiveField', getPrimitiveField(fieldSchema['$__schemaType']));
               //rewrite the default value for array
               let defaultMap = fieldSchema.options.default;
               if (typeof defaultMap == 'object') {
@@ -437,11 +437,11 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
               }
               //let fs = fieldSchema;
               //console.log(fieldSchema);
-              //console.log("===fieldSchema['$__schemaType']:", fieldSchema['$__schemaType']);
-              // console.log("===caster.validators:", fs.caster.validators);
-              // console.log("===casterConstructor:", fs.casterConstructor);
-              // console.log("===validators:", fs.validators);
-              //console.log("***schema map: ", fieldSchema)
+              //console.log('===fieldSchema['$__schemaType']:', fieldSchema['$__schemaType']);
+              // console.log('===caster.validators:', fs.caster.validators);
+              // console.log('===casterConstructor:', fs.casterConstructor);
+              // console.log('===validators:', fs.validators);
+              //console.log('***schema map: ', fieldSchema)
               break;
           default:
               console.warn(`Warning: Field type ${type} is not recoganized for field ${item}...`);
@@ -453,14 +453,14 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           jstype = 'string';
   
       } else {
-          console.warn("Warning: Field", item, "is not defined in schema", schemaName + ". Skipped...");
+          console.warn('Warning: Field', item, 'is not defined in schema', schemaName + '. Skipped...');
           continue;
       }
 
       if (type == 'SchemaMap') {
         type = 'Map';
-        //console.log("***schema", schema);
-        //console.log("***Map", fieldPicture);
+        //console.log('***schema', schema);
+        //console.log('***Map', fieldPicture);
       }
 
       let fieldPicture = {
@@ -513,17 +513,17 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
         //example: this.<anotherfield>.<subfield>
         fInfo = f.mapKey.split('.');
         if (fInfo.length <= 1) {
-          console.log("  -- mapKey for", f.fieldName, "is not in correct format.");
+          console.log('  -- mapKey for', f.fieldName, 'is not in correct format.');
           continue;
         }
         if (fInfo[0] != 'this') {
-          console.log("  -- mapKey for", f.fieldName, "doesn't refer to same schema field.");
+          console.log('  -- mapKey for', f.fieldName, 'doesn\'t refer to same schema field.');
           continue;
         }
         let refField = fInfo[1];
         if (refField in viewMap && viewMap[refField].type == 'ObjectId') {
           if (fInfo.length <= 2) {
-            console.log("  -- mapKey for", f.fieldName, "refers to a reference but no sub field given.");
+            console.log('  -- mapKey for', f.fieldName, 'refers to a reference but no sub field given.');
             continue;
           }
           f.mapKeyInfo = {
@@ -539,7 +539,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           f.mapKeyInfo = {type: 'SchemaArray',  name: refField};
           continue;
         }
-        //console.log("   -- mapKey for", f.fieldName, ". No idea how to get the key from: ", refField);
+        //console.log('   -- mapKey for', f.fieldName, '. No idea how to get the key from: ', refField);
       }
     }
 
@@ -561,7 +561,7 @@ const getLoginUserPermission = function(permission) {
   if (typeof ownPermisson !== 'string') {
     ownPermisson = ''; //not permitted
   }
-  return {"others": othersPermission, "own": ownPermisson}
+  return {'others': othersPermission, 'own': ownPermisson}
 }
 
 const getPermission = function(authz, identity, schemaName) {
@@ -571,9 +571,9 @@ const getPermission = function(authz, identity, schemaName) {
     schemaAuthz = authz[schemaName];
   } 
   let moduleAuthz; 
-  if ("module-authz" in authz) {
+  if ('module-authz' in authz) {
     //use the permission definition for the module
-    moduleAuthz = authz["module-authz"];
+    moduleAuthz = authz['module-authz'];
   }
   
   let identityPermission;
@@ -583,19 +583,19 @@ const getPermission = function(authz, identity, schemaName) {
     identityPermission = moduleAuthz[identity];
   }
 
-  if (identity == "Anyone") {
+  if (identity == 'Anyone') {
     if (typeof identityPermission === 'string' || typeof identityPermission === 'undefined') {
       return identityPermission;
     } else {
-      return ""; //not permitted
+      return ''; //not permitted
     }
-  } else if (identity == "LoginUser") {
+  } else if (identity == 'LoginUser') {
     if (typeof identityPermission === 'string' || typeof identityPermission === 'undefined') {
-      return {"others": identityPermission, "own": identityPermission};
+      return {'others': identityPermission, 'own': identityPermission};
     } else if (typeof identityPermission === 'object') {
       return getLoginUserPermission(identityPermission); 
     } else {
-      return {"others": '', "own": ''}; //not permitted
+      return {'others': '', 'own': ''}; //not permitted
     }
   }
   return identityPermission;
@@ -604,10 +604,10 @@ const getPermission = function(authz, identity, schemaName) {
 const getSchemaPermission = function(schemaName, authz) {
 
     let anyonePermission = getPermission(authz, 'Anyone', schemaName);
-    let permission = "";
+    let permission = '';
 
     if (typeof anyonePermission == 'undefined') {
-      permission = ""; //not permitted
+      permission = ''; //not permitted
     } else {
       permission = anyonePermission;
     }
@@ -792,16 +792,16 @@ function loadTemplate (name) {
 function main() {
   let inputFile = program.args.shift()
   if (!inputFile)  {
-	  console.error("Argument error.")
+	  console.error('Argument error.')
 	  program.outputHelp();
 	  _exit(1);
   }
   if (!fs.existsSync(inputFile)) {
-	  console.error("Error: cannot find input file: " + inputFile)
+	  console.error('Error: cannot find input file: ' + inputFile)
 	  _exit(1);
   }
-  if (!inputFile.endsWith(".js")) {
-	  console.error("Error: input file must be a .js file with Mongoose schema defined.");
+  if (!inputFile.endsWith('.js')) {
+	  console.error('Error: input file must be a .js file with Mongoose schema defined.');
 	  _exit(1);
   }
   
@@ -818,7 +818,7 @@ function main() {
 
   let apiBase;
   if (!program.api) {
-	  apiBase = "api/" + moduleName;
+	  apiBase = 'api/' + moduleName;
 	  console.info('NOTE: REST API base is not provided. Use "%s" as api base...', apiBase);
   } else {
 	  apiBase = program.api;
@@ -827,7 +827,7 @@ function main() {
 
   let generateView;
   if (!program.view) {
-	  generateView = "admin";
+	  generateView = 'admin';
   } else {
     generateView = program.view;
     if (generateView !== 'public') generateView = 'admin';
@@ -837,13 +837,13 @@ function main() {
   // output directory
   let outputDir;
   if (!program.output) {
-	  outputDir = "./"
-	  console.info("NOTE: Output directory is not provided. Use the current directory for the output...");
+	  outputDir = './'
+	  console.info('NOTE: Output directory is not provided. Use the current directory for the output...');
   } else {
 	  outputDir = program.output;
 	  if(!fs.existsSync(outputDir)) {
-		  //console.info('Creating output directory "%s"...', outputDir);
-		  mkdir(".", outputDir)
+		  //console.info('Creating output directory '%s'...', outputDir);
+		  mkdir('.', outputDir)
 	  }
   }
   let parentOutputDir = outputDir;
@@ -888,16 +888,16 @@ function main() {
   for (let name in schemas) {
     let schemaDef = schemas[name];
     
-    let schemaAnyonePermission = "CRUD";
+    let schemaAnyonePermission = 'CRUDA';  // A - archive
     if (authz) {
       schemaAnyonePermission = getSchemaPermission(name, authz);
     }
-    if (["C", "R", "U", "D"].some(e=>!schemaAnyonePermission.includes(e))) { //not crud
+    if (['C', 'R', 'U', 'D', 'A'].some(e=>!schemaAnyonePermission.includes(e))) { //not crud
       authRequired = true;
     }
 
   	if (typeof schemaDef !== 'object') {
-  		console.error("Error: input file must export an object defining an object for each schema.");
+  		console.error('Error: input file must export an object defining an object for each schema.');
   		_exit(1);
   	}
   
@@ -921,7 +921,7 @@ function main() {
           f[p] = PredefinedPatchFields[p];
           mongooseSchema.add(f);
         } else {
-          console.warn("Warning: ignore patching. Field is not a predefined patch fields:", p);
+          console.warn('Warning: ignore patching. Field is not a predefined patch fields:', p);
         }
       }
     }
@@ -940,8 +940,8 @@ function main() {
     let listCategories = []; // object {listCategoryField:xxx, listCategoryShowMore: 'field...', listCategoryRef: 'xxxx', showCategoryCounts: true, showEmptyCategory: false}
 
     let detailActions = []; //extra buttons that trigger other pipelines
-    let detailActionButtons = ['Edit', 'New', 'Delete'];
-    let listActionButtons = ['Create', 'Delete', 'Send Email'];
+    let detailActionButtons = ['Edit', 'New', 'Delete', 'Archive'];
+    let listActionButtons = ['Create', 'Delete', 'Send Email', 'Archive'];
     
     let detailRefBlackList = undefined;
     let detailRefName = {};
@@ -1009,7 +1009,7 @@ function main() {
 
     let embeddedViewOnly = schemaDef.embeddedViewOnly? true: false;
     let viewName = schemaDef.name; //Display name on UI
-    let api = schemaDef.api || "LCRUD"; //APIs exposed to front end ("LCRUD")
+    let api = schemaDef.api || 'LCRUDA'; //APIs exposed to front end ('LCRUD')
     api = api.toUpperCase();
     let singleRecord = schemaDef.singleRecord || false;
     if (singleRecord) {
@@ -1039,29 +1039,29 @@ function main() {
 
   	//views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
   	if (typeof views !== 'object' || !Array.isArray(views)) {
-  		console.error("Error: input file must export an object defining an array for each schema.");
+  		console.error('Error: input file must export an object defining an array for each schema.');
   		_exit(1);
   	}
   	let schemaName = name.toLowerCase();
   	//let model = mongoose.model(name, mongooseSchema, ); //model uses given name
-  	//console.log("----------------------------");
+  	//console.log('----------------------------');
   	//console.log(model);
   	
   	let componentDir = path.join(outputDir, schemaName);
   	if(!fs.existsSync(componentDir)) {
-  		//console.info('Creating component directory "%s"...', componentDir);
-  		mkdir(".", componentDir)
+  		//console.info('Creating component directory '%s'...', componentDir);
+  		mkdir('.', componentDir)
   	}
   
     let subComponentDirs = [];
-    if (api.includes("R") || api.includes("L")) subComponentDirs.push(schemaName+'-detail');
-    if (api.includes("L")) subComponentDirs.push(schemaName+'-list');
-    if (api.includes("C") || api.includes("U")) subComponentDirs.push(schemaName+'-edit');
+    if (api.includes('R') || api.includes('L')) subComponentDirs.push(schemaName+'-detail');
+    if (api.includes('L')) subComponentDirs.push(schemaName+'-list');
+    if (api.includes('C') || api.includes('U')) subComponentDirs.push(schemaName+'-edit');
     subComponentDirs.forEach( (subComponent) => {
   		let subComponentDir = path.join(componentDir, subComponent);
   		if(!fs.existsSync(subComponentDir)) {
-  			//console.info('Creating sub-component directory "%s"...', subComponentDir);
-  			mkdir(".", subComponentDir)
+  			//console.info('Creating sub-component directory '%s'...', subComponentDir);
+  			mkdir('.', subComponentDir)
   		}
     });
     let indexViewNames = [];
@@ -1077,8 +1077,8 @@ function main() {
     let [briefViewGrp, briefView, hasDate1, hasRef1, hasEditor1, 
           hasReqGrp1, hasReqArr1, hasReqMap1, hasFileUpload1, hasEmailing1] =
             generateViewPicture(name, views[0], mongooseSchema, validators, indexViewNames);
-    //console.log("***briefView", briefView);
-    //console.log("***hasRef1", hasRef1);
+    //console.log('***briefView', briefView);
+    //console.log('***hasRef1', hasRef1);
     let [detailViewGrp, detailView, hasDate2, hasRef2, hasEditor2, 
           hasReqGrp2, hasReqArr2, hasReqMap2, hasFileUpload2, hasEmailing2] = 
             generateViewPicture(name, views[1], mongooseSchema, validators, indexViewNames);
@@ -1100,20 +1100,20 @@ function main() {
     let schemaHasRequiredMap = false;
     let schemaHasFileUpload = false;
     let schemaHasEmailing = false;
-    if (api.includes("L")) { // includes list view
+    if (api.includes('L')) { // includes list view
       schemaHasDate = schemaHasDate || hasDate1;
       schemaHasRef = schemaHasRef || hasRef1;
       schemaHasFileUpload = schemaHasFileUpload || hasFileUpload1;
       schemaHasEditor = schemaHasEditor || hasEditor1;
       schemaHasEmailing = schemaHasEmailing || hasEmailing1;
     }
-    if (api.includes("R")) { // includes detail view
+    if (api.includes('R')) { // includes detail view
       schemaHasDate = schemaHasDate || hasDate2;
       schemaHasFileUpload = schemaHasFileUpload || hasFileUpload2;
       schemaHasEditor = schemaHasEditor || hasEditor2;
       schemaHasEmailing = schemaHasEmailing || hasEmailing2;
     }
-    if (api.includes("C")) { // includes CreateView
+    if (api.includes('C')) { // includes CreateView
       schemaHasDate = schemaHasDate || hasDate3;
       schemaHasRef = schemaHasRef || hasRef3;
       schemaHasEditor = schemaHasEditor || hasEditor3;
@@ -1122,7 +1122,7 @@ function main() {
       schemaHasRequiredMap = schemaHasRequiredMap || hasReqMap3;
       schemaHasFileUpload = schemaHasFileUpload || hasFileUpload3;
     }
-    if (api.includes("U")) { // includes editView
+    if (api.includes('U')) { // includes editView
       schemaHasDate = schemaHasDate || hasDate4;
       schemaHasRef = schemaHasRef || hasRef4;
       schemaHasEditor = schemaHasEditor || hasEditor4;
@@ -1151,10 +1151,10 @@ function main() {
           generateViewPicture(name, detailSubViewStr, mongooseSchema, validators, indexViewNames);
 
     let compositeEditView = [];
-  	if (api.includes("U") ) {
+  	if (api.includes('U') ) {
       compositeEditView = editView.slice();
   	}
-  	if (api.includes("C") ) {
+  	if (api.includes('C') ) {
       let editFields = compositeEditView.map( x => x.fieldName);
       createView.forEach( function(x) {
         if (!editFields.includes(x.fieldName)) compositeEditView.push(x);
@@ -1163,13 +1163,13 @@ function main() {
     
     // Edit + brief + detailed view
   	let compositeEditBriefView = compositeEditView.slice(); //do reference include for this view.
-    if (api.includes("L") ) {
+    if (api.includes('L') ) {
       let compositeEditFields = compositeEditBriefView.map( x => x.fieldName);
       briefView.forEach(  function(x) {
         if (!compositeEditFields.includes(x.fieldName)) compositeEditBriefView.push(x);
       });
     }
-    if (api.includes("R")) { //also add the "Detailed" view for links on reference
+    if (api.includes('R')) { //also add the 'Detailed' view for links on reference
       let compositeEditFields = compositeEditBriefView.map( x => x.fieldName);
       detailView.forEach(  function(x) {
         if (!compositeEditFields.includes(x.fieldName)) compositeEditBriefView.push(x);
@@ -1195,7 +1195,7 @@ function main() {
   	compositeEditBriefView.forEach(function(x) { //Ref fields: for edit create view, or search in list view
   		if (x.ref) {
   		  referenceSchemas.push(x.ref);
-        let isArray = x.type == "SchemaArray";
+        let isArray = x.type == 'SchemaArray';
   			referenceMap.push(JSON.stringify([schemaName, SchemaName, x.fieldName, x.ref, x.Ref, SchemaCamelName, x.RefCamel, isArray, api]))
   		}
       if (x.mapKeyInfo && x.mapKeyInfo.type == 'ObjectId') {
@@ -1324,7 +1324,7 @@ function main() {
 
       FIELD_NUMBER_FOR_SELECT_VIEW: FIELD_NUMBER_FOR_SELECT_VIEW
   	}
-  	//console.log("======schemaObj", schemaObj);
+  	//console.log('======schemaObj', schemaObj);
   	
   	if (!defaultSchema) defaultSchema = schemaName;
   	schemaMap[schemaName] = schemaObj;
@@ -1391,7 +1391,7 @@ function main() {
       if (schemaObj.detailRefBlackList && schemaObj.detailRefBlackList.includes(refName)) {
         continue;
       }
-      if (!refApi.includes("L")) {
+      if (!refApi.includes('L')) {
         continue;
       }
       if (!schemaObj.associations[refName]) {
@@ -1447,7 +1447,7 @@ function main() {
 
     generateView,
   }
-  //console.log("***renderObj", renderObj);
+  //console.log('***renderObj', renderObj);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
   
   generateSourceFile(moduleName, templates.conf, renderObj, parentOutputDir);
@@ -1475,7 +1475,7 @@ function main() {
   	generateSourceFile(schemaName, templates.schemaService, schemaObj, componentDir);
   	generateSourceFile(schemaName, templates.schemaComponent, schemaObj, componentDir);
 
-  	if (schemaObj.api.includes("L")) {
+  	if (schemaObj.api.includes('L')) {
     	let subComponentDir = path.join(componentDir, schemaName+'-list');
     	generateSourceFile(schemaName, templates.schemaListComponent, schemaObj, subComponentDir);
     	generateSourceFile(schemaName, templates.schemaListComponentHtml, schemaObj, subComponentDir);
@@ -1526,7 +1526,7 @@ function main() {
         if (!fs.existsSync(basedirFile(tsTemplate)) ||
             !fs.existsSync(basedirFile(htmlTemplate)) ||
             !fs.existsSync(basedirFile(cssTemplate))) {
-          console.log(`Error! template files for list widget "${widgetname}" don't exist! Ignore...`);
+          console.log(`Error! template files for list widget '${widgetname}' don't exist! Ignore...`);
           console.log(`    Expecting:${tsTemplate} and ${htmlTemplate}`);
           console.log(`       -- ${tsTemplate}`);
           console.log(`       -- ${htmlTemplate}`);
@@ -1557,7 +1557,7 @@ function main() {
       }
     }
 
-    if (schemaObj.api.includes("R")) {
+    if (schemaObj.api.includes('R')) {
       subComponentDir = path.join(componentDir, schemaName+'-detail');
 
     	generateSourceFile(schemaName, templates.schemaDetail[0], schemaObj, subComponentDir);
@@ -1606,14 +1606,14 @@ function main() {
       }
     }
 
-    if (schemaObj.api.includes("R") || schemaObj.api.includes("L"))  {  //genearte filed show component
+    if (schemaObj.api.includes('R') || schemaObj.api.includes('L'))  {  //genearte filed show component
       subComponentDir = path.join(componentDir, schemaName+'-detail');
     	generateSourceFile(schemaName, templates.schemaDetail[2], schemaObj, subComponentDir); //generate css. reuse the normal one
       generateSourceFile(schemaName, templates.schemaDetailShowFieldCompoment, schemaObj, subComponentDir);
       generateSourceFile(schemaName, templates.schemaDetailShowFieldCompomentHtml, schemaObj, subComponentDir);
     }
 
-    if (schemaObj.api.includes("U") || schemaObj.api.includes("C")) {
+    if (schemaObj.api.includes('U') || schemaObj.api.includes('C')) {
     	subComponentDir = path.join(componentDir, schemaName+'-edit');
     	generateSourceFile(schemaName, templates.schemaEditComponent, schemaObj, subComponentDir);
     	generateSourceFile(schemaName, templates.schemaEditComponentHtml, schemaObj, subComponentDir);
@@ -1664,7 +1664,7 @@ function mkdir (base, dir) {
 
 function renamedOption (originalName, newName) {
   return function (val) {
-    warning(util.format("option `%s' has been renamed to `%s'", originalName, newName))
+    warning(util.format('option "%s" has been renamed to "%s"', originalName, newName))
     return val
   }
 }
@@ -1709,7 +1709,7 @@ function append (file, str, mode) {
     fs.appendFileSync(file, str, fileMode)
     console.log('   \x1b[36mcreate\x1b[0m : ' + file)
   } else {
-    let result = "";
+    let result = '';
     console.log('   \x1b[36mappend to\x1b[0m : ' + file)
     console.log('      IMPORTANT! Please check content and merge if necessary.')
     fs.readFile(file, 'utf8', function(err, data) {
@@ -1719,10 +1719,10 @@ function append (file, str, mode) {
       }
       result = data.replace(/\/\*>>>(.*\n)+.*<<<\*\/\n/g, '');
       fs.writeFileSync(file, result, fileMode)
-      fs.appendFileSync(file, "/*>>> Please check this recent updates and merge with existing ones***\n", fileMode)
-      fs.appendFileSync(file, "**Date: " + date + "\n\n", fileMode)
+      fs.appendFileSync(file, '/*>>> Please check this recent updates and merge with existing ones***\n', fileMode)
+      fs.appendFileSync(file, '**Date: ' + date + '\n\n', fileMode)
       fs.appendFileSync(file, str, fileMode)
-      fs.appendFileSync(file, "**** End of recent updates.<<<*/\n", fileMode)
+      fs.appendFileSync(file, '**** End of recent updates.<<<*/\n', fileMode)
     })
   }
 }

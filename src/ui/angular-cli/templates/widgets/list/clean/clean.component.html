@@ -7,7 +7,8 @@
 
 	let canUpdate = api.includes('U');
 	let canDelete = api.includes('D');
-	let canCheck = api.includes('D');
+	let canArchive = api.includes('A');
+	let canCheck = api.includes('D') || api.includes('A');
 
 	let embeddedEdit = false;
 

@@ -1,4 +1,4 @@
-			  <%_ let hasStringFields = false; let stringFields = []; let noMoreSearchArea = true;
+			<%_ let hasStringFields = false; let stringFields = []; let noMoreSearchArea = true;
 			  	const listCategoryFields = listCategories.map(x=>x.listCategoryField);
 
 			    for (let field of briefView){
@@ -8,8 +8,11 @@
 
 			        if(field.type == 'SchemaString') { hasStringFields = true; stringFields.push(field.fieldName);}
 			        else {noMoreSearchArea = false;}
-			    }%>
-			<%_ if (hasStringFields) { %>
+				}
+				if (api.includes('A') && listActionButtons[3]) {
+					noMoreSearchArea = false;
+				}
+			%><%_ if (hasStringFields) { %>
 			    <div class="input-group">
 	              <input type="search" class="form-control border border-secondary" id="<%-schemaName%>TextSearch" 
 						#<%-schemaName%>TextSearch [(ngModel)]="searchText"
@@ -24,8 +27,7 @@
 				    <button type="button" class="btn btn-outline-secondary" (click)="searchList()"><i class="fas fa-search"></i></button>
 				  </div>
 				</div>
-			<%}%>
-			<%_ if (typeof noMoreSearchArea == 'undefined' || !noMoreSearchArea) { %>
+			<%}%><%_ if (typeof noMoreSearchArea == 'undefined' || !noMoreSearchArea) { %>
 				<div class="text-center">
                     <span  class="pointer" (click)="toggleMoreSearch()">
                         <span class="refine-search-text">Refine Search &nbsp;</span>
@@ -45,10 +47,29 @@
 							let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName;
 							%> <%_ include schema-search.field.html %> 
 						<%_ }) %>
-						  <div class="action-buttons" style="margin-top: 10px;">
-								<button type="button" class="btn btn-outline-success" (click)="onSearchClear()">Reset</button>
-								<button type="button" class="btn btn-success" (click)="searchList()">Search</button>
-						  </div>
+						<%_ if(api.includes('A') && listActionButtons[3]) {%>
+							<hr>
+							<div class="single-line-edit mt-3">
+								<div class="row">
+								  	<div class="col-3"><label for="Archived">Archived</label></div>
+								  	<div class="col-8">
+										<label class="mr-1">No</label>
+										<label class="switch">
+											<input type="checkbox"
+												[(ngModel)]="detail['archived']"
+		        								#EditArchived="ngModel">
+											<span class="slider round"></span>
+										</label>
+										<label class="ml-1">Yes</label>
+									</div>
+								</div>
+							</div>
+							<hr><%}%>
+
+							<div class="action-buttons" style="margin-top: 10px;">
+									<button type="button" class="btn btn-outline-success" (click)="onSearchClear()">Reset</button>
+									<button type="button" class="btn btn-success" (click)="searchList()">Search</button>
+							</div>
 						</div>
 					</div>
 		        </div>
@@ -59,4 +80,3 @@
 					</span>
 				</div>
 		    <%}%>
-			

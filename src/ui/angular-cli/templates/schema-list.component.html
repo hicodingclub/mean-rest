@@ -42,16 +42,21 @@ if (listCategoryRef && listCategoryShowMore) {%>
 		<div class="row">
 			<div class="col-9">
 				<%_ include schema-search.bar.html %>
-		    </div>
+			</div>
 		</div><%}%>
 		<div class="row">
 			<div class="col">
 		        <div class="action-buttons">
-					<%if(api.includes("M") && listActionButtons[2] && schemaHasEmailing){%><mdds-action-email *ngIf="emailFields.length > 0" [emailFields]="emailFields" (componentEvents)="onActionBaseEvent($event)"></mdds-action-email><%}%>
+					<%if(api.includes('M') && listActionButtons[2] && schemaHasEmailing){%><lib-mdds-action-email *ngIf="emailFields.length > 0" [emailFields]="emailFields" (componentEvents)="onActionBaseEvent($event)"></lib-mdds-action-email><%}%>
 
-					<%if(api.includes("C") && listActionButtons[0]){%><a [routerLink]="['../new' ]" [skipLocationChange]="false" class="btn btn-outline-primary"><%-listActionButtons[0]%></a><%}%>
-					<%if(api.includes("D") && listActionButtons[1]){%><a *ngIf="list.length > 1" routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
+					<%if(api.includes('C') && listActionButtons[0]){%><a [routerLink]="['../new' ]" [skipLocationChange]="false" class="btn btn-outline-primary"><%-listActionButtons[0]%></a><%}%>
+					<%if(api.includes('D') && listActionButtons[1]){%><a routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
 						[ngClass]="{'disabled': !isItemSelected()}"><%-listActionButtons[1]%></a><%}%>
+					<%if(api.includes('A') && listActionButtons[3]){%><a routerLink="." class="btn btn-outline-primary" (click)="onArchiveSelected()"
+						[ngClass]="{'disabled': !isItemSelected()}">
+							<span *ngIf="!archivedSearch"><%-listActionButtons[3]%></span>
+							<span *ngIf="archivedSearch">Unarchive</span>
+					</a><%}%>
 				</div>
 			</div>
 		</div>
@@ -71,7 +76,8 @@ if (listCategoryRef && listCategoryShowMore) {%>
 
 		let canUpdate = api.includes('U');
 		let canDelete = api.includes('D');
-		let canCheck = api.includes('D');
+		let canArchive = api.includes('A');
+		let canCheck = api.includes('D') || api.includes('A');
 
 		let embeddedEdit = false;
 

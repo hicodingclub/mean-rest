@@ -168,6 +168,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
     public isEditing = false;
 
+    // archived search
+    public archivedSearch = false;
+
     constructor(
         public service: MddsBaseService,
         public injector: Injector,
@@ -1103,6 +1106,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
         const actionType = 'get';
 
+        this.archivedSearch = this.detail.archived;
         this.service.getList(newPage, this.perPage, searchContext, this.listSortField, this.listSortOrder,
             cateInfo.cate1[0], cateInfo.cate1[1], cateInfo.cate1[2], cateInfo.cate1[3],
             cateInfo.cate2[0], cateInfo.cate2[1], cateInfo.cate2[2], cateInfo.cate2[3],
@@ -1529,6 +1533,93 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
       const modal = new Modal(modalConfig);
       modal.show();
+    }
+
+    public onArchive(id: string, idx: number, archived): void {
+        const modalConfig: ModalConfig = {
+          title: 'Archive Confirmation',
+          content: `Are you sure you want to ${archived ? 'unarchive' : 'archive'} ` +
+                   `this ${this.itemCamelName} and ${archived ? 'restore' : 'remove'} it from search result?`,
+          // list of button text
+          buttons: [archived ? 'Unarchive' : 'Archive', 'Cancel'],
+          // list of button returns when clicked
+          returns: [true, false],
+          callBack: (result: any) => {
+              if (result) {
+                  this.service.archiveOne(id, archived).subscribe(
+                      (_: any) => {
+                          const snackBarConfig: SnackBarConfig = {
+                              content: this.ItemCamelName + (archived ? ' unarchived' : ' archived'),
+                          };
+                          const snackBar = new SnackBar(snackBarConfig);
+                          snackBar.show();
+
+                          if (this.view !== ViewType.LIST) {
+                              this.detail.archived = !archived;
+                          } else if (idx !== null && this.list) {
+                                  this.list.splice(idx, 1);
+                                  this.checkedItem.splice(idx, 1);
+                                  this.totalCount -= 1;
+                              }
+                      },
+                      this.onServiceError
+                  );
+              }
+          }
+        };
+
+        const modal = new Modal(modalConfig);
+        modal.show();
+    }
+
+    public onArchiveSelected(): void {
+        const archivedItem = [];
+        this.checkedItem.forEach((value, index) => {
+                if (value) {
+                    archivedItem.push(this.list[index]._id);
+                }
+            });
+
+        const modalConfig: ModalConfig = {
+        title: 'Archive Confirmation',
+        content: `Are you sure you want to ${this.archivedSearch ? 'unarchive' : 'archive'}` + 
+                 `  selected items and ${this.archivedSearch ? 'restore' : 'remove'} them from search results?`,
+        // list of button text
+        buttons: [this.archivedSearch ? 'Unarchive' : 'Archive', 'Cancel'],
+        // list of button returns when clicked
+        returns: [true, false],
+        callBack: (result: any) => {
+            if (result) {
+                this.service.archiveManyByIds(archivedItem, this.archivedSearch).subscribe(
+                    (_: any) => {
+                        const snackBarConfig: SnackBarConfig = {
+                            content: this.ItemCamelName + (this.archivedSearch ? ' unarchived' : ' archived'),
+                        };
+                        const snackBar = new SnackBar(snackBarConfig);
+                        snackBar.show();
+
+                        if (this.view !== ViewType.LIST) {
+                            this.router.navigate(['../../list'], {relativeTo: this.route});
+                        } else {
+                            const len = this.checkedItem.length;
+                            for (let i = 0; i < len; i++ ) {
+                                const idx = len - 1 - i;
+                                const value = this.checkedItem[idx];
+                                if (value) {
+                                    this.list.splice(idx, 1);
+                                    this.checkedItem.splice(idx, 1);
+                                    this.totalCount -= 1;
+                                }
+                            }
+                        }
+                    },
+                    this.onServiceError
+                );
+            }
+          }
+        };
+        const modal = new Modal(modalConfig);
+        modal.show();
     }
 
     public onSubmit(): void {

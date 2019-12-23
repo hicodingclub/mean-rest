@@ -2,7 +2,11 @@ const mongoose = require('mongoose');
 const express = require('express');
 const createError = require('http-errors');
 
-const util = require('../util')
+const {
+  moveRouterStackTailToHead,
+  moveRouterStackTailForward,
+  archiveDocument,
+} = require('../util')
 const RestController = require('./rest_controller')
 const RestRouter = require('./rest_sub_router')
 
@@ -94,12 +98,15 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     if ("api" in schemas[schemaName]) {
       api = schemas[schemaName].api
     } else {
-      api = "LCRUD";
+      api = "LCRUDA";
     }
 
     const schm = schemaDef.schema;
     let model;
     if (schm) {
+      // apply archive
+      schm.plugin(archiveDocument);
+
       const patchFields = schemaDef.patch || patch;
       for (const p of patchFields) {
         if (p in PredefinedPatchFields) {
@@ -126,7 +133,10 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     }
     //pass pure view string to register.
     if (schm) {
+      // apply owner
       const ownerConfig = schemaDef.owner || owner;
+
+      // tell controller to use save so mongoose logic of plugin can be triggered
       schm.options.useSaveInsteadOfUpdate = true; //this is a special indicator to controller use save.
       restController.register(schemaName, schm, views, model, moduleName, ownerConfig);
     }
@@ -142,7 +152,7 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     if ("api" in schemas[schemaName]) {
       api = schemas[schemaName].api
     } else {
-      api = "LCRUD";
+      api = "LCRUDA";
     }
 
     if (!api) continue;
@@ -221,10 +231,10 @@ meanRestExpressRouter.Hook = function(expressRouter, subRouterName, subRouter) {
     subRouter.use(expressRouter.mdds.authzFunc);
     num++;
   }
-  subRouter = util.moveRouterStackTailToHead(subRouter, num) //move forward to head
+  subRouter = moveRouterStackTailToHead(subRouter, num) //move forward to head
 
   expressRouter.use(routPath, subRouter)
-  expressRouter = util.moveRouterStackTailForward(expressRouter, 3) //move forward before error handling
+  expressRouter = moveRouterStackTailForward(expressRouter, 3) //move forward before error handling
   
   return expressRouter;
 }

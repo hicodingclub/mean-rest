@@ -66,7 +66,7 @@ const populateAdminRoles = function(restController) {
               "mpermission",
               "create",
               //{role: adminRoleId, module: allModuleId}, //search criteria
-              {role: adminRoleId, module: allModuleId, modulePermission: "CRUD"}//document
+              {role: adminRoleId, module: allModuleId, modulePermission: "CRUDA"}//document
           ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
     }    
     takInfo = 'create "admin" account with initial password "adminPassword"...';

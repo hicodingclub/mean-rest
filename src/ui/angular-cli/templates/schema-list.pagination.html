@@ -47,7 +47,7 @@
 			<div>
 				<div class="total_counts">
 					<span *ngIf="list.length > <%-SearchAndSortThreshold%>">Total: <b>{{totalCount}}</b></span><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {
-					%><%if(api.includes("D")){%>
+					%><%if(api.includes('D') || api.includes('A') ){%>
 					<span *ngIf="list.length > 1"><input type="checkbox" class="ml-3 mr-1" [(ngModel)]="checkAll" (change)="onCheckAllChange()">All</span><%}%>
 					<a class="ml-3" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a><%}%>
 				</div>

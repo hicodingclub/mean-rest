@@ -140,10 +140,10 @@ export class MddsBaseService {
             actionData,
         };
         return this.http.post(this.serviceUrl + url, data, httpOptions)
-            .pipe(
-                map(this.formatList),
-                catchError(this.errorResponseHandler)
-            );
+        .pipe(
+            map(this.formatList),
+            catchError(this.errorResponseHandler)
+        );
     }
 
     getListWithCondition(page: number, perPage: number) {
@@ -185,6 +185,9 @@ export class MddsBaseService {
                 catchError(this.errorResponseHandler)
             );
     }
+    archiveOne(id: string, archived) {
+        return this.archiveManyByIds([id], archived);
+    }
     deleteManyByIds(ids: string[]) {
         const httpOptions = {
             headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -195,6 +198,18 @@ export class MddsBaseService {
                 catchError(this.errorResponseHandler)
             );
     }
+    archiveManyByIds(ids: string[], archived: boolean) {
+        const httpOptions = {
+            headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+            params: new HttpParams().set('action', 'ArchiveManyByIds'),
+        };
+        const url = this.serviceUrl + 'mddsaction/' + (archived ? 'unarchive' : 'archive');
+        return this.http.post<any>(url, ids, httpOptions)
+            .pipe(
+                catchError(this.errorResponseHandler)
+            );
+    }
+
     createOne(item: any) {
         const httpOptions = {
             headers: new HttpHeaders({ 'Content-Type': 'application/json' })
