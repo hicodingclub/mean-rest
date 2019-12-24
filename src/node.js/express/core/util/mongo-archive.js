@@ -50,7 +50,7 @@ module.exports = function archiveDocument(schema, options) {
       archivedAt: new Date()
     };
 
-    this.update(conditions, update, function(err, raw) {
+    this.updateMany(conditions, update, function(err, raw) {
       if (err) {
         return callback(err);
       }
@@ -91,7 +91,7 @@ module.exports = function archiveDocument(schema, options) {
       }
     };
 
-    this.update(conditions, update, function(err, raw) {
+    this.updateMany(conditions, update, function(err, raw) {
       if (err) {
         return callback(err);
       }
