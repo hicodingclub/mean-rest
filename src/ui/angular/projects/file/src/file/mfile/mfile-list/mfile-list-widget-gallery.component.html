@@ -213,12 +213,14 @@
             </div>
         </div>
     
+        <!--
         <div class="action-buttons">
 
             <button type="button" class="btn btn-success" (click)="selectConfirmed()"
             [disabled]="!selectedId">Confirm Selection</button>
             <button type="button" class="btn btn-outline-success" (click)="selectFiles()">Upload New</button>            
         </div>
+        -->
       </div>
       
     </div>
@@ -229,12 +231,17 @@
   </div>  <!-- end of selection -->
 
   <!-- start of crop-->
-  <div *ngIf="croppingPictureLink">
-    <img class="crop-image" id="crop-image" src="{{croppingPictureLink}}">
+  <div *ngIf="croppingPictureLink" class="crop-area">
+    <div class="crop-area-ratio"></div>
+      <lib-mdds-cropper  class="crop-area-box"
+        [downloadUrl]="croppingPictureLink"
+        [aspectRatio]="options['aspectRatio']"
+        (cropper)="cropperCreated($event)"
+      ></lib-mdds-cropper>
     <hr>
   </div>
   <div *ngIf="croppingPictureLink" class="crop-actions">
-    <div class="action-buttons">
+    <div class="action-buttons text-center">
   
       <button type="button" class="btn btn-success" (click)="selectItemConfirmed()">Finish</button>
       <button type="button" class="btn btn-outline-success" (click)="backSelect()">Back</button>            

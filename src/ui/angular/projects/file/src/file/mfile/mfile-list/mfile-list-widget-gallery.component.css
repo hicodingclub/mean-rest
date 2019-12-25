@@ -103,8 +103,24 @@
   display: flex;
   width: 100%;
 }
+.crop-area {
+  width: 80%;
+  position: relative;
+}
+.crop-area-ratio {
+  margin-top: 56.25%; /* 16/9 ratio */
+}
+.crop-area-box {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: silver /* show me! */
+}
 .crop-actions {
   width: 100%;
+  margin-top: 0.5rem;
 }
 .crop-image {
   display: block;

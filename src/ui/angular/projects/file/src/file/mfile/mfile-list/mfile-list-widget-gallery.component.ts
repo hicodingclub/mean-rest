@@ -193,17 +193,11 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent implemen
     this.croppingPictureLink = detail.link;
     this.selectedFileName = detail._id;
     this.stepTitle = `Crop Picture`;
-
-    setTimeout(() => {
-      const image = document.getElementById('crop-image') as HTMLImageElement;
-      this.cropper = new Cropper(image, {
-        aspectRatio: this.options.aspectRatio || NaN,
-        zoomable: false,
-        autoCropArea: 1,
-      });
-    }, 100);
   }
 
+  cropperCreated(cropper) {
+    this.cropper = cropper;
+  }
   // overload the base one
   selectItemConfirmed() {
     this.cropper.getCroppedCanvas().toBlob((blob) => {

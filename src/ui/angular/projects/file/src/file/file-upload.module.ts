@@ -21,7 +21,9 @@ import { MfilegroupService } from './mfilegroup/mfilegroup.service';
 import { MfilegroupListSelectComponent } from './mfilegroup/mfilegroup-list/mfilegroup-list-select.component';
 import { MfilegroupListSelectIndexComponent } from './mfilegroup/mfilegroup-list/mfilegroup-list-select-index.component';
 
-import { MfileService } from './mfile/mfile.service'
+import { MfileService } from './mfile/mfile.service';
+
+import { MddsCropperComponent } from '../cropper/mdds-cropper.component'
 
 import { SafeUrlPipe } from './pipes';
 
@@ -49,6 +51,8 @@ import { SafeUrlPipe } from './pipes';
         MfilegroupListSelectIndexComponent,
         MfilegroupEditComponent,
         MfilegroupListComponent,
+
+        MddsCropperComponent,
     ],
     exports: [
         FileUploadComponent,
