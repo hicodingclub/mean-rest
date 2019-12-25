@@ -8,6 +8,10 @@
   font-size: 0.75rem;
 }
 
+.carousel-caption {
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
+}
+
 .carousel-caption-p {
   display: none;
 }
