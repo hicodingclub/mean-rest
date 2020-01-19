@@ -637,10 +637,17 @@ before(program, 'unknownOption', function () {
   }
 })
 
+let programName = path.basename(process.argv[1]);
+if (programName === 'hg-angular-cli') {
+  // called inside hg cli 
+  programName = 'hg angular-gen';
+}
+
 program
-  .name('mra')
+  .name(`${programName}`)
+  .description('generate Angular UI components with given input schema')
   .version(VERSION, '    --version')
-  .usage('[options] input')
+  .usage('[options] inputfile')
   .option('-m, --module <module_name>', 'module name generated for the given schemas. Default is schema file name.')
   .option('-a, --api <api_base>', 'api base that will be used for rest calls. Default is "/api/<module_name>".')
   .option('-o, --output <output_dir>', 'output directory of generated files')

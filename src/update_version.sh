@@ -41,7 +41,7 @@ echo "Upgrade to VERSION $VERSION..."
 BASEDIR=$PWD
 
 packages=(
-  "/ui/angular-cli"
+  "/dev/angular-cli"
   "/node.js/express/core" 
   "/node.js/express/emailing"
   "/node.js/express/auth-app"
@@ -54,7 +54,7 @@ ANDROIDPROJECT="$ANDROIDDIR/projects"
 ANDROIDDIST="$ANDROIDDIR/dist"
 
 #Package name and angular subfolder pairs
-android_libs=(
+angular_libs=(
   "Auth auth"
   "RichText richtext"
   "ActionBase action-base"
@@ -113,7 +113,7 @@ do
     fi
 done
 
-for element in "${android_libs[@]}"
+for element in "${angular_libs[@]}"
 do
     number=$(($number+1))
     echo "=========$number: Processing Android lib $element ..."
