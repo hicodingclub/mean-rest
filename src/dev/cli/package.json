@@ -1,0 +1,23 @@
+{
+  "name": "@hicoder/cli",
+  "version": "0.8.51",
+  "description": "HiCoder templates and UI generation tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "HiCoder"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@hicoder/angular-cli": "^0.8.50",
+    "commander": "^4.1.0",
+    "inquirer": "^7.0.3",
+    "unzipper": "^0.10.5"
+  },
+  "bin": {
+    "hg": "./index.js"
+  }
+}

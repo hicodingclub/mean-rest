@@ -42,6 +42,7 @@ BASEDIR=$PWD
 
 packages=(
   "/dev/angular-cli"
+  "/dev/cli"
   "/node.js/express/core" 
   "/node.js/express/emailing"
   "/node.js/express/auth-app"
@@ -78,6 +79,7 @@ dependencies=(
   "@hicoder\/express-auth-server"
   "@hicoder\/express-file-server"
   "@hicoder\/express-core"
+  "@hicoder\/cli"
 )
 
 
