@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, Inject  } from '@angular/core';
+﻿import { Component, OnInit, Inject, Input,  } from '@angular/core';
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { AuthenticationService } from '../auth.service';
 
@@ -11,10 +11,12 @@ import { DropdownItem } from './dropdown-item';
     styleUrls: ['auth-icon.component.css']
 })
 export class AuthIconComponent implements OnInit {
+  @Input() showUserName: boolean = true;
   public popup = false;
   public popupStyle: any = {};
   public userName = 'Please login';
   public userNameShort = 'Please login';
+  public userNameFirst = '';
 
   public loginPageUri: string;
   public changePassPageUri: string;
@@ -57,6 +59,7 @@ export class AuthIconComponent implements OnInit {
     const isAuth = this.authService.isAuthorized();
     if (name) {
         this.userName = name;
+        this.userNameFirst = name.substr(0,1).toUpperCase();
         if (isAuth) {
           if (name.length > 12) {
             this.userNameShort = name.substring(0, 10) + '...';
