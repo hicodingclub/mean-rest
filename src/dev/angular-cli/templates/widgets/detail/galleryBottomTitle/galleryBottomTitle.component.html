@@ -6,7 +6,7 @@
 		<div class="grid-block"  [ngClass]="{'grid-block-large': options['largePicture']}">
 			<div class="text-left h-100"
 				[ngClass]="{'clickable-card pointer': options['canSelect'], 'clicked-row': selectedId === detail['_id']}" >
-				<div class="grid-fields" (click)="selectItemCandidate(i)" >
+				<div class="grid-fields" (click)="selectItemCandidate(0)" >
 				<%_
 				let field0 = detailView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
 				let field1 = detailView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
