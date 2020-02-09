@@ -165,7 +165,12 @@ export class AuthenticationService {
 
     return this.http.post<any>(this.authServerRootUri + '/register', userInfo, options);
   }
+  regVerification(tokenInfo: any) {
+    const options = this.adminInterface ?
+    { params: new HttpParams().set('type', 'admin') } : {};
 
+    return this.http.post<any>(this.authServerRootUri + '/regverification', tokenInfo, options);
+  }
   changePass(passInfo: any) {
     const options = this.adminInterface ?
     { params: new HttpParams().set('type', 'admin') } : {};

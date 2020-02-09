@@ -13,3 +13,8 @@ label span {
 .form-control.is-invalid {
     background-image: none;
 }
+
+.register-verification {
+    width: 100%;
+    margin-top: 50px;
+}

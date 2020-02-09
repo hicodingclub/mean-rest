@@ -4,6 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { AuthenticationComponent } from './auth.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
+import { RegisterVerifyComponent } from './register/register-verify.component';
 import { ChangePassComponent } from './changepass/changepass.component';
 import { ChangedPassComponent } from './changepass/changedpass.component';
 import { FindPassComponent } from './findpass/findpass.component';
@@ -17,6 +18,12 @@ const routes: Routes = [
 
                 { path: 'login',  component: LoginComponent },
                 { path: 'register', component: RegisterComponent },
+                { path: 'regverification',
+                  children: [{
+                    path: '**',
+                    component: RegisterVerifyComponent,
+                  }],
+                },
                 { path: 'changepass', component: ChangePassComponent },
                 { path: 'changedpass', component: ChangedPassComponent },
                 { path: 'findpass', component: FindPassComponent },

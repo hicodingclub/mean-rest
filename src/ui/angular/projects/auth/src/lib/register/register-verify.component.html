@@ -1,0 +1,13 @@
+<h2>Registration Verification</h2>
+
+<div class="register-verification">
+    <p *ngIf="loading">Verifying registrationg...</p>
+    <ng-template [ngIf]="!loading && verificationSucc">
+        <p>Your registration has been successfully verified!</p>
+        <p><a [routerLink]="['.']" (click)="goLogin()">Redirect to login page</a> in {{timeleft}} seconds...</p>
+    </ng-template>
+    <ng-template [ngIf]="!loading && !verificationSucc">
+        <p>Verification failed:</p>
+        <p>{{serverText}}</p>
+    </ng-template>
+</div>

@@ -28,6 +28,9 @@ export class RegisterComponent implements OnInit {
     servererror = false;
     serverText = '';
 
+    registrationSucc = false;
+    email: string;
+
     constructor(
         private formBuilder: FormBuilder,
         private router: Router,
@@ -72,9 +75,14 @@ export class RegisterComponent implements OnInit {
             .subscribe(
                 data => {
                     this.servererror = false;
-
-                    // this.alertService.success('Registration successful', true);
-                    this.router.navigate(['../login'], {relativeTo: this.route, });
+                    if (!data.registrationEmailVerification) {
+                        // this.alertService.success('Registration successful', true);
+                        this.router.navigate(['../login'], {relativeTo: this.route, });
+                        return;
+                    }
+                    this.registrationSucc = true;
+                    this.email = this.registerForm.controls.email.value;
+                    
                 },
                 error => {
                     // this.alertService.error(error);

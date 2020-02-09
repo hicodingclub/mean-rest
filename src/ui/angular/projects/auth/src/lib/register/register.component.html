@@ -1,5 +1,5 @@
 <h2>Register</h2>
-<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+<form *ngIf="!registrationSucc" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
         <label for="username">Username&nbsp;<span>*</span></label>
         <input type="text" formControlName="username" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" />
@@ -51,3 +51,7 @@
   		{{serverText}}
     </div>
 </form>
+<div *ngIf="registrationSucc" class="register-verification">
+    <p>Registration verification email has been sent to {{email}}. Please check your email and verify your email address.</p>
+    <p>Please check your "Junk" or "Spam" email folder if you could not find the email.</p>
+</div>
