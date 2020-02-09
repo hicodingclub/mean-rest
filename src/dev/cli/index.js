@@ -114,7 +114,7 @@ async function newApp(name) {
 program.version(pjson.version);
 program
   .command('new [appname]')
-  .description('greate a new workspace for the given application.')
+  .description('create a new workspace for the given application.')
   .action(newApp);
 program.command(
     'angular-gen [options] <inputfile>',

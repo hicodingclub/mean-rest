@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/cli",
-  "version": "0.8.60",
+  "version": "0.8.61",
   "description": "HiCoder templates and UI generation tool",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@hicoder/angular-cli": "0.8.60",
+    "@hicoder/angular-cli": "0.8.61",
     "commander": "^4.1.0",
     "inquirer": "^7.0.3",
     "unzipper": "^0.10.5"

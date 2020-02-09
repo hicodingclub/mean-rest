@@ -1,0 +1,16 @@
+<div class="detail" *ngIf="detail">
+	<div *ngIf="!options['disableActionButtions']"><%_ include ../../../schema-detail.d.actions.html %></div>
+	<div class="card text-left transparent-border " [ngStyle]="style['card']">
+	  <div class="grid-fields">
+		<div class="card-body" [ngStyle]="style['card-body']"><%_{
+			let view='detail';
+			let field = detailView[0]; let fn = field.fieldName; let ft = field.type;%>
+			<div>
+			  <% include ../../../schema-display.field.html %>
+			</div><%_ }%>
+		</div>
+	  </div>
+	</div>
+	<%_ include ../../../schema-detail.d.pipeline.html %>
+    <%_ include ../../../schema-detail.d.ref.html %>
+</div>
