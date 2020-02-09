@@ -5,6 +5,13 @@ let commonInfo = {
 
 const templates = [
   {
+    templateName: 'Registration Verification',
+    fromEmail: 'sampleemailxibinliu@gmail.com',
+    subject: 'Registration Verification',
+    content: 'Dear {{userName}}<br/>Thanks for registration! Please click the following link to verify your registration: {{link}}.',
+    tag: 'registrationverification',
+  },
+  {
     templateName: 'Reset Password',
     fromEmail: 'sampleemailxibinliu@gmail.com',
     subject: 'Reset Password',

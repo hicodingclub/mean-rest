@@ -32,7 +32,7 @@ const internalRoleRouter =  meanRestExpress.RestRouter(authzDef, 'internal-role-
 const restController = internalRoleRouter.restController;
 //getAccountRoles - the function to get account roles that can be used as middleware in Authn router.
 const AuthzController = require('./authz/controller');
-let getAccountRoles = AuthzController.getAccountRoles(restController)
+let getAccountRoles = AuthzController.getAccountRoles(restController); // function that appends user roles in user info
 
 //authorization  - Public Access based authorization, used to manage the public access
 const accessDef = require('./authz/model.access');
@@ -40,9 +40,11 @@ const accessDef = require('./authz/model.access');
 module.exports.authzDef = authzDef;
 
 //authentication router
-module.exports.GetDefaultAuthnRouter = function(authDef, withRoles) {
-  if (withRoles) return GetAuthnRouter(authDef, getAccountRoles); //append user roles in user info
-  return GetAuthnRouter(authDef);
+module.exports.GetDefaultAuthnRouter = function(authDef, options) {
+  let getRoleFunc;
+  // TODO: get role for accout or for user role.
+  if (options && options.authz === 'role') getRoleFunc = getAccountRoles;
+  return GetAuthnRouter(authDef, options, getRoleFunc,);
 }
 
 const dbOperations = require('./defaultDbOperations');

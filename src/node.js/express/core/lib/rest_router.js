@@ -192,19 +192,19 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
 
 
   expressRouter.setEmailer = function(emailer, info) {
-    if (!restController.mmdsProperties) {
-      restController.mmdsProperties = {};
+    if (!restController.mddsProperties) {
+      restController.mddsProperties = {};
     }
     // no predefined template at this time.
     // emailer.populateTemplatesToDB(templates);
 
-    restController.mmdsProperties.emailer = emailer;
+    restController.mddsProperties.emailer = emailer;
 
     // no predefined object at this time.
-    restController.mmdsProperties.emailerObj = {};
+    restController.mddsProperties.emailerObj = {};
 
     if (info) {
-      restController.mmdsProperties.emailerObj = info;
+      restController.mddsProperties.emailerObj = info;
     }
   }
 

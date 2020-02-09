@@ -258,12 +258,13 @@ const ownerPatch = function (query, owner, req) {
 }
 
 class RestController {
-  constructor() {
+  constructor(options) {
     this.schema_collection = {};
     this.views_collection = {}; // views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
     this.model_collection = {};
     this.populate_collection = {};
     this.owner_config = {}; // {enable: true, type: 'user | module'
+    this.mddsProperties = options || {};
   }
 
   loadContextVarsByName(name) {
@@ -437,7 +438,7 @@ class RestController {
       return next(createError(400, 'Bad action data for emailing'));
     }
 
-    const { emailer, emailerObj } = this.mmdsProperties || {};
+    const { emailer, emailerObj } = this.mddsProperties || {};
 
     if (!emailer) {
       return next(createError(503, 'Emailing service is not available'));

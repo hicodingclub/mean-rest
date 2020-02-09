@@ -4,7 +4,7 @@ const createError = require('http-errors');
 const AuthnController = require('./controller')
 const { templates, commonInfo } = require('./mdds-emailing');
 
-const AuthnRouter = function(userDef, getUserRoleFunc) {
+const AuthnRouter = function(userDef, options, getUserRoleFunc) {
   let authModelCreated = false; 
   const authn = userDef.authn || {};
   let authUserFields = "username";
@@ -20,7 +20,7 @@ const AuthnRouter = function(userDef, getUserRoleFunc) {
     authSchemaName = authn["authUserSchema"];
   }
 
-  const authnController = new AuthnController();
+  const authnController = new AuthnController(options);
 
   let schemas = userDef.schemas;
   for (let schemaName in schemas) {
@@ -70,6 +70,11 @@ const AuthnRouter = function(userDef, getUserRoleFunc) {
       authnController.authRegister.bind(authnController)
     );
 
+    expressRouter.post("/regverification",
+      setSchemaName,
+      authnController.authVerifyReg.bind(authnController)
+    );
+
     expressRouter.post("/changepass",
       setSchemaName,
       authnController.authLogin.bind(authnController),
@@ -104,16 +109,16 @@ const AuthnRouter = function(userDef, getUserRoleFunc) {
   }
 
   expressRouter.setEmailer = function(emailer, info) {
-    if (!authnController.mmdsProperties) {
-      authnController.mmdsProperties = {};
+    if (!authnController.mddsProperties) {
+      authnController.mddsProperties = {};
     }
     emailer.populateTemplatesToDB(templates);
 
-    authnController.mmdsProperties.emailer = emailer;
-    authnController.mmdsProperties.emailerObj = commonInfo;
+    authnController.mddsProperties.emailer = emailer;
+    authnController.mddsProperties.emailerObj = commonInfo;
 
     if (info) {
-      authnController.mmdsProperties.emailerObj = info;
+      authnController.mddsProperties.emailerObj = info;
     }
   }
 
