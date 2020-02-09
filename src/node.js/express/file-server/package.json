@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/express-file-server",
-  "version": "0.8.40",
+  "version": "0.8.61",
   "description": "Model Driver Development Stack - File server which stores files in MongoDB through Mongoose.",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,7 @@
   "dependencies": {
     "express-fileupload": "^1.1.2-alpha.1",
     "image-size": "^0.7.2",
-    "image-thumbnail": "^1.0.2"
+    "image-thumbnail": "^1.0.6"
   },
   "peerDependencies": {
     "express": "^4.16.3",

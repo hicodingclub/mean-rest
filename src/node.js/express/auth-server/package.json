@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/express-auth-server",
-  "version": "0.8.40",
+  "version": "0.8.61",
   "description": "Model Driver Development Stack - authentication and authorization server for mongoose and express based application. It can be enabled to work as authentication, user profile managment, and authorization management servers.",
   "main": "index.js",
   "scripts": {
@@ -27,14 +27,14 @@
   },
   "homepage": "",
   "dependencies": {
-    "bcrypt": "^3.0.2",
+    "bcrypt": "^3.0.8",
     "jsonwebtoken": "^8.4.0"
   },
   "peerDependencies": {
     "express": "^4.16.3",
     "http-errors": "~1.6.2",
-    "@hicoder/express-emailing": "0.8.40",
-    "@hicoder/express-core": "0.8.40"
+    "@hicoder/express-emailing": "0.8.60",
+    "@hicoder/express-core": "0.8.60"
   },
   "devDependencies": {}
 }
