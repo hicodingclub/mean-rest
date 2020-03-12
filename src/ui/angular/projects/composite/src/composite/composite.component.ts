@@ -30,22 +30,27 @@ export interface CompositeStepConfig {
 
     submitFieldName: string; // mapping to the field in submit components
 }
+
+export interface SubmitComponentUrl {
+    url: string,
+    appendID: boolean,
+};
 export interface SubmitComponent {
     compoment: any;
-    succeedUrl: string;
+    succeedUrl: SubmitComponentUrl;
     cancelUrl: string;
     requireConfirm: boolean;
 }
 
 @Directive({
-    selector: '[libComposite]',
+    selector: '[lib-composite-directive]',
 })
 export class CompositeDirective {
     constructor(public viewContainerRef: ViewContainerRef) { }
 }
 
 @Directive({
-    selector: '[libCompositeSubmit]',
+    selector: '[lib-composite-submit-directive]',
 })
 export class CompositeSubmitDirective {
     constructor(public viewContainerRef: ViewContainerRef) { }
@@ -230,9 +235,26 @@ export class CompositeComponent implements OnInit, AfterViewInit {
         componentInstance.initData = initData;
         componentInstance.ngOnInit();
         componentInstance.onSubmit();
+
+        let submitResult;
+        componentInstance.doneData.subscribe((value) => {
+            submitResult = value;
+        });
         componentInstance.done.subscribe((value) => {
             if (value) {
-                this.router.navigateByUrl(this.submit.succeedUrl);
+                // make a short delay to make sure submitResult is received.
+                setTimeout(()=>{
+                    let submitId:string = null;
+                    if (!submitResult) {
+                        console.error('submit result data is not available');
+                    } else {
+                        submitId = submitResult._id;
+                    }
+                    // append submitID only the url end with
+                    let succUrl = this.submit.succeedUrl;
+                    const url = succUrl.appendID ? succUrl.url + submitId : succUrl.url;
+                    this.router.navigateByUrl(url);
+                }, 10);
             }
         });
     }

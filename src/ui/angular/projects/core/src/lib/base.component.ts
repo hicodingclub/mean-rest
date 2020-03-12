@@ -822,7 +822,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     public populateDetailForAction(id: string, action: string): EventEmitter<any> {
       // action: eg: action=edit  -> get detail for editing purpose
       this.service.getDetailForAction(id, action).subscribe(
-          (        detail: any) => {
+          (detail: any) => {
             this.onDetailReturned(detail, action);
         },
         this.onServiceError
@@ -832,7 +832,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
     public populateDetailFromCopy(copyId: string): void {
       this.service.getDetail(copyId).subscribe(
-          (        detail: any) => {
+          (detail: any) => {
             this.detail = this.formatDetail(detail);
             delete this.detail._id;
             this.extraFieldsUnload(this.detail); // unload data to text editors, etc
@@ -858,7 +858,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
             if (mapField[recordKey] === id) { continue; } // already populated for the same id
 
             refService.getDetail(id).subscribe(
-                (              detail: { [x: string]: any[]; }) => {
+                (detail: { [x: string]: any[]; }) => {
                 if (Array.isArray(detail[fieldDef[5]])) {
                   keyArray = detail[fieldDef[5]];
                   mapField.keys = keyArray;
@@ -1628,7 +1628,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       this.cloneDetail = this.deFormatDetail(this.detail);
       if (this.id) {
           this.service.updateOne(this.id, this.cloneDetail).subscribe(
-              (            result: any) => {
+              (result: any) => {
                 const snackBarConfig: SnackBarConfig = {
                     content: this.ItemCamelName + ' updated.'
                 };
@@ -1646,7 +1646,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
           );
       } else {
           this.service.createOne(this.cloneDetail).subscribe(
-              (            result: { [x: string]: string; }) => {
+              (result: { [x: string]: string; }) => {
                 const action = this.embeddedView ? ' added' : ' created.';
 
                 const snackBarConfig: SnackBarConfig = {
