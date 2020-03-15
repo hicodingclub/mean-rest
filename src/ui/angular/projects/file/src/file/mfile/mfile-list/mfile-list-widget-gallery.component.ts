@@ -243,7 +243,7 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent implemen
           this.uploadingFiles.push(f.name);
         }
       });
-    });
+    }, 'image/jpeg', 0.9);
   }
 
   backSelect() {

@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/angular-file",
-  "version": "0.8.60",
+  "version": "0.8.61",
   "dependencies": {
     "cropperjs": "^1.5.6"
   },
