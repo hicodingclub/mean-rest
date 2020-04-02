@@ -5,28 +5,19 @@ import { first } from 'rxjs/operators';
 
 import { AuthenticationService } from '../auth.service';
 
-const validatePasswords = (form) => {
-    const passwordConf = form.controls.password_conf.value;
-    const password = form.controls.password.value;
-
-    if (passwordConf === password) {
-        return null;
-    } else {
-        form.controls.password_conf.setErrors({passwordNotSame: true});
-        return null;
-    }
-};
-
 @Component(
-    {templateUrl: 'register.component.html',
-     styleUrls: ['register.component.css']
+    {templateUrl: 'profile.component.html',
+     styleUrls: ['register.component.css', 'profile.component.css']
     })
-export class RegisterComponent implements OnInit {
+export class ProfileComponent implements OnInit {
     registerForm: FormGroup;
     loading = false;
     submitted = false;
     servererror = false;
     serverText = '';
+
+    showProfile: boolean = true;
+    profile: any = {};
 
     registrationSucc = false;
     email: string;
@@ -40,22 +31,36 @@ export class RegisterComponent implements OnInit {
 
 
     ngOnInit() {
-        const phoneNumber = /^(\d+-?)+\d+$/;
-        const userName = /^[A-Za-z]((?!(@)).)*$/;
-        this.registerForm = this.formBuilder.group({
-            username: ['', [Validators.pattern(userName), Validators.required]],
-            firstname: ['', []],
-            lastname: ['', []],
-            email: ['', [Validators.email, Validators.required]],
-            phone: ['', Validators.pattern(phoneNumber)],
-            password: ['', [Validators.required, Validators.minLength(6)]],
-            password_conf: ['', [Validators.required, Validators.minLength(6)]]
-        }, {validator: validatePasswords });
+        this.loading = true;
+        this.authenticationService.getProfile()
+        .pipe(first())
+        .subscribe(
+            data => {
+                this.profile = data;
+                this.loading = false;
+            },
+            error => {
+                this.servererror = true;
+                this.serverText = error.error.error;
+                this.serverText = this.serverText.replace('muser', 'User');
+                this.loading = false;
+            }
+        );
     }
 
     // convenience getter for easy access to form fields
     get f() { return this.registerForm.controls; }
 
+    onEdit() {
+        const phoneNumber = /^(\d+-?)+\d+$/;
+        this.registerForm = this.formBuilder.group({
+            firstname: [this.profile.firstname, []],
+            lastname: [this.profile.lastname, []],
+            phone: [this.profile.phone, Validators.pattern(phoneNumber)],
+        }, {});
+
+        this.showProfile = false;
+    }
     onSubmit() {
         this.submitted = true;
 
@@ -67,24 +72,28 @@ export class RegisterComponent implements OnInit {
         this.loading = true;
         const values = this.registerForm.value;
         const o = {};
+        for (let p in this.profile) { // remove empty string
+            if (!!this.profile[p]) {
+                o[p] = this.profile[p];
+            }
+        }
         for (let p in values) { // remove empty string
             if (!!values[p]) {
                 o[p] = values[p];
             }
+            if (!values[p]) {
+                delete o[p];
+            }
         }
-        this.authenticationService.register(o)
+        this.authenticationService.updateProfile(o)
             .pipe(first())
             .subscribe(
                 data => {
+                    this.profile = data;
                     this.servererror = false;
-                    if (!data.registrationEmailVerification) {
-                        // this.alertService.success('Registration successful', true);
-                        this.router.navigate(['../login'], {relativeTo: this.route, });
-                        return;
-                    }
-                    this.registrationSucc = true;
-                    this.email = this.registerForm.controls.email.value;
-                    
+                    this.serverText = '';
+                    this.loading = false;
+                    this.showProfile = true;
                 },
                 error => {
                     // this.alertService.error(error);
@@ -95,8 +104,10 @@ export class RegisterComponent implements OnInit {
                     this.loading = false;
                 });
     }
-    cancel() {
-      const routedFromUrl = this.authenticationService.getRoutedFromUrl();
-      this.router.navigateByUrl(routedFromUrl);
+    cancelEdit() {
+        this.servererror = false;
+        this.serverText = '';
+        this.loading = false;
+        this.showProfile = true;
     }
 }

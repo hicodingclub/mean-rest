@@ -5,6 +5,7 @@ import { AuthenticationComponent } from './auth.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { RegisterVerifyComponent } from './register/register-verify.component';
+import { ProfileComponent } from './register/profile.component';
 import { ChangePassComponent } from './changepass/changepass.component';
 import { ChangedPassComponent } from './changepass/changedpass.component';
 import { FindPassComponent } from './findpass/findpass.component';
@@ -24,6 +25,7 @@ const routes: Routes = [
                     component: RegisterVerifyComponent,
                   }],
                 },
+                { path: 'profile', component: ProfileComponent },
                 { path: 'changepass', component: ChangePassComponent },
                 { path: 'changedpass', component: ChangedPassComponent },
                 { path: 'findpass', component: FindPassComponent },

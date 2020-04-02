@@ -11,6 +11,7 @@ import { AuthenticationComponent } from './auth.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { RegisterVerifyComponent } from './register/register-verify.component';
+import { ProfileComponent } from './register/profile.component';
 import { ChangePassComponent } from './changepass/changepass.component';
 import { ResetPassComponent } from './changepass/resetpass.component';
 import { ChangedPassComponent } from './changepass/changedpass.component';
@@ -34,6 +35,7 @@ import { ClickElsewhereDirective } from './auth-icon/click-elsewhere.directive';
         LoginComponent,
         RegisterComponent,
         RegisterVerifyComponent,
+        ProfileComponent,
         ChangePassComponent,
         ResetPassComponent,
         ChangedPassComponent,

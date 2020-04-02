@@ -165,6 +165,36 @@ export class AuthenticationService {
 
     return this.http.post<any>(this.authServerRootUri + '/register', userInfo, options);
   }
+
+  public getProfile(): Observable<any> {
+    let authRecord: any = JSON.parse(localStorage.getItem('mdds-auth-record'));
+    if (!authRecord) {
+      authRecord = {refreshToken: '', userName: ''};
+    }
+    const refreshToken: string = authRecord.refreshToken;
+    const userName: string = authRecord.userName;
+
+    // use post with refresh token
+    return this.http.post<any>(
+      this.authServerRootUri + '/getprofile',
+      {refreshToken, userName}
+    );
+  }
+
+  public updateProfile(userInfo: any) {
+    let authRecord: any = JSON.parse(localStorage.getItem('mdds-auth-record'));
+    if (!authRecord) {
+      authRecord = {refreshToken: '', userName: ''};
+    }
+    userInfo.refreshToken = authRecord.refreshToken;
+
+    // use post with refresh token
+    return this.http.post<any>(
+      this.authServerRootUri + '/updateprofile',
+      userInfo,
+    );
+  }
+
   regVerification(tokenInfo: any) {
     const options = this.adminInterface ?
     { params: new HttpParams().set('type', 'admin') } : {};

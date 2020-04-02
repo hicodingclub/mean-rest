@@ -20,6 +20,7 @@ export class AuthIconComponent implements OnInit {
 
   public loginPageUri: string;
   public changePassPageUri: string;
+  public profileUri: string;
 
   constructor(
     private router: Router,
@@ -33,6 +34,7 @@ export class AuthIconComponent implements OnInit {
     this.authPageRootUri = this.authPageRootUri.replace(/\/$/, ''); // remove trailing slash
     this.loginPageUri = this.authPageRootUri + '/login';
     this.changePassPageUri = this.authPageRootUri + '/changepass';
+    this.profileUri = this.authPageRootUri + '/profile';
 
     this.isAuthorized();
   }
@@ -92,6 +94,13 @@ export class AuthIconComponent implements OnInit {
     this.authService.setInterruptedUrl(state.url);
     this.popup = false;
     this.router.navigate([this.changePassPageUri]);
+  }
+
+  public myProfile() {
+    const state: RouterStateSnapshot = this.router.routerState.snapshot;
+    this.authService.setInterruptedUrl(state.url);
+    this.popup = false;
+    this.router.navigate([this.profileUri]);
   }
 
   public logout() {
