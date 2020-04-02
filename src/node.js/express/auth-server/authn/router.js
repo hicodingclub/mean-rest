@@ -19,7 +19,10 @@ const AuthnRouter = function(userDef, options, getUserRoleFunc) {
   if ("authUserSchema" in authn) {
     authSchemaName = authn["authUserSchema"];
   }
-
+  let profileFields;
+  if ("authProfileFields" in authn) {
+    profileFields = authn["authProfileFields"];
+  }
   const authnController = new AuthnController(options);
 
   let schemas = userDef.schemas;
@@ -30,7 +33,7 @@ const AuthnRouter = function(userDef, options, getUserRoleFunc) {
     if (schemaName == authSchemaName) {
       let schm = schemaDef.schema;
       authnController.registerAuth(authSchemaName, schemaDef.schema, 
-              authUserFields, authPasswordField);
+              authUserFields, authPasswordField, profileFields);
       authModelCreated = true;
       break;
     }
@@ -63,6 +66,19 @@ const AuthnRouter = function(userDef, options, getUserRoleFunc) {
       authnController.authRefresh.bind(authnController),
       roleFunc,
       authnController.generateToken.bind(authnController)
+    );
+
+    expressRouter.post(
+      "/getprofile",
+      setSchemaName,
+      authnController.verifyRefreshToken.bind(authnController),
+      authnController.getProfile.bind(authnController),
+    );
+    expressRouter.post(
+      "/updateprofile",
+      setSchemaName,
+      authnController.verifyRefreshToken.bind(authnController),
+      authnController.updateProfile.bind(authnController),
     );
 
     expressRouter.post("/register",

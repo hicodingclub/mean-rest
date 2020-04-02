@@ -33,12 +33,18 @@ const userSchema = new Schema({
   status:    {type: String, enum: ['Enabled', 'Disabled', 'Pending'], default: 'Enabled'},
   since: { type: Date, default: Date.now },
   password: { type: String, required: true },
+
+  firstname: {type: String, maxlength: 100},
+  lastname: {type: String, maxlength: 100},
+  photo: {type: String,
+    mraType: 'picture', mraSharable: false},
+  description: {type: String, textarea: true},
 });
 
-const userBrief = "username email phone since status";
-const userDetail = "username email phone since status";
-const userCreat = "username email phone status password";
-const userEdit = "username email phone status";
+const userBrief = "username email phone firstname lastname since status";
+const userDetail = "username email phone firstname lastname picture since status";
+const userCreat = "username email phone status firstname lastname picture password";
+const userEdit = "username email phone firstname lastname picture status";
 const userTextSearch = "username email phone";
 const userIndex = "username";
 
@@ -61,8 +67,9 @@ const config = {
 
 const authn = {
   authUserSchema: "muser",
-  authUserFields: "username email phone",
+  authUserFields: "username email",
   authPasswordField: "password",
+  authProfileFields: "firstname lastname phone",
 }
 
 const authz = {

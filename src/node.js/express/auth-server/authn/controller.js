@@ -14,12 +14,12 @@ class AuthnController {
     this.mddsProperties = options || {};
   }
 
-  registerAuth(schemaName, schema, userFields, passwordField) {
+  registerAuth(schemaName, schema, userFields, passwordField, profileFields) {
     let a = {};
     a.schemaName = schemaName;
     a.userFields = userFields;
     a.passwordField = passwordField;
-    
+    a.profileFields = profileFields;
     
     a.schema = schema;
     a.model = mongoose.model(schemaName, schema );//model uses given name
@@ -180,6 +180,91 @@ class AuthnController {
     });
   }
   
+  getProfile(req, res, next) {
+    let { _id, userName, fieldName} = req.muser;
+    
+    let authSchemaName = req.authSchemaName;
+    let auth = this.authSchemas[authSchemaName];
+    let model = auth.model;
+    if (!model) {
+      return next(createError(400, "Authentication server is not provisioned."));
+    }
+      
+    let query = {};
+    query["_id"] = _id;
+    model.findOne(query, function(err, user) {
+      if (err) {
+        return next(err); 
+      }
+      if (!user) {
+        return next(createError(403, "Bad user."));
+      }
+      const profile = {"_id": user["_id"]};
+      let profileFields = [];
+      if (auth.profileFields) {
+        profileFields = auth.profileFields.split(' ');
+      }
+      for (const f of profileFields) {
+        profile[f] = user[f];
+      }
+
+      return res.send(profile);
+    });
+  }
+
+  updateProfile(req, res, next) {
+    let { _id, userName, fieldName} = req.muser;
+    
+    let authSchemaName = req.authSchemaName;
+    let auth = this.authSchemas[authSchemaName];
+    let model = auth.model;
+    if (!model) {
+      return next(createError(400, "Authentication server is not provisioned."));
+    }
+      
+    let body = req.body;
+    if (typeof body === "string") {
+        try {
+            body = JSON.parse(body);
+        } catch(e) {
+          return next(createError(400, "Bad request body."));
+        }
+    }
+    if (body._id !== _id) {
+      return next(createError(403, "User id doesn't match."));
+    }
+
+    let query = {};
+    query["_id"] = _id;
+    model.findOne(query, function (err, result) {
+      if (err) {
+        return next(err);
+      }
+
+      const profile = {"_id": _id};
+      let profileFields = [];
+      if (auth.profileFields) {
+        profileFields = auth.profileFields.split(' ');
+      }
+      for (const f of profileFields) {
+        if (!(f in body)) {
+          //not in body means user deleted this field
+          // delete result[field]
+          result[f] = undefined;
+        } else {
+          result[f] = body[f];
+          profile[f] = body[f];
+        }
+      }
+      result.save(function (err, result) {
+        if (err) {
+          return next(err);
+        }
+        return res.send(profile);
+      });
+    });
+  }
+
   authRegister(req, res, next) {
     let authSchemaName = req.authSchemaName;
     let auth = this.authSchemas[authSchemaName];
