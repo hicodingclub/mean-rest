@@ -3,4 +3,5 @@
 	for (let field of viewFields) {
 		let fn = field.fieldName; let ft = field.type;;
 		%>
-		<div *ngIf="detail && showFields.includes('<%-fn%>')"><% include schema-display.field.html %></div><%}%>
+		<div *ngIf="detail && showFields.includes('<%-fn%>')"><% include schema-display.field.html %>
+		</div><%}%>

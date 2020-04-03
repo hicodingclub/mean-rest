@@ -1,4 +1,4 @@
-                <%if(ft == 'ObjectId') { 
+                <%_if(ft == 'ObjectId') { 
                     if (typeof ref_link === 'undefined') ref_link = true;
                     let ref_l = false;
 
@@ -52,4 +52,4 @@
                         <%} else {%>
                     {{detail['<%-fn%>']}}<%_
                         }%><%
-                } else {%>  {{detail['<%-fn%>']}} <%}%>
+                } else {%>{{detail['<%-fn%>']}} <%}%>
