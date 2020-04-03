@@ -16,6 +16,7 @@ const userSchema = new Schema({
   username: { type: String, required: true, index: { unique: true, sparse: true } },
   email: {
     type: String,
+    required: true,
     trim: true,
     lowercase: true,
     index: { unique: true, sparse: true },
@@ -42,9 +43,9 @@ const userSchema = new Schema({
 });
 
 const userBrief = "username email phone firstname lastname since status";
-const userDetail = "username email phone firstname lastname picture since status";
-const userCreat = "username email phone status firstname lastname picture password";
-const userEdit = "username email phone firstname lastname picture status";
+const userDetail = "username email phone firstname lastname photo since status";
+const userCreat = "username email phone status firstname lastname password";
+const userEdit = "username email phone firstname lastname status";
 const userTextSearch = "username email phone";
 const userIndex = "username";
 
