@@ -12,8 +12,8 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
   styleUrls: ['./<%-schemaName%>-list.component.css', './<%-schemaName%>-list-widget-galleryBottomTitle.component.css'],
 })
 export class <%-SchemaName%>ListWidgetGalleryBottomTitleComponent extends <%-SchemaName%>ListComponent implements OnInit {
-  @Input() public fieldsMap: any = {}; // { title: 'title', subTitle: 'subTitle', picturelink: 'link'};
-  @Input() public options: any = {}; // { canSelect: true, largePicture: true, showTitle: true}; // {canSelect: true, largePicture: true, showTitle: true};
+  @Input() public fieldsMap: any = {}; // { title: 'title', subTitle: 'subTitle', picturelink: 'link' }
+  @Input() public options: any = {}; // { canSelect: true, clickToDetail: false, largePicture: true, showTitle: true }
 
   public title: string;
   public subTitle: string;
@@ -62,7 +62,17 @@ export class <%-SchemaName%>ListWidgetGalleryBottomTitleComponent extends <%-Sch
     if (typeof this.options.showTitle === 'undefined') {
       this.options.showTitle = true;
     }
+    if (typeof this.options.clickToDetail === 'undefined') {
+      this.options.clickToDetail = false;
+    }
 
     super.ngOnInit();
+  }
+
+  clickOneItem(i: number, id: string) {
+    this.selectItemCandidate(i);
+    if (this.options.clickToDetail) {
+      this.onDetailLinkClicked(id);
+    }
   }
 }
