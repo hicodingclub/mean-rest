@@ -102,6 +102,7 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     }
 
     const schm = schemaDef.schema;
+    const collectionName = schemaDef.collection;
     let model;
     if (schm) {
       // apply archive
@@ -119,7 +120,11 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
       }
       schm.set('toObject', {getters: false, virtuals: true});
       schm.set('toJSON', {getters: false, virtuals: true});
-      model = mongoose.model(schemaName, schm );//model uses given name
+      if (collectionName) {
+        model = mongoose.model(schemaName, schm, collectionName );//model uses given name and given collection
+      } else {
+        model = mongoose.model(schemaName, schm );//model uses given name
+      }
     }
     //schemaDef.views in [briefView, detailView, CreateView, EditView, SearchView] sequence
     const views = [];
