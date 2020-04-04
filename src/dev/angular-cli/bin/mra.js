@@ -225,7 +225,7 @@ var getPrimitiveField = function(fieldSchema) {
             flagDate = true;
             break;
         default:
-            console.warn('Warning: Field type', type, 'is not recoganized...');
+            warning(`Field type ${type} is not recoganized...`);
             ;
     }
 
@@ -444,7 +444,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
               //console.log('***schema map: ', fieldSchema)
               break;
           default:
-              console.warn(`Warning: Field type ${type} is not recoganized for field ${item}...`);
+              warning(`Field type ${type} is not recoganized for field ${item}...`);
               ;
   			}
   		} else if (item in schema.virtuals) {
@@ -453,7 +453,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           jstype = 'string';
   
       } else {
-          console.warn('Warning: Field', item, 'is not defined in schema', schemaName + '. Skipped...');
+          warning(`Field ${item} is not defined in schema ${schemaName}. Skipped...`);
           continue;
       }
 
@@ -928,7 +928,7 @@ function main() {
           f[p] = PredefinedPatchFields[p];
           mongooseSchema.add(f);
         } else {
-          console.warn('Warning: ignore patching. Field is not a predefined patch fields:', p);
+          warning(`ignore patching. Field is not a predefined patch fields: ${p}`);
         }
       }
     }
@@ -1116,6 +1116,7 @@ function main() {
     }
     if (api.includes('R')) { // includes detail view
       schemaHasDate = schemaHasDate || hasDate2;
+      schemaHasRef = schemaHasRef || hasRef2;
       schemaHasFileUpload = schemaHasFileUpload || hasFileUpload2;
       schemaHasEditor = schemaHasEditor || hasEditor2;
       schemaHasEmailing = schemaHasEmailing || hasEmailing2;
@@ -1412,15 +1413,20 @@ function main() {
 
       let assocationSchema = schemaMap[ref[0]];
 
+      let fieldFound = false;
       for (let field of assocationSchema.detailView) {
         //find out the schema of the association schema
         if (field.fieldName === assoField && field.ref) {
           assoRecord.push(field.ref);
           assoRecord.push(field.Ref);
-        } else {
-          assoRecord.push(null);
-          assoRecord.push(null);
+          fieldFound = true;
         }
+      }
+      if (!fieldFound) {
+        warning(`Association schema ${ref[0]} doesn't have ref field ${assoField}...`);
+        assoRecord.push(null);
+        assoRecord.push(null);
+        continue;
       }
 
       assoRoutes.push(assoRecord);

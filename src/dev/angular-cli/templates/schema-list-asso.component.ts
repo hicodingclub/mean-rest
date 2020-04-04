@@ -11,7 +11,6 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
   the Label text triggering the asso, my schemaName (lower case),
   the asso field Schema name
   */
-
   let assoField = asso[2];
   let assoSchemaName = asso[5];
   let AssoSchemaName = asso[6];
