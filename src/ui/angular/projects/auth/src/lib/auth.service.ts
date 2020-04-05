@@ -41,7 +41,7 @@ export class AuthenticationService {
 
   isAuthorized(): boolean {
     const authRecord = JSON.parse(localStorage.getItem('mdds-auth-record'));
-    if (authRecord && authRecord.accessToken) {
+    if (authRecord && authRecord.accessToken && Date.now() < authRecord.expiresIn) {
       return true;
     }
     return false;
@@ -218,7 +218,8 @@ export class AuthenticationService {
       userName: '',
       accessToken: '',
       refreshToken: '',
-      displayName: ''
+      displayName: '',
+      expiresIn: 0,
     };
     if (user && user.accessToken) {
       authRecord.accessToken = user.accessToken;
@@ -231,6 +232,9 @@ export class AuthenticationService {
     }
     if (user && user.userName) {
       authRecord.userName = user.userName;
+    }
+    if (user && user.expiresIn) {
+      authRecord.expiresIn = user.expiresIn * 1000 + Date.now();
     }
     localStorage.setItem('mdds-auth-record', JSON.stringify(authRecord));
     return user;
