@@ -132,7 +132,8 @@ export class MddsRichTextSelectDirective implements OnChanges {
   }
 
   getContent(): string[] {
-    const html = $('#richtext' + this.id).summernote('code');
+    let html = $('#richtext' + this.id).summernote('code');
+    html = html.replace('http:///', '/'); // restore local link
     const text = $('<div>' + html + '</div>').text();
     return [html, text];
   }
