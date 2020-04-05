@@ -104,6 +104,9 @@ for element in "${packages[@]}"
 do
     number=$(($number+1))
     echo "=========$number: Processing $element ..."
+
+    sleep 5
+
     DIR=$BASEDIR/$element
     if ! [ -d $DIR ]; then
       echo "Error: Directory $DIR doesn't exist."

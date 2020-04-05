@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/express-emailing",
-  "version": "0.8.60",
+  "version": "0.9.0",
   "description": "Send emails",
   "main": "index.js",
   "scripts": {
@@ -15,9 +15,9 @@
     "aws-sdk": "^2.533.0"
   },
   "devDependencies": {
-    "@hicoder/express-core": "0.8.60"
+    "@hicoder/express-core": "0.9.0"
   },
   "peerDependencies": {
-    "@hicoder/express-core": "0.8.60"
+    "@hicoder/express-core": "0.9.0"
   }
 }
