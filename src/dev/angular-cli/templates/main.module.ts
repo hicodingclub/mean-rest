@@ -6,11 +6,11 @@ import { FormsModule } from '@angular/forms';
 import { NgbModule, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { MraNgbDateFormatterService } from './<%-moduleName%>.directive'; <%_ }%>
 <%_ if (hasRequiredMultiSelection) {%>
-import { DirectiveMultiSelectionRequired } from './<%-moduleName%>.directive';<%_ } %>
+import { Directive<%-ModuleName%>MultiSelectionRequired } from './<%-moduleName%>.directive';<%_ } %>
 <%_ if (hasRequiredArray) {%>
-import { DirectiveArrayRequired } from './<%-moduleName%>.directive';<%_ } %>
+import { Directive<%-ModuleName%>ArrayRequired } from './<%-moduleName%>.directive';<%_ } %>
 <%_ if (hasRequiredMap) {%>
-import { DirectiveMapRequired } from './<%-moduleName%>.directive';<%_ } %>
+import { Directive<%-ModuleName%>MapRequired } from './<%-moduleName%>.directive';<%_ } %>
 <%if (hasFileUpload) {%>
 import { FileUploadModule } from '@hicoder/angular-file';<%}%>
 <%if (hasEmailing) {%>
@@ -89,11 +89,11 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
   <%_ validatorFields.forEach(function(element){ %>
     <%-element.Directive%>,<%_ }); %>
   <%_ if (hasRequiredMultiSelection) {%>
-    DirectiveMultiSelectionRequired,<%_ } %>
+    Directive<%-ModuleName%>MultiSelectionRequired,<%_ } %>
   <%_ if (hasRequiredArray) {%>
-    DirectiveArrayRequired,<%_ } %>
+    Directive<%-ModuleName%>ArrayRequired,<%_ } %>
   <%_ if (hasRequiredMap) {%>
-    DirectiveMapRequired,<%_ } %>
+    Directive<%-ModuleName%>MapRequired,<%_ } %>
   ],
   exports: [
     <%-ModuleName%>Component,
@@ -117,6 +117,14 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     <% if (api.includes("L")) {%><%-schm.SchemaName%>ListSubComponent,<%if (schm.associationFor.length > 0) {%>
     <%-schm.SchemaName%>ListAssoComponent,<%}%><%}%>
     <% if (api.includes("R")) {%><%-schm.SchemaName%>DetailSubComponent,<%}%><%_ }}%>
+    <%_ validatorFields.forEach(function(element){ %>
+      <%-element.Directive%>,<%_ }); %>
+    <%_ if (hasRequiredMultiSelection) {%>
+      Directive<%-ModuleName%>MultiSelectionRequired,<%_ } %>
+    <%_ if (hasRequiredArray) {%>
+      Directive<%-ModuleName%>ArrayRequired,<%_ } %>
+    <%_ if (hasRequiredMap) {%>
+      Directive<%-ModuleName%>MapRequired,<%_ } %>
   ],
   providers: [
     { provide: <%-ModuleName%>_SERVER_ROOT_URI, useValue: <%-moduleName%>_server_root_uri },

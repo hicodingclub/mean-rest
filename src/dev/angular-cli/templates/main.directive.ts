@@ -19,10 +19,10 @@ export class MraNgbDateFormatterService extends NgbDateParserFormatter {
     }
 }<%_} %><%_if (hasRequiredMultiSelection) {%>
 @Directive({
-  selector: '[directiveMultiSelectionRequired]',
-  providers: [{provide: NG_VALIDATORS, useExisting: DirectiveMultiSelectionRequired, multi: true}]
+  selector: '[directive<%-ModuleName%>MultiSelectionRequired]',
+  providers: [{provide: NG_VALIDATORS, useExisting: Directive<%-ModuleName%>MultiSelectionRequired, multi: true}]
 })
-export class DirectiveMultiSelectionRequired implements Validator {
+export class Directive<%-ModuleName%>MultiSelectionRequired implements Validator {
   validate(control: AbstractControl): ValidationErrors | null {
     let selected = false;
     let controlGroup = control as FormGroup; //cast to FormGroup
@@ -43,10 +43,10 @@ export class DirectiveMultiSelectionRequired implements Validator {
   }
 }  <%_} %><%_if (hasRequiredArray) {%>
 @Directive({
-  selector: '[directiveArrayRequired]',
-  providers: [{provide: NG_VALIDATORS, useExisting: DirectiveArrayRequired, multi: true}]
+  selector: '[directive<%-ModuleName%>ArrayRequired]',
+  providers: [{provide: NG_VALIDATORS, useExisting: Directive<%-ModuleName%>ArrayRequired, multi: true}]
 })
-export class DirectiveArrayRequired implements Validator {
+export class Directive<%-ModuleName%>ArrayRequired implements Validator {
   validate(control: AbstractControl): ValidationErrors | null {
     let selected = false;
     let controlGroup = control as FormGroup; //cast to FormGroup
@@ -67,10 +67,10 @@ export class DirectiveArrayRequired implements Validator {
   }
 }  <%_} %><%_if (hasRequiredMap) {%>
 @Directive({
-  selector: '[directiveMapRequired]',
-  providers: [{provide: NG_VALIDATORS, useExisting: DirectiveMapRequired, multi: true}]
+  selector: '[directive<%-ModuleName%>MapRequired]',
+  providers: [{provide: NG_VALIDATORS, useExisting: Directive<%-ModuleName%>MapRequired, multi: true}]
 })
-export class DirectiveMapRequired implements Validator {
+export class Directive<%-ModuleName%>MapRequired implements Validator {
   validate(control: AbstractControl): ValidationErrors | null {
     let selected = false;
     let controlGroup = control as FormGroup; //cast to FormGroup

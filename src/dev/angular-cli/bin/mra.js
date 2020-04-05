@@ -1193,7 +1193,7 @@ function main() {
   		if (x.validators) {
   			schemaHasValidator = true;
   			validatorFields.push( 
-  			{ Directive: SchemaName+'Directive'+x.FieldName,
+  			{ Directive: ModuleName+SchemaName+'Directive'+x.FieldName,
   			 schemaName: schemaName,
   			})
   		}

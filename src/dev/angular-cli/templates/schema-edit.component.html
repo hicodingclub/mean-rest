@@ -9,11 +9,11 @@
 	    <form (ngSubmit)="onSubmit()" #editForm="ngForm">
 	    
 	     <div *ngIf="action == 'Edit'">
-<%_ editView.forEach( (field) => { let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName;
+<%_ editView.forEach( (field) => { let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName, Sn=SchemaName, mn=moduleName, Mn=ModuleName;
 %> <%_ include schema-edit.field.html %> <%_ }) %>
          </div>	
 	     <div *ngIf="action == 'Create' || action == 'Add' ">
-<%_ createView.forEach( (field) => { let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName;
+<%_ createView.forEach( (field) => { let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName,  Sn=SchemaName, mn=moduleName, Mn=ModuleName;
 %> <%_ include schema-edit.field.html %> <%_ }) %>
          </div>	
          

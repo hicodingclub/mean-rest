@@ -17,7 +17,7 @@
 		    </div>
         <%_ } else { %>
 	        <input type="text" class="form-control" id="<%-sn%>Edit<%-Fn%>" 
-		        	<%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
+		        	<%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
 	                [(ngModel)]="detail['<%-fn%>']" name="<%-sn%>Edit<%-Fn%>"
 	                #<%-sn%>Edit<%-Fn%>="ngModel">
         <%_ } %>
@@ -77,7 +77,7 @@
 		        <input class="form-control rounded" id="<%-sn%>Edit<%-Fn%>" 
 		             [ngClass]="{'pointer ref-badge': detail['<%-fn%>']['_id']}"
 		             (focus)="onRefSelect('<%-fn%>')"
-		        	 <%if (field.validators) {%><%-sn%>Directive<%-Fn%>=""<%}%> 
+		        	 <%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
 		             [ngModel]="detail['<%-fn%>']['value']" name="<%-sn%>Edit<%-Fn%>"
 		             #<%-sn%>Edit<%-Fn%>="ngModel"> 
 			</div><!-- (focus)="detail['<%-fn%>']['_id']?onRefShow('<%-field.fieldName%>', 'select', detail['<%-fn%>']['_id']):onRefSelect('<%-fn%>')" -->

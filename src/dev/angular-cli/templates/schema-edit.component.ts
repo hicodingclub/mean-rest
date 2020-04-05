@@ -15,10 +15,10 @@ import { NG_VALIDATORS, Validator, ValidationErrors, AbstractControl, FormGroup 
   <%_ compositeEditView.forEach( (field) => {
 if (field.validators) {%>
 @Directive({
-  selector: '[<%-schemaName%>Directive<%-field.FieldName%>]',
-  providers: [{provide: NG_VALIDATORS, useExisting: <%-SchemaName%>Directive<%-field.FieldName%>, multi: true}]
+  selector: '[<%-moduleName%><%-SchemaName%>Directive<%-field.FieldName%>]',
+  providers: [{provide: NG_VALIDATORS, useExisting: <%-ModuleName%><%-SchemaName%>Directive<%-field.FieldName%>, multi: true}]
 })
-export class <%-SchemaName%>Directive<%-field.FieldName%> implements Validator {
+export class <%-ModuleName%><%-SchemaName%>Directive<%-field.FieldName%> implements Validator {
   validators:any[] = [
       <%field.validators.forEach( (v)=>{%>
          {validator: <%-v.validator%>,
@@ -39,9 +39,9 @@ export class <%-SchemaName%>Directive<%-field.FieldName%> implements Validator {
             let obj = this.validators[idx];
             try {
                 result = obj.validator(value)
-                if (result == false ) return { '<%-schemaName%>Directive<%-field.FieldName%>': obj.msg };
+                if (result == false ) return { '<%-moduleName%><%-SchemaName%>Directive<%-field.FieldName%>': obj.msg };
             } catch (e) {
-                return { '<%-schemaName%>Directive<%-field.FieldName%>': obj.msg };
+                return { '<%-moduleName%><%-SchemaName%>Directive<%-field.FieldName%>': obj.msg };
             }
         }
     }

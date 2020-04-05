@@ -44,7 +44,7 @@
 							if (field.hidden) return;
 							if (listCategoryFields.includes(field.fieldName)) return;
 							if (field.type == 'SchemaString') return;
-							let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName;
+							let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName, Sn=SchemaName, mn=moduleName, Mn=ModuleName;
 							%> <%_ include schema-search.field.html %> 
 						<%_ }) %>
 						<%_ if(api.includes('A') && listActionButtons[3]) {%>
