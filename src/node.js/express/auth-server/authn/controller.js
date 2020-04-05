@@ -99,23 +99,27 @@ class AuthnController {
   }
   
   generateToken(req, res, next) {
+    const accessExpires = 60*60;
+    const refreshExpires = 60*60*12;
+    
     let accessToken = jwt.sign(
       req.muser, 
       ACCESS_SECRETE, 
-      {expiresIn: 60*60}
+      {expiresIn: accessExpires}
     );
   
     let refreshToken = jwt.sign(
       req.muser, 
       REFRESH_SECRETE, 
-      {expiresIn: 60*60*12}
+      {expiresIn: refreshExpires}
     );
   
     let r = {
-      "accessToken": accessToken,
-      "refreshToken": refreshToken,
-      "userName": req.muser.userName,
-      "fieldName": req.muser.fieldName
+      accessToken,
+      refreshToken,
+      userName: req.muser.userName,
+      fieldName: req.muser.fieldName,
+      expiresIn: refreshExpires,
     }
     return res.send(r);
   }
