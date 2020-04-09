@@ -1125,8 +1125,8 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
                     total_pages: number;
                 }) => {
             this.list = result.items.map((x: any) => {
-                const d = this.formatDetail(x);
-                return d;
+                let d = this.formatDetail(x);
+                return this.formatTextareaFields(d);
             });
             this.originalList = result.items;
 
