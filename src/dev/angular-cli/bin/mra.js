@@ -463,10 +463,13 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
         //console.log('***Map', fieldPicture);
       }
 
+      const DN = displayNames[item] || camelToDisplay(item);
+      const dn = DN.toLowerCase();
       let fieldPicture = {
           fieldName: item,
           FieldName: capitalizeFirst(item),
-          displayName: displayNames[item] || camelToDisplay(item),
+          displayName: DN,
+          displayname: dn,
           hidden,
           type,
           jstype,

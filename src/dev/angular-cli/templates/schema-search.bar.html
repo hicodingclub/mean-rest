@@ -6,7 +6,7 @@
 					if (listCategoryFields.includes(field.fieldName)) continue;
 					if (field.picture) continue;
 
-			        if(field.type == 'SchemaString') { hasStringFields = true; stringFields.push(field.fieldName);}
+			        if(field.type == 'SchemaString') { hasStringFields = true; stringFields.push(field.displayname);}
 			        else {noMoreSearchArea = false;}
 				}
 				if (api.includes('A') && listActionButtons[3]) {
