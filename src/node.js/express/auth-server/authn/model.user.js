@@ -70,7 +70,7 @@ const authn = {
   authUserSchema: "muser",
   authUserFields: "username email",
   authPasswordField: "password",
-  authProfileFields: "firstname lastname phone",
+  authProfileFields: "firstname lastname phone email",
 }
 
 const authz = {
