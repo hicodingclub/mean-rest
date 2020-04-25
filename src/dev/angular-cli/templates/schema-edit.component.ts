@@ -113,6 +113,7 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
     }
 
     ngOnInit() {
+      super.ngOnInit();
       if (this.embedMode == 'create') { // parent ask to create
         this.action='Create';
         this.getDetailData();

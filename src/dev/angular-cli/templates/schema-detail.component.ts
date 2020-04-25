@@ -24,10 +24,6 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
   public searchObj:any;
   @Input()
   public disableActionButtions:boolean;
-  @Input()
-  public style: any; // {}
-  @Input()
-  public options: any; // {} uiOptions
   @Output()
   public eventEmitter: EventEmitter<any> = new EventEmitter();
 
@@ -48,8 +44,7 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
   }
 
   ngOnInit() {
-      this.style = this.style || {};
-      this.options = this.options || {};
+      super.ngOnInit();
       if (!this.id) this.id = this.route.snapshot.paramMap.get('id');
       if (this.id) {
         this.populateDetail(this.id);

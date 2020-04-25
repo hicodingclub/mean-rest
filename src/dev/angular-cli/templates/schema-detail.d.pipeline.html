@@ -1,5 +1,7 @@
 <% if (detailActions.length > 0) {%>
-    <br/><%for (let p of detailActions) { %>
+    <br/>
     <div class="row justify-content-center">
-        <button type="button" class="btn btn-primary" routerLink="<%-p[1]%>" [queryParams]="{<%-schemaName%>: detail['_id']}"><%-p[0]%></button>
-    </div><%} }%>
+        <%_ for (let p of detailActions) { %>
+        <button type="button" class="btn btn-outline-primary m-3" routerLink="<%-p[1]%>" [queryParams]="{<%-schemaName%>: detail['_id']}"><%-p[0]%></button>
+        <%_}%>
+    </div><%}%>

@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MddsBaseComponent, ViewType } from '@hicoder/angular-core';
-import { Injector } from '@angular/core';
+import { Injector, OnInit, Input } from '@angular/core';
 import { <%-SchemaName%>Service } from './<%-schemaName%>.service';
 
 const itemCamelName = '<%-schemaCamelName%>';
@@ -23,7 +23,12 @@ import { <%-ModuleName%>RefSelectDirective } from '../<%-moduleName%>.component'
       %>import { <%-field.Ref%>ListSelect<%-ListSelTypeRef%>Component } from '../<%-field.ref%>/<%-field.ref%>-list/<%-field.ref%>-list-select-<%-listSelTypeRef%>.component';<%}%><%}%><%}}%>
 <%}%>
 
-export class <%-SchemaName%>Component extends MddsBaseComponent {
+export class <%-SchemaName%>Component extends MddsBaseComponent implements OnInit {
+    @Input()
+    public style: any; // {}
+    @Input()
+    public options: any; // {} uiOptions
+
 <%if (schemaHasRef) {%>
     public selectComponents = {
   <%_ for (let field of compositeEditBriefView) { 
@@ -57,5 +62,10 @@ export class <%-SchemaName%>Component extends MddsBaseComponent {
         this.timeFormat = '<%-timeFormat%>';<%}%>
         this.modulePath = '<%-moduleName%>';
         this.indexFields = [<%for (let field of indexView) {%>'<%-field.fieldName%>',<%}%> ];
+    }
+
+    ngOnInit() {
+        this.style = this.style || {};
+        this.options = this.options || {};
     }
 }

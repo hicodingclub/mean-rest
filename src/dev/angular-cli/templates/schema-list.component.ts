@@ -50,6 +50,8 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
   }
 
   ngOnInit() {
+      super.ngOnInit();
+
       this.adjustListViewForWindowSize();
 
       // this is to initialize the detail that will be used for search condition selection
