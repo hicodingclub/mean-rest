@@ -250,10 +250,13 @@ const ownerPatch = function (query, owner, req) {
     if (owner.type === 'module') {
       query.mmodule_name = req.mddsModuleName;
     } else if (owner.type === 'user') {
-      if (!!owner.field) {
-        query[owner.field] = req.muser._id;
-      } else {
-        query.muser_id = req.muser._id;
+      if (req.muser) {
+        // user logged in
+        if (!!owner.field) {
+          query[owner.field] = req.muser._id;
+        } else {
+          query.muser_id = req.muser._id;
+        }
       }
     }
 
