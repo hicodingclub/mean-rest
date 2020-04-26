@@ -379,13 +379,15 @@
                 <%if (field.required) {%>directive<%-Mn%>MultiSelectionRequired<%}%>
                 #Edit<%-Fn%>="ngModelGroup" 
             >
-            <%_ field.enumValues.forEach( (f, index) => { %>
+            <%_ field.enumValues.forEach( (f, index) => {
+              const fd = f.trim().replace(/\s+/g, '');
+            %>
             <div class="form-check-inline">
-            <input type="checkbox" name="Edit<%-Fn%><%-f%>" 
+            <input type="checkbox" name="Edit<%-Fn%><%-fd%>" 
               class="form-check-input"
-              id="Edit<%-Fn%><%-f%>"
+              id="Edit<%-Fn%><%-fd%>"
               [(ngModel)]="detail['<%-fn%>']['selection']['<%-f%>']"
-              #Edit<%-Fn%><%-f%>="ngModel">
+              #Edit<%-Fn%><%-fd%>="ngModel">
             <label class="form-check-label"><%-f%></label>
           </div>
           <%_ }) %>

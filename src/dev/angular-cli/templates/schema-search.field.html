@@ -84,13 +84,15 @@
     <%_ } else if (field.type === "SchemaArray") { %>
 	  <%_ if (field.elementType === "SchemaString") { %>
         <%_ if (field.enumValues && field.elementUnique) { %>
-	        <%_ field.enumValues.forEach( (f, index) => { %>
+	        <%_ field.enumValues.forEach( (f, index) => { 
+				const fd = f.trim().replace(/\s+/g, '');
+			%>
 	        <div class="form-check-inline">
-		        <input type="checkbox" name="<%-sn%>Edit<%-Fn%><%-f%>" 
+		        <input type="checkbox" name="<%-sn%>Edit<%-Fn%><%-fd%>" 
 		        	class="form-check-input"
-		        	id="<%-sn%>Edit<%-Fn%><%-f%>"
+		        	id="<%-sn%>Edit<%-Fn%><%-fd%>"
 		        	[(ngModel)]="detail['<%-fn%>']['selection']['<%-f%>']"
-		        	#<%-sn%>Edit<%-Fn%><%-f%>="ngModel">
+		        	#<%-sn%>Edit<%-Fn%><%-fd%>="ngModel">
 		      	<span class="form-check-label"><%-f%></span>
 		    </div>
 		    <%_ }) %>
