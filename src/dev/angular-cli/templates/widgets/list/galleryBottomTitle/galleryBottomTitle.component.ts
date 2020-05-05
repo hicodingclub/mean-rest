@@ -65,6 +65,10 @@ export class <%-SchemaName%>ListWidgetGalleryBottomTitleComponent extends <%-Sch
     if (typeof this.options.clickToDetail === 'undefined') {
       this.options.clickToDetail = false;
     }
+    if (this.options.disableCatetory) {
+      this.listCategory1 = {}; // no do query based on category for home view;
+      this.listCategory2 = {}; // no do query based on category for home view;
+    }
 
     super.ngOnInit();
   }

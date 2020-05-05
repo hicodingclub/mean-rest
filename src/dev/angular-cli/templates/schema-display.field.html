@@ -1,4 +1,4 @@
-                <%_if(ft == 'ObjectId') { 
+                <%_if(ft == 'ObjectId') {
                     if (typeof ref_link === 'undefined') ref_link = true;
                     let ref_l = false;
 
@@ -40,16 +40,18 @@
                         </ng-template>
                     </div><%}%><%
                 } else if (ft === 'SchemaString') {
-                        if (field.editor) {%> 
+                        if (field.editor) {%>
                     <div libMddsRichtextShow="<%-schemaName%>Detail<%-field.FieldName%>" [content]="detail['<%-fn%>']"></div><%
                         } else if (field.picture) {
-                            let isLarge; 
-                            if (typeof largePicture === 'undefined') isLarge = false; 
+                            let isLarge;
+                            if (typeof largePicture === 'undefined') isLarge = false;
                             else isLarge = largePicture;%>
                     <lib-mdds-file-display [downloadUrl]="detail['<%-fn%>']" [isLarge]="<%-isLarge%>" [aspectRatio]="<%-field.aspectRatio%>"></lib-mdds-file-display><%
                         } else if (field.textarea) {%>
-                    <div [innerHTML]="detail['<%-fn%>']"></div>
-                        <%} else {%>
+                    <div [innerHTML]="detail['<%-fn%>']"></div><%
+                        } else if (field.link) {%>
+                    <a href="{{detail['<%-fn%>']}}">{{detail['<%-fn%>']}}</a><%
+                        } else {%>
                     {{detail['<%-fn%>']}}<%_
                         }%><%
                 } else {%>{{detail['<%-fn%>']}} <%}%>

@@ -156,6 +156,7 @@ var getPrimitiveField = function(fieldSchema) {
     let enumValues;
     let ref, Ref, RefCamel;
     let editor = false;
+    let link = false; // if this is URL link
     let textarea = false;
     let requiredField = false;
     let mraEmailRecipient = false; // if this email can be used by sendEmail Action 
@@ -198,6 +199,8 @@ var getPrimitiveField = function(fieldSchema) {
               textarea = true;
             } else if (fieldSchema.options.mraEmailRecipient == true) {
               mraEmailRecipient = true;
+            } else if (fieldSchema.options.link == true) {
+              link = true;
             }
             break;
         case 'SchemaBoolean':
@@ -230,7 +233,7 @@ var getPrimitiveField = function(fieldSchema) {
     }
 
     return [type, jstype, numberMin, numberMax, maxlength, minlength,  enumValues,
-            ref, Ref, RefCamel, editor, textarea, mraEmailRecipient,
+            ref, Ref, RefCamel, editor, link, textarea, mraEmailRecipient,
             flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable];
 }
 
@@ -330,6 +333,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
       let enumValues;
       let ref, Ref, RefCamel;
       let editor = false;
+      let link = false;
       let textarea = false;
       let requiredField = false;
       let mraEmailRecipient = false;
@@ -371,7 +375,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           case 'ObjectId':
           case 'SchemaDate':
               [type,  jstype,  numberMin,  numberMax,  maxlength, minlength,  enumValues,
-              ref, Ref, RefCamel, editor, textarea, mraEmailRecipient,
+              ref, Ref, RefCamel, editor, link, textarea, mraEmailRecipient,
               flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema);
               if (flagDate) hasDate = true;
@@ -385,7 +389,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
               break;
           case 'SchemaArray':
               [elementType,  jstype,  numberMin,  numberMax,  maxlength,  minlength,  enumValues,
-              ref, Ref, RefCamel, editor, textarea, mraEmailRecipient,
+              ref, Ref, RefCamel, editor, link, textarea, mraEmailRecipient,
               flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema.caster);
               //rewrite the default value for array
@@ -416,7 +420,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           case 'SchemaMap':
           case 'Map':
               [elementType,  jstype,  numberMin,  numberMax,  maxlength,  minlength,  enumValues,
-              ref, Ref, RefCamel, editor,  textarea,  mraEmailRecipient,
+              ref, Ref, RefCamel, editor, link, textarea, mraEmailRecipient,
               flagDate, flagRef, flagEditor, flagPicture, aspectRatio, flagFile, flagSharable]
                   = getPrimitiveField(fieldSchema['$__schemaType']);
               //console.log('getPrimitiveField', getPrimitiveField(fieldSchema['$__schemaType']));
@@ -477,6 +481,7 @@ var generateViewPicture = function(schemaName, viewStr, schema, validators, inde
           Ref,
           RefCamel,
           editor,  //rich format text
+          link,
           textarea, // big text input
           mraEmailRecipient, // an email field an can receive email
           picture: flagPicture, // a picture field
