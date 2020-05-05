@@ -42,7 +42,6 @@ export class <%-SchemaName%>ListWidgetSldComponent extends <%-SchemaName%>ListCo
     this.subtitleFn = this.inputData[1];
     this.descriptionFn = this.inputData[2];
     this.picturelinkFn = this.inputData[3];
-    this.searchDetailReady = true;
 
     super.ngOnInit();
   }

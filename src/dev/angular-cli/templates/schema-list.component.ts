@@ -26,6 +26,8 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
   @Input()
   public searchObj:any;
   @Input()
+  public sortObj: any;  // {listSortField: 'a', listSortOrder: 'asc' / 'desc'}
+  @Input()
   public categoryBy:string; //field name whose value is used as category
   <%if (schemaHasEditor) {%>
   @ViewChildren(MddsRichTextShowDirective) textEditors: QueryList<MddsRichTextShowDirective>;<%}%>
@@ -55,7 +57,15 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
       this.adjustListViewForWindowSize();
 
       // this is to initialize the detail that will be used for search condition selection
-      const detail = this.searchObj || {};
+      let detail = {};
+      if (this.searchObj) {
+        this.searchDetailReady = true; // search provided from "detail", not from search bar.
+        detail = this.searchObj;
+      }
+      if (this.sortObj) {
+        this.listSortField = this.sortObj.listSortField;
+        this.listSortOrder = this.sortObj.listSortOrder;
+      }
       this.detail = this.formatDetail(detail);
       this.searchList();
   }
