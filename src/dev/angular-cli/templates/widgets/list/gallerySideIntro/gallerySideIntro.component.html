@@ -1,0 +1,28 @@
+<ng-template ngFor let-detail [ngForOf]="list" let-idx="index">
+	<div class="d-flex flex-wrap align-items-center" [ngClass]="{'flex-row-reverse': idx%2 == 1}">
+		<div class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}">
+			<div class="text-left h-100"
+				[ngClass]="{'clickable-card pointer': options['canSelect'], 'clicked-row': options['canSelect'] && selectedId === detail['_id']}">
+				<div class="grid-fields" (click)="clickOneItem(idx, detail['_id'])">
+					<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}"
+						[ngStyle]="style['picture']">
+						<lib-mdds-file-display [downloadUrl]="detail[pictureLink]" [isLarge]="options['largePicture']">
+						</lib-mdds-file-display>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="intro-block">
+			<div *ngIf="title" class="grid-picture-title"
+				[ngClass]="{'grid-picture-title-large': options['largePicture']}"
+				[ngStyle]="style['title']">
+				{{detail[title]}}
+			</div>
+			<div *ngIf="intro" class="grid-picture-subtitle"
+				[ngClass]="{'grid-picture-subtitle-large': options['largePicture']}"
+				[ngStyle]="style['intro']">
+				{{detail[intro]}}
+			</div>
+		</div>
+	</div>
+</ng-template>

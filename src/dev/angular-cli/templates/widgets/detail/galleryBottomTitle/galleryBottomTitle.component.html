@@ -5,7 +5,7 @@
 	<div class="d-flex justify-content-center">
 		<div class="grid-block"  [ngClass]="{'grid-block-large': options['largePicture']}">
 			<div class="text-left h-100"
-				[ngClass]="{'clickable-card pointer': options['canSelect'], 'clicked-row': selectedId === detail['_id']}" >
+				[ngClass]="{'clickable-card pointer': options['canSelect'], 'clicked-row': options['canSelect'] && selectedId === detail['_id']}" >
 				<div class="grid-fields" (click)="selectItemCandidate(0)" >
 				<%_
 				let field0 = detailView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;

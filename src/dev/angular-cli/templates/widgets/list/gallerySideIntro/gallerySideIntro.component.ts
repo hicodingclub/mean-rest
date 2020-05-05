@@ -7,17 +7,17 @@ import { <%-SchemaName%>ListComponent } from './<%-schemaName%>-list.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
 @Component({
-  selector: 'app-<%-schemaName%>-list-widget-galleryBottomTitle',
-  templateUrl: './<%-schemaName%>-list-widget-galleryBottomTitle.component.html',
-  styleUrls: ['./<%-schemaName%>-list.component.css', './<%-schemaName%>-list-widget-galleryBottomTitle.component.css'],
+  selector: 'app-<%-schemaName%>-list-widget-gallerySideIntro',
+  templateUrl: './<%-schemaName%>-list-widget-gallerySideIntro.component.html',
+  styleUrls: ['./<%-schemaName%>-list.component.css', './<%-schemaName%>-list-widget-gallerySideIntro.component.css'],
 })
-export class <%-SchemaName%>ListWidgetGalleryBottomTitleComponent extends <%-SchemaName%>ListComponent implements OnInit {
-  @Input() public fieldsMap: any = {}; // { title: 'title', subTitle: 'subTitle', picturelink: 'link' }
+export class <%-SchemaName%>ListWidgetGallerySideIntroComponent extends <%-SchemaName%>ListComponent implements OnInit {
+  @Input() public fieldsMap: any = {}; // { title: 'title', intro: 'intro', picturelink: 'link' }
   @Input() public options: any = {}; // { canSelect: true, clickToDetail: false, largePicture: true, showTitle: true }
-  @Input() public style: any = {}; // { picture: {height: '16rem'}, title: {}, subtitle: {} }
+  @Input() public style: any = {}; // { picture: {height: '16rem'}, title: {}, intro: {} }
 
   public title: string;
-  public subTitle: string;
+  public intro: string;
   public pictureLink: string;
 
   constructor(
@@ -38,7 +38,7 @@ export class <%-SchemaName%>ListWidgetGalleryBottomTitleComponent extends <%-Sch
     if (this.fieldsMap) {
       this.pictureLink = this.fieldsMap.pictureLink;
       this.title = this.fieldsMap.title;
-      this.subTitle = this.fieldsMap.subTitle;
+      this.intro = this.fieldsMap.intro;
     }
 
     if (!this.pictureLink) {
@@ -47,18 +47,18 @@ export class <%-SchemaName%>ListWidgetGalleryBottomTitleComponent extends <%-Sch
     if (!this.title) {
       this.title = '<%-fn1%>';
     }
-    if (!this.subTitle) {
-      this.subTitle = '<%-fn2%>';
+    if (!this.intro) {
+      this.intro = '<%-fn2%>';
     }
 
     if (!this.options) {
       this.options = {};
     }
     if (typeof this.options.canSelect === 'undefined') {
-      this.options.canSelect = true;
+      this.options.canSelect = false;
     }
     if (typeof this.options.largePicture === 'undefined') {
-      this.options.largePicture = false;
+      this.options.largePicture = true;
     }
     if (typeof this.options.showTitle === 'undefined') {
       this.options.showTitle = true;
