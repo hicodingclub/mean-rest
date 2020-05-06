@@ -12,7 +12,7 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
   styleUrls: ['./<%-schemaName%>-list.component.css', './<%-schemaName%>-list-widget-gallerySideIntro.component.css'],
 })
 export class <%-SchemaName%>ListWidgetGallerySideIntroComponent extends <%-SchemaName%>ListComponent implements OnInit {
-  @Input() public fieldsMap: any = {}; // { title: 'title', intro: 'intro', picturelink: 'link' }
+  // @Input() public fieldsMap: any = {}; // { title: 'title', intro: 'intro', picturelink: 'link' }
   @Input() public options: any = {}; // { canSelect: true, clickToDetail: false, largePicture: true, showTitle: true }
   @Input() public style: any = {}; // { picture: {height: '16rem'}, title: {}, intro: {} }
 
@@ -35,6 +35,7 @@ export class <%-SchemaName%>ListWidgetGallerySideIntroComponent extends <%-Schem
     let field0 = detailView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
     let field1 = detailView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
     let field2 = detailView[2]; let fn2 = field2.fieldName; let ft2 = field2.type;%>
+    /*
     if (this.fieldsMap) {
       this.pictureLink = this.fieldsMap.pictureLink;
       this.title = this.fieldsMap.title;
@@ -50,7 +51,7 @@ export class <%-SchemaName%>ListWidgetGallerySideIntroComponent extends <%-Schem
     if (!this.intro) {
       this.intro = '<%-fn2%>';
     }
-
+    */
     if (!this.options) {
       this.options = {};
     }

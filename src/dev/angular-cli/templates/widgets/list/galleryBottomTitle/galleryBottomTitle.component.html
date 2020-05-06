@@ -1,29 +1,44 @@
 <div class="galleryView">
 	<div class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"
 		*ngFor="let detail of list;  let i = index; let list_index = index;">
-
+		<%_
+		let field0 = detailView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
+		let field1 = detailView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
+		let field2 = detailView[2]; let fn2 = field2.fieldName; let ft2 = field2.type;
+		let field, fn, ft;
+		%>
 		<div class="text-left h-100"
 			[ngClass]="{'clickable-card pointer': options['canSelect'], 'clicked-row': options['canSelect'] && selectedId === detail['_id']}">
 			<div class="grid-fields" (click)="clickOneItem(i, detail['_id'])">
 
 				<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}"
 					[ngStyle]="style['picture']">
-					<lib-mdds-file-display [downloadUrl]="detail[pictureLink]" [isLarge]="options['largePicture']">
+					<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']">
 					</lib-mdds-file-display>
 				</div>
 				<div *ngIf="options['showTitle']" class="text-center">
 					<div class="grid-picture-title" [ngClass]="{'grid-picture-title-large': options['largePicture']}"
 					[ngStyle]="style['title']">
-						{{detail[title]}}
+						<%
+						field = field1; fn = fn1; ft = ft1;
+						%>
+						<% include ../../../schema-display.field.html %>
 					</div>
-					<div *ngIf="subTitle" class="grid-picture-subtitle"
+					<div class="grid-picture-subtitle"
 						[ngClass]="{'grid-picture-subtitle-large': options['largePicture']}"
 						[ngStyle]="style['subtitle']">
-						{{detail[subTitle]}}
+						<%
+						field = field2; fn = fn2; ft = ft2;
+						%>
+						<% include ../../../schema-display.field.html %>
 					</div>
 				</div>
 			</div>
 		</div>
-
 	</div>
+	<i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+	<i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+	<i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+	<i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+	<i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
 </div>
