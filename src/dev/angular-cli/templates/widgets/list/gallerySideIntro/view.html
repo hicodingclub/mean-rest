@@ -1,7 +1,5 @@
-<div class="detail" *ngIf="detail">
-	<%_ include ../../../schema-detail.d.actions.html %>
-
-	<div class="d-flex flex-wrap align-items-center">
+<ng-template ngFor let-detail [ngForOf]="list" let-idx="index">
+	<div class="d-flex flex-wrap align-items-center" [ngClass]="{'flex-row-reverse': idx%2 == 1}">
 		<%_
 		let field0 = detailView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
 		let field1 = detailView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
@@ -10,10 +8,9 @@
 		<div class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}">
 			<div class="text-left h-100"
 				[ngClass]="{'clickable-card pointer': !options['disableSelect'], 'clicked-row': !options['disableSelect'] && selectedId === detail['_id']}">
-				<div class="grid-fields" (click)="selectItemCandidate(0)">
+				<div class="grid-fields" (click)="clickOneItem(idx, detail['_id'])">
 					<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}"
 						[ngStyle]="style['picture']">
-
 						<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']">
 						</lib-mdds-file-display>
 					</div>
@@ -21,13 +18,16 @@
 			</div>
 		</div>
 		<div class="intro-block">
-			<div class="grid-picture-title" [ngClass]="{'grid-picture-title-large': options['largePicture']}"
+			<div class="grid-picture-title"
+				[ngClass]="{'grid-picture-title-large': options['largePicture']}"
 				[ngStyle]="style['title']">
 				<%
 				field = field1; fn = fn1; ft = ft1;
 				%>
-				<% include ../../../schema-display.field.html %>			</div>
-			<div class="grid-picture-subtitle" [ngClass]="{'grid-picture-subtitle-large': options['largePicture']}"
+				<% include ../../../schema-display.field.html %>
+			</div>
+			<div class="grid-picture-subtitle"
+				[ngClass]="{'grid-picture-subtitle-large': options['largePicture']}"
 				[ngStyle]="style['intro']">
 				<%
 				field = field2; fn = fn2; ft = ft2;
@@ -36,8 +36,4 @@
 			</div>
 		</div>
 	</div>
-
-
-	<%_ include ../../../schema-detail.d.pipeline.html %>
-	<%_ include ../../../schema-detail.d.ref.html %>
-</div>
+</ng-template>

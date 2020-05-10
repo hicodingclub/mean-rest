@@ -1,6 +1,7 @@
 // Import components for each schema
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; let detailType = schm.detailType;%>
-  <%_ if (api.includes("L")) {%>import { <%-schm.SchemaName%>ListComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list.component';<%}%>
+  <%_ if (api.includes("L") && schm.listTypeNormal) {%>import { <%-schm.SchemaName%>ListComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list.component';<%}%>
+  <%_ if (api.includes("L") && !schm.listTypeNormal) {%>import { <%-schm.SchemaName%>ListWidget<%-schm.ListType%>Component } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-widget-<%-schm.listType%>.component';<%}%>
   <%_ if (api.includes("R") && detailType === 'normal') {%>import { <%-schm.SchemaName%>DetailComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail.component';<%}%>
   <%_ if (api.includes("R") && detailType !== 'normal') {%>import { <%-schm.SchemaName%>DetailWidget<%-schm.DetailType%>Component } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail-widget-<%-detailType%>.component';<%}%>
   <%_ if (api.includes("U") || api.includes("C")) {%>import { <%-schm.SchemaName%>EditComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-edit/<%-schm.schemaName%>-edit.component';<%}%>
@@ -27,7 +28,7 @@ import { AuthGuard } from '@hicoder/angular-auth';
 <%}} %>
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; let detailType = schm.detailType;%>
 export const <%-schm.schemaName%>RoutingPath = [
-    <%if (api.includes("L")) {%>{path: 'list', component: <%-schm.SchemaName%>ListComponent<%
+    <%if (api.includes("L")) {%>{path: 'list', component: <%if (schm.listTypeNormal) {%><%-schm.SchemaName%>ListComponent<%} else {%><%-schm.SchemaName%>ListWidget<%-schm.ListType%>Component<%}
      if (!schm.permission.includes('R')) {%>, canActivate: [AuthGuard]<%}%>},<%}%>
      <%if (api.includes("R")) {%>{path: 'detail/:id', component: <%if (detailType === 'normal') {%><%-schm.SchemaName%>DetailComponent<%} else {%><%-schm.SchemaName%>DetailWidget<%-schm.DetailType%>Component<%}
      if (schm.referred) {%>, children: <%-schm.schemaName%>DetailPath<%}%><%

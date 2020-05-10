@@ -1,6 +1,6 @@
 		<div class="row justify-content-end mt-3">
 		<%const SearchAndSortThreshold = 2;
-		%><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {
+		%><%_ if (typeof(disableSortSelection) == 'undefined' || !disableSortSelection) {
 			const listCategoryFields = listCategories.map(x=>x.listCategoryField);
 			let sortableFields = briefView.filter(x=>x.sortable && !x.hidden && !listCategoryFields.includes(x.fieldName));
 			if (sortableFields.length > 0) {
@@ -27,9 +27,10 @@
 			<button type="button" class="btn btn-outline-success" (click)="onExport()">Export to excel</button><%}%>
 		</div>
 		<div class="d-flex justify-content-between">
-			<div><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {%>
+			<div><%_ if (typeof(disableViewSwitch) == 'undefined' || !disableViewSwitch) {%>
 				<div *ngIf="list.length > 0">
-				<%_ for (const viewType of listTypes) { %><% if (viewType === 'table') { %>
+				<%_ if (listTypes && listTypes.length > 1) {
+				    for (const lt of listTypes) {  let viewType = lt[0];%><% if (viewType === 'table') { %>
 					<input type="radio" name="view-filter" id="table-view" class="view-radio"
 						(click)="setListViewFilter('table')" [checked]="isShowListView('table')">
 						<label for="table-view"><i class="fa fa-list-alt"></i></label><%}%><% if (viewType === 'list') { %>
@@ -39,14 +40,14 @@
 					<input type="radio" name="view-filter" id="grid-view" class="view-radio"
 						(click)="setListViewFilter('grid')" [checked]="isShowListView('grid')">
 						<label for="grid-view"><i class="fa fa-th"></i></label><%}%>
-				<%_ } %>
+				<%_ } } %>
 				</div>
 			<%_ } %>
 			</div>
 
 			<div>
 				<div class="total_counts">
-					<span *ngIf="list.length > <%-SearchAndSortThreshold%>">Total: <b>{{totalCount}}</b></span><%_ if (typeof(showRefreshIcon) !== 'undefined' && showRefreshIcon) {
+					<span *ngIf="list.length > <%-SearchAndSortThreshold%>">Total: <b>{{totalCount}}</b></span><%_ if (typeof(disableRefreshIcon) == 'undefined' || !disableRefreshIcon) {
 					%><%if(api.includes('D') || api.includes('A') ){%>
 					<span *ngIf="list.length > 1"><input type="checkbox" class="ml-3 mr-1" [(ngModel)]="checkAll" (change)="onCheckAllChange()">All</span><%}%>
 					<a class="ml-3" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a><%}%>

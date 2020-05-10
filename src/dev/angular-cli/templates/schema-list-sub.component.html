@@ -23,7 +23,7 @@
 		<span *ngIf="!loaded">Loading...</span>
 	</div>
 	<div class="container search">
-		<% include schema-list.pagination.html %>
+		<%_ let disableRefreshIcon = true; let disableSortSelection = true; let disableViewSwitch = true;%><% include schema-list.pagination.html %>
 	</div>
 	<table *ngIf="list.length > 0" class="table">
 	    <thead>
@@ -84,7 +84,7 @@
 	</table>
 	
 	<div class="container">
-		<% include schema-list.pagination.html %>
+		<%_ disableRefreshIcon = true; disableSortSelection = true; disableViewSwitch = true;%><% include schema-list.pagination.html %>
 	</div>
 	
 </div>

@@ -2,6 +2,7 @@ const createError = require('http-errors');
 const mongoose = require('mongoose');
 
 const MddsUncategorized = 'MddsUncategorized';
+const MddsAll = 'MddsAll';
 
 const createRegex = function(obj) {
   //obj in {key: string} format
@@ -748,8 +749,11 @@ class RestController {
               { _id: null, count: 64 },
               { _id: 5de17192518aa428ae761e70, count: 1 } ]*/
   
+          // Order based on alphebetic
           originCategoriesAll[i].sort();
-          originCategoriesAll[i].reverse();
+          if (i === 1) { // reverse (eg: time based.)
+            originCategoriesAll[i].reverse();
+          }
 
           categoriesAll[i] = originCategoriesAll[i];
           if (cate.categoryFieldRef) {
@@ -781,6 +785,15 @@ class RestController {
           }
           categoriesCounts[i].push(cateCountsObj[MddsUncategorized] || 0);
 
+          if (i===0) {
+            let totalCnt = 0;
+            for (let j = 0; j<categoriesCounts[i].length; j++) {
+              totalCnt += categoriesCounts[i][j];
+            }
+            // put total cnt in front.
+            categoriesCounts[i].splice(0, 0, totalCnt);
+          }
+
           // get the biref population of the category fields
           if (cate.listCategoryShowMore) {
             const [briefPopulateArray, briefPopulateMap] = this.getPopulateInfo(populates.briefView, cate.categoryBy);
@@ -794,17 +807,22 @@ class RestController {
         }
       }
 
-      if (!cate.categoryProvided && originCategoriesAll[i].length > 0) {
+      if (!cate.categoryProvided && originCategoriesAll[i].length > 0) { 
+        // user get a link, it has cateory Candidate, but no categoryProvided
         if (originCategoriesAll[i].includes(cate.categoryCand)) {
           // candidate found
-
           query[cate.categoryBy] = cate.categoryCand;
         } else if (cate.categoryCand === MddsUncategorized) {
           // uncategorized request from front end. use null.
           query[cate.categoryBy] = null;
         } else {
-          // take the first category as query filter
-          query[cate.categoryBy] = originCategoriesAll[i][0];
+          if (i === 0) {
+            // Search all. don't put to query
+            ; // do nothing
+          } else {
+            // take the first category as query filter
+            query[cate.categoryBy] = originCategoriesAll[i][0];
+          }
         }
       }
     }

@@ -21,12 +21,15 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
   <%_ if (schemaHasDate) { %>
   public minDate = {year: (new Date()).getFullYear() - 100, month: 1, day: 1};<%}%>
 
+  // @Input() options: any; {disableCatetory: false, disablePagination: false, disbleActionButtons: false
+  //                        disableListSearch: false, disableTitle: false, disableRefs: false
+  //                        disableListHead: false, disableTitleRow: false}
   @Input()
   public inputData:any;
   @Input()
   public searchObj:any;
   @Input()
-  public sortObj: any;  // {listSortField: 'a', listSortOrder: 'asc' / 'desc'}
+  public queryParams: any;  // {listSortField: 'a', listSortOrder: 'asc' / 'desc', perPage: 6}
   @Input()
   public categoryBy:string; //field name whose value is used as category
   <%if (schemaHasEditor) {%>
@@ -43,7 +46,7 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
                 <%-schemaName%>Service, injector, router, route, location, ViewType.LIST);
 <% let theView = briefView; %><%_ include schema-construct.component.ts %>
 
-          this.listViewFilter = '<%-listType%>';<% if (defaultSortField) { %>
+          this.listViewFilter = '<%-listTypes[0][0]%>';<% if (defaultSortField) { %>
           this.setListSort('<%-defaultSortField%>', '<%-defaultSortFieldDisplay%>', '<%-defaultSortOrder%>');<%}%>
           <%_ const listCategoriesString = JSON.stringify(listCategories);%>
           const listCategories = <%-listCategoriesString%>;
@@ -56,15 +59,27 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
 
       this.adjustListViewForWindowSize();
 
+      if (!this.options) {
+        this.options = {};
+      }
+  
+      if (this.options.disableCatetory) {
+        this.listCategory1 = {}; // no do query based on category for home view;
+        this.listCategory2 = {}; // no do query based on category for home view;
+      }
+
       // this is to initialize the detail that will be used for search condition selection
       let detail = {};
       if (this.searchObj) {
         this.searchDetailReady = true; // search provided from "detail", not from search bar.
         detail = this.searchObj;
       }
-      if (this.sortObj) {
-        this.listSortField = this.sortObj.listSortField;
-        this.listSortOrder = this.sortObj.listSortOrder;
+      if (this.queryParams) {
+        this.listSortField = this.queryParams.listSortField;
+        this.listSortOrder = this.queryParams.listSortOrder;
+        if (this.queryParams.perPage) {
+          this.perPage = this.queryParams.perPage 
+        }
       }
       this.detail = this.formatDetail(detail);
       this.searchList();

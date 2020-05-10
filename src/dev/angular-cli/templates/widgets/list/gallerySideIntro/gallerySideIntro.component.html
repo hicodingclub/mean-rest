@@ -1,39 +1,84 @@
-<ng-template ngFor let-detail [ngForOf]="list" let-idx="index">
-	<div class="d-flex flex-wrap align-items-center" [ngClass]="{'flex-row-reverse': idx%2 == 1}">
-		<%_
-		let field0 = detailView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
-		let field1 = detailView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
-		let field2 = detailView[2]; let fn2 = field2.fieldName; let ft2 = field2.type;
-		let field, fn, ft;%>
-		<div class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}">
-			<div class="text-left h-100"
-				[ngClass]="{'clickable-card pointer': options['canSelect'], 'clicked-row': options['canSelect'] && selectedId === detail['_id']}">
-				<div class="grid-fields" (click)="clickOneItem(idx, detail['_id'])">
-					<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}"
-						[ngStyle]="style['picture']">
-						<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']">
-						</lib-mdds-file-display>
-					</div>
+<%_ let cate = listCategories[0] || {};
+	let { listCategoryField, listCategoryRef, listCategoryShowMore } = cate;
+	let cate2 = listCategories[1] || {};
+	let { listCategoryField: listCategoryField2, listCategoryRef: listCategoryRef2, listCategoryShowMore: listCategoryShowMore2 } = cate2;
+%>
+<div class="mt-4 mb-4 d-flex" *ngIf="!options['disableTitleRow']">
+	<%_ if (listTitle) {%>
+	<div class="list-title" *ngIf="!options['disableTitle']"><%-listTitle%></div><%}%>
+	<%_ if (listCategoryField2) {%>
+	<div *ngIf="categoryDisplays2.length > 0" class="sort-selection ml-3">
+			<div class="dropdown" style="width: 100%;">
+				<button class="category2-dropdown btn btn-light btn-sm dropdown-toggle"
+					type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					{{categoryDisplays2[selectedCategory2 || 0]}}
+				</button>
+				<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+					<a *ngFor="let ele of categoryDisplays2; let idx = index;"  class="dropdown-item pointer" (click)="categorySelected2(idx)">{{ele}}</a>
+				</div>
+			</div>
+	</div><%}%>
+</div>
+
+
+<ul *ngIf="listCategory1.listCategoryField" class="nav nav-pills category-nav">
+	<li *ngFor="let ele of categoryDisplays; let idx = index;" class="nav-item" >
+		<a *ngIf=" listCategory1.showEmptyCategory || (!listCategory1.showEmptyCategory && categoriesCounts[idx] > 0)"
+			class="nav-link" [ngClass]="{'active': idx === selectedCategory }" [routerLink]="['.']" queryParamsHandling="preserve" (click)="categorySelected(idx)">
+				{{ele}} <span *ngIf="listCategory1.showCategoryCounts">({{categoriesCounts[idx]}})</span>
+		</a>
+	</li>
+</ul>
+<%_ 
+if (listCategoryRef && listCategoryShowMore) {%>
+<div *ngFor="let cat of categoryMore; let i = index;" class="ml-3 mb-5">
+	<div *ngIf="i === selectedCategory">
+		<app-<%-listCategoryRef%>-detail-field [showFieldsStr]="'<%-listCategoryShowMore%>'" [detailObj]="cat"></app-<%-listCategoryRef%>-detail-field>
+	</div>
+</div> <%}%>
+
+<div>
+	<div *ngIf="!options['disableListHead']" class="container search"><% if (!disableListSearch) {%>
+		<div class="row" *ngIf="!options['disableListSearch']">
+			<div class="col-9">
+				<%_ include ../../../schema-search.bar.html %>
+			</div>
+		</div><%}%>
+		<div class="row" *ngIf="!options['disableActionButtions']">
+			<div class="col">
+		        <div class="action-buttons">
+					<%if(api.includes('M') && listActionButtons[2] && schemaHasEmailing){%><lib-mdds-action-email *ngIf="emailFields.length > 0" [emailFields]="emailFields" (componentEvents)="onActionBaseEvent($event)"></lib-mdds-action-email><%}%>
+
+					<%if(api.includes('C') && listActionButtons[0]){%><a [routerLink]="['../new' ]" [skipLocationChange]="false" class="btn btn-outline-primary"><%-listActionButtons[0]%></a><%}%>
+					<%if(api.includes('D') && listActionButtons[1]){%><a routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
+						[ngClass]="{'disabled': !isItemSelected()}"><%-listActionButtons[1]%></a><%}%>
+					<%if(api.includes('A') && listActionButtons[3]){%><a routerLink="." class="btn btn-outline-primary" (click)="onArchiveSelected()"
+						[ngClass]="{'disabled': !isItemSelected()}">
+							<span *ngIf="!archivedSearch"><%-listActionButtons[3]%></span>
+							<span *ngIf="archivedSearch">Unarchive</span>
+					</a><%}%>
 				</div>
 			</div>
 		</div>
-		<div class="intro-block">
-			<div class="grid-picture-title"
-				[ngClass]="{'grid-picture-title-large': options['largePicture']}"
-				[ngStyle]="style['title']">
-				<%
-				field = field1; fn = fn1; ft = ft1;
-				%>
-				<% include ../../../schema-display.field.html %>
-			</div>
-			<div class="grid-picture-subtitle"
-				[ngClass]="{'grid-picture-subtitle-large': options['largePicture']}"
-				[ngStyle]="style['intro']">
-				<%
-				field = field2; fn = fn2; ft = ft2;
-				%>
-				<% include ../../../schema-display.field.html %>
-			</div>
+		<hr/>
+		<div *ngIf="!options['disablePagination']">
+			<%_ let disableRefreshIcon = false; let disableSortSelection = false; let disableViewSwitch = false;%><% include ../../../schema-list.pagination.html %>
 		</div>
 	</div>
-</ng-template>
+	<div class="no-records" *ngIf="list.length === 0">
+		<span *ngIf="loaded">No records found.</span>
+		<span *ngIf="!loaded">Loading...</span>
+	</div>
+	<div *ngIf="list.length > 0">
+<% include view.html %>
+	</div>
+	<div class="container">
+		<div *ngIf="!options['disablePagination']">
+		<%_ disableRefreshIcon = true; disableSortSelection = true; disableViewSwitch = true;%><% include ../../../schema-list.pagination.html %>
+		</div>
+	</div>
+	
+</div>
+
+<%_ if (schemaHasRef) {%>
+<ng-template *ngIf="!options['disableRefs']" <%-moduleName%>-ref-select></ng-template><%}%>

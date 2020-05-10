@@ -20,7 +20,7 @@
 			</div>
 		</div>
 		<hr/>
-		<% include schema-list.pagination.html %>
+		<%_ let disableRefreshIcon = true; let disableSortSelection = true; let disableViewSwitch = true;%><% include schema-list.pagination.html %>
 	</div>
 	
 	<table class="table table-bordered table-hover">
@@ -51,7 +51,7 @@
 	</table>
 	
 	<div class="container">
-		<% include schema-list.pagination.html %>
+		<%_ disableRefreshIcon = true; disableSortSelection = true; disableViewSwitch = true;%><% include schema-list.pagination.html %>
 	</div>
 	
 

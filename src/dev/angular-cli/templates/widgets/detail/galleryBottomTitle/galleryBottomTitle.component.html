@@ -5,7 +5,7 @@
 	<div class="d-flex justify-content-center">
 		<div class="grid-block"  [ngClass]="{'grid-block-large': options['largePicture']}">
 			<div class="text-left h-100"
-				[ngClass]="{'clickable-card pointer': options['canSelect'], 'clicked-row': options['canSelect'] && selectedId === detail['_id']}" >
+				[ngClass]="{'clickable-card pointer': !options['disableSelect'], 'clicked-row': !options['disableSelect'] && selectedId === detail['_id']}" >
 				<div class="grid-fields" (click)="selectItemCandidate(0)" >
 				<%_
 				let field0 = detailView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
@@ -15,7 +15,7 @@
 				<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}">                
 								<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']"></lib-mdds-file-display>
 					</div>
-					<div *ngIf="options['showTitle']"  class="text-center">
+					<div *ngIf="!options['notShowTitle']"  class="text-center">
 						<div class="grid-picture-title" [ngClass]="{'grid-picture-title-large': options['largePicture']}">		
 							<%
 						    field = field1; fn = fn1; ft = ft1;

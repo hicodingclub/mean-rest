@@ -9,7 +9,7 @@ export class MddsCommonService {
 
   constructor() {}
 
-  public getFromStorage(name: string) {
+  public getFromStorage(name: string): any {
       return this.storage[name];
   }
   public putToStorage(name: string, value: any) {

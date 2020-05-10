@@ -1,12 +1,12 @@
 
 			<div class="text-left h-100"
-				[ngClass]="{'clickable-card pointer': options['canSelect'], 'clicked-row': selectedId === detail['_id']}" >
+				[ngClass]="{'clickable-card pointer': !options['disableSelect'], 'clicked-row': !options['disableSelect'] && selectedId === detail['_id']}" >
 				<div class="grid-fields" (click)="selectItemCandidate(i)" >
 
 					<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}">                
 								<lib-mdds-file-display [downloadUrl]="detail[pictureLink]" [isLarge]="options['largePicture']"></lib-mdds-file-display>
 					</div>
-					<div *ngIf="options['showTitle']">
+					<div *ngIf="!options['notShowTitle']">
 						<div class="grid-picture-title" [ngClass]="{'grid-picture-title-large': options['largePicture']}">		
 							{{detail[title]}}
 						</div>

@@ -19,6 +19,7 @@ export enum ViewType {
 }
 
 export const MddsUncategorized = "MddsUncategorized";
+export const MddsAll = "MddsAll";
 
 export class MddsBaseComponent implements MddsBaseComponentInterface {
   public objectKeys = Object.keys;
@@ -1148,7 +1149,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         oValue = null;
       }
       const o = {};
-      o[field] = oValue;
+      if (oValue !== MddsAll) {
+        o[field] = oValue;
+      }
       andSearchContext.push(o);
     }
     // Handle date range selection. These fields are not in d2, because field.date is undefined.
@@ -1395,13 +1398,22 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
               selectedCategory: this.selectedCategory2,
             },
           ];
-          for (const c of cateGroup) {
+          for (let i = 0; i < 2; i++) {
+            const c = cateGroup[i];
             if (c.listCategoryField && !c.categoryProvided) {
+              // Non required field will have "uncategorized" selection
               if (!this.requiredFields.includes(c.listCategoryField)) {
                 const fakeObj = {};
                 fakeObj[c.listCategoryField] = MddsUncategorized;
                 c.categories.push(fakeObj);
                 c.categoriesBrief.push({ _id: MddsUncategorized });
+              }
+              if (i === 0) {
+                // Add "All" selection
+                const fakeObj = {};
+                fakeObj[c.listCategoryField] = MddsAll;
+                c.categories.splice(0, 0, fakeObj);
+                c.categoriesBrief.splice(0, 0, { _id: MddsAll });
               }
 
               c.categoriesOut = c.categories.map((x: any) =>
@@ -1417,6 +1429,8 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
                 );
                 if (display === MddsUncategorized) {
                   display = "Uncategorized";
+                } else if (display === MddsAll) {
+                  display = "All";
                 }
                 return display;
               });
