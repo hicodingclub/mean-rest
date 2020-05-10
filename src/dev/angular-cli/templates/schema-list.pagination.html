@@ -18,8 +18,8 @@
 							if (field.hidden) continue;
 							if (listCategoryFields.includes(field.fieldName)) continue;
 							if (field.sortable) {%>
-							<a class="dropdown-item pointer" (click)="setListSortAndRefresh('<%-field.fieldName%>', '<%-field.displayName%>', 'asc')"><%-field.FieldName%><i class="fas fa-arrow-up"></i></a>
-							<a class="dropdown-item pointer" (click)="setListSortAndRefresh('<%-field.fieldName%>', '<%-field.displayName%>', 'desc')"><%-field.FieldName%><i class="fas fa-arrow-down"></i></a><%} }%>
+							<a class="dropdown-item pointer" (click)="setListSortAndRefresh('<%-field.fieldName%>', '<%-field.displayName%>', 'asc')"><%-field.displayName%><i class="fas fa-arrow-up"></i></a>
+							<a class="dropdown-item pointer" (click)="setListSortAndRefresh('<%-field.fieldName%>', '<%-field.displayName%>', 'desc')"><%-field.displayName%><i class="fas fa-arrow-down"></i></a><%} }%>
 						</div>
 					</div>
 			</div><%} }%>
