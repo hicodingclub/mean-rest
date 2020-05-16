@@ -16,7 +16,9 @@ import { ComponentFactoryResolver } from '@angular/core';<%}%>
   styleUrls: ['./<%-schemaName%>-detail.component.css', './<%-schemaName%>-detail-widget-gallerySideIntro.component.css']
 })
 export class <%-SchemaName%>DetailWidgetGallerySideIntroComponent extends <%-SchemaName%>DetailComponent implements OnInit, AfterViewInit {
-  @Input() public options: any = {}; // { disableSelect: true, largePicture: true, notShowTitle: true}; // {disableSelect: true, largePicture: true, notShowTitle: true};
+  @Input() public options: any = {
+    largePicture: true,
+  }; // { disableSelect: true, largePicture: true, notShowTitle: true}; // {disableSelect: true, largePicture: true, notShowTitle: true};
   @Input() public style: any = {}; // { picture: {height: '16rem'}, title: {}, intro: {} }
 
   constructor(
@@ -31,9 +33,6 @@ export class <%-SchemaName%>DetailWidgetGallerySideIntroComponent extends <%-Sch
   }
 
   ngOnInit() {
-    if (!this.options) {
-      this.options = {};
-    }
     super.ngOnInit();
   }
 

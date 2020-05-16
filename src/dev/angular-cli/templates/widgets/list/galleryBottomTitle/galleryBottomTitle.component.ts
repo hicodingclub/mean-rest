@@ -12,7 +12,7 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
   styleUrls: ['./<%-schemaName%>-list.component.css', './<%-schemaName%>-list-widget-galleryBottomTitle.component.css'],
 })
 export class <%-SchemaName%>ListWidgetGalleryBottomTitleComponent extends <%-SchemaName%>ListComponent implements OnInit {
-  // @Input() public options: any = {}; // { disableSelect: true, largePicture: true, notShowTitle: true, clickToDetail }
+  // @Input() public options: any = {}; // { disableSelect, clickToDetail, largePicture, notShowTitle, notShowSubTitle}
   // @Input() public style: any = {}; // { picture: {height: '16rem'}, title: {}, subtitle: {} }
 
   public title: string;

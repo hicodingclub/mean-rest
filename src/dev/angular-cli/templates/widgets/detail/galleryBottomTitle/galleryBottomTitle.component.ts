@@ -16,8 +16,11 @@ import { ComponentFactoryResolver } from '@angular/core';<%}%>
   styleUrls: ['./<%-schemaName%>-detail.component.css', './<%-schemaName%>-detail-widget-galleryBottomTitle.component.css']
 })
 export class <%-SchemaName%>DetailWidgetGalleryBottomTitleComponent extends <%-SchemaName%>DetailComponent implements OnInit, AfterViewInit {
-  @Input() public options: any = {}; // { disableSelect: true, largePicture: true, notShowTitle: true}; // {disableSelect: true, largePicture: true, notShowTitle: true};
-  
+  @Input() public options: any = {
+    largePicture: true,
+  }; // { disableSelect: true, largePicture: true, notShowTitle: true}; // {disableSelect: true, largePicture: true, notShowTitle: true};
+  // @Input() public style: any = {}; // { picture: {height: '16rem'}, title: {}, intro: {} }
+
   constructor(
       <%if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
       public <%-schemaName%>Service: <%-SchemaName%>Service,
@@ -31,7 +34,9 @@ export class <%-SchemaName%>DetailWidgetGalleryBottomTitleComponent extends <%-S
 
   ngOnInit() {
     if (!this.options) {
-      this.options = {};
+      this.options = {
+        largePicture: true,
+      };
     }
     super.ngOnInit();
   }

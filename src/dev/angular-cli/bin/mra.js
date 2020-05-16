@@ -1330,13 +1330,13 @@ function main() {
       if (mraUI.listTypeOnly) {
         listTypeOnly = mraUI.listTypeOnly;
         listTypes = [listTypeOnly];
+        listType = listTypeOnly;
       }
       if (mraUI.listType) {
         if (listTypeOnly) {
           warning(
             `Schema ${name} "listTypeOnly" is already set. Ignore listType ${mraUI.listType}...`
           );
-          listType = listTypeOnly;
         } else {
           if (!listTypes.includes(mraUI.listType)) {
             `Schema ${name} "listType" value ${mraUI.listType} incorrect. Ignore...`;
@@ -1408,7 +1408,7 @@ function main() {
     let listWidgets = schemaDef.listWidgets || []; //widgets: clean, sld, sel, ...
     let ListType = capitalizeFirst(listType);
     if ( !listTypeNormal && !listWidgets.includes(listType)) {
-      listWidgets.push(detailType);
+      listWidgets.push(listType);
     }
     listWidgets = listWidgets.map((x) => {
       return [x, capitalizeFirst(x)];
@@ -1775,6 +1775,7 @@ function main() {
       tempListCategories.push(cate);
     }
     listCategories = tempListCategories;
+    const listCategoryFields = listCategories.map(x=>x.listCategoryField);
 
     let schemaObj = {
       name: name,
@@ -1832,6 +1833,7 @@ function main() {
       disableListSearch,
       listActionButtons,
       listCategories,
+      listCategoryFields,
 
       detailType, // normal, post, info, slide, term...
       DetailType,

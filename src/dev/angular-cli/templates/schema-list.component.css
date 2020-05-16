@@ -125,7 +125,7 @@ tr th:first-child{
   background-color: rgba(0,0,0,.075);
 }
 
-.card label, .list-body-fields label {
+.card label, .list-body-fields label, .field-label {
   font-weight: bold;
 	font-size: 1rem;
 }

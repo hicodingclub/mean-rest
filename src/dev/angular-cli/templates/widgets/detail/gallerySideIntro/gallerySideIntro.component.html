@@ -1,7 +1,8 @@
 <div class="detail" *ngIf="detail">
-	<%_ include ../../../schema-detail.d.actions.html %>
-
-	<div class="d-flex flex-wrap align-items-center">
+	<div>
+		<%_ include ../../../schema-detail.d.actions.html %>
+	</div>
+	<div class="row flex-wrap align-items-center">
 		<%_
 		let field0 = detailView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
 		let field1 = detailView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
@@ -33,7 +34,19 @@
 				field = field2; fn = fn2; ft = ft2;
 				%>
 				<% include ../../../schema-display.field.html %>
-			</div>
+			</div><%if (detailView.length > 3) {%>
+			<hr/><%}%><%_
+			const otherFields = detailView.slice(3);
+			for (let [index, field] of otherFields.entries()){
+				if (field.hidden) continue;
+		
+				let fn = field.fieldName; let ft = field.type;;
+				%>
+			<div *ngIf="detail['<%-fn%>']" class="mr-3 d-inline-flex flex-wrap">
+				<div><label class="field-label"><%-field.displayName%>:</label></div>
+				<div class="ml-3"><% include ../../../schema-display.field.html %></div>
+			</div><%_  
+			}%>
 		</div>
 	</div>
 

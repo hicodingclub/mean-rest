@@ -25,6 +25,8 @@ export class <%-SchemaName%>DetailWidgetTermComponent extends <%-SchemaName%>Det
       public location: Location) {
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
                 <%-schemaName%>Service, injector, router, route, location);
+          
+          this.actionType = 'term';
   }
 
   ngOnInit() {

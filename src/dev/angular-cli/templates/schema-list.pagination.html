@@ -1,7 +1,6 @@
 		<div class="row justify-content-end mt-3">
 		<%const SearchAndSortThreshold = 2;
 		%><%_ if (typeof(disableSortSelection) == 'undefined' || !disableSortSelection) {
-			const listCategoryFields = listCategories.map(x=>x.listCategoryField);
 			let sortableFields = briefView.filter(x=>x.sortable && !x.hidden && !listCategoryFields.includes(x.fieldName));
 			if (sortableFields.length > 0) {
 			%>

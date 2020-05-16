@@ -39,8 +39,7 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
       public location: Location) {
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
                 <%-schemaName%>Service, injector, router, route, location, ViewType.DETAIL);
-<% let theView = detailView; let isEditView = false;%><%_ include schema-construct.component.ts %><% if (detailType === 'term') {%>
-          this.actionType = 'term';<%}%>
+<% let theView = detailView; let isEditView = false;%><%_ include schema-construct.component.ts %>
   }
 
   ngOnInit() {
@@ -66,7 +65,7 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component imp
       }
       if (refApi.includes("L")) {%>
     //Load first reference, if not others activated
-    if (!this.isChildRouterActivated()) {
+    if (!this.options['disableRefLink'] && !this.isChildRouterActivated()) {
       this.router.navigate(['./<%-ref[0]%>/list', {}], {relativeTo: this.route, queryParamsHandling: 'preserve',});
     }<%
         break;

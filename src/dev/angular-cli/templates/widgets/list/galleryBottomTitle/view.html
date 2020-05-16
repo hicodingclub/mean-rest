@@ -2,9 +2,9 @@
 	<div class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"
 		*ngFor="let detail of list;  let i = index; let list_index = index;">
 		<%_
-		let field0 = detailView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
-		let field1 = detailView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
-		let field2 = detailView[2]; let fn2 = field2.fieldName; let ft2 = field2.type;
+		let field0 = briefView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
+		let field1 = briefView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
+		let field2 = briefView[2]; let fn2 = field2.fieldName; let ft2 = field2.type;
 		let field, fn, ft;
 		%>
 		<div class="text-left h-100"
@@ -16,22 +16,34 @@
 					<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']">
 					</lib-mdds-file-display>
 				</div>
-				<div *ngIf="!options['notShowTitle']" class="text-center">
-					<div class="grid-picture-title" [ngClass]="{'grid-picture-title-large': options['largePicture']}"
+				<div class="text-center">
+					<div *ngIf="!options['notShowTitle']" class="grid-picture-title" [ngClass]="{'grid-picture-title-large': options['largePicture']}"
 					[ngStyle]="style['title']">
 						<%
 						field = field1; fn = fn1; ft = ft1;
 						%>
 						<% include ../../../schema-display.field.html %>
 					</div>
-					<div class="grid-picture-subtitle"
+					<div *ngIf="!options['notShowSubTitle']" class="grid-picture-subtitle"
 						[ngClass]="{'grid-picture-subtitle-large': options['largePicture']}"
 						[ngStyle]="style['subtitle']">
 						<%
 						field = field2; fn = fn2; ft = ft2;
 						%>
 						<% include ../../../schema-display.field.html %>
-					</div>
+					</div><%_
+					const otherFields = briefView.slice(3);
+					for (let [index, field] of otherFields.entries()){
+						if (field.hidden) continue;
+						if (listCategoryFields.includes(field.fieldName)) continue;
+				
+						let fn = field.fieldName; let ft = field.type;;
+						%>
+					<div *ngIf="detail['<%-fn%>']" class="mr-3 d-inline-flex flex-wrap">
+						<div><label class="field-label"><%-field.displayName%>:</label></div>
+						<div class="ml-3"><% include ../../../schema-display.field.html %></div>
+					</div><%_  
+					}%>
 				</div>
 			</div>
 		</div>

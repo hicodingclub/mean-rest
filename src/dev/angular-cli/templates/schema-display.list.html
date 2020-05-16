@@ -4,7 +4,7 @@
     let otherFields = viewFields.filter(x => !x.picture && !x.isIndexField);
     for (let field of pictureFields){
       if (field.hidden) continue;
-
+      if (listCategoryFields.includes(field.fieldName)) continue;
       let fn = field.fieldName; let ft = field.type;;
       %>
       <div class="list-head-picture"><% include schema-display.field.html %>
@@ -14,6 +14,7 @@
         <h5><%
     for (let [index, field] of indexedFields.entries()){
         if (field.hidden) continue;
+        if (listCategoryFields.includes(field.fieldName)) continue;
 
         let fn = field.fieldName; let ft = field.type;;
         %>
@@ -24,6 +25,7 @@
         </h5><%
     for (let [index, field] of otherFields.entries()){
         if (field.hidden) continue;
+        if (listCategoryFields.includes(field.fieldName)) continue;
 
         let fn = field.fieldName; let ft = field.type;;
         %>
