@@ -356,6 +356,25 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     return str;
   }
 
+  /***Start: formatCurrency. Will be called by UI, not inside component data structure ***/
+  public formatCurrency(num: number, thouSep: string, decSep: string, decPlaces: number): string {
+    decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces;
+    decSep = typeof decSep === "undefined" ? '.' : decSep;
+    thouSep = typeof thouSep === "undefined" ? ',' : thouSep;
+    const sign = num < 0 ? "-" : "";
+    // Integer part
+    const i = Math.abs(num).toFixed(0);
+    // Decimal part, with seperator
+    const d = decPlaces ? decSep + Math.abs(num).toFixed(decPlaces).split('.')[1] : '';
+
+    const l = i.length;
+    const j = l > 3 ? l % 3 : 0;
+    
+    return sign +
+      (j ? i.substr(0, j) + thouSep : '') +
+      i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thouSep) + d;
+  }
+
   /***Start: handle textarea fields***/
   public formatTextareaFields(detail: any): any {
     for (const fnm of this.textareaFields) {
