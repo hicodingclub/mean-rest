@@ -19,7 +19,7 @@ export class <%-SchemaName%>DetailWidgetGallerySideIntroComponent extends <%-Sch
   @Input() public options: any = {
     largePicture: true,
   }; // { disableSelect: true, largePicture: true, notShowTitle: true}; // {disableSelect: true, largePicture: true, notShowTitle: true};
-  @Input() public style: any = {}; // { picture: {height: '16rem'}, title: {}, intro: {} }
+  // @Input() public style: any = {}; // { picture: {height: '16rem'}, title: {}, intro: {} }
 
   constructor(
       <%if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>

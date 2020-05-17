@@ -102,7 +102,8 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     }
 
     const schm = schemaDef.schema;
-    const collectionName = schemaDef.collection;
+    const mraBE = schemaDef.mraBE || {};
+    const collectionName = mraBE.collection;
     let model;
     if (schm) {
       // apply archive
@@ -120,6 +121,7 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
       }
       schm.set('toObject', {getters: false, virtuals: true});
       schm.set('toJSON', {getters: false, virtuals: true});
+
       if (collectionName) {
         model = mongoose.model(schemaName, schm, collectionName );//model uses given name and given collection
       } else {
@@ -143,7 +145,7 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
 
       // tell controller to use save so mongoose logic of plugin can be triggered
       schm.options.useSaveInsteadOfUpdate = true; //this is a special indicator to controller use save.
-      restController.register(schemaName, schm, views, model, moduleName, ownerConfig);
+      restController.register(schemaName, schm, views, model, moduleName, ownerConfig, mraBE);
     }
     if (permissionStore && api) {
       permissionStore.registerResource(schemaName, moduleName);
