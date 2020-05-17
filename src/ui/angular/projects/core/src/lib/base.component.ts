@@ -360,9 +360,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   /***Start: formatCurrency. Will be called by UI, not inside component data structure ***/
   public formatCurrency(
     num: number,
-    thouSep: string,
-    decSep: string,
-    decPlaces: number
+    thouSep?: string,
+    decSep?: string,
+    decPlaces?: number
   ): string {
     decPlaces = isNaN((decPlaces = Math.abs(decPlaces))) ? 2 : decPlaces;
     decSep = typeof decSep === "undefined" ? "." : decSep;
