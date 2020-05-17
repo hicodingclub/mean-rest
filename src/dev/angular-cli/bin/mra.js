@@ -360,14 +360,14 @@ var getPrimitiveField = function (fieldSchema) {
   let enumValues;
   let ref, Ref, RefCamel;
   let editor = false;
-  let link = false; // if this is URL link
+  let mraType = ''; // if this is URL link
   let textarea = false;
+  let currency = false;
   let requiredField = false;
   let mraEmailRecipient = false; // if this email can be used by sendEmail Action
 
   let flagDate = false;
   let flagRef = false;
-  let flagEditor = false;
   let flagPicture = false;
   let aspectRatio;
   let flagFile = false;
@@ -397,20 +397,29 @@ var getPrimitiveField = function (fieldSchema) {
         });
       if (fieldSchema.options.editor == true) {
         editor = true;
-        flagEditor = true;
-      } else if (fieldSchema.options.mraType === 'picture') {
-        flagPicture = true;
-        flagSharable = !!fieldSchema.options.mraSharable;
-        aspectRatio = fieldSchema.options.aspectRatio;
-      } else if (fieldSchema.options.mraType === 'file') {
-        flagFile = true;
-        flagSharable = !!fieldSchema.options.mraSharable;
-      } else if (fieldSchema.options.textarea == true) {
+      }  else if (fieldSchema.options.textarea == true) {
         textarea = true;
       } else if (fieldSchema.options.mraEmailRecipient == true) {
         mraEmailRecipient = true;
-      } else if (fieldSchema.options.link == true) {
-        link = true;
+      } else if (fieldSchema.options.mraType) {
+        mraType = fieldSchema.options.mraType.toLowerCase();
+        switch (mraType) {
+          case 'picture':
+            flagPicture = true;
+            flagSharable = !!fieldSchema.options.mraSharable;
+            aspectRatio = fieldSchema.options.aspectRatio;
+    
+            break;
+          case 'file':
+            flagFile = true;
+            flagSharable = !!fieldSchema.options.mraSharable;
+    
+            break;
+          case 'httpurl':
+            break;
+          default:
+            warning(`Unrecoganized mraType for SchemaString: ${fieldSchema.options.mraType}. Ignore...`);
+        }
       }
       break;
     case 'SchemaBoolean':
@@ -418,6 +427,16 @@ var getPrimitiveField = function (fieldSchema) {
       break;
     case 'SchemaNumber':
       jstype = 'number';
+
+      if (fieldSchema.options.mraType) {
+        mraType = fieldSchema.options.mraType.toLowerCase();
+        switch (mraType) {
+          case 'currency':
+            break;
+          default:
+            warning(`Unrecoganized mraType for SchemaNumber: ${fieldSchema.options.mraType}. Ignore...`);
+        }
+      }
       if (fieldSchema.validators)
         fieldSchema.validators.forEach((val) => {
           if (val.type == 'min' && typeof val.min === 'number')
@@ -455,12 +474,11 @@ var getPrimitiveField = function (fieldSchema) {
     Ref,
     RefCamel,
     editor,
-    link,
+    mraType,
     textarea,
     mraEmailRecipient,
     flagDate,
     flagRef,
-    flagEditor,
     flagPicture,
     aspectRatio,
     flagFile,
@@ -572,7 +590,7 @@ var generateViewPicture = function (
     let enumValues;
     let ref, Ref, RefCamel;
     let editor = false;
-    let link = false;
+    let mraType = '';
     let textarea = false;
     let requiredField = false;
     let mraEmailRecipient = false;
@@ -581,7 +599,6 @@ var generateViewPicture = function (
 
     let flagDate = false;
     let flagRef = false;
-    let flagEditor = false;
     let flagPicture = false;
     let aspectRatio;
     let flagFile = false;
@@ -627,12 +644,11 @@ var generateViewPicture = function (
             Ref,
             RefCamel,
             editor,
-            link,
+            mraType,
             textarea,
             mraEmailRecipient,
             flagDate,
             flagRef,
-            flagEditor,
             flagPicture,
             aspectRatio,
             flagFile,
@@ -640,12 +656,12 @@ var generateViewPicture = function (
           ] = getPrimitiveField(fieldSchema);
           if (flagDate) hasDate = true;
           if (flagRef) hasRef = true;
-          if (flagEditor) hasEditor = true;
+          if (editor) hasEditor = true;
           if (flagPicture || flagFile) hasFileUpload = true;
           if (mraEmailRecipient) hasEmailing = true;
 
           sortable = true;
-          if (flagEditor || flagPicture || flagFile) sortable = false;
+          if (editor || flagPicture || flagFile) sortable = false;
           break;
         case 'SchemaArray':
           [
@@ -660,12 +676,11 @@ var generateViewPicture = function (
             Ref,
             RefCamel,
             editor,
-            link,
+            mraType,
             textarea,
             mraEmailRecipient,
             flagDate,
             flagRef,
-            flagEditor,
             flagPicture,
             aspectRatio,
             flagFile,
@@ -710,12 +725,11 @@ var generateViewPicture = function (
             Ref,
             RefCamel,
             editor,
-            link,
+            mraType,
             textarea,
             mraEmailRecipient,
             flagDate,
             flagRef,
-            flagEditor,
             flagPicture,
             aspectRatio,
             flagFile,
@@ -780,7 +794,7 @@ var generateViewPicture = function (
       Ref,
       RefCamel,
       editor, //rich format text
-      link,
+      mraType,
       textarea, // big text input
       mraEmailRecipient, // an email field an can receive email
       picture: flagPicture, // a picture field
@@ -881,6 +895,16 @@ var generateViewPicture = function (
     hasEmailing,
   ];
 };
+
+const setSortFields = function (view, fieldArr) {
+  if (!fieldArr) return;
+  let arr = fieldArr.slice(0);
+  for (let f of view) {
+    if (!arr.includes(f.fieldName)) {
+      f.sortable = false;
+    }
+  }
+}
 
 const getLoginUserPermission = function (permission) {
   let othersPermisson = permission['others'];
@@ -1311,6 +1335,7 @@ function main() {
     let defaultSortField, defaultSortOrder;
     let homeListNumber = 4;
     let listCategories = []; // object {listCategoryField:xxx, listCategoryShowMore: 'field...', listCategoryRef: 'xxxx', showCategoryCounts: true, showEmptyCategory: false}
+    let listSortFields; // sortable fields name inside the array. 'undefined' will use default sort fields.
 
     let detailActions = []; //extra buttons that trigger other pipelines
     let detailActionButtons = ['Edit', 'New', 'Delete', 'Archive'];
@@ -1371,6 +1396,7 @@ function main() {
       detailRefName = mraUI.detailRefName || detailRefName;
       selectActionViewType = mraUI.selectActionViewType || selectActionViewType;
       listCategories = mraUI.listCategories || listCategories;
+      listSortFields = mraUI.listSortFields;
       homeListNumber = mraUI.homeListNumber || homeListNumber;
 
       if (mraUI.defaultListSort) {
@@ -1472,6 +1498,7 @@ function main() {
     let indexViewNames = [];
     //briefView, detailView, CreateView, EditView, SearchView, indexView]
 
+    /* 1. handle fields in indexView */
     let [
       indexViewGrp,
       indexView,
@@ -1493,7 +1520,7 @@ function main() {
     for (let s of indexView) {
       indexViewNames.push(s.fieldName);
     }
-
+    /* 2. handle fields in briefView */
     let [
       briefViewGrp,
       briefView,
@@ -1514,6 +1541,9 @@ function main() {
     );
     //console.log('***briefView', briefView);
     //console.log('***hasRef1', hasRef1);
+    setSortFields(briefView, listSortFields);
+
+    /* 3. handle fields in detailView */
     let [
       detailViewGrp,
       detailView,
@@ -1532,6 +1562,8 @@ function main() {
       validators,
       indexViewNames
     );
+
+    /* 4. handle fields in createView */
     let [
       createViewGrp,
       createView,
@@ -1550,6 +1582,8 @@ function main() {
       validators,
       indexViewNames
     );
+
+    /* 5. handle fields in editView */
     let [
       editViewGrp,
       editView,
@@ -1568,6 +1602,8 @@ function main() {
       validators,
       indexViewNames
     );
+
+    /* 6. handle fields in searchView */
     let [
       searchViewGrp,
       searchView,
@@ -1648,6 +1684,8 @@ function main() {
     for (let i of briefFields) {
       detailSubViewStr = detailSubViewStr.replace(i, '');
     }
+
+    /* 6. handle fields in detailSubView */
     let [
       detailSubViewGrp,
       detailSubView,
