@@ -49,8 +49,14 @@
                     <lib-mdds-file-display [downloadUrl]="detail['<%-fn%>']" [isLarge]="<%-isLarge%>" [aspectRatio]="<%-field.aspectRatio%>"></lib-mdds-file-display><%
                         } else if (field.textarea) {%>
                     <div [innerHTML]="detail['<%-fn%>']"></div><%
-                        } else if (field.link) {%>
+                        } else if (field.mraType === 'httpurl') {%>
                     <a href="{{detail['<%-fn%>']}}">{{detail['<%-fn%>']}}</a><%
+                        } else {%>
+                    {{detail['<%-fn%>']}}<%_
+                        }%><%
+                } else if (ft === 'SchemaNumber') {
+                        if (field.mraType === 'currency') {%>
+                    $ {{formatCurrency(detail['<%-fn%>'])}}<%
                         } else {%>
                     {{detail['<%-fn%>']}}<%_
                         }%><%

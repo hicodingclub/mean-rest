@@ -1,6 +1,10 @@
 	    <div class="single-line-edit">
 	      <div class="row">
-	        <div class="col-3"><label for="<%-sn%>Edit<%-Fn%>"><%-fD%></label></div>
+			<div class="col-3">
+				<label for="<%-sn%>Edit<%-Fn%>">
+				<%-fD%> <%if (field.type === "SchemaNumber" && field.mraType === 'currency'){%>(USD)<%}%>
+				</label>
+			</div>
 	        <div class="col-8">
 
     <%_ if (field.type === "SchemaString") { %>
