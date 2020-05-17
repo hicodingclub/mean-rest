@@ -39,9 +39,13 @@
 				
 						let fn = field.fieldName; let ft = field.type;;
 						%>
-					<div *ngIf="detail['<%-fn%>']" class="mr-3 d-inline-flex flex-wrap">
-						<div><label class="field-label"><%-field.displayName%>:</label></div>
-						<div class="ml-3"><% include ../../../schema-display.field.html %></div>
+					<div *ngIf="detail['<%-fn%>']" class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']">
+						<div class="field-label text-right w-50" [ngStyle]="style['<%-fn%>-label']">
+							<%-field.displayName%>:
+						</div>
+						<div class="ml-1 text-left" [ngStyle]="style['<%-fn%>-value']">
+							<% include ../../../schema-display.field.html %>
+						</div>
 					</div><%_  
 					}%>
 				</div>

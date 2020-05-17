@@ -34,7 +34,7 @@ export class <%-SchemaName%>ListWidgetGalleryBottomTitleComponent extends <%-Sch
   }
 
   clickOneItem(i: number, id: string) {
-    this.selectItemCandidate(i);
+    // this.selectItemCandidate(i);
     if (this.options.clickToDetail) {
       this.onDetailLinkClicked(id);
     }

@@ -35,7 +35,7 @@ export class <%-SchemaName%>ListWidgetGallerySideIntroComponent extends <%-Schem
   }
 
   clickOneItem(i: number, id: string) {
-    this.selectItemCandidate(i);
+    // this.selectItemCandidate(i);
     if (this.options.clickToDetail) {
       this.onDetailLinkClicked(id);
     }
