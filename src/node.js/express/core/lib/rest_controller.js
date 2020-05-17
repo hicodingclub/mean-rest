@@ -109,7 +109,7 @@ const checkAndSetValue = function (obj, schema) {
           d2.setDate(d2.getDate() + 1);
 
           obj[item] = { $gte: d1, $lt: d2 };
-        } else if (typeof obj[item] == 'object') {
+        } else if (typeof obj[item] === 'object') {
           //data range
           let o = {};
           if (obj[item]['from']) {
@@ -128,7 +128,7 @@ const checkAndSetValue = function (obj, schema) {
           }
           obj[item] = o;
         }
-      } else if (type == 'SchemaString') {
+      } else if (type === 'SchemaString') {
         let userInput = obj[item];
 
         if (userInput) {
@@ -140,6 +140,26 @@ const checkAndSetValue = function (obj, schema) {
         }
 
         obj[item] = userInput;
+      } else if (type == 'SchemaNumber') {
+        if (typeof obj[item] === 'object') {
+          //data range
+          let o = {};
+          if (typeof obj[item]['from'] === 'number') {
+            let dt = obj[item]['from'];
+            //let y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate();
+            //let d1 = new Date(y, m, d);
+            o['$gte'] = dt;
+          }
+          if (typeof obj[item]['to'] === 'number') {
+            let dt = obj[item]['to'];
+            //let y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate();
+            //let d2 = new Date(y, m, d);
+            //d2.setDate(d2.getDate() + 1);
+
+            o['$lte'] = dt;
+          }
+          obj[item] = o;
+        }
       }
     }
   }
@@ -1030,7 +1050,53 @@ class RestController {
     }
   }
 
-  getFieldValues(req, res, next, fieldValueSearch) {
+  async searchFieldValues(req, res, next, fieldValueSearch) {
+    const {
+      name,
+      schema,
+      model,
+      views,
+      populates,
+      owner,
+      mraBE,
+    } = this.loadContextVars(req);
+    //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+
+    let query = {};
+    //get the query parameters ?a=b&c=d, but filter out unknown ones
+    const PER_PAGE = 100,
+      MAX_PER_PAGE = 1000;
+    let __page = 1;
+    let __per_page = PER_PAGE;
+    for (let prop in req.query) {
+      if (prop === '__page') {
+        __page = parseInt(req.query[prop]);
+      } else if (prop === '__per_page') {
+        __per_page = parseInt(req.query[prop]);
+      }
+    }
+    
+    let catQuery = {};
+    catQuery = ownerPatch(catQuery, owner, req);
+    catQuery = searchObjPatch(catQuery, mraBE)
+
+    originCategoriesAll[i] = await model
+      .find(catQuery)
+      .distinct(cate.categoryBy)
+      .exec(); // no objects
+
+    const aggregatePipes = [
+      { $match: catQuery },
+      { $group: { _id: `$${cate.categoryBy}`, count: { $sum: 1 } } },
+    ];
+    let cateCounts = await model.aggregate(aggregatePipes).exec();
+    cateCounts = JSON.parse(JSON.stringify(cateCounts));
+    const cateCountsObj = {};
+    for (const c of cateCounts) {
+      let k = c['_id'];
+      if (k === null) k = MddsUncategorized;
+      cateCountsObj[k] = c['count'];
+    }
   }
 
   getSamples(req, res, next, searchContext) {
@@ -1225,7 +1291,7 @@ class RestController {
         break;
       case '/mddsaction/getfieldvalue':
         let fieldValueSearch = body ? body.fieldValueSearch : {};
-        this.getFieldValues(req, res, next, fieldValueSearch);
+        this.searchFieldValues(req, res, next, fieldValueSearch);
         break;
       case '/mddsaction/get':
         let searchContext = body ? body.search : {};
