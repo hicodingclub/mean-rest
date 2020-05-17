@@ -460,6 +460,10 @@ div.badge-click:hover {
   zoom: 1.35;
 }
 
+.currency {
+  margin-right: 10px;
+}
+
 /*Start Archive Slider*/
 /* The switch - the box around the slider */
 .switch {

@@ -183,9 +183,10 @@
         </fieldset>
     <%_ } else if (field.type === "SchemaNumber") { %>
         <fieldset class="form-group">
-          <label for="Edit<%-Fn%>"><%-fD%> <%if (field.mraType === 'currency'){%>(USD)<%}%></label>
+          <label for="Edit<%-Fn%>"><%-fD%></label>
           <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
+          <%if (field.mraType === 'currency'){%><span class="currency">$</span><%}%>
           <input type="number" class="form-control" id="Edit<%-Fn%>" 
                   <%if (typeof field.numberMin === 'number') {%>libMddsMinNumber="<%-field.numberMin%>" min="<%-field.numberMin%>"<%}%>
                   <%if (typeof field.numberMax === 'number') {%>libMddsMaxNumber="<%-field.numberMax%>" max="<%-field.numberMax%>"<%}%>

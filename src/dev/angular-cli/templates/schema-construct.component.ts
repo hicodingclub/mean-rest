@@ -16,6 +16,12 @@
     }
     if (dateObjects.length > 0) {%>
           this.dateFields = [<%for (let fnm of dateObjects) {%>'<%-fnm%>', <%}%>];<%}%>
+<%_ let numberObjects = [];
+    for (let field of theView) { 
+        if (field.type === "SchemaNumber") numberObjects.push(field.fieldName);
+    }
+    if (numberObjects.length > 0) {%>
+          this.numberFields = [<%for (let fnm of numberObjects) {%>'<%-fnm%>', <%}%>];<%}%>
 <%_ let mapFields = [];
     for (let field of theView) { 
         if (field.type === "Map") {
