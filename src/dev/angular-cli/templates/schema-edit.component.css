@@ -126,6 +126,10 @@ margin-left: 0.5rem;
 .currency {
   margin-right: 10px;
 }
+
+.badge-group {
+  min-height: 1.5rem;
+}
 .new-modal {
     z-index: 1100;
     display: block;
@@ -138,15 +142,13 @@ margin-left: 0.5rem;
     overflow: auto;
     background-color: rgba(0,0,0,0.2);
 }
-
 .new-card {
   width: 400px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
-
 .available-hints {
-  padding-left: 20px;
+  padding: 5px 0 5px 20px;
   background-color: #0000000d;
 }

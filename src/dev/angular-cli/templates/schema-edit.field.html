@@ -403,24 +403,25 @@
                 <%if (field.required) {%>directive<%-Mn%>ArrayRequired<%}%>
                 #Edit<%-Fn%>="ngModelGroup" 
             >
-            <ng-template [ngIf]="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+            <div class="badge-group" *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
               <div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
                   {{element}}
                 <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
               </div>
-            </ng-template>
 
-            <span *ngIf="arraySelected('<%-fn%>')" 
-              class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
-              <i class="fas fa-times-circle" title="Clear"></i>
-            </span>
+              <span *ngIf="arraySelected('<%-fn%>')" 
+                class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
+                <i class="fas fa-times-circle" title="Clear"></i>
+              </span>
+            </div>
+
             <hr>
 
             <div class="available-hints">
               <%_ if (field.hint) {%>
                 <div *ngIf="editHintFields['<%-fn%>'].length > 0" style="font-size: 0.9rem;">Select from Available <%-fD%>: </div>
                 <ng-template ngFor let-hintEle [ngForOf]="editHintFields['<%-fn%>']" let-i="index">
-                  <div class="badge badge-pill badge-info pointer"
+                  <div class="badge badge-pill badge-primary pointer"
                     *ngIf="!detail['<%-fn%>']['selection'].includes(hintEle['_id'])" 
                     (click)="onAddArrayItemValue('<%-fn%>', hintEle['_id'])">
                       {{hintEle['_id']}}

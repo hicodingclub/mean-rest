@@ -108,23 +108,50 @@
 		    </div>
 		    <%_ }) %>
         <%_ } else { %>
-	        <ng-template [ngIf]="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
-	            <div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
-	                      {{element}}
-				    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
+			<div class="badge-group" *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+				<div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
+					{{element}}
+					<i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
 				</div>
-	        </ng-template>
-	
-	        <div class="input-group mt-3">
-	             <input type="search" class="form-control border"
-	             		id="<%-sn%>Edit<%-Fn%>New" #<%-sn%>Edit<%-Fn%>New
-					[(ngModel)]="detail['<%-fn%>']['new']" [ngModelOptions]="{standalone: true}"
-					(keydown.enter)="$event.target.blur();onAddArrayItem('<%-fn%>');false"
-				    > 
-			    <div class="input-group-append">
-			        <button type="button" class="btn btn-outline-secondary" (click)="onAddArrayItem('<%-fn%>')"><i class="fas fa-plus"></i></button>
-			    </div>
 			</div>
+			<hr>
+	
+			<div class="available-hints">
+				<%_ if (field.hint) {%>
+				<div *ngIf="editHintFields['<%-fn%>'].length > 0" style="font-size: 0.9rem;">Select from Available <%-fD%>: </div>
+				<ng-template ngFor let-hintEle [ngForOf]="editHintFields['<%-fn%>']" let-i="index">
+					<div class="badge badge-pill badge-primary pointer"
+						*ngIf="!detail['<%-fn%>']['selection'].includes(hintEle['_id'])" 
+						(click)="onAddArrayItemValue('<%-fn%>', hintEle['_id'])">
+						{{hintEle['_id']}}
+					</div>
+				</ng-template><%_ }%>
+				<%_ if (!field.hint) {%>
+				<div class="mt-1">
+					<a class="pointer" routerLink="." (click)="onAddArrayItemClicked('<%-fn%>')"
+						style="font-size: 0.75rem;">
+						<i class="fas fa-plus-square" title="New"></i>
+						New
+					</a>
+				</div><%_ }%>
+			</div>
+			<%_ if (!field.hint) {%>
+			<div *ngIf="detail['<%-fn%>']['adding']" class="new-modal">
+				<div class="card text-center new-card">
+					<div class="card-body">
+					<input type="search" class="form-control border"
+						id="Edit<%-Fn%>New" #Edit<%-Fn%>New="ngModel"
+						[(ngModel)]="detail['<%-fn%>']['new']" [ngModelOptions]="{standalone: true}"
+						(keydown.enter)="$event.target.blur();onAddArrayItem('<%-fn%>');false"> 
+
+					<div class="d-flex my-3 justify-content-center">
+						<button class="btn btn-outline-primary mx-1" [disabled]="!Edit<%-Fn%>New.valid" (click)="onAddArrayItem('<%-fn%>')">Confirm</button>
+						<button class="btn btn-outline-secondary mx-1" (click)="onAddArrayItemCancelled('<%-fn%>')">Cancel</button>
+					</div>
+					</div>
+				</div>
+			</div><%_ }%>
+
         <%_ } %>
       <%_ } else if (field.elementType === "ObjectId") { %>
             <ng-template [ngIf]="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">

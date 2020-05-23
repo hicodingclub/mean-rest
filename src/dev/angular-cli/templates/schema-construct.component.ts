@@ -74,3 +74,13 @@
     }
     if (textareaFields.length > 0) {%>
           this.textareaFields = [<%for (let fnm of textareaFields) {%>'<%-fnm%>', <%}%>];<%}%>
+<%_  let hintFields = [];
+    for (let field of theView) {
+        if (field.hint) {
+        hintFields.push(field.fieldName);
+        }
+    }
+    if (hintFields.length > 0) {%>
+          this.editHintFields = {<%for (let itm of hintFields) {%>
+            '<%-itm%>': [],<%}%>
+          };<%}%>

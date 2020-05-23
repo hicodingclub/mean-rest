@@ -1547,6 +1547,7 @@ function main() {
     //console.log('***briefView', briefView);
     //console.log('***hasRef1', hasRef1);
     setFieldProperty(briefView, listSortFields, false, 'sortable', false); // if include is "false", set to "false"
+    setFieldProperty(briefView, editHintFields, true, 'hint', true); // if include is "true", set to "true"
 
     /* 3. handle fields in detailView */
     let [

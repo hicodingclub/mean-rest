@@ -83,6 +83,9 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component imple
       }
       this.detail = this.formatDetail(detail);
       this.searchList();
+
+      // get editHintFields
+      this.searchHintFieldValues();
   }
 
   static getInstance() {

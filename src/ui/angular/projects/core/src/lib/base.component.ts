@@ -2222,6 +2222,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       this.detail[field].selection = this.detail[field].selection.filter(
         (x: any, i: number) => i !== idx
       );
+      this.detail[field].value = this.detail[field].selection.join(" | ");
       // check if any info needs to change after clear certain values;
       this.extraInfoPopulate();
     }
@@ -2287,14 +2288,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         if (!this.detail[fieldName].selection.includes(item)) {
           this.detail[fieldName].selection.push(item);
 
-          let values = [];
-          if (this.detail[fieldName].value) {
-            values = this.detail[fieldName].value.split(" | ");
-          }
-          values.push(item); // display value
-          values = values.filter((x) => !!x);
-          this.detail[fieldName].value = values.join(" | ");
-
+          this.detail[fieldName].value = this.detail[fieldName].selection.join(" | ");
           // see if related info needs to change after the change of this value
           this.extraInfoPopulate();
         }

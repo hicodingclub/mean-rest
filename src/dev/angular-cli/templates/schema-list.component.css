@@ -15,10 +15,9 @@ table {
   background-color: #c9f5eb;
 }
 
-
-tr th:first-child{
-  width:8%;
-  white-space:nowrap;
+tr th:first-child {
+  width: 8%;
+  white-space: nowrap;
 }
 
 .line-breaker {
@@ -60,7 +59,8 @@ tr th:first-child{
   width: 100%;
   background-color: rgba(0, 0, 0, 0.04);
 }
-.grid-head-picture, .list-head-picture {
+.grid-head-picture,
+.list-head-picture {
   flex-grow: 0;
   flex-shrink: 0;
   flex-basis: 6rem;
@@ -118,16 +118,18 @@ tr th:first-child{
   background-image: linear-gradient(to right, #ccc, #095484, #ccc);
 }
 .list-diverder {
-  width: 80%
+  width: 80%;
 }
 
 .clickable-card:hover {
-  background-color: rgba(0,0,0,.075);
+  background-color: rgba(0, 0, 0, 0.075);
 }
 
-.card label, .list-body-fields label, .field-label {
+.card label,
+.list-body-fields label,
+.field-label {
   font-weight: bold;
-	font-size: 1rem;
+  font-size: 1rem;
 }
 
 .card-action-icons {
@@ -139,48 +141,52 @@ tr th:first-child{
   margin-left: auto;
 }
 
-td input, .card-action-icons input {
-	margin-left: 0.5rem;
-	margin-right: 0.5rem;
+td input,
+.card-action-icons input {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 
-td a i, .card-action-icons a i {
-	color:rgb(196, 191, 191);
-	margin-left: 0.5rem;
-	margin-right: 0.5rem;
+td a i,
+.card-action-icons a i {
+  color: rgb(196, 191, 191);
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 /*change the icon color when card is hoverred*/
-tr:hover td a i, .clickable-card:hover .card-action-icons a i {
-	color:black;
+tr:hover td a i,
+.clickable-card:hover .card-action-icons a i {
+  color: black;
 }
-tr:hover td i.fa-edit:hover, .clickable-card:hover .card-action-icons i.fa-edit:hover{
-	color: blue;
+tr:hover td i.fa-edit:hover,
+.clickable-card:hover .card-action-icons i.fa-edit:hover {
+  color: blue;
 }
-tr:hover td i.fa-trash-alt:hover, .clickable-card:hover .card-action-icons i.fa-trash-alt:hover {
-	color: red;
+tr:hover td i.fa-trash-alt:hover,
+.clickable-card:hover .card-action-icons i.fa-trash-alt:hover {
+  color: red;
 }
 
 /* action buttons and paginations
 */
 
 .action-buttons {
-	width: 100%;
-	float:right; 
-	text-align: right;
+  width: 100%;
+  float: right;
+  text-align: right;
 }
 .action-buttons .btn {
-	display: inline-block;
-	margin-left: 1rem;
+  display: inline-block;
+  margin-left: 1rem;
 }
 
 .pagination li {
-	min-width: 2.8rem;
+  min-width: 2.8rem;
 }
 .total_counts {
   padding-top: 0.8rem;
   text-align: right;
 }
-
 
 /* earch area
 */
@@ -190,23 +196,23 @@ tr:hover td i.fa-trash-alt:hover, .clickable-card:hover .card-action-icons i.fa-
 }
 
 .icon-clear {
-cursor: pointer;
-margin-top: 0.5rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
 }
 
 .icon-clear-inside {
-    z-index: 3;
-    vertical-align: middle;
-    padding: 0.5rem 0.5rem 0rem 0.5rem;
-    cursor: pointer;
-    position: relative;
-    margin-left: -2rem;   /* text 1 + left 0.5 + right 0.5 = 2 rem*/
-    border: 0;
+  z-index: 3;
+  vertical-align: middle;
+  padding: 0.5rem 0.5rem 0rem 0.5rem;
+  cursor: pointer;
+  position: relative;
+  margin-left: -2rem; /* text 1 + left 0.5 + right 0.5 = 2 rem*/
+  border: 0;
 }
 
 .icon-clear-badge {
-cursor: pointer;
-margin-left: 1rem;
+  cursor: pointer;
+  margin-left: 1rem;
 }
 
 .pointer {
@@ -227,42 +233,40 @@ margin-left: 1rem;
 */
 
 .select-model {
-    display: block; 
-    position: fixed; 
-    z-index: 1000; 
-    padding-top: 100px; 
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%; 
-    overflow: auto; 
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
+  display: block;
+  position: fixed;
+  z-index: 1000;
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .select-model.show {
-    display: block; 
+  display: block;
 }
 
 .select-model-content {
-    position: relative;
-    float:right;
-    background-color: #fefefe;
-    /*margin: auto;*/
-    margin-right: 50px;
-    padding: 0;
-    border: 1px solid #888;
-    width: 60%;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  position: relative;
+  float: right;
+  background-color: #fefefe;
+  /*margin: auto;*/
+  margin-right: 50px;
+  padding: 0;
+  border: 1px solid #888;
+  width: 60%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-
 .single-line-edit {
-	
 }
 
 .single-line-edit > .row {
-	padding-bottom: 2px;
+  padding-bottom: 2px;
 }
 
 /*NdbDatePicker Range Selector */
@@ -276,37 +280,38 @@ margin-left: 1rem;
 .custom-day.focused {
   background-color: #e6e6e6;
 }
-.custom-day.range, .custom-day:hover {
+.custom-day.range,
+.custom-day:hover {
   background-color: rgb(2, 117, 216);
   color: white;
 }
 .custom-day.faded {
   background-color: rgba(2, 117, 216, 0.5);
 }
-    
+
 .date-selection-pop {
-  position:absolute;
-  top:100%;
-  left:0;
-  z-index:1000;
-  display:block;
-  float:left;
-  min-width:10rem;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: block;
+  float: left;
+  min-width: 10rem;
   /*padding:.5rem 0;*/
-  margin:.125rem 0 0;
-  font-size:1rem;
-  color:#212529;
-  text-align:left;
-  list-style:none;
-  background-color:#fff;
-  background-clip:padding-box;
-  border: 1px solid #dfdfdf;
-  border-radius:.25rem;
+  margin: 0.125rem 0 0;
+  font-size: 1rem;
+  color: #212529;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid #dfdfdf;
+  border-radius: 0.25rem;
 }
-    
+
 .add-area {
-    margin-left: 0.75rem;
-    margin-top: 1rem;
+  margin-left: 0.75rem;
+  margin-top: 1rem;
 }
 
 .badge-click {
@@ -362,13 +367,13 @@ div.badge-click:hover {
 }
 
 .sort-selection i {
-  color:#007bff;
+  color: #007bff;
   margin-left: 1rem;
   margin-right: 2rem;
 }
 
 .th-sort-arrow {
-  color:#007bff;
+  color: #007bff;
   margin-left: 1rem;
 }
 
@@ -387,10 +392,10 @@ div.badge-click:hover {
 }
 
 .no-records {
-    margin: 1rem auto 1rem auto; /*centering*/
+  margin: 1rem auto 1rem auto; /*centering*/
 
-    width: 20rem;
-    font-size: 1.25rem;
+  width: 20rem;
+  font-size: 1.25rem;
 }
 
 .list-selection {
@@ -408,7 +413,7 @@ div.badge-click:hover {
   min-height: 100vh;
 
   z-index: 9;
-  background-color:rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-front {
@@ -424,7 +429,11 @@ div.badge-click:hover {
 }
 
 .category-nav {
-  background: linear-gradient(180deg, rgba(233,236,239,1) 0%, rgba(233,236,239,0.2) 80%);
+  background: linear-gradient(
+    180deg,
+    rgba(233, 236, 239, 1) 0%,
+    rgba(233, 236, 239, 0.2) 80%
+  );
   padding: 1rem 20px 1rem 20px;
   margin-bottom: 1rem;
 }
@@ -451,10 +460,10 @@ div.badge-click:hover {
   color: #0056b3 !important;
 }
 
-.nohref-link.active, .nohref-link.active:hover {
+.nohref-link.active,
+.nohref-link.active:hover {
   color: #fff !important;
-} 
-
+}
 
 .list-check-box {
   zoom: 1.35;
@@ -489,28 +498,28 @@ div.badge-click:hover {
   right: 0;
   bottom: 0;
   background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
 .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 16px;
   width: 16px;
   left: 10px;
   bottom: 4px;
   background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+  background-color: #2196f3;
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+  box-shadow: 0 0 1px #2196f3;
 }
 
 input:checked + .slider:before {
@@ -528,3 +537,30 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 /*End Archive Slider*/
+
+.badge-group {
+  min-height: 1.5rem;
+}
+.new-modal {
+  z-index: 1100;
+  display: block;
+  padding-top: 0px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.new-card {
+  width: 400px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.available-hints {
+  padding: 5px 0 5px 20px;
+  background-color: #0000000d;
+}
