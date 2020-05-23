@@ -71,6 +71,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public textareaFields = [];
   public requiredFields = []; // collection of required fields. used by category field to check of 'other' need to present
   public emailFields = []; // [displayName, fieldName]
+  public editHintFields = {}; // fields that need hint for their values
   public dateFormat = "MM/DD/YYYY";
   public timeFormat = "hh:mm:ss";
 
@@ -225,6 +226,26 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     errorToast.show();
 
     this.loaded = true;
+  }
+  public onServiceErrorSuppress(error: MddsServiceError): void {
+    let errMsg: string;
+    let more: string;
+    if (error.clientErrorMsg) {
+      errMsg = error.clientErrorMsg;
+    } else if (error.serverError) {
+      if (error.status === 401) {
+        return;
+      } // Don't show unauthorized error
+      if (typeof error.serverError === "object") {
+        errMsg = error.status + ": " + JSON.stringify(error.serverError);
+      } else {
+        errMsg = error.status + ": " + error.serverError;
+      }
+    }
+    if (!errMsg) {
+      errMsg = "Unknown error.";
+    }
+    console.error(errMsg);
   }
 
   public populatePages(): void {
@@ -1024,6 +1045,17 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         this.onDetailReturned(detail, action);
       }, this.onServiceError);
     return this.eventEmitter;
+  }
+
+  public searchHintFieldValues(): void {
+    for (let f in this.editHintFields) {
+      const sort = 'value';
+      const field_value = undefined;
+      const limit = 50;
+      this.service.getFieldValues(f, field_value, sort, limit).subscribe((result: any) => {
+        this.editHintFields[f] = result;
+      }, this.onServiceErrorSuppress);
+    }
   }
 
   public populateDetailForAction(
@@ -2252,19 +2284,38 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         const item = this.detail[fieldName].new;
         this.detail[fieldName].new = undefined; // clear it
 
-        this.detail[fieldName].selection.push(item);
+        if (!this.detail[fieldName].selection.includes(item)) {
+          this.detail[fieldName].selection.push(item);
 
-        let values = [];
-        if (this.detail[fieldName].value) {
-          values = this.detail[fieldName].value.split(" | ");
+          let values = [];
+          if (this.detail[fieldName].value) {
+            values = this.detail[fieldName].value.split(" | ");
+          }
+          values.push(item); // display value
+          values = values.filter((x) => !!x);
+          this.detail[fieldName].value = values.join(" | ");
+
+          // see if related info needs to change after the change of this value
+          this.extraInfoPopulate();
         }
-        values.push(item); // display value
-        values = values.filter((x) => !!x);
-        this.detail[fieldName].value = values.join(" | ");
-
-        // see if related info needs to change after the change of this value
-        this.extraInfoPopulate();
       }
+      this.detail[fieldName].adding = false;
+    }
+  }
+
+  public onAddArrayItemValue(fieldName: string, value: string) {
+    this.detail[fieldName].new = value; // clear it
+    this.onAddArrayItem(fieldName);
+  }
+
+  public onAddArrayItemClicked(fieldName: string) {
+    if (this.arrayFields.some((x) => x[0] === fieldName)) {
+      this.detail[fieldName].adding = true;
+    }
+  }
+  public onAddArrayItemCancelled(fieldName: string) {
+    if (this.arrayFields.some((x) => x[0] === fieldName)) {
+      this.detail[fieldName].adding = false;
     }
   }
   public onAddMapItem(fieldName: string) {
