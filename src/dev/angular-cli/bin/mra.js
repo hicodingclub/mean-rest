@@ -896,12 +896,12 @@ var generateViewPicture = function (
   ];
 };
 
-const setSortFields = function (view, fieldArr) {
+const setFieldProperty = function (view, fieldArr, include, property, value) {
   if (!fieldArr) return;
   let arr = fieldArr.slice(0);
   for (let f of view) {
-    if (!arr.includes(f.fieldName)) {
-      f.sortable = false;
+    if (arr.includes(f.fieldName) === include) {
+      f[property] = value;
     }
   }
 }
@@ -1464,6 +1464,11 @@ function main() {
       return [x, capitalizeFirst(x)];
     });
 
+    let editHintFields = [];
+    if (schemaDef.mraBE) {
+      editHintFields = schemaDef.mraBE.valueSearchFields || editHintFields;
+    }
+
     //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
     if (typeof views !== 'object' || !Array.isArray(views)) {
       console.error(
@@ -1541,7 +1546,7 @@ function main() {
     );
     //console.log('***briefView', briefView);
     //console.log('***hasRef1', hasRef1);
-    setSortFields(briefView, listSortFields);
+    setFieldProperty(briefView, listSortFields, false, 'sortable', false); // if include is "false", set to "false"
 
     /* 3. handle fields in detailView */
     let [
@@ -1582,6 +1587,7 @@ function main() {
       validators,
       indexViewNames
     );
+    setFieldProperty(createView, editHintFields, true, 'hint', true); // if include is "true", set to "true"
 
     /* 5. handle fields in editView */
     let [
@@ -1602,6 +1608,7 @@ function main() {
       validators,
       indexViewNames
     );
+    setFieldProperty(editView, editHintFields, true, 'hint', true); // if include is "true", set to "true"
 
     /* 6. handle fields in searchView */
     let [
@@ -1872,28 +1879,29 @@ function main() {
       listActionButtons,
       listCategories,
       listCategoryFields,
+      defaultSortField,
+      defaultSortFieldDisplay,
+      defaultSortOrder,
+      listWidgets,
+      listSelectWidgets,
 
       detailType, // normal, post, info, slide, term...
       DetailType,
       detailActionButtons,
       detailRefName,
       detailTitle,
-
-      defaultSortField,
-      defaultSortFieldDisplay,
-      defaultSortOrder,
-      homeListNumber,
       detailActions,
       detailRefBlackList,
+      detailWidgets,
+
+      editHintFields,
+
+      homeListNumber,
 
       selectActionViewType,
-
       generateView,
 
       api,
-      listWidgets,
-      listSelectWidgets,
-      detailWidgets,
 
       refApi: {},
       refListSelectType: {},

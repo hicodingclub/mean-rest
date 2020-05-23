@@ -17,4 +17,9 @@
         this.emailFields = [<%for (let itm of emailFields) {%>['<%-itm[0]%>','<%-itm[1]%>'],<%}%>];<%
   }
   if (requiredFields.length > 0) {%>
-        this.requiredFields = [<%for (let itm of requiredFields) {%>'<%-itm%>',<%}%>];<%}%>
+        this.requiredFields = [<%for (let itm of requiredFields) {%>'<%-itm%>',<%}%>];<%
+  }
+  if (editHintFields.length > 0) {%>
+        this.editHintFields = {<%for (let itm of editHintFields) {%>
+            '<%-itm%>': [],<%}%>
+        };<%}%>

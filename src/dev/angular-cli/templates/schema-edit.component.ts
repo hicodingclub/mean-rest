@@ -133,6 +133,8 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>Component imple
             }
         }
       }
+      // get editHintFields
+      this.searchHintFieldValues();
     }
 
     ngAfterViewInit() {
