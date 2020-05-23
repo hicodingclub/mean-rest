@@ -72,6 +72,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public requiredFields = []; // collection of required fields. used by category field to check of 'other' need to present
   public emailFields = []; // [displayName, fieldName]
   public editHintFields = {}; // fields that need hint for their values
+  public fieldDisplayNames = {}; // display names of field
   public dateFormat = "MM/DD/YYYY";
   public timeFormat = "hh:mm:ss";
 
@@ -1239,7 +1240,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         }
         if (!listCategoryFields.includes(field)) {
           // don't show category field
-          this.searchMoreDetail.push([field, valueToShow]);
+          this.searchMoreDetail.push([this.fieldDisplayNames[field] || field, valueToShow]);
         }
       }
       if (oValue === MddsUncategorized) {
@@ -1274,7 +1275,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         o[prop].to = this.deFormatDateField(d[prop].to);
         valueToShow += this.formatDateField(o[prop].to).value;
       }
-      this.searchMoreDetail.push([prop, valueToShow]);
+      this.searchMoreDetail.push([this.fieldDisplayNames[prop] || prop, valueToShow]);
       andSearchContext.push(o);
     }
     // Handle number range selection. These fields are not in d2.
@@ -1300,7 +1301,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         o[fnm].to = d[toFld];
         valueToShow += d[toFld];
       }
-      this.searchMoreDetail.push([fnm, valueToShow]);
+      this.searchMoreDetail.push([this.fieldDisplayNames[fnm] || fnm, valueToShow]);
       andSearchContext.push(o);
     }
 

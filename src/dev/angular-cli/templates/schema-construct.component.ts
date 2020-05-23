@@ -1,3 +1,7 @@
+
+          this.fieldDisplayNames = {<%for (let field of theView) {%>
+            '<%-field.fieldName%>': '<%-field.displayName%>',<%}%>
+          };
 <%_ for (let field of theView) { let fn = field.fieldName;
         if (field.enumValues) {%>
           this.enums['<%-fn%>'] = [<%for (let ev of field.enumValues) {%>'<%-ev%>', <%}%>];<%}}%>
