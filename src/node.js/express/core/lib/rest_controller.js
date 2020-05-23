@@ -5,16 +5,20 @@ const MddsUncategorized = 'MddsUncategorized';
 const MddsAll = 'MddsAll';
 
 const createRegex = function (obj) {
-  //obj in {key: string} format
-  for (let prop in obj) {
-    let userInput = obj[prop];
-    obj[prop] = new RegExp(
+  const fieldRegex = function (field) {
+    return new RegExp(
       // Escape all special characters except *
-      userInput
-        .replace(/([.+?^=!:${}()|\[\]\/\\])/g, '\\$1')
-        .replace(/\*/g, '.*'), // Allow the use of * as a wildcard like % in SQL.
+      // Allow the use of * as a wildcard like % in SQL.
+      field.replace(/([.+?^=!:${}()|\[\]\/\\])/g, '\\$1').replace(/\*/g, '.*'), 
       'i'
     );
+  };
+  if (typeof obj === 'string') {
+    return fieldRegex(obj);
+  }
+  //obj in {key: string} format
+  for (let prop in obj) {
+    obj[prop] = fieldRegex(obj[prop]);
   }
   return obj;
 };
@@ -318,6 +322,31 @@ const searchObjPatch = function (query, mraBE) {
     query[p] = searchObj[p];
   }
   return query;
+};
+
+const processPages = function (
+  __per_page,
+  __page,
+  PER_PAGE,
+  MAX_PER_PAGE,
+  count
+) {
+  if (isNaN(__per_page) || __per_page <= 0) {
+    __per_page = PER_PAGE;
+  } else if (__per_page > MAX_PER_PAGE) {
+    __per_page = MAX_PER_PAGE;
+  }
+  let maxPageNum = Math.ceil(count / (__per_page * 1.0));
+  if (isNaN(__page)) __page = 1;
+  if (__page > maxPageNum) __page = maxPageNum;
+  if (__page <= 0) __page = 1;
+  let skipCount = (__page - 1) * __per_page;
+  return [__per_page, __page, maxPageNum, skipCount];
+};
+
+const fieldValueSearchAllowed = function (field, mraBE) {
+  const fields = mraBE.valueSearchFields || [];
+  return fields.includes(field)
 }
 
 class RestController {
@@ -825,7 +854,7 @@ class RestController {
       //console.log("query is ....", query['$and'][0]['$or'], query['$and'][1]['$and']);
     }
     query = ownerPatch(query, owner, req);
-    query = searchObjPatch(query, mraBE)
+    query = searchObjPatch(query, mraBE);
 
     let originCategoriesAll = [[], []];
     let categoriesAll = [[], []]; // all reference documents that are used by this model
@@ -858,7 +887,7 @@ class RestController {
         try {
           let catQuery = {};
           catQuery = ownerPatch(catQuery, owner, req);
-          catQuery = searchObjPatch(catQuery, mraBE)
+          catQuery = searchObjPatch(catQuery, mraBE);
 
           originCategoriesAll[i] = await model
             .find(catQuery)
@@ -992,16 +1021,14 @@ class RestController {
       return next(err);
     }
 
-    if (isNaN(__per_page) || __per_page <= 0) {
-      __per_page = PER_PAGE;
-    } else if (__per_page > MAX_PER_PAGE) {
-      __per_page = MAX_PER_PAGE;
-    }
-    let maxPageNum = Math.ceil(count / (__per_page * 1.0));
-    if (isNaN(__page)) __page = 1;
-    if (__page > maxPageNum) __page = maxPageNum;
-    if (__page <= 0) __page = 1;
-    let skipCount = (__page - 1) * __per_page;
+    const [perPage, pageNum, maxPageNum, skipCount] = processPages(
+      __per_page,
+      __page,
+      PER_PAGE,
+      MAX_PER_PAGE,
+      count
+    );
+
     let srt = {};
     if (__sort && __order) srt[__sort] = __order;
     //let dbExec = model.find(query, briefView)
@@ -1010,7 +1037,7 @@ class RestController {
       .find(query) //return every thing for the document
       .sort(srt)
       .skip(skipCount)
-      .limit(__per_page);
+      .limit(perPage);
     for (let pi = 0; pi < populateArray.length; pi++) {
       let p = populateArray[pi];
       //dbExec = dbExec.populate(p);
@@ -1023,8 +1050,8 @@ class RestController {
       let output = {
         total_count: count,
         total_pages: maxPageNum,
-        page: __page,
-        per_page: __per_page,
+        page: pageNum,
+        per_page: perPage,
         items: result,
         categoryBy: __categoryBy,
         categories: categoryObjectsIndexAll[0],
@@ -1064,39 +1091,63 @@ class RestController {
 
     let query = {};
     //get the query parameters ?a=b&c=d, but filter out unknown ones
-    const PER_PAGE = 100,
-      MAX_PER_PAGE = 1000;
-    let __page = 1;
-    let __per_page = PER_PAGE;
+    let __field;
+    let __field_value;
+    const MAX_LIMIT = 1000;
+    let __limit = 25;
+    const sortValues = ['count', 'value']; // sort based on count, or field value
+    let __sort = 'count'; // default: sort based on count
     for (let prop in req.query) {
-      if (prop === '__page') {
-        __page = parseInt(req.query[prop]);
-      } else if (prop === '__per_page') {
-        __per_page = parseInt(req.query[prop]);
+      if (prop === '__field') {
+        __field = req.query[prop];
+      } else if (prop === '__field_value') {
+        __field_value = req.query[prop];
+      } else if (prop === '__limit') {
+        let lmt = parseInt(req.query[prop]);
+        __limit =
+          isNaN(lmt) || lmt <= 0 ? __limit : lmt > MAX_LIMIT ? MAX_LIMIT : lmt;
+      } else if (prop === '__sort') {
+        let srt = req.query[prop];
+        __sort = sortValues.includes(srt) ? srt : __sort;
       }
     }
-    
-    let catQuery = {};
-    catQuery = ownerPatch(catQuery, owner, req);
-    catQuery = searchObjPatch(catQuery, mraBE)
+    if (!__field) {
+      return next(createError(400, 'Field is not provided'));
+    }
+    if (!fieldValueSearchAllowed(__field, mraBE)) {
+      return next(createError(400, `Field value search for '${__field}' is now allowed`));
+    }
 
-    originCategoriesAll[i] = await model
-      .find(catQuery)
-      .distinct(cate.categoryBy)
-      .exec(); // no objects
+    let catQuery = {};
+    let fieldQuery = {};
+    if (__field_value) {
+      const v = createRegex(__field_value);
+      catQuery[__field] = v;
+      fieldQuery['_id'] = v;
+    }
+    let sortO = { count: -1 };
+    if (__sort === 'value') {
+      sortO = { _id: 1 };
+    }
+
+    catQuery = ownerPatch(catQuery, owner, req);
+    catQuery = searchObjPatch(catQuery, mraBE);
+
+    console.log('===catQuery', catQuery);
 
     const aggregatePipes = [
       { $match: catQuery },
-      { $group: { _id: `$${cate.categoryBy}`, count: { $sum: 1 } } },
+      { $unwind: `$${__field}` }, // unwind will unpack the array, if field is of type array.
+      { $group: { _id: `$${__field}`, count: { $sum: 1 } } }, // group and sum
+      { $match: fieldQuery}, // pick fields matching the given field value;
+      { $sort: sortO },
+      { $limit: __limit },
     ];
+    // count for each value
     let cateCounts = await model.aggregate(aggregatePipes).exec();
+    console.log('===cateCounts', cateCounts);
     cateCounts = JSON.parse(JSON.stringify(cateCounts));
-    const cateCountsObj = {};
-    for (const c of cateCounts) {
-      let k = c['_id'];
-      if (k === null) k = MddsUncategorized;
-      cateCountsObj[k] = c['count'];
-    }
+    return res.send(cateCounts);
   }
 
   getSamples(req, res, next, searchContext) {
@@ -1158,18 +1209,19 @@ class RestController {
         return next(err);
       }
       count = cnt;
-      if (isNaN(__per_page) || __per_page <= 0) __per_page = PER_PAGE;
-      else if (__per_page > MAX_PER_PAGE) __per_page = MAX_PER_PAGE;
-      let maxPageNum = Math.ceil(count / (__per_page * 1.0));
-      if (isNaN(__page)) __page = 1;
-      if (__page > maxPageNum) __page = maxPageNum;
-      if (__page <= 0) __page = 1;
-      let skipCount = (__page - 1) * __per_page;
+      const [perPage, pageNum, maxPageNum, skipCount] = processPages(
+        __per_page,
+        __page,
+        PER_PAGE,
+        MAX_PER_PAGE,
+        count
+      );
+
       //let dbExec = model.find(query, briefView)
       let dbExec = model
         .find(query) //return every thing for the document
         .skip(skipCount)
-        .limit(__per_page);
+        .limit(perPage);
       for (let pi = 0; pi < populateArray.length; pi++) {
         let p = populateArray[pi];
         //dbExec = dbExec.populate(p);
@@ -1180,8 +1232,8 @@ class RestController {
         let output = {
           total_count: count,
           total_pages: maxPageNum,
-          page: __page,
-          per_page: __per_page,
+          page: pageNum,
+          per_page: perPage,
           items: result,
         };
         output = JSON.parse(JSON.stringify(output));
@@ -1289,7 +1341,7 @@ class RestController {
         ids = body;
         this.unarchiveManyByIds(req, res, next, ids);
         break;
-      case '/mddsaction/getfieldvalue':
+      case '/mddsaction/getfieldvalues':
         let fieldValueSearch = body ? body.fieldValueSearch : {};
         this.searchFieldValues(req, res, next, fieldValueSearch);
         break;

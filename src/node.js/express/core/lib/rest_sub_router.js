@@ -19,7 +19,7 @@ const RestRouter = function(restController, schemaName, authzFunc, api) {
 
   if (api.includes('L')) {
     router.get('/', restController.getAll.bind(restController));
-    router.post('/mddsaction/getfieldvalue', restController.PostActions.bind(restController));
+    router.post('/mddsaction/getfieldvalues', restController.PostActions.bind(restController));
     router.post('/mddsaction/get', restController.PostActions.bind(restController));
   }
   let idParam = name + 'Id';
