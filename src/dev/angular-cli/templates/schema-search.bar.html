@@ -74,7 +74,7 @@
 		        <div *ngIf="!moreSearchOpened" style="text-align: left;">
 					<span class="badge badge-pill badge-info" *ngFor="let value of searchMoreDetail">
 					    <a (click)="toggleMoreSearch()" class="pointer"> {{value[0]}}: {{value[1]}}</a>
-					    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromDetailAndSearchList(value[0])" title="Clear"></i>
+					    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromDetailAndSearchList(value[2])" title="Clear"></i>
 					</span>
 				</div>
 		    <%}%>

@@ -1240,7 +1240,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         }
         if (!listCategoryFields.includes(field)) {
           // don't show category field
-          this.searchMoreDetail.push([this.fieldDisplayNames[field] || field, valueToShow]);
+          this.searchMoreDetail.push([this.fieldDisplayNames[field] || field, valueToShow, field]);
         }
       }
       if (oValue === MddsUncategorized) {
@@ -1275,7 +1275,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         o[prop].to = this.deFormatDateField(d[prop].to);
         valueToShow += this.formatDateField(o[prop].to).value;
       }
-      this.searchMoreDetail.push([this.fieldDisplayNames[prop] || prop, valueToShow]);
+      this.searchMoreDetail.push([this.fieldDisplayNames[prop] || prop, valueToShow, prop]);
       andSearchContext.push(o);
     }
     // Handle number range selection. These fields are not in d2.
@@ -1301,7 +1301,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         o[fnm].to = d[toFld];
         valueToShow += d[toFld];
       }
-      this.searchMoreDetail.push([this.fieldDisplayNames[fnm] || fnm, valueToShow]);
+      this.searchMoreDetail.push([this.fieldDisplayNames[fnm] || fnm, valueToShow, fnm]);
       andSearchContext.push(o);
     }
 
