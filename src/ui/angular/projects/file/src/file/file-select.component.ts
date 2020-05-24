@@ -1,4 +1,4 @@
-﻿import { Component, EventEmitter, OnInit, Input, Output, ViewChild } from '@angular/core';
+﻿import { Component, EventEmitter, OnInit, Input, Output, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
 import { ViewContainerRef,  Directive, ComponentFactoryResolver } from '@angular/core';
 
 import { MddsBaseComponentInterface } from '@hicoder/angular-core';
@@ -16,9 +16,11 @@ export class MddsFileSelectDirective {
     templateUrl: 'file-select.component.html',
     styleUrls: ['file-select.component.css']
 })
-export class FileSelectComponent implements OnInit {
+export class FileSelectComponent implements OnInit, OnChanges {
     @Input() downloadUrl: string;
     @Input() aspectRatio: number;
+    @Input() disableDisplay: boolean = false;
+    @Input() askForSelect: boolean = false;
     @Output() downloadUrlChange = new EventEmitter<string>();
 
     @ViewChild(MddsFileSelectDirective, {static: true}) refSelectDirective: MddsFileSelectDirective;
@@ -38,6 +40,13 @@ export class FileSelectComponent implements OnInit {
           return `${downloadUrl}_thumbnail`;
       }
       return downloadUrl;
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+      // changes.prop contains the old and the new value...
+      if (changes.askForSelect && changes.askForSelect.currentValue === true) {
+        this.selectFileList();
+      }
     }
 
     selectFileList() {

@@ -246,14 +246,16 @@
       <button type="button" class="btn btn-success" (click)="selectItemConfirmed()">Finish</button>
       <button type="button" class="btn btn-outline-success" (click)="backSelect()">Back</button>            
     </div>
-    <div *ngFor="let file of uploadingFiles">
-      <small *ngIf="progress" >
-          <span>{{progress[file].progress | async}} </span>
-          <span *ngIf="uploadSuccessful">
-              <span *ngIf="progress[file].result.success">SUCC</span>
-              <span *ngIf="!progress[file].result.success">FAIL</span>
-          </span>
-      </small>
+    <div class="d-flex justify-content-center">
+      <div class="mx-3" *ngFor="let file of uploadingFiles">
+        <small *ngIf="progress" >
+            <span>{{progress[file].progress | async}}% </span>
+            <span *ngIf="uploadSuccessful">
+                <span *ngIf="progress[file].result.success">SUCC</span>
+                <span *ngIf="!progress[file].result.success">FAIL</span>
+            </span>
+        </small>
+      </div>
     </div>
   </div>
 

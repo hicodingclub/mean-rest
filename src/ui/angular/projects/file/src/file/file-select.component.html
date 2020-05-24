@@ -1,4 +1,4 @@
-<div style="width: 100%;">
+<div *ngIf="!disableDisplay" style="width: 100%;">
   <div class="display-file">
     <div class="thumbnail">
         <img *ngIf="downloadUrl" [src]="getDownloadUrl() | SafeUrlPipe">
