@@ -7,6 +7,11 @@
 }
 
 .thumbnail img {
+    height: 100%;
+    width: auto;
+    /*width: 100%;*/
+    /*object-fit: contain;*/
+
     left: 50%;
     position: relative;
     transform: translateX(-50%);

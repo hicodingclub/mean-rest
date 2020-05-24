@@ -9,17 +9,13 @@ export class FileDisplayComponent implements OnInit {
     @Input() clickToShow: boolean;
     @Input() isLarge = false;
     @Input() aspectRatio: number;
-
+    @Input() style: any = {};
+    
     public embeddedPicture = false;
-    public imgStyle: any = {height: 'auto', width: '100%'};
 
     constructor() {}
 
     ngOnInit() {
-      if (!this.aspectRatio) {
-        // if aspectRatio is not defined, the caller shall fix the height of the image
-        this.imgStyle = {height: '100%', width: 'auto'};
-      }
     }
 
     getDownloadUrl() {
