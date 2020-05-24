@@ -8,15 +8,24 @@
 		let field1 = detailView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
 		let field2 = detailView[2]; let fn2 = field2.fieldName; let ft2 = field2.type;
 		let field, fn, ft;%>
-		<div class="grid-block grid-block-large">
-			<div class="text-left h-100">
-				<div class="grid-fields">
-					<div class="grid-head-picture grid-head-picture-large"
-						[ngStyle]="style['picture']">
-
-						<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="true"
-							[style]="{img: {'object-fit': 'contain', width: '100%'}}">
-						</lib-mdds-file-display>
+		<div class="d-flex align-items-center">
+			<div class="d-flex flex-column">
+				<div class="grid-head-picture grid-head-picture-column-small"
+				[ngStyle]="style['small-picture']">
+					<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="false"
+						[style]="{img: {'background-color': '#8080801f', 'object-fit': 'contain', width: '100%'}}">
+					</lib-mdds-file-display>
+				</div>
+			</div>
+			<div class="grid-block grid-block-large">
+				<div class="text-left h-100">
+					<div class="grid-fields">
+						<div class="grid-head-picture grid-head-picture-large"
+							[ngStyle]="style['large-picture']">
+							<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="true"
+								[style]="{img: {'object-fit': 'contain', width: '100%'}}">
+							</lib-mdds-file-display>
+						</div>
 					</div>
 				</div>
 			</div>

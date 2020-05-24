@@ -1,0 +1,22 @@
+
+<% include ../../list/gallerySideIntro/gallerySideIntro.component.css %>
+
+.grid-head-picture-large {
+  height: 20rem;
+  flex-basis: 20rem;
+  width: 20rem;
+}
+
+.grid-head-picture-column-small {
+  flex-basis: 2.5rem; /*height for flex-column*/
+  height: 2.5rem;
+  width: 2.5rem;
+}
+
+@media screen and (min-width: 500px) {
+  .grid-head-picture-large {
+    height: 16rem;
+    flex-basis: 16rem;
+    width: 20rem;
+  }
+}

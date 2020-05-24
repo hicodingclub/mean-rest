@@ -11,11 +11,11 @@ import { ComponentFactoryResolver } from '@angular/core';<%}%>
 
 
 @Component({
-  selector: 'app-<%-schemaName%>-detail-widget-gallerySideIntro',
-  templateUrl: './<%-schemaName%>-detail-widget-gallerySideIntro.component.html',
-  styleUrls: ['./<%-schemaName%>-detail.component.css', './<%-schemaName%>-detail-widget-gallerySideIntro.component.css']
+  selector: 'app-<%-schemaName%>-detail-widget-gallerySideIntroMP',
+  templateUrl: './<%-schemaName%>-detail-widget-gallerySideIntroMP.component.html',
+  styleUrls: ['./<%-schemaName%>-detail.component.css', './<%-schemaName%>-detail-widget-gallerySideIntroMP.component.css']
 })
-export class <%-SchemaName%>DetailWidgetGallerySideIntroComponent extends <%-SchemaName%>DetailComponent implements OnInit, AfterViewInit {
+export class <%-SchemaName%>DetailWidgetGallerySideIntroMPComponent extends <%-SchemaName%>DetailComponent implements OnInit, AfterViewInit {
   // @Input() public style: any = {}; // { picture: {height: '16rem'}, title: {}, intro: {} }
 
   constructor(
