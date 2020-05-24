@@ -1,7 +1,9 @@
     <%_{
-      let pictureFields = viewFields.filter(x => x.picture);
+      let pictureFields = viewFields.filter(x => x.picture && x.type !== 'SchemaArray');
+      let pictureFieldsName = pictureFields.map(x=>x.fieldName);
       let indexedFields = viewFields.filter(x => !x.picture && x.isIndexField);
-      let otherFields = viewFields.filter(x => !x.picture && !x.isIndexField);
+      let indexedFieldsName = indexedFields.map(x=>x.fieldName);
+      let otherFields = viewFields.filter(x => !pictureFieldsName.includes(x.fieldName) && !indexedFieldsName.includes(x.fieldName));
       let otherFieldsName = otherFields.map(x=>x.fieldName);
       
       if (pictureFields.length > 0 || indexedFields.length > 0){%>

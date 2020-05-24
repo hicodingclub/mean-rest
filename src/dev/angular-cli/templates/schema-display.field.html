@@ -12,6 +12,14 @@
                     <div class="badge badge-pill badge-secondary" *ngFor="let element of enums['<%-fn%>']">
                          <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection'][element]">{{element}}</div>
                     </div><%
+                        } else if (field.elementType === 'SchemaString' && field.picture) {%>
+                    <div class="d-flex align-items-center" *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+                        <div class="picture-small-block" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
+                          <lib-mdds-file-display [downloadUrl]="element" [isLarge]="false"
+                            [style]="{img: {'background-color': '#8080801f', 'object-fit': 'contain', width: '100%'}}">
+                          </lib-mdds-file-display>
+                        </div>
+                    </div><%
                         } else if (field.elementType === 'SchemaString') {%>
                     <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
                         <ng-template ngFor let-element [ngForOf]="detail['<%-fn%>']['selection']" let-idx="index">

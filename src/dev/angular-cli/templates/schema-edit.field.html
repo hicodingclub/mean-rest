@@ -397,6 +397,41 @@
               <i class="fas fa-times-circle" title="Clear"></i>
             </span>
           </div>
+        <%_ } else if (field.elementType === 'SchemaString' && field.picture) { %>
+          <div class="form-check"
+                ngModelGroup="Edit<%-Fn%>"
+                <%if (field.required) {%>directive<%-Mn%>ArrayRequired<%}%>
+                #Edit<%-Fn%>="ngModelGroup" 
+            >
+            <div class="d-flex align-items-center">
+              <div class="picture-small-block" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
+                <lib-mdds-file-display [downloadUrl]="element" [isLarge]="false"
+                  [style]="{img: {'background-color': '#8080801f', 'object-fit': 'contain', width: '100%'}}">
+                </lib-mdds-file-display>
+                <i class="fas fa-times-circle icon-clear-badge-ontop" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
+              </div>
+              <span *ngIf="arraySelected('<%-fn%>')" 
+                class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
+                <i class="fas fa-times-circle" title="Clear All"></i>
+              </span>
+            </div>
+            <hr>
+            <div class="new-area">
+              <div class="mt-1">
+                <a class="pointer" routerLink="." (click)="onAddArrayItemClicked('<%-fn%>')"
+                  style="font-size: 0.75rem;">
+                  <i class="fas fa-plus-square" title="Add"></i>
+                  Add
+                </a>
+              </div>
+            </div>
+            <div *ngIf="detail['<%-fn%>']['adding']">
+              <lib-mdds-file-select [aspectRatio]="<%-field.aspectRatio%>"
+                [disableDisplay]="true" [askForSelect]="detail['<%-fn%>']['adding']"
+                (downloadUrlChange)="detail['<%-fn%>']['new'] = $event; onAddArrayItem('<%-fn%>')">
+              </lib-mdds-file-select>
+            </div>
+          </div>
         <%_ } else if (field.elementType === 'SchemaString') { %>
           <div class="form-check"
                 ngModelGroup="Edit<%-Fn%>"
@@ -417,7 +452,7 @@
 
             <hr>
 
-            <div class="available-hints">
+            <div class="new-area">
               <%_ if (field.hint) {%>
                 <div *ngIf="editHintFields['<%-fn%>'].length > 0" style="font-size: 0.9rem;">Select from Available <%-fD%>: </div>
                 <ng-template ngFor let-hintEle [ngForOf]="editHintFields['<%-fn%>']" let-i="index">

@@ -2,27 +2,41 @@
 	<div>
 		<%_ include ../../../schema-detail.d.actions.html %>
 	</div>
-	<div class="row flex-wrap align-items-center">
+	<div class="row flex-wrap align-items-center justify-content-center">
 		<%_
-		let field0 = detailView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
-		let field1 = detailView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
-		let field2 = detailView[2]; let fn2 = field2.fieldName; let ft2 = field2.type;
+		let fieldMainPic = detailView[0]; let fn0 = fieldMainPic.fieldName;
+		let fieldMP = detailView[1]; let fnMP = fieldMP.fieldName;
+		let fieldTitle = detailView[2];
+		let fieldSubtitle = detailView[3];
 		let field, fn, ft;%>
 		<div class="d-flex align-items-center">
 			<div class="d-flex flex-column">
 				<div class="grid-head-picture grid-head-picture-column-small"
-				[ngStyle]="style['small-picture']">
+					[ngClass]="{'picure-selected': !selectedPictureLink || selectedPictureLink === detail['<%-fn0%>']}"
+					[ngStyle]="style['small-picture']"
+					(click)="selectPicture(detail['<%-fn0%>'])">
 					<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="false"
-						[style]="{img: {'background-color': '#8080801f', 'object-fit': 'contain', width: '100%'}}">
+						[style]="{img: {'object-fit': 'contain', width: '100%'}}">
 					</lib-mdds-file-display>
 				</div>
+				<ng-template [ngIf]="detail['<%-fnMP%>'] && detail['<%-fnMP%>']['selection']">
+				<div class="grid-head-picture grid-head-picture-column-small"
+					*ngFor="let ele of detail['<%-fieldMP.fieldName%>']['selection']"
+					[ngClass]="{'picure-selected': selectedPictureLink === ele}"
+					[ngStyle]="style['small-picture']"
+					(click)="selectPicture(ele)">
+					<lib-mdds-file-display [downloadUrl]="ele" [isLarge]="false"
+						[style]="{img: {'object-fit': 'contain', width: '100%'}}">
+					</lib-mdds-file-display>
+				</div>
+				</ng-template>
 			</div>
 			<div class="grid-block grid-block-large">
 				<div class="text-left h-100">
 					<div class="grid-fields">
 						<div class="grid-head-picture grid-head-picture-large"
 							[ngStyle]="style['large-picture']">
-							<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="true"
+							<lib-mdds-file-display [downloadUrl]="selectedPictureLink || detail['<%-fn0%>']" [isLarge]="true"
 								[style]="{img: {'object-fit': 'contain', width: '100%'}}">
 							</lib-mdds-file-display>
 						</div>
@@ -34,14 +48,14 @@
 			<div class="grid-picture-title grid-picture-title-large"
 				[ngStyle]="style['title']">
 				<%
-				field = field1; fn = fn1; ft = ft1;
+				field = fieldTitle; fn = fieldTitle.fieldName; ft = fieldTitle.type;
 				%>
 				<% include ../../../schema-display.field.html %>
 			</div>
 			<div class="grid-picture-subtitle grid-picture-subtitle-large"
 				[ngStyle]="style['intro']">
 				<%
-				field = field2; fn = fn2; ft = ft2;
+				field = fieldSubtitle; fn = fieldSubtitle.fieldName; ft = fieldSubtitle.type;
 				%>
 				<% include ../../../schema-display.field.html %>
 			</div><%if (detailView.length > 3) {%>

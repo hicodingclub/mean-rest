@@ -107,7 +107,7 @@
 		      	<span class="form-check-label"><%-f%></span>
 		    </div>
 		    <%_ }) %>
-        <%_ } else { %>
+        <%_ } else if (!field.picture) { %>
 			<div class="badge-group" *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
 				<div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
 					{{element}}

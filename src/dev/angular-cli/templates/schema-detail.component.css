@@ -116,6 +116,14 @@ div.badge-click:hover {
   }
 }
 
+.picture-small-block {
+  display: inline-block;
+  width: 4rem;
+  height: 4rem;
+  position: relative;
+  margin: 0.25rem;
+}
+
 .transparent-border {
   border-color: rgba(0, 0, 0, 0);
 }

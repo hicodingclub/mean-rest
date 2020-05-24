@@ -18,6 +18,7 @@ import { ComponentFactoryResolver } from '@angular/core';<%}%>
 export class <%-SchemaName%>DetailWidgetGallerySideIntroMPComponent extends <%-SchemaName%>DetailComponent implements OnInit, AfterViewInit {
   // @Input() public style: any = {}; // { picture: {height: '16rem'}, title: {}, intro: {} }
 
+  public selectedPictureLink: string;
   constructor(
       <%if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
       public <%-schemaName%>Service: <%-SchemaName%>Service,
@@ -35,5 +36,9 @@ export class <%-SchemaName%>DetailWidgetGallerySideIntroMPComponent extends <%-S
 
   ngAfterViewInit() {
     super.ngAfterViewInit();
+  }
+
+  public selectPicture(link: string): void {
+    this.selectedPictureLink = link;
   }
 }
