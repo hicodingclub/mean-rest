@@ -563,3 +563,12 @@ input:checked + .slider:before {
   padding: 5px 0 5px 20px;
   background-color: #0000000d;
 }
+
+.col-gutter {
+}
+@media screen and (max-width: 500px) {
+  .col-gutter > [class*="col-"] {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+}
