@@ -3,7 +3,8 @@ import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
 import { Injector } from '@angular/core';
 
-import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
+import { <%-SchemaName%>DetailCustComponent } from '../../../<%-moduleName%>-cust/<%-schemaName%>/<%-schemaName%>-detail.cust.component';
+import { ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
 <%if (schemaHasRef) {%>
@@ -17,15 +18,15 @@ import { MddsRichTextShowDirective } from '@hicoder/angular-core';<%}%>
   templateUrl: './<%-schemaName%>-detail.component.html',
   styleUrls: ['./<%-schemaName%>-detail.component.css']
 })
-export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>Component implements OnInit, AfterViewInit {
-  @Input() 
-  public id:string;
-  @Input()
-  public searchObj:any;
-  @Input()
-  public disableActionButtions:boolean;
-  @Output()
-  public eventEmitter: EventEmitter<any> = new EventEmitter();
+export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>DetailCustComponent implements OnInit, AfterViewInit {
+  // @Input() 
+  // public id:string;
+  // @Input()
+  // public searchObj:any;
+  // @Input()
+  // public disableActionButtions:boolean;
+  // @Output()
+  // public eventEmitter: EventEmitter<any> = new EventEmitter();
 
 <%if (schemaHasEditor) {%>
   @ViewChildren(MddsRichTextShowDirective) textEditors: QueryList<MddsRichTextShowDirective>;<%}%>

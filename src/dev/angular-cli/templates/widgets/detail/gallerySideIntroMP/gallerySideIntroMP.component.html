@@ -60,15 +60,19 @@
 				<% include ../../../schema-display.field.html %>
 			</div><%if (detailView.length > 3) {%>
 			<hr/><%}%><%_
-			const otherFields = detailView.slice(3);
+			const otherFields = detailView.slice(4);
 			for (let [index, field] of otherFields.entries()){
 				if (field.hidden) continue;
 		
 				let fn = field.fieldName; let ft = field.type;;
 				%>
-			<div *ngIf="detail['<%-fn%>']" class="mr-3 d-inline-flex flex-wrap" [ngStyle]="style['<%-fn%>']">
-				<div class="field-label" [ngStyle]="style['<%-fn%>-label']"><%-field.displayName%>:</div>
-				<div class="ml-1" [ngStyle]="style['<%-fn%>-value']"><% include ../../../schema-display.field.html %></div>
+			<div *ngIf="detail['<%-fn%>']" class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']">
+				<div class="field-label" [ngStyle]="style['<%-fn%>-label']">
+					<%-field.displayName%>:
+				</div>
+				<div class="ml-1" [ngStyle]="style['<%-fn%>-value']">
+					<% include ../../../schema-display.field.html %>
+				</div>
 			</div><%_  
 			}%>
 		</div>

@@ -13,7 +13,7 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 })
 export class <%-SchemaName%>DetailSubComponent extends <%-SchemaName%>DetailComponent 
         implements OnInit {
-    @Input() inputData;
+    // @Input() inputData;
     
     constructor(
         public <%-schemaName%>Service: <%-SchemaName%>Service,

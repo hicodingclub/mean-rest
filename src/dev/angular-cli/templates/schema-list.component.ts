@@ -3,7 +3,8 @@ import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Injector } from '@angular/core';
 
-import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
+import { <%-SchemaName%>ListCustComponent } from '../../../<%-moduleName%>-cust/<%-schemaName%>/<%-schemaName%>-list.cust.component';
+import { ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
 <%if (schemaHasRef) {%>
@@ -17,21 +18,21 @@ import { MddsRichTextShowDirective } from '@hicoder/angular-core';<%}%>
   templateUrl: './<%-schemaName%>-list.component.html',
   styleUrls: ['./<%-schemaName%>-list.component.css']
 })
-export class <%-SchemaName%>ListComponent extends <%-SchemaName%>Component implements OnInit {
+export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustComponent implements OnInit {
   <%_ if (schemaHasDate) { %>
   public minDate = {year: (new Date()).getFullYear() - 100, month: 1, day: 1};<%}%>
 
   // @Input() options: any; {disableCatetory: false, disablePagination: false, disbleActionButtons: false
   //                        disableListSearch: false, disableTitle: false, disableRefs: false
   //                        disableListHead: false, disableTitleRow: false}
-  @Input()
-  public inputData:any;
-  @Input()
-  public searchObj:any;
-  @Input()
-  public queryParams: any;  // {listSortField: 'a', listSortOrder: 'asc' / 'desc', perPage: 6}
-  @Input()
-  public categoryBy:string; //field name whose value is used as category
+  // @Input()
+  // public inputData:any;
+  // @Input()
+  // public searchObj:any;
+  // @Input()
+  // public queryParams: any;  // {listSortField: 'a', listSortOrder: 'asc' / 'desc', perPage: 6}
+  // @Input()
+  // public categoryBy:string; //field name whose value is used as category
   <%if (schemaHasEditor) {%>
   @ViewChildren(MddsRichTextShowDirective) textEditors: QueryList<MddsRichTextShowDirective>;<%}%>
 

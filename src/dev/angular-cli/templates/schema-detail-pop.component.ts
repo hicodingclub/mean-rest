@@ -13,8 +13,8 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 })
 export class <%-SchemaName%>DetailPopComponent extends <%-SchemaName%>DetailComponent 
         implements OnInit {
-    @Input() inputData;
-    @Output() outputData;
+    // @Input() inputData;
+    // @Output() outputData;
     done = new EventEmitter<boolean>();
     
     constructor(

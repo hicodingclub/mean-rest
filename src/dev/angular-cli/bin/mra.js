@@ -161,6 +161,12 @@ var templates = {
     'list component file',
     'W',
   ],
+  schemaListCustComponent: [
+    '../templates/schema-list.cust.component.ts',
+    'list.cust.component.ts',
+    'list customization component file',
+    'A',
+  ],
   schemaListComponentHtml: [
     '../templates/schema-list.component.html',
     'list.component.html',
@@ -228,6 +234,12 @@ var templates = {
       'detail.component.css',
       'detail component css file',
       'W',
+    ],
+    [
+      '../templates/schema-detail.cust.component.ts',
+      'detail.cust.component.ts',
+      'detail customization component file',
+      'A',
     ],
   ],
 
@@ -299,6 +311,12 @@ var templates = {
     'edit.component.ts',
     'edit component file',
     'W',
+  ],
+  schemaEditCustComponent: [
+    '../templates/schema-edit.cust.component.ts',
+    'edit.cust.component.ts',
+    'edit customization component file',
+    'A',
   ],
   schemaEditComponentHtml: [
     '../templates/schema-edit.component.html',
@@ -1195,6 +1213,7 @@ function main() {
     console.info('Using "%s" as generated module name...', moduleName);
   }
   let ModuleName = capitalizeFirst(moduleName);
+  let moduleNameCust = `${moduleName}-cust`
 
   let apiBase;
   if (!program.api) {
@@ -1232,7 +1251,8 @@ function main() {
     }
   }
   let parentOutputDir = outputDir;
-  outputDir = path.join(outputDir, moduleName);
+  outputDir = path.join(parentOutputDir, moduleName);
+  outputDirCust = path.join(parentOutputDir, moduleNameCust);
 
   let overWrite = false;
   if (program.force) overWrite = true;
@@ -1482,17 +1502,26 @@ function main() {
     //console.log(model);
 
     let componentDir = path.join(outputDir, schemaName);
+    let componentDirCust = path.join(outputDirCust, schemaName);
     if (!fs.existsSync(componentDir)) {
       //console.info('Creating component directory '%s'...', componentDir);
       mkdir('.', componentDir);
     }
+    if (!fs.existsSync(componentDirCust)) {
+      //console.info('Creating component directory '%s'...', componentDir);
+      mkdir('.', componentDirCust);
+    }
 
     let subComponentDirs = [];
-    if (api.includes('R') || api.includes('L'))
+    if (api.includes('R') || api.includes('L')) {
       subComponentDirs.push(schemaName + '-detail');
-    if (api.includes('L')) subComponentDirs.push(schemaName + '-list');
-    if (api.includes('C') || api.includes('U'))
+    }
+    if (api.includes('L')) { 
+      subComponentDirs.push(schemaName + '-list');
+    }
+    if (api.includes('C') || api.includes('U')) {
       subComponentDirs.push(schemaName + '-edit');
+    }
     subComponentDirs.forEach((subComponent) => {
       let subComponentDir = path.join(componentDir, subComponent);
       if (!fs.existsSync(subComponentDir)) {
@@ -1853,6 +1882,7 @@ function main() {
       mapFieldsRef,
 
       componentDir,
+      componentDirCust,
       dateFormat,
       timeFormat,
       schemaHasDate,
@@ -2096,6 +2126,7 @@ function main() {
   for (let key in schemaMap) {
     let schemaObj = renderObj.schemaMap[key];
     let componentDir = schemaObj.componentDir;
+    let componentDirCust = schemaObj.componentDirCust;
     let schemaName = schemaObj.schemaName;
 
     generateSourceFile(
@@ -2124,6 +2155,12 @@ function main() {
         templates.schemaListComponent,
         schemaObj,
         subComponentDir
+      );
+      generateSourceFile(
+        schemaName,
+        templates.schemaListCustComponent,
+        schemaObj,
+        componentDirCust
       );
       generateSourceFile(
         schemaName,
@@ -2254,19 +2291,25 @@ function main() {
 
       generateSourceFile(
         schemaName,
-        templates.schemaDetail[0],
+        templates.schemaDetail[0], // component.ts
         schemaObj,
         subComponentDir
       );
       generateSourceFile(
         schemaName,
-        templates.schemaDetail[1],
+        templates.schemaDetail[3], // cust.component.ts
+        schemaObj,
+        componentDirCust
+      );
+      generateSourceFile(
+        schemaName,
+        templates.schemaDetail[1], // html
         schemaObj,
         subComponentDir
       );
       generateSourceFile(
         schemaName,
-        templates.schemaDetail[2],
+        templates.schemaDetail[2], // css
         schemaObj,
         subComponentDir
       );
@@ -2388,6 +2431,12 @@ function main() {
         templates.schemaEditComponent,
         schemaObj,
         subComponentDir
+      );
+      generateSourceFile(
+        schemaName,
+        templates.schemaEditCustComponent,
+        schemaObj,
+        componentDirCust
       );
       generateSourceFile(
         schemaName,

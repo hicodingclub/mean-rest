@@ -13,9 +13,9 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 })
 export class <%-SchemaName%>DetailFieldComponent extends <%-SchemaName%>Component
         implements OnInit {
-    @Input() id: string;
-    @Input() detailObj: any;
-    @Input() showFieldsStr: string;
+    // @Input() id: string;
+    // @Input() detailObj: any;
+    // @Input() showFieldsStr: string;
     showFields: string[];
     
     constructor(

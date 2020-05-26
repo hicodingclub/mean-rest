@@ -23,7 +23,7 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
   styleUrls: ['./<%-schemaName%>-list.component.css']
 })
 export class <%-SchemaName%>ListAssoComponent extends <%-SchemaName%>ListSubComponent implements OnInit {
-  @Input('asso') public associationField: string;
+  // @Input('asso') public associationField: string;
   public parentSchema;
   public parentItemId;
 
@@ -65,8 +65,9 @@ export class <%-SchemaName%>ListAssoComponent extends <%-SchemaName%>ListSubComp
       }
       
     
-      this.parentSchema = this.getParentRouteRefField();
-      let ref = this.referenceFieldsReverseMap[this.parentSchema];
+      let ref = this.getParentRouteRefField();
+      this.parentSchema = this.referenceFieldsReverseMap[ref];
+
       this.ignoreField = ref; // used for export (send to server)
 
       this.parentItemId = this.getParentRouteItemId();
