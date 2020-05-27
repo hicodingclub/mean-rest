@@ -4,14 +4,15 @@ import { RouteReuseStrategy } from '@angular/router';
 
 import { MddsRouteReuseStrategy } from '@hicoder/angular-core';
 
-import { <%-ModuleName%>Routes } from '../<%-moduleName%>-cust/<%-moduleName%>.conf';
+import { <%-ModuleName%>Component } from './<%-moduleName%>.component';
+import { <%-ModuleName%>CoreRoutes } from '../<%-moduleName%>-cust/<%-moduleName%>.conf';
 
 @NgModule({
-  imports: [RouterModule.forChild(<%-ModuleName%>Routes)],
+  imports: [RouterModule.forChild(<%-ModuleName%>CoreRoutes)],
   exports: [RouterModule],
   providers: [ // only use these providers in component scope
     { provide: RouteReuseStrategy, useClass: MddsRouteReuseStrategy },
   ],
 
 })
-export class <%-ModuleName%>RoutingModule { }
+export class <%-ModuleName%>RoutingCoreModule { }

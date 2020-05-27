@@ -27,10 +27,10 @@ import { AuthGuard } from '@hicoder/angular-auth';
 ];<%}%>
 <%}} %>
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; let detailType = schm.detailType;%>
-export const <%-schm.schemaName%>RoutingPath = [
+export const <%-schm.schemaName%>RoutingCorePath = [
     <%if (api.includes("L")) {%>{path: 'list', component: <%if (schm.listTypeNormal) {%><%-schm.SchemaName%>ListComponent<%} else {%><%-schm.SchemaName%>ListWidget<%-schm.ListType%>Component<%}
      if (!schm.permission.includes('R')) {%>, canActivate: [AuthGuard]<%}%>},<%}%>
-     <%if (api.includes("R")) {%>{path: 'detail/:id', component: <%if (detailType === 'normal') {%><%-schm.SchemaName%>DetailComponent<%} else {%><%-schm.SchemaName%>DetailWidget<%-schm.DetailType%>Component<%}
+    <%if (api.includes("R")) {%>{path: 'detail/:id', component: <%if (detailType === 'normal') {%><%-schm.SchemaName%>DetailComponent<%} else {%><%-schm.SchemaName%>DetailWidget<%-schm.DetailType%>Component<%}
      if (schm.referred) {%>, children: <%-schm.schemaName%>DetailPath<%}%><%
      if (!schm.permission.includes('R')) {%>, canActivate: [AuthGuard]<%}%>},<%}%>
     <% if (api.includes("U")) {%>{path: 'edit/:id', component: <%-schm.SchemaName%>EditComponent<%

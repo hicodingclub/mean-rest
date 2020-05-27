@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { Router, ActivatedRoute }    from '@angular/router';
 import { Injector } from '@angular/core';
 
-import { <%-SchemaName%>DetailCustComponent } from '../../../<%-moduleName%>-cust/<%-schemaName%>/<%-schemaName%>-detail.cust.component';
+import { <%-SchemaName%>DetailCustComponent } from '../../../<%-moduleName%>-cust/base/<%-schemaName%>/<%-schemaName%>-detail.cust.component';
 import { ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 

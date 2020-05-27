@@ -98,6 +98,18 @@ var templates = {
     'main module file',
     'W',
   ],
+  mainCoreModule: [
+    '../templates/main.core.module.ts',
+    '.core.module.ts',
+    'main module file',
+    'W',
+  ],
+  mainCustModule: [
+    '../templates/main.cust.module.ts',
+    '.cust.module.ts',
+    'main module file',
+    'A',
+  ],
   mainComponent: [
     '../templates/main.component.ts',
     '.component.ts',
@@ -130,13 +142,24 @@ var templates = {
     'routing module file',
     'W',
   ],
-  routingPath: [
-    '../templates/routing.path.ts',
-    'routing.path.ts',
-    'routing path file',
+  routingCoreModule: [
+    '../templates/routing.core.module.ts',
+    'routing.core.module.ts',
+    'routing core module file',
     'W',
   ],
-
+  routingCorePath: [
+    '../templates/routing.core.path.ts',
+    'routing.core.path.ts',
+    'routing core path file',
+    'W',
+  ],
+  routingCustPath: [
+    '../templates/routing.cust.path.ts',
+    'routing.cust.path.ts',
+    'routing cust path file',
+    'A',
+  ],
   schemaBaseService: [
     '../templates/schema.base.service.ts',
     '.base.service.ts',
@@ -1254,6 +1277,12 @@ function main() {
   outputDir = path.join(parentOutputDir, moduleName);
   outputDirCust = path.join(parentOutputDir, moduleNameCust);
 
+  let subDirCust = path.join(parentOutputDir, moduleNameCust, 'cust');
+  if (!fs.existsSync(subDirCust)) {
+    //console.info('Creating component directory '%s'...', componentDir);
+    mkdir('.', subDirCust);
+  }
+
   let overWrite = false;
   if (program.force) overWrite = true;
 
@@ -1502,7 +1531,7 @@ function main() {
     //console.log(model);
 
     let componentDir = path.join(outputDir, schemaName);
-    let componentDirCust = path.join(outputDirCust, schemaName);
+    let componentDirCust = path.join(outputDirCust, 'base', schemaName);
     if (!fs.existsSync(componentDir)) {
       //console.info('Creating component directory '%s'...', componentDir);
       mkdir('.', componentDir);
@@ -2088,9 +2117,11 @@ function main() {
   //console.log('***renderObj', renderObj);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
 
-  generateSourceFile(moduleName, templates.conf, renderObj, parentOutputDir);
+  generateSourceFile(moduleName, templates.conf, renderObj, outputDirCust);
 
   generateSourceFile(moduleName, templates.mainModule, renderObj, outputDir);
+  generateSourceFile(moduleName, templates.mainCoreModule, renderObj, outputDir);
+  generateSourceFile(moduleName, templates.mainCustModule, renderObj, outputDirCust);
   generateSourceFile(moduleName, templates.mainComponent, renderObj, outputDir);
   generateSourceFile(
     moduleName,
@@ -2107,7 +2138,9 @@ function main() {
   generateSourceFile(moduleName, templates.tokens, renderObj, outputDir);
 
   generateSourceFile(moduleName, templates.routingModule, renderObj, outputDir);
-  generateSourceFile(moduleName, templates.routingPath, renderObj, outputDir);
+  generateSourceFile(moduleName, templates.routingCoreModule, renderObj, outputDir);
+  generateSourceFile(moduleName, templates.routingCorePath, renderObj, outputDir);
+  generateSourceFile(moduleName, templates.routingCustPath, renderObj, outputDirCust);
 
   if (
     hasDate ||

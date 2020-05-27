@@ -5,7 +5,7 @@ import { Injector } from '@angular/core';
 
 declare const $: any;
 
-import { <%-SchemaName%>EditCustComponent } from '../../../<%-moduleName%>-cust/<%-schemaName%>/<%-schemaName%>-edit.cust.component';
+import { <%-SchemaName%>EditCustComponent } from '../../../<%-moduleName%>-cust/base/<%-schemaName%>/<%-schemaName%>-edit.cust.component';
 import { ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 <%for (let mapField of mapFieldsRef) {%>
