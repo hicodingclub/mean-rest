@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 
 import { NgbModule, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
 import { MddsCoreModule } from '@hicoder/angular-core';
@@ -32,7 +31,6 @@ import { SafeUrlPipe } from './pipes';
         CommonModule,
         RouterModule,
         FormsModule,
-        HttpClientModule,
 
         NgbModule,
         MddsCoreModule,

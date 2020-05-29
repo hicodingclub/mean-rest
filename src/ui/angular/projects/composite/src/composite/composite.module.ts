@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
 
 import { CompositeComponent, CompositeDirective, CompositeSubmitDirective } from './composite.component';
 
@@ -10,7 +9,6 @@ import { CompositeComponent, CompositeDirective, CompositeSubmitDirective } from
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        HttpClientModule,
     ],
     declarations: [
         CompositeComponent,

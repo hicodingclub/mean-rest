@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AuthRoutingModule } from './auth-routing.module';
@@ -26,7 +25,6 @@ import { ClickElsewhereDirective } from './auth-icon/click-elsewhere.directive';
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
-        HttpClientModule,
 
         AuthRoutingModule
     ],
