@@ -101,6 +101,12 @@ const populateAdminRoles = function(restController) {
             {role: 'LoginUser', description: 'Login users, if not assigned any roles.'} //document
         ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
 
+    takInfo = 'create "Anyone" role ...';
+    await restController.ModelExecute(
+            "mrole",
+            "create",
+            {role: 'Anyone', description: 'Any one, login or not.'} //document
+        ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
   }
   
   runDB();

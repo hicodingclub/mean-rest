@@ -219,35 +219,54 @@ const getOperation = function(req) {
 
 
 const verifyRolePermission = function(req, res, next) {
+  // console.log("***req.muser", req.muser)
+  
   let schemaName = req.meanRestSchemaName;
-  //console.log("***schemaName", schemaName)  
   let operation = getOperation(req);
   
-  let roles = req.muser.role; //[] list of role ids
-  
-  let roleDisallow = false;
   let mddsModulePermissions = req.mddsModulePermissions? req.mddsModulePermissions : [];
   let mddsAllModulePermissions = req.mddsAllModulePermissions? req.mddsAllModulePermissions : [];
-  //console.log("***mddsModulePermissions", mddsModulePermissions)  
-  //console.log("***mddsAllModulePermissions", mddsAllModulePermissions)
-  for (let rId of roles) {
-    //mddsPermission is set by restRouter before authorization (rest_router.js)
-    let rolePermission = getPermission(mddsModulePermissions, 'role', rId, schemaName, mddsAllModulePermissions);
+  // console.log("***mddsModulePermissions", mddsModulePermissions)  
+  // console.log("***mddsAllModulePermissions", mddsAllModulePermissions)
+
+  const loggedIn = !!req.muser
+  if (loggedIn) {
+    let roles = req.muser.role || []; //[] list of role ids
     
-    if (rolePermission && rolePermission.includes(operation)) { //any role allows it
-      return next();
+    let roleDisallow = false;
+    for (let rId of roles) {
+      //mddsPermission is set by restRouter before authorization (rest_router.js)
+      let rolePermission = getPermission(mddsModulePermissions, 'role', rId, schemaName, mddsAllModulePermissions);
+      // console.log("***roleID, rolePermission", rId, rolePermission)
+
+      if (rolePermission && rolePermission.includes(operation)) { //any role allows it
+        return next();
+      }
+      if (rolePermission) roleDisallow = true; //disallowed by any least one row.
     }
-    if (rolePermission) roleDisallow = true; //disallowed by any least one row.
+    if (roleDisallow) {
+      return next(createError(403, "Forbidden."));
+    }
+    
+    // not allowed or forbidden by any role
+
+    // check LoginUser Role
+    let loginPermission = getPermission(mddsModulePermissions, 'role', "LoginUser", schemaName, mddsAllModulePermissions);
+    if (loginPermission) {
+      if (loginPermission.includes(operation)) {
+        return next(); //allowed by allModulePermission
+      } 
+      return next(createError(403, "Forbidden."));
+    }
   }
 
-  if (roleDisallow) {
+  // check anyOneUser
+  let anyOnePermission = getPermission(mddsModulePermissions, 'role', "Anyone", schemaName, mddsAllModulePermissions);
+  if (anyOnePermission) {
+    if (anyOnePermission.includes(operation)) {
+      return next(); //allowed by allModulePermission
+    }
     return next(createError(403, "Forbidden."));
-  }
-  
-  let loginPermission = getPermission(mddsModulePermissions, 'role', "LoginUser", schemaName, mddsAllModulePermissions);
-
-  if (loginPermission && loginPermission.includes(operation)) {
-    return next(); //allowed by allModulePermission
   }
 
   return next(createError(403, "Forbidden."));
@@ -258,11 +277,6 @@ const verifyPermission = function(req, res, next) {
   const loggedIn = !!req.muser
   // console.log("***req.muser", req.muser)
   // console.log("***req.mddsModuleAccesses - public access\n", req.mddsModuleAccesses)
-  // console.log("***req.mddsModulePermissions - role access\n", req.mddsModulePermissions)
-
-  if (loggedIn && req.muser.role && req.muser.role.length > 0) {
-    return verifyRolePermission(req, res, next); //use role based permission
-  } 
   
   let schemaName = req.meanRestSchemaName;
   let operation = getOperation(req);
@@ -320,5 +334,9 @@ const setModulePermission = function(req, res, next) {
   next();
 }
 
-module.exports = { verifyPermission: verifyPermission, setModulePermission: setModulePermission};
+module.exports = {
+  verifyPermission,
+  verifyRolePermission,
+  setModulePermission,
+};
 

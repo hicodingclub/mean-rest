@@ -12,6 +12,17 @@ const authFuncs = {
   "setPermissionFunc": authz.setModulePermission,
   "permissionStore": PermissionStore
 };
+function getAuthFuncs(option) { //option = {authz: 'group'}, or 'role'
+  // group, or role
+  if (option) {
+    if (option.authz == 'role') {
+      authFuncs.authzFunc = authz.verifyRolePermission;
+    } else {
+      authFuncs.authzFunc = authz.verifyPermission;
+    }
+  }
+  return authFuncs;
+}
 
 const dbOperation = require('./defaultDbOperations');
 
@@ -58,6 +69,6 @@ const run = function(authServerUrl, appKey, appSecrete, localRouter, options) {
 }
 
 module.exports = {
-  authFuncs: authFuncs,
-  run: run
+  getAuthFuncs,
+  run,
 }
