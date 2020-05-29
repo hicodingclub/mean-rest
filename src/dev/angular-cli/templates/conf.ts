@@ -14,7 +14,7 @@ import { <%
 export const <%-ModuleName%>CoreRoutes: Routes = [
   { 
     // Lazy Load: and add to app routing: 
-    //     loadChildren: () => import('./<%-moduleName%>/<%-moduleName%>.module').then(m => m.<%-ModuleName%>Module)
+    //     { path: '<%-moduleName%>', loadChildren: () => import('./<%-moduleName%>/<%-moduleName%>.module').then(m => m.<%-ModuleName%>Module) },
     path: '',
     // non lazy load config. Include module in app module.
     // path: '<%-moduleName%>',
@@ -37,7 +37,7 @@ import { <%-ModuleName%>RoutingCustPath } from './<%-moduleName%>-routing.cust.p
 export const <%-ModuleName%>Routes: Routes = [
   {
     // Lazy Load: and add to app routing: 
-    //     loadChildren: () => import('./<%-moduleName%>/<%-moduleName%>.module').then(m => m.<%-ModuleName%>Module)
+    //     { path: '<%-moduleName%>', loadChildren: () => import('./<%-moduleName%>/<%-moduleName%>.module').then(m => m.<%-ModuleName%>Module) },
     path: 'cust',
     // non lazy load config. Include module in app module.
     // path: '<%-moduleName%>/cust',

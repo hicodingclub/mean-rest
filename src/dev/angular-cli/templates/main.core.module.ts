@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 <% if (hasDate) {%>
 import { NgbModule, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
@@ -54,7 +53,6 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
 @NgModule({
   imports: [
     CommonModule,
-    HttpClientModule,
     FormsModule,<%_ if (hasDate) {%>
     NgbModule,<%}%>
     MddsCoreModule,<%if (hasFileUpload) {%>

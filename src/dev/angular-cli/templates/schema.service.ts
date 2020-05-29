@@ -6,7 +6,7 @@ import { <%-ModuleName%>_SERVER_ROOT_URI } from '../<%-moduleName%>.tokens';
 @Injectable()
 export class <%-SchemaName%>Service extends <%-SchemaName%>BaseService implements OnDestroy {
     constructor(
-        @SkipSelf() http: HttpClient,
+        http: HttpClient,
         @Inject(<%-ModuleName%>_SERVER_ROOT_URI) private <%-moduleName%>ServerRootUri: string) {
         super(http, <%-moduleName%>ServerRootUri);
     }
