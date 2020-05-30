@@ -146,11 +146,10 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>EditCustCompone
     getDetailData() {
       if (this.initData) {
         this.action='Add';
-        let detail = {
-            <% createView.forEach( (field) => { 
+        let detail = {<%_ createView.forEach( (field) => { 
               let fn = field.fieldName;let fdv = field.defaultValue;
-              if ( typeof(fdv) !== 'undefined') {
-                %><%-fn%>: <%-JSON.stringify(fdv)%>,<%_}
+              if ( typeof(fdv) !== 'undefined') {%>
+          <%-fn%>: <%-JSON.stringify(fdv)%>,<%_}
             }); %>
         };
         for (let prop of Object.keys(this.initData)) {
@@ -159,11 +158,10 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>EditCustCompone
         }
         this.detail = this.formatDetail(detail);
       } else {
-          let detail = {
-              <% createView.forEach( (field) => { 
+          let detail = {<%_ createView.forEach( (field) => { 
                 let fn = field.fieldName;let fdv = field.defaultValue;
-                if ( typeof(fdv) !== 'undefined') {
-                  %><%-fn%>: <%-JSON.stringify(fdv)%>,<%_}
+                if ( typeof(fdv) !== 'undefined') {%>
+            <%-fn%>: <%-JSON.stringify(fdv)%>,<%_}
               }); %>
           };
           this.detail = this.formatDetail(detail);
