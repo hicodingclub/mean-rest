@@ -892,10 +892,11 @@ class RestController {
           originCategoriesAll[i] = await model
             .find(catQuery)
             .distinct(cate.categoryBy)
-            .exec(); // no objects
+            .exec(); // returns array of distinct field values. Value is unwinded for array type.
 
           const aggregatePipes = [
             { $match: catQuery },
+            { $unwind: `$${cate.categoryBy}` }, // support array field
             { $group: { _id: `$${cate.categoryBy}`, count: { $sum: 1 } } },
           ];
           let cateCounts = await model.aggregate(aggregatePipes).exec();
@@ -903,7 +904,7 @@ class RestController {
           const cateCountsObj = {};
           for (const c of cateCounts) {
             let k = c['_id'];
-            if (k === null) k = MddsUncategorized;
+            if (k === null) coninue; // ignore null field; k = MddsUncategorized;
             cateCountsObj[k] = c['count'];
           }
           /*[ { _id: 5de16d0db8c1b52671ff717f, count: 1 },
@@ -939,6 +940,8 @@ class RestController {
               categoriesDocumentsAll[i]
             ); // merge
           }
+
+          // categoriesAll could be ref object, or just simple value. Put it to parent objects.
           categoryObjectsAll[i] = categoriesAll[i].map((x) => {
             const obj = {};
             obj[cate.categoryBy] = x;
@@ -957,6 +960,7 @@ class RestController {
             categoryObjectsAll[i],
             indexPopulateMap
           );
+          // get the indexed ref objects, or just simple value if not ref.
           categoriesAll[i] = categoryObjectsIndexAll[i].map(
             (x) => x[cate.categoryBy]
           );
@@ -966,16 +970,28 @@ class RestController {
           for (const c of originCategoriesAll[i]) {
             categoriesCounts[i].push(cateCountsObj[c] || 0);
           }
-          categoriesCounts[i].push(cateCountsObj[MddsUncategorized] || 0);
+          // categoriesCounts[i].push(cateCountsObj[MddsUncategorized] || 0);
 
           if (i === 0) {
+            /*
             let totalCnt = 0;
             for (let j = 0; j < categoriesCounts[i].length; j++) {
               totalCnt += categoriesCounts[i][j];
             }
             // put total cnt in front.
             categoriesCounts[i].splice(0, 0, totalCnt);
+            */
+            let totalCnt = await model
+              .countDocuments(catQuery)
+              .exec(); // returns array of distinct field values. Value is unwinded for array type.
+            categoriesCounts[i].splice(0, 0, totalCnt);
           }
+
+          catQuery[cate.categoryBy] = {$in: [null, []]};
+          let uncategorizedCnt = await model
+            .countDocuments(catQuery)
+            .exec(); // returns array of distinct field values. Value is unwinded for array type.
+          categoriesCounts[i].push(uncategorizedCnt);
 
           // get the biref population of the category fields
           if (cate.listCategoryShowMore) {
@@ -986,7 +1002,7 @@ class RestController {
             categoryObjectsBriefAll[i] = resultReducerForRef(
               categoryObjectsAll[i],
               briefPopulateMap
-            ).map((x) => x[cate.categoryBy]);
+            ).map((x) => x[cate.categoryBy]); // put only the biref-ed ref or simple value
           }
 
           // db.someCollection.aggregate([{ $match: { age: { $gte: 21 }}}, {"$group" : {_id:"$source", count:{$sum:1}}} ])
@@ -1002,7 +1018,8 @@ class RestController {
           query[cate.categoryBy] = cate.categoryCand;
         } else if (cate.categoryCand === MddsUncategorized) {
           // uncategorized request from front end. use null.
-          query[cate.categoryBy] = null;
+          // query[cate.categoryBy] = null;
+          query[cate.categoryBy] = {$in: [null, []]};
         } else {
           if (i === 0) {
             // Search all. don't put to query
