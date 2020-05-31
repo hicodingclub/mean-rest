@@ -1205,10 +1205,12 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     const d2 = this.deFormatDetail(d); // undefined field is deleted after this step.
     for (const field of Object.keys(d2)) {
       let oValue: any;
+      let oValueRaw: any[] = [];
       if (this.stringFields.indexOf(field) >= 0) {
         if (listCategoryFields.includes(field)) {
           // put category field to 'and'
           oValue = d[field];
+          oValueRaw = [oValue];
         } else {
           continue; // string fields already put to orSearchContext
         }
@@ -1217,9 +1219,11 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         let valueToShow: any;
 
         oValue = d2[field];
+        oValueRaw = [oValue];
 
         if (this.multiSelectionFields.includes(field)) {
           oValue = { $in: d2[field] }; // use $in for or, and $all for and
+          oValueRaw = d2[field];
 
           const t = this.formatArrayMultiSelectionField(
             d2[field],
@@ -1228,6 +1232,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
           valueToShow = t.value;
         } else if (this.arrayFields.some((x) => x[0] === field)) {
           oValue = { $in: d2[field] }; // use $in for or, and $all for and
+          oValueRaw = d2[field];
 
           valueToShow = d[field].value;
         } else if (this.dateFields.includes(field)) {
@@ -1243,11 +1248,11 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
           this.searchMoreDetail.push([this.fieldDisplayNames[field] || field, valueToShow, field]);
         }
       }
-      if (oValue === MddsUncategorized) {
+      if (oValueRaw.includes(MddsUncategorized)) {
         oValue = null;
       }
       const o = {};
-      if (oValue !== MddsAll) { // MddsAll means no filter on this field
+      if (!oValueRaw.includes(MddsAll)) { // MddsAll means no filter on this field
         o[field] = oValue;
         andSearchContext.push(o);
       }
@@ -1540,6 +1545,16 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
                 c.categoriesBrief.splice(0, 0, { _id: MddsAll });
               }
 
+              if (this.multiSelectionFields.includes(c.listCategoryField) ||
+                  this.arrayFields.some( x => x[0] === c.listCategoryField)) {
+                // back end support array value categorizing
+                c.categories = c.categories.map(
+                  (x) => {
+                    x[c.listCategoryField] = [x[c.listCategoryField]];
+                    return x;
+                  }
+                )
+              }
               c.categoriesOut = c.categories.map((x: any) =>
                 this.formatDetail(x)
               );
