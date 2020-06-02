@@ -111,14 +111,16 @@ tr th:first-child {
 
 .list-body-fields {
 }
-.list-diverder-gradient {
+.list-devider-gradient {
   border: 0;
   height: 2px;
   background: #095484;
   background-image: linear-gradient(to right, #ccc, #095484, #ccc);
 }
-.list-diverder {
+.list-devider {
   width: 80%;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
 }
 
 .clickable-card:hover {
@@ -378,15 +380,15 @@ div.badge-click:hover {
 
 .read-more {
   /*font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;*/
-  margin-top: 1rem;
   color: #307bff;
   cursor: pointer;
 }
-.read-more-in-table {
+.read-more:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+.font-size-75 {
   /*font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;*/
-  margin-top: 1rem;
-  color: #307bff;
-  cursor: pointer;
   font-size: 0.75rem;
 }
 

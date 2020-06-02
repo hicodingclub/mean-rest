@@ -25,7 +25,7 @@
 	    </thead>
 	    <tbody>
 	        <tr *ngFor="let detail of list;  let i = index; let list_index = index;" [ngClass]="{'clicked-row': clickedId==detail['_id']}">
-	            <td scope="row" <%if(clickToDetail){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer read-more"<%}%>>
+	            <td scope="row" <%if(clickToDetail){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer read-more mt-3"<%}%>>
 	            	{{(page-1)*perPage+i+1}}
 	            </td>
 <%_ let view = 'list'; for (let field of briefView){ 
@@ -45,7 +45,7 @@
 						<i *ngIf="archivedSearch" class="fas fa-trash-restore" title="Unarchive"></i>	
 					</a><%}%>
 					<%if(canCheck){%><input class="list-check-box" type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
-					<%if(cardHasLink){%><span class="read-more-in-table" (click)="onDetailLinkClicked(detail['_id'])">Detail <i class="fas fa-arrow-right" ></i></span><%}%>
+					<%if(cardHasLink){%><span class="read-more font-size-75 mt-3" (click)="onDetailLinkClicked(detail['_id'])">Detail <i class="fas fa-arrow-right" ></i></span><%}%>
 	            </td><%}%>
 	        </tr>
 	    </tbody>

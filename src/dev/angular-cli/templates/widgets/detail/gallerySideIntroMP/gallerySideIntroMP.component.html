@@ -66,10 +66,10 @@
 		
 				let fn = field.fieldName; let ft = field.type;;
 				%>
-			<div *ngIf="detail['<%-fn%>']" class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']">
+			<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="detail['<%-fn%>']"<%}%> class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (ft !== 'AngularSelector') {%>
 				<div class="field-label" [ngStyle]="style['<%-fn%>-label']">
 					<%-field.displayName%>:
-				</div>
+				</div><%}%>
 				<div class="ml-1" [ngStyle]="style['<%-fn%>-value']">
 					<% include ../../../schema-display.field.html %>
 				</div>

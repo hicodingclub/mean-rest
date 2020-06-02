@@ -33,12 +33,12 @@
 
           let fn = field.fieldName; let ft = field.type;;
           %>
-          <div *ngIf="detail['<%-fn%>']" class="d-flex flex-wrap">
-            <div class=""><label><%-field.displayName%>:</label></div>
+          <div <%_ if (ft !== 'AngularSelector') {%> *ngIf="detail['<%-fn%>']"<%}%> class="d-flex flex-wrap"><%_ if (ft !== 'AngularSelector') {%>
+            <div class=""><label><%-field.displayName%>:</label></div><%}%>
             <div class="ml-3"><% include schema-display.field.html %></div>
           </div><%_ 
       }%><% if (cardHasLink) {%>
-        <div class="read-more" (click)="onDetailLinkClicked(detail['_id'])">
+        <div class="read-more mt-3" (click)="onDetailLinkClicked(detail['_id'])">
           Read more ...
         </div><%}%>
       </div><%

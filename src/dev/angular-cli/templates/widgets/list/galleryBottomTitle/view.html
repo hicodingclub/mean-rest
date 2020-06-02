@@ -8,25 +8,30 @@
 		let field, fn, ft;
 		%>
 		<div class="text-left h-100"
-			[ngClass]="{'clickable-card pointer': !options['disableSelect'], 'clicked-row': !options['disableSelect'] && selectedId === detail['_id']}">
-			<div class="grid-fields" (click)="clickOneItem(i, detail['_id'])">
+			[ngClass]="{'clicked-row': !options['disableSelect'] && selectedId === detail['_id']}">
+			<div class="grid-fields">
 
-				<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}"
-					[ngStyle]="style['picture']">
+				<div class="grid-head-picture"
+					[ngClass]="{'grid-head-picture-large': options['largePicture'], 'clickable-card pointer': !options['disableSelect']}"
+					[ngStyle]="style['picture']"
+					(click)="clickOneItem(i, detail['_id'])">
 					<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']">
 					</lib-mdds-file-display>
 				</div>
 				<div class="text-center">
-					<div *ngIf="!options['notShowTitle']" class="grid-picture-title" [ngClass]="{'grid-picture-title-large': options['largePicture']}"
-					[ngStyle]="style['title']">
+					<div *ngIf="!options['notShowTitle']" class="grid-picture-title"
+						[ngClass]="{'grid-picture-title-large': options['largePicture'], 'read-more': !options['disableSelect']}"
+						[ngStyle]="style['title']"
+						(click)="clickOneItem(i, detail['_id'])">
 						<%
 						field = field1; fn = fn1; ft = ft1;
 						%>
 						<% include ../../../schema-display.field.html %>
 					</div>
 					<div *ngIf="!options['notShowSubTitle']" class="grid-picture-subtitle"
-						[ngClass]="{'grid-picture-subtitle-large': options['largePicture']}"
-						[ngStyle]="style['subtitle']">
+						[ngClass]="{'grid-picture-subtitle-large': options['largePicture'], 'read-more': !options['disableSelect']}"
+						[ngStyle]="style['subtitle']"
+						(click)="clickOneItem(i, detail['_id'])">
 						<%
 						field = field2; fn = fn2; ft = ft2;
 						%>
@@ -39,11 +44,11 @@
 				
 						let fn = field.fieldName; let ft = field.type;;
 						%>
-					<div *ngIf="detail['<%-fn%>']" class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']">
+					<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="detail['<%-fn%>']"<%}%> class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (ft !== 'AngularSelector') {%>
 						<div class="field-label text-right w-50" [ngStyle]="style['<%-fn%>-label']">
 							<%-field.displayName%>:
-						</div>
-						<div class="ml-1 text-left" [ngStyle]="style['<%-fn%>-value']">
+						</div><%}%>
+						<div class="<%_ if (ft !== 'AngularSelector') {%>ml-1 <%}%>text-left" [ngStyle]="style['<%-fn%>-value']">
 							<% include ../../../schema-display.field.html %>
 						</div>
 					</div><%_  

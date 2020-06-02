@@ -7,50 +7,52 @@
 
 const FIELD_NUMBER_FOR_SELECT_VIEW = 4;
 
-var ejs = require('ejs');
-var mongoose = require('mongoose');
+const ejs = require('ejs');
+const mongoose = require('mongoose');
 
-var fs = require('fs');
-var path = require('path');
-var relative = require('relative');
-var program = require('commander');
+const fs = require('fs');
+const path = require('path');
+const relative = require('relative');
+const program = require('commander');
 
-var minimatch = require('minimatch');
-var mkdirp = require('mkdirp');
-var readline = require('readline');
-var sortedObject = require('sorted-object');
-var util = require('util');
+const minimatch = require('minimatch');
+const mkdirp = require('mkdirp');
+const readline = require('readline');
+const sortedObject = require('sorted-object');
+const util = require('util');
 
-var MODE_0666 = parseInt('0666', 8);
-var MODE_0755 = parseInt('0755', 8);
-var TEMPLATE_DIR = path.join(__dirname, '..', 'templates');
-var VERSION = require('../package').version;
+const MODE_0666 = parseInt('0666', 8);
+const MODE_0755 = parseInt('0755', 8);
+const TEMPLATE_DIR = path.join(__dirname, '..', 'templates');
+const VERSION = require('../package').version;
 
-var _exit = process.exit;
+const { Selectors } = require('./selectors');
+
+const _exit = process.exit;
 
 // Re-assign process.exit because of commander
 process.exit = exit;
 
-var views_collection = {}; //views in [schema, briefView, detailView, CreateView, EditView, SearchView, IndexView] format
-var model_collection = {};
+const views_collection = {}; //views in [schema, briefView, detailView, CreateView, EditView, SearchView, IndexView] format
+const model_collection = {};
 
-var basedirFile = function (relativePath) {
+const basedirFile = function (relativePath) {
   return path.join(__dirname, relativePath);
 };
-var generatedFile = function (outputDir, prefix, outputFile) {
+const generatedFile = function (outputDir, prefix, outputFile) {
   if (!prefix) prefix = '';
   if (prefix !== '' && !outputFile.startsWith('.')) prefix += '-';
   return path.join(outputDir, prefix + outputFile);
 };
-var capitalizeFirst = function (str) {
+const capitalizeFirst = function (str) {
   return str.charAt(0).toUpperCase() + str.substr(1);
 };
 
-var lowerFirst = function (str) {
+const lowerFirst = function (str) {
   return str.charAt(0).toLowerCase() + str.substr(1);
 };
 
-var camelToDisplay = function (str) {
+const camelToDisplay = function (str) {
   // insert a space before all caps
   words = [
     'At',
@@ -87,7 +89,7 @@ var camelToDisplay = function (str) {
   return capitalizeFirst(arr.join(' '));
 };
 
-var templates = {
+const templates = {
   //key:[template_file, output_file_suffix, description, write_options]
   //write_options: W: write, A: append
   conf: ['../templates/conf.ts', '.conf.ts', 'module conf file', 'A'],
@@ -366,7 +368,7 @@ const PredefinedPatchFields = {
   mmodule_name: { type: String, index: true },
 };
 
-var generateSourceFile = function (keyname, template, renderObj, outputDir) {
+const generateSourceFile = function (keyname, template, renderObj, outputDir) {
   let renderOptions = {};
   let templateFile = basedirFile(template[0]);
   let output = generatedFile(outputDir, keyname, template[1]);
@@ -392,7 +394,7 @@ var generateSourceFile = function (keyname, template, renderObj, outputDir) {
   });
 };
 
-var getPrimitiveField = function (fieldSchema) {
+const getPrimitiveField = function (fieldSchema) {
   let type;
   let jstype;
   let defaultValue;
@@ -527,7 +529,7 @@ var getPrimitiveField = function (fieldSchema) {
   ];
 };
 
-var processField = function (x) {
+const processField = function (x) {
   let hidden = false;
   let field = x;
   let matches = x.match(/\((.*?)\)/);
@@ -538,7 +540,7 @@ var processField = function (x) {
   return [field, hidden];
 };
 
-var processFieldGroups = function (fieldGroups) {
+const processFieldGroups = function (fieldGroups) {
   //remove surrounding ()
   for (let arr of fieldGroups) {
     arr = arr.map((x) => {
@@ -557,12 +559,14 @@ var processFieldGroups = function (fieldGroups) {
 
   return fieldGroups;
 };
-var generateViewPicture = function (
+const generateViewPicture = function (
+  API,
   schemaName,
   viewStr,
   schema,
   validators,
-  indexViewNames
+  indexViewNames,
+  selectors
 ) {
   const displayNames = {};
   const re = /([^\s]+)\[([^\]]*)\]/g; // handle 'field[field displayName]'
@@ -651,6 +655,8 @@ var generateViewPicture = function (
     let mapKey;
 
     let sortable = false;
+
+    let selector;
 
     if (item in schema.paths) {
       let fieldSchema = schema.paths[item];
@@ -808,6 +814,20 @@ var generateViewPicture = function (
       //Handle as a string
       type = 'SchemaString';
       jstype = 'string';
+    } else if (item.startsWith('~')) {
+      // selector type:
+      type = 'AngularSelector';
+      item = item.slice(1);
+
+      if (selectors && selectors.hasSelector(item)) {
+        selector = selectors.getSelector(item);
+        selector.usedCandidate(API);
+      } else {
+        warning(
+          `Field ${item} is not defined in selectors. Skipped...`
+        );
+        continue;
+      }
     } else {
       warning(
         `Field ${item} is not defined in schema ${schemaName}. Skipped...`
@@ -862,6 +882,9 @@ var generateViewPicture = function (
       elementUnique,
       //for map
       mapKey,
+
+      //selector
+      selector,
     };
 
     if (fieldPicture.fieldName === 'student') {
@@ -1319,6 +1342,8 @@ function main() {
   if (config && config.fileServer) fileServer = config.fileServer;
   let authRequired = false;
 
+  let allSelectors = [];
+
   for (let name in schemas) {
     let schemaDef = schemas[name];
 
@@ -1518,6 +1543,11 @@ function main() {
       editHintFields = schemaDef.mraBE.valueSearchFields || editHintFields;
     }
 
+    let selectors = new Selectors();
+    if (schemaDef.selectors) {
+      selectors = new Selectors(schemaDef.selectors);
+    }
+
     //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
     if (typeof views !== 'object' || !Array.isArray(views)) {
       console.error(
@@ -1560,7 +1590,6 @@ function main() {
     });
     let indexViewNames = [];
     //briefView, detailView, CreateView, EditView, SearchView, indexView]
-
     /* 1. handle fields in indexView */
     let [
       indexViewGrp,
@@ -1574,11 +1603,13 @@ function main() {
       hasFileUpload6,
       hasEmailing6,
     ] = generateViewPicture(
+      'I',
       name,
       views[5],
       mongooseSchema,
       validators,
-      indexViewNames
+      indexViewNames,
+      selectors
     );
     for (let s of indexView) {
       indexViewNames.push(s.fieldName);
@@ -1596,11 +1627,13 @@ function main() {
       hasFileUpload1,
       hasEmailing1,
     ] = generateViewPicture(
+      'L',
       name,
       views[0],
       mongooseSchema,
       validators,
-      indexViewNames
+      indexViewNames,
+      selectors
     );
     //console.log('***briefView', briefView);
     //console.log('***hasRef1', hasRef1);
@@ -1620,11 +1653,13 @@ function main() {
       hasFileUpload2,
       hasEmailing2,
     ] = generateViewPicture(
+      'R',
       name,
       views[1],
       mongooseSchema,
       validators,
-      indexViewNames
+      indexViewNames,
+      selectors
     );
 
     /* 4. handle fields in createView */
@@ -1640,11 +1675,13 @@ function main() {
       hasFileUpload3,
       hasEmailing3,
     ] = generateViewPicture(
+      'C',
       name,
       views[2],
       mongooseSchema,
       validators,
-      indexViewNames
+      indexViewNames,
+      selectors
     );
     setFieldProperty(createView, editHintFields, true, 'hint', true); // if include is "true", set to "true"
 
@@ -1661,11 +1698,13 @@ function main() {
       hasFileUpload4,
       hasEmailing4,
     ] = generateViewPicture(
+      'U',
       name,
       views[3],
       mongooseSchema,
       validators,
-      indexViewNames
+      indexViewNames,
+      selectors
     );
     setFieldProperty(editView, editHintFields, true, 'hint', true); // if include is "true", set to "true"
 
@@ -1682,11 +1721,13 @@ function main() {
       hasFileUpload5,
       hasEmailing5,
     ] = generateViewPicture(
+      'S',
       name,
       views[4],
       mongooseSchema,
       validators,
-      indexViewNames
+      indexViewNames,
+      selectors
     );
 
     let schemaHasDate = hasDate5 || hasDate6;
@@ -1698,6 +1739,7 @@ function main() {
     let schemaHasFileUpload = false;
     let schemaHasEmailing = false;
     if (api.includes('L')) {
+      selectors.used('L');
       // includes list view
       schemaHasDate = schemaHasDate || hasDate1;
       schemaHasRef = schemaHasRef || hasRef1;
@@ -1706,6 +1748,7 @@ function main() {
       schemaHasEmailing = schemaHasEmailing || hasEmailing1;
     }
     if (api.includes('R')) {
+      selectors.used('R');
       // includes detail view
       schemaHasDate = schemaHasDate || hasDate2;
       schemaHasRef = schemaHasRef || hasRef2;
@@ -1714,6 +1757,7 @@ function main() {
       schemaHasEmailing = schemaHasEmailing || hasEmailing2;
     }
     if (api.includes('C')) {
+      selectors.used('C');
       // includes CreateView
       schemaHasDate = schemaHasDate || hasDate3;
       schemaHasRef = schemaHasRef || hasRef3;
@@ -1725,6 +1769,7 @@ function main() {
       schemaHasFileUpload = schemaHasFileUpload || hasFileUpload3;
     }
     if (api.includes('U')) {
+      selectors.used('U');
       // includes editView
       schemaHasDate = schemaHasDate || hasDate4;
       schemaHasRef = schemaHasRef || hasRef4;
@@ -1763,11 +1808,13 @@ function main() {
       hasFileUpload7,
       hasEmailing7,
     ] = generateViewPicture(
+      'R',
       name,
       detailSubViewStr,
       mongooseSchema,
       validators,
-      indexViewNames
+      indexViewNames,
+      selectors
     );
 
     let compositeEditView = [];
@@ -1881,6 +1928,8 @@ function main() {
     listCategories = tempListCategories;
     const listCategoryFields = listCategories.map(x=>x.listCategoryField);
 
+    allSelectors = allSelectors.concat(selectors.selectors);
+
     let schemaObj = {
       name: name,
       moduleName: moduleName,
@@ -1962,6 +2011,8 @@ function main() {
       generateView,
 
       api,
+
+      selectors,
 
       refApi: {},
       refListSelectType: {},
@@ -2091,6 +2142,15 @@ function main() {
     schemaObj.assoRoutes = assoRoutes;
   }
 
+  const usedSelectors = [];
+  allSelectors = allSelectors.filter(x => {
+    if (x.isUsed() && !usedSelectors.includes(x.name)) {
+      usedSelectors.push(x.name);
+      return true;
+    }
+    return false;
+  })
+
   let renderObj = {
     moduleName,
     ModuleName,
@@ -2111,6 +2171,7 @@ function main() {
     timeFormat,
     authRequired,
     fileServer,
+    allSelectors,
 
     generateView,
   };

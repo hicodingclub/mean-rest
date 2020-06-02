@@ -23,7 +23,9 @@ import { <%-ModuleName%>Component } from './<%-moduleName%>.component';
 
 import { <%-ModuleName%>_SERVER_ROOT_URI } from './<%-moduleName%>.tokens';
 import { <%-moduleName%>_server_root_uri } from '../<%-moduleName%>-cust/<%-moduleName%>.conf';
-
+<% for (let sel of allSelectors) { if (sel.usedFlag) {%>
+import { <%-sel.module%> } from '<%-sel.package%>';
+<%}}%>
 // Import components for each schema
 <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api;%>
   <%_ if (api.includes("L")) {%>import { <%-schm.SchemaName%>ListComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list.component';<%_ } %>
@@ -58,6 +60,8 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     MddsCoreModule,<%if (hasFileUpload) {%>
     FileUploadModule,<%}%><%if (hasEmailing) {%>
     ActionEmailModule,<%}%>
+    <%_ for (let sel of allSelectors) { if (sel.usedFlag) {%>
+    <%-sel.module%>,<%}}%>
 
     <%-ModuleName%>RoutingCoreModule,
   ],

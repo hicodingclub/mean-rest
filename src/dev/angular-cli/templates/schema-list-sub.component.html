@@ -68,7 +68,7 @@
                 </td>
                 <%_ if (lastColumnWidth) {%>
 	            <td><%_ if (putRead) {%>
-					<span class="read-more-in-table" (click)="onDetailLinkClicked(detail['_id'])">Detail <i class="fas fa-arrow-right" ></i></span><%_ }
+					<span class="read-more font-size-75 mt-3" (click)="onDetailLinkClicked(detail['_id'])">Detail <i class="fas fa-arrow-right" ></i></span><%_ }
 				if (putDelete) {%>
 	            	<a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%_ }
 				if (putArchive) {%>

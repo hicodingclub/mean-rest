@@ -68,4 +68,8 @@
                         } else {%>
                     {{detail['<%-fn%>']}}<%_
                         }%><%
+                } else if (ft === 'AngularSelector') { let sel = field.selector;%>
+                    <<%-sel.selector%><% for(let input of sel.inputs) {%>
+                        [<%-input.key%>]="<%-input.value%>"<%}%>>
+                    </<%-sel.selector%>><%
                 } else {%>{{detail['<%-fn%>']}} <%}%>
