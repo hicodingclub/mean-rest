@@ -1,5 +1,8 @@
 import { ActivatedRouteSnapshot, DetachedRouteHandle, RouteReuseStrategy } from '@angular/router'
 
+import { InjectionToken, Inject } from '@angular/core';
+
+export const MDDS_ROUTE_REUSE_RUIs = new InjectionToken<Array<string>>('MDDS_ROUTE_REUSE_RUIs');
 const COMPONENT_CACHE_DURATION = 30 * 1000;
 
 function getResolvedUrl(route: ActivatedRouteSnapshot): string {
@@ -9,6 +12,8 @@ function getResolvedUrl(route: ActivatedRouteSnapshot): string {
 }
 
 export class MddsRouteReuseStrategy implements RouteReuseStrategy {
+
+    constructor(@Inject(MDDS_ROUTE_REUSE_RUIs) public reuseURIs: Array<string>) { }
 
     detachedRouteHandles: { [key: string]: any[] } = {}; // key is url, and value is at [handle, timestamp] format
     pageYOffset = {};
@@ -43,6 +48,10 @@ export class MddsRouteReuseStrategy implements RouteReuseStrategy {
         return false;
     }
 
+    private isMraRoutePath(route: ActivatedRouteSnapshot, path: string) {
+        return route.data && route.data.mraLevel && route.routeConfig && route.routeConfig.path === path;
+    }
+
     private checkAuthentication() {
         const auth = this.isAuth;
         this.isAuth = this.isAuthorized();
@@ -54,12 +63,14 @@ export class MddsRouteReuseStrategy implements RouteReuseStrategy {
 
     /** Determines if this route (and its subtree) should be detached to be reused later */
     public shouldDetach(route: ActivatedRouteSnapshot): boolean {
-        if (route.routeConfig && route.routeConfig.path === 'list') {
+        const key = getResolvedUrl(route)
+
+        if (this.reuseURIs.includes(key) || this.isMraRoutePath(route, 'list')) {
             // save current scroll position
-            const key = getResolvedUrl(route);
             this.pageYOffset[key] = window.pageYOffset;
+            return true;
         }
-        return route.routeConfig.path === 'list';
+        return false;
     }
 
     /** Stores the detached route */
@@ -75,12 +86,11 @@ export class MddsRouteReuseStrategy implements RouteReuseStrategy {
         this.checkAuthentication();
         const date = new Date();
         const key = getResolvedUrl(route);
-        if (route.routeConfig && (route.routeConfig.path === 'new' || route.routeConfig.path === 'edit/:id')) {
+        if ( this.isMraRoutePath(route, 'new') || this.isMraRoutePath(route, 'edit/:id') ) {
             if (route.data && route.data.item) {
                 this.editItems[route.data.item] = true;
             }
         }
-        if (!route.routeConfig || route.routeConfig.path !== 'list') {  return false; }
         if (!this.detachedRouteHandles[key]) { return false; }
         if (date.getTime() - this.detachedRouteHandles[key][1]  > COMPONENT_CACHE_DURATION) {
             return false; 
@@ -92,10 +102,7 @@ export class MddsRouteReuseStrategy implements RouteReuseStrategy {
     public retrieve(route: ActivatedRouteSnapshot): DetachedRouteHandle {
         const date = new Date();
         const key = getResolvedUrl(route);
-        if (!route.routeConfig || route.routeConfig.path !== 'list') {
-            return null;
-        }
-        if (route.data.item && (route.data.item in this.editItems)) {
+        if (route.data && route.data.item && (route.data.item in this.editItems)) {
             delete this.editItems[route.data.item];
             delete this.detachedRouteHandles[key];
             return null;
@@ -105,8 +112,8 @@ export class MddsRouteReuseStrategy implements RouteReuseStrategy {
 
         const yOffset = this.pageYOffset[key];
         setTimeout(() => {
-                window.scrollTo(0, yOffset);
-            }, 20); // scroll to saved position
+            window.scrollTo(0, yOffset);
+        }, 20); // scroll to saved position
 
         return this.detachedRouteHandles[key][0];
     }
@@ -114,9 +121,15 @@ export class MddsRouteReuseStrategy implements RouteReuseStrategy {
     /** Determines if a route should be reused */
     public shouldReuseRoute(future: ActivatedRouteSnapshot, curr: ActivatedRouteSnapshot): boolean {
         // Below is the default implementation;
+        // return future.routeConfig == curr.routeConfig;
+        // Now is the customization:
+        if (future.routeConfig !== curr.routeConfig) {return false;}
         if (this.isLogoutReload()) {
             return false; // authentication status changed. Don't reuse.
         }
-        return future.routeConfig === curr.routeConfig;
+        if (this.isMraRoutePath(future, 'detail/:id')) {
+            return false;
+        }
+        return true;
     }
 }

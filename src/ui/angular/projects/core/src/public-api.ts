@@ -16,4 +16,4 @@ export { ModalConfig, Modal } from './lib/util.modal';
 export { SnackBarConfig, SnackBar } from './lib/util.snackbar';
 export { stringToDateStructure, dateStructureToString } from './lib/ngb-date-formatter';
 
-export { MddsRouteReuseStrategy } from './lib/route-reuse-strategy';
+export { MddsRouteReuseStrategy, MDDS_ROUTE_REUSE_RUIs } from './lib/route-reuse-strategy';
