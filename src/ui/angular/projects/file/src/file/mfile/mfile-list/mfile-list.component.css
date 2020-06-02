@@ -108,13 +108,13 @@ tr th:first-child{
 
 .list-body-fields {
 }
-.list-diverder-gradient {
+.list-devider-gradient {
   border: 0;
   height: 2px;
   background: #095484;
   background-image: linear-gradient(to right, #ccc, #095484, #ccc);
 }
-.list-diverder {
+.list-devider {
   width: 80%
 }
 
@@ -375,12 +375,17 @@ div.badge-click:hover {
   color: #307bff;
   cursor: pointer;
 }
+
 .read-more-in-table {
   /*font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;*/
   margin-top: 1rem;
   color: #307bff;
   cursor: pointer;
   font-size: 0.75rem;
+}
+.read-more:hover, .read-more-in-table:hover {
+  color: #0056b3;
+  text-decoration: underline;
 }
 
 .no-records {

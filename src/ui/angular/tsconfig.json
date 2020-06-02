@@ -60,6 +60,12 @@
       ],
       "richtext/*": [
         "dist/richtext/*"
+      ],
+      "shopping-cart": [
+        "dist/shopping-cart"
+      ],
+      "shopping-cart/*": [
+        "dist/shopping-cart/*"
       ]
     }
   },

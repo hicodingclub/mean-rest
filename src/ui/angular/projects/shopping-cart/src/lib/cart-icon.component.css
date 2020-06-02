@@ -1,0 +1,89 @@
+
+.cart-icon-container {
+}
+
+.cart-icon {
+    cursor: pointer;
+    position: relative;
+    color: #a88734;
+
+    width: 100%;
+    height: 100%;
+}
+
+.cart-icon:hover
+{
+    color: #846a29;
+}
+
+.cart-diagram {
+    font-size: 2rem;
+}
+
+.cart-badge {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(0, 0);
+}
+
+.cart-pop {
+	position: absolute;
+    z-index: 10;
+    
+    background-color: #FFFFFF;
+    color: black;
+    padding: 1rem;
+
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: .25rem;
+}
+
+/*** list view ***/
+.total-price {
+    color: red;
+}
+.list-blocks {
+    max-height: 315px;
+    overflow: scroll;
+}
+.list-block {
+    width: 100%;
+    margin: 0.5rem;
+  
+    word-break: break-word;
+    overflow-wrap: break-word;
+    /*border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;*/
+}
+.list-fields {
+    display: flex;
+    align-items: flex-start;
+  
+    min-width: 300px;
+    max-width: 85%;
+}
+.list-head-picture {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 6rem;
+    height: 4rem;
+    background-color: #e0dada9c;
+  
+    margin-right: 0.5rem;
+    overflow: hidden;
+}
+.list-body-fields {
+}
+.list-body-field {
+    font-size: 0.75rem;
+
+    margin-right: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+}
+.list-devider {
+    width: 80%;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
