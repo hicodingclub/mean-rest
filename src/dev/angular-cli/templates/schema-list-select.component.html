@@ -41,7 +41,8 @@
 	            </td><%_ } %>
 	            <%_ if (api.includes("R")) { %>
 	            <td><a routerLink="." class="btn" 
-	                 [ngClass]="{'btn-primary': detail['_id']==selectedId, 'btn-outline-primary': detail['_id']!==selectedId}"
+					 [ngClass]="{'btn-primary': detail['_id']==selectedId || checkedItem[i], 
+					 			'btn-outline-primary': detail['_id']!==selectedId && !checkedItem[i]}"
 	            	 (click)="selectViewDetail(i)">View Details</a>
 	            </td><%}%>
 	        </tr>
@@ -51,8 +52,6 @@
 	<div class="container">
 		<%_ disableRefreshIcon = true; disableSortSelection = true; disableViewSwitch = true;%><% include schema-list.pagination.html %>
 	</div>
-	
-
 <!--  model body ends -->
 
       </div>

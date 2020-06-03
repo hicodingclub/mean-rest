@@ -1,7 +1,10 @@
 
 	<%_ viewFields = detailView; let viewGrp = detailViewGrp; let view='detail'; let largePicture=false;
 	for (let field of viewFields) {
-		let fn = field.fieldName; let ft = field.type;;
+		let fn = field.fieldName; let ft = field.type;
+		if (ft === 'AngularSelector') {
+			continue;
+		}
 		%>
 		<div *ngIf="detail && showFields.includes('<%-fn%>')"><% include schema-display.field.html %>
 		</div><%}%>

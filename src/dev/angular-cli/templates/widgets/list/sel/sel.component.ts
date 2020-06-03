@@ -25,6 +25,8 @@ export class <%-SchemaName%>ListWidgetSelComponent extends <%-SchemaName%>ListCo
         this.listViewFilter = '<%-selectActionViewType%>';
         this.listCategory1 = {}; // no do query based on category for select view;
         this.listCategory2 = {}; // no do query based on category for select view;
+
+        this.itemMultiSelect = false;
   }
 
   ngOnInit() {

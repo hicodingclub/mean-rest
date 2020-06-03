@@ -4,13 +4,12 @@
 {%><form>
 	<div class="form-group list-selection">
 		<select class="form-control" id="select<%-schemaName%>" [(ngModel)]="selectedId"
-			(change)="onItemSelected()"
+			(change)="onDropdownSelected()"
 			name="elect<%-schemaName%>">
 			<option *ngFor="let ele of dropdownItems" [ngValue]="ele.id">{{ele.displayName}}</option>
 		</select>
 	</div>
 </form><%} else {
-	let cardCanClick = true;
 	let clickToDetail = false;
 	let cardHasLink = false;
 

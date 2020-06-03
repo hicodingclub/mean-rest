@@ -1,9 +1,9 @@
 	<div class="listview" *ngIf="isShowListView('list')">
 		<div class="list-block" *ngFor="let detail of list;  let i = index; let list_index = index;">
 			<hr *ngIf="i==0" class="list-devider">
-			<div class="list-card text-left <%if(cardCanClick){%>clickable-card<%}%> "
-				[ngClass]="{'clicked-row': clickedId==detail['_id']}" >
-				<div class="list-fields <%if(cardCanClick){%>pointer<%}%>" <%if(clickToDetail){%>(click)="onDetailLinkClicked(detail['_id'])"<%}%><%if(clickToCheck){%>(click)="onItemChecked(i)"<%}%> >
+			<div class="list-card text-left"
+				[ngClass]="{'clicked-row': clickedId==detail['_id'], 'clickable-card': clickItemAction}" >
+				<div class="list-fields" [ngClass]="{pointer: clickItemAction}" (click)="clickOneItem(i)">
 			<%_ let viewFields = briefView; %><%_ include schema-display.list.html %>
 				</div><%if(canDelete || canUpdate || canArchive || canCheck) {%>
 				<div class="card-action-icons">
@@ -16,7 +16,7 @@
 						<i *ngIf="!archivedSearch" class="fa fa-archive" title="Archive"></i>
 						<i *ngIf="archivedSearch" class="fas fa-trash-restore" title="Unarchive"></i>	
 					</a><%}%>
-					<%if(canCheck){%><input class="list-check-box" type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
+					<%if(canCheck){%><input class="list-check-box" type="checkbox" [ngModel]="checkedItem[i]" (click)="selectOneItem(i)"/><%}%>
 				</div><%}%>
 			</div>
 			<hr class="list-devider">

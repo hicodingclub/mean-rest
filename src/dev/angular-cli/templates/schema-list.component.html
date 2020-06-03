@@ -73,7 +73,6 @@ if (listCategoryRef && listCategoryShowMore) {%>
 		<span *ngIf="!loaded">Loading...</span>
 	</div>
 	<div *ngIf="list.length > 0"><%
-		let cardCanClick = api.includes('R') && listToDetail === 'click';
 		let clickToDetail = api.includes('R') && listToDetail === 'click';
 		let cardHasLink = api.includes('R') && listToDetail === 'link';
 

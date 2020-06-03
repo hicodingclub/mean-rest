@@ -26,6 +26,7 @@ export class <%-SchemaName%>ListSelectComponent extends <%-SchemaName%>ListCompo
         ) {
             super(<%if (schemaHasRef) {%>null,<%}%><%-schemaName%>Service, injector, router, route, location);
             this.majorUi = false;
+            this.itemMultiSelect = false;
     }
 
     ngOnInit() {

@@ -7,8 +7,9 @@
 		let field, fn, ft;%>
 		<div class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}">
 			<div class="text-left h-100"
-				[ngClass]="{'clickable-card pointer': !options['disableSelect'], 'clicked-row': !options['disableSelect'] && selectedId === detail['_id']}">
-				<div class="grid-fields" (click)="clickOneItem(idx, detail['_id'])">
+				[ngClass]="{'clickable-card pointer': clickItemAction, 
+							'clicked-row': clickItemAction === 'select' && checkedItem[idx]}">
+				<div class="grid-fields" (click)="clickOneItem(idx)">
 					<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}"
 						[ngStyle]="style['picture']">
 						<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']">

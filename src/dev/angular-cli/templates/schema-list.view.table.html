@@ -25,13 +25,13 @@
 	    </thead>
 	    <tbody>
 	        <tr *ngFor="let detail of list;  let i = index; let list_index = index;" [ngClass]="{'clicked-row': clickedId==detail['_id']}">
-	            <td scope="row" <%if(clickToDetail){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer read-more mt-3"<%}%>>
+	            <td scope="row" (click)="clickOneItem(i)"  class="pointer read-more mt-3">
 	            	{{(page-1)*perPage+i+1}}
 	            </td>
 <%_ let view = 'list'; for (let field of briefView){ 
 				if (field.hidden) continue;
 				let fn = field.fieldName, ft = field.type;; %>
-	            <td <%if(clickToDetail){%>(click)="onDetailLinkClicked(detail['_id'])"  class="pointer"<%}%><%if(clickToCheck){%>(click)="onItemChecked(i)" class="pointer"<%}%>>
+	            <td (click)="clickOneItem(i)"  [ngClass]="{'pointer': clickItemAction}">
 	            	<% include schema-display.field.html %>
 	            </td><%_ } %><%if(canDelete || canArchive || canUpdate || canCheck || cardHasLink){%>
 	            <td>
@@ -44,7 +44,7 @@
 						<i *ngIf="!archivedSearch" class="fa fa-archive" title="Archive"></i>
 						<i *ngIf="archivedSearch" class="fas fa-trash-restore" title="Unarchive"></i>	
 					</a><%}%>
-					<%if(canCheck){%><input class="list-check-box" type="checkbox" [(ngModel)]="checkedItem[i]"/><%}%>
+					<%if(canCheck){%><input class="list-check-box" type="checkbox"  [ngModel]="checkedItem[i]" (click)="selectOneItem(i)"/><%}%>
 					<%if(cardHasLink){%><span class="read-more font-size-75 mt-3" (click)="onDetailLinkClicked(detail['_id'])">Detail <i class="fas fa-arrow-right" ></i></span><%}%>
 	            </td><%}%>
 	        </tr>

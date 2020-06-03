@@ -8,30 +8,29 @@
 		let field, fn, ft;
 		%>
 		<div class="text-left h-100"
-			[ngClass]="{'clicked-row': !options['disableSelect'] && selectedId === detail['_id']}">
+			[ngClass]="{'clicked-row': clickItemAction === 'select' && checkedItem[i]}">
 			<div class="grid-fields">
-
 				<div class="grid-head-picture"
-					[ngClass]="{'grid-head-picture-large': options['largePicture'], 'clickable-card pointer': !options['disableSelect']}"
+					[ngClass]="{'grid-head-picture-large': options['largePicture'], 'clickable-card pointer': clickItemAction}"
 					[ngStyle]="style['picture']"
-					(click)="clickOneItem(i, detail['_id'])">
+					(click)="clickOneItem(i)">
 					<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']">
 					</lib-mdds-file-display>
 				</div>
 				<div class="text-center">
 					<div *ngIf="!options['notShowTitle']" class="grid-picture-title"
-						[ngClass]="{'grid-picture-title-large': options['largePicture'], 'read-more': !options['disableSelect']}"
+						[ngClass]="{'grid-picture-title-large': options['largePicture'], 'read-more': clickItemAction === 'detail'}"
 						[ngStyle]="style['title']"
-						(click)="clickOneItem(i, detail['_id'])">
+						(click)="clickOneItem(i)">
 						<%
 						field = field1; fn = fn1; ft = ft1;
 						%>
 						<% include ../../../schema-display.field.html %>
 					</div>
 					<div *ngIf="!options['notShowSubTitle']" class="grid-picture-subtitle"
-						[ngClass]="{'grid-picture-subtitle-large': options['largePicture'], 'read-more': !options['disableSelect']}"
+						[ngClass]="{'grid-picture-subtitle-large': options['largePicture'], 'read-more': clickItemAction === 'detail'}"
 						[ngStyle]="style['subtitle']"
-						(click)="clickOneItem(i, detail['_id'])">
+						(click)="clickOneItem(i)">
 						<%
 						field = field2; fn = fn2; ft = ft2;
 						%>

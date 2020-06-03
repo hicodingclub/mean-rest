@@ -13,7 +13,7 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 })
 export class <%-SchemaName%>ListWidgetGallerySideIntroComponent extends <%-SchemaName%>ListComponent implements OnInit {
   // @Input() public fieldsMap: any = {}; // { title: 'title', intro: 'intro', picturelink: 'link' }
-  // @Input() public options: any = {}; // { disableSelect, clickToDetail, largePicture, notShowTitle, notShowSubTitle}
+  // @Input() public options: any = {}; // { clickItemAction, largePicture, notShowTitle, notShowSubTitle}
   // @Input() public style: any = {}; // { picture: {height: '16rem'}, title: {}, intro: {} }
 
   public title: string;
@@ -32,12 +32,5 @@ export class <%-SchemaName%>ListWidgetGallerySideIntroComponent extends <%-Schem
 
   ngOnInit() {
     super.ngOnInit();
-  }
-
-  clickOneItem(i: number, id: string) {
-    // this.selectItemCandidate(i);
-    if (this.options.clickToDetail) {
-      this.onDetailLinkClicked(id);
-    }
   }
 }

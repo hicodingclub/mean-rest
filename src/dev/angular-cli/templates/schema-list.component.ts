@@ -53,6 +53,9 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustCompone
           const listCategories = <%-listCategoriesString%>;
           this.listCategory1 = listCategories[0] || {};
           this.listCategory2 = listCategories[1] || {};
+
+          <%let clickToDetail = api.includes('R') && listToDetail === 'click'; if (clickToDetail) {%>this.clickItemAction = 'detail';<%}%>
+          this.itemMultiSelect = true;
   }
 
   ngOnInit() {
@@ -60,6 +63,9 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustCompone
 
       this.adjustListViewForWindowSize();
 
+      this.clickItemAction = typeof this.options.clickItemAction === 'undefined'? this.clickItemAction : this.options.clickItemAction;
+      this.itemMultiSelect = typeof this.options.itemMultiSelect === 'boolean' ?  this.options.itemMultiSelect : this.itemMultiSelect;
+  
       if (!this.options) {
         this.options = {};
       }

@@ -65,7 +65,7 @@ class Selectors {
   selectors = [];
   constructor(sels) {
     if (typeof sels !== 'object') {
-      warning('selectors not given as object.');
+      // warning(`selectors not given as object. ${JSON.stringify(sels)}`);
       return;
     }
     for (const s in sels) {
