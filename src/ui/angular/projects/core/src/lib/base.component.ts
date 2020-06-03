@@ -117,6 +117,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   // actions (pipeline/composite)
   public isDropdownList = false;
   public dropdownItems: { displayName: string; id: string }[];
+  public dropdownSelectedIdx: number;
   public actionType: string;
 
   // search bar
@@ -155,8 +156,10 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public componentSubscription: any;
 
   public clickedId = null;
-  public selectedId = null;
+  public selectedId; //used by single selection components
 
+  public clickItemAction: string = '';
+  public itemMultiSelect: boolean = false;
   /* This is for editor related */
   public textEditors: any; // type of QueryList<T>
   public textEditorMap: any = {};
@@ -1634,9 +1637,10 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
           }
 
           if (this.isDropdownList) {
-            this.dropdownItems = this.list.map((x) => ({
+            this.dropdownItems = this.list.map((x, idx) => ({
               displayName: this.stringify(x),
               id: x._id,
+              idx,
             }));
           }
           this.page = result.page;
@@ -1645,13 +1649,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
           this.totalPages = result.total_pages;
           this.populatePages();
 
-          this.checkedItem = Array.apply(null, Array(this.list.length)).map(
-            Boolean.prototype.valueOf,
-            false
-          );
-          this.checkAll = false;
-
-          this.clearSelectItemCandidate();
+          this.clearSelectItems();
 
           if (this.refreshing) {
             this.refreshing = false;
@@ -1879,29 +1877,15 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       this.checkAll
     );
 
-    this.onItemSelected();
-  }
-
-  public onItemChecked(i: number): void {
-    this.checkedItem[i] = !this.checkedItem[i];
-    this.onItemSelected();
+    this.notifyItemSelected();
   }
 
   public isItemSelected(): boolean {
     // single selection or multiple selection
-    return this.selectedId || this.checkedItem.some((value) => value);
+    return this.checkedItem.some((value) => value);
   }
 
-  public getSelectedItems(): string[] {
-    if (this.selectedId) {
-      // single selection
-      for (const itm of this.list) {
-        if (itm._id === this.selectedId) {
-          return [itm];
-        }
-      }
-    }
-
+  public getSelectedItems(): any[] {
     const selectedItems = [];
     for (const [indx, ckd] of this.checkedItem.entries()) {
       if (ckd) {
@@ -1912,7 +1896,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
 
   // triggered by user selection from checkbox or dropdown list
-  public onItemSelected() {
+  public notifyItemSelected() {
     // no changing value because already handled with other function or two way bindings
     this.eventEmitter.emit({
       type: "selection",
@@ -2504,36 +2488,70 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     this.uiCloseModal();
   }
 
-  selectItemCandidate(num: number) {
-    if (typeof num !== "number") {
-      return;
+  clickOneItem(i: number) {
+    const detail = this.list[i];
+    this.clickedId = detail._id;
+
+    if (this.clickItemAction === "select") {
+      this.selectOneItem(i);
+    } else if (this.clickItemAction === "detail") {
+      this.onDetailLinkClicked(this.clickedId);
     }
-    const detail = this.list[num];
-    this.selectedId = detail._id;
+  }
+  selectOneItem(i: number) {
+    const detail = this.list[i];
+    this.clickedId = detail._id;
+
+    if (!this.itemMultiSelect) {
+      this.clearSelectItems();
+    }
+    this.checkedItem[i] = !this.checkedItem[i];
+    this.notifyItemSelected();
+  }
+  onDropdownSelected() {
+    for (let i=0; i<=this.list.length; i++) {
+      if (this.list[i]._id === this.selectedId) {
+        this.selectOneItem(i);
+        break;
+      }
+    }
   }
   // triggered when there is a change of page or search condition
-  clearSelectItemCandidate() {
+  clearSelectItems() {
     this.selectedId = undefined;
+    this.checkedItem = Array.apply(null, Array(this.list.length)).map(
+      Boolean.prototype.valueOf,
+      false
+    );
+    this.checkAll = false;
+
   }
+  // Second step of two-step selection
   selectItemConfirmed() {
-    const detail = this.list.find((x) => x._id === this.selectedId);
+    let values = this.getSelectedItems();
+    let value;
+    let id;
+    if (values.length > 0) {
+      value = this.itemMultiSelect? values : values[0];
+      id = values[0]._id;
+    }
     this.outputData = {
       action: "selected",
-      value: { _id: this.selectedId, value: this.stringify(detail) },
-      detail,
+      value: { _id: id, value: this.stringify(value) },
+      detail: value,
     };
     this.done.emit(true);
   }
+  // One-step selection - select and confirm
   selectItemSelected(num: number) {
     if (typeof num !== "number") {
       return;
     }
-    const detail = this.list[num];
-    this.selectedId = detail._id;
-    this.clickedId = detail._id;
+    this.selectOneItem(num);
     this.selectItemConfirmed();
   }
 
+  // selected from detail view
   detailSelSelected() {
     const detail = this.detail;
     this.outputData = {
@@ -2544,6 +2562,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     this.done.emit(true);
   }
 
+  // select to view detail
   selectViewDetail(num: number) {
     const detail = this.list[num];
     this.clickedId = detail._id;

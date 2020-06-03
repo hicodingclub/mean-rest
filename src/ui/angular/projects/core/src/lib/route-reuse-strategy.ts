@@ -127,7 +127,9 @@ export class MddsRouteReuseStrategy implements RouteReuseStrategy {
         if (this.isLogoutReload()) {
             return false; // authentication status changed. Don't reuse.
         }
-        if (this.isMraRoutePath(future, 'detail/:id')) {
+        if (this.isMraRoutePath(future, 'detail/:id')
+            && this.isMraRoutePath(curr, 'detail/:id')
+            && future.params.id !== curr.params.id) {
             return false;
         }
         return true;
