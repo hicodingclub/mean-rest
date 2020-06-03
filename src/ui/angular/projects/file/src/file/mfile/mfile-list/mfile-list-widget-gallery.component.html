@@ -58,7 +58,7 @@
         <div class="action-buttons">
 
             <button type="button" class="btn btn-success" (click)="selectConfirmed()"
-            [disabled]="!selectedId">Confirm Selection</button>
+            [disabled]="!isItemSelected()">Confirm Selection</button>
             <button type="button" class="btn btn-outline-success" (click)="selectFiles()">Upload New</button>            
         </div>
         <div class="row justify-content-end mt-3">
@@ -136,8 +136,8 @@
         <div class="galleryView">
           <div class="grid-block"  [ngClass]="{'grid-block-large': options['largePicture']}" *ngFor="let detail of list;  let i = index; let list_index = index;">
             <div class="text-left h-100"
-              [ngClass]="{'clickable-card pointer': options['canSelect'], 'clicked-row': selectedId === detail['_id']}" >
-              <div class="grid-fields" (click)="selectItemCandidate(i)" >
+              [ngClass]="{'clickable-card pointer': clickItemAction, 'clicked-row': checkedItem[i]}" >
+              <div class="grid-fields" (click)="clickOneItem(i)" >
 
                 <div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}">                
                       <lib-mdds-file-display [downloadUrl]="detail[picturelinkFn]" [isLarge]="options['largePicture']"></lib-mdds-file-display>
@@ -217,7 +217,7 @@
         <div class="action-buttons">
 
             <button type="button" class="btn btn-success" (click)="selectConfirmed()"
-            [disabled]="!selectedId">Confirm Selection</button>
+            [disabled]="!isItemSelected()">Confirm Selection</button>
             <button type="button" class="btn btn-outline-success" (click)="selectFiles()">Upload New</button>            
         </div>
         -->

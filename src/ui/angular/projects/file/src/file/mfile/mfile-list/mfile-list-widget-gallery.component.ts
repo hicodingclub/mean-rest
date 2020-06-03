@@ -71,6 +71,8 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent implemen
 
     this.titleFn = this.inputData[0];
     this.picturelinkFn = this.inputData[1];
+    this.clickItemAction = "select";
+    this.itemMultiSelect = false;
     super.ngOnInit();
   }
 
@@ -189,7 +191,7 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent implemen
   selectConfirmed() {
     this.uploadingFiles = []; // clear
 
-    const detail = this.list.find(x => x._id === this.selectedId);
+    const detail = this.getSelectedItems()[0];
     this.croppingPictureLink = detail.link;
     this.selectedFileName = detail._id;
     this.stepTitle = `Crop Picture`;
@@ -201,19 +203,6 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent implemen
   // overload the base one
   selectItemConfirmed() {
     this.cropper.getCroppedCanvas().toBlob((blob) => {
-      // const reader = new FileReader();
-      // reader.onloadend = () => {
-      //   const base64Content = reader.result;
-      //   let detail = this.list.find(x => x['_id'] == this.selectedId);
-      //   this.outputData = {action: "selected",
-      //                       value: {"_id": this.selectedId, "value": this.stringify(detail)},
-      //                       detail: detail,
-      //                       pictureDataSource: base64Content,
-      //                     };
-      //   this.done.emit(true);
-      // };
-      // reader.readAsDataURL(blob);
-
       // convert to a file
       const b: any = blob;
       b.lastModifiedDate = new Date();
