@@ -404,6 +404,41 @@
           }
         }
       }
+    },
+    "ShoppingFramework": {
+      "projectType": "library",
+      "root": "projects/shopping-framework",
+      "sourceRoot": "projects/shopping-framework/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/shopping-framework/tsconfig.lib.json",
+            "project": "projects/shopping-framework/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/shopping-framework/src/test.ts",
+            "tsConfig": "projects/shopping-framework/tsconfig.spec.json",
+            "karmaConfig": "projects/shopping-framework/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/shopping-framework/tsconfig.lib.json",
+              "projects/shopping-framework/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }},
   "defaultProject": "angular-packages"
 }

@@ -63,6 +63,8 @@ angular_libs=(
   "Core core"
   "File file"
   "Composite composite"
+  "ShoppingFramework shopping-framework"
+  "ShoppingCart shopping-cart"
 )
 
 dependencies=(
@@ -74,6 +76,8 @@ dependencies=(
   "@hicoder\/angular-action-base"
   "@hicoder\/angular-action-email"
   "@hicoder\/angular-richtext"
+  "@hicoder\/angular-shopping-framework"
+  "@hicoder\/angular-shopping-cart"
   "@hicoder\/express-auth-app"
   "@hicoder\/express-emailing"
   "@hicoder\/express-auth-server"

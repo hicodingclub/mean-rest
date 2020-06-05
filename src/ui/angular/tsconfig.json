@@ -66,6 +66,12 @@
       ],
       "shopping-cart/*": [
         "dist/shopping-cart/*"
+      ],
+      "shopping-framework": [
+        "dist/shopping-framework"
+      ],
+      "shopping-framework/*": [
+        "dist/shopping-framework/*"
       ]
     }
   },
