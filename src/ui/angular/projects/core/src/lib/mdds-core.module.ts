@@ -19,7 +19,6 @@ import { MddsRichTextSelectDirective, MddsRichTextShowDirective } from './summer
     MddsRichTextShowDirective,
  ],
   providers: [
-    MddsCommonService,
   ],
 })
 export class MddsCoreModule { }
