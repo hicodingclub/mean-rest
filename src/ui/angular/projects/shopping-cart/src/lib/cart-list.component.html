@@ -1,0 +1,34 @@
+<div *ngIf="totalPrice > 0" class="m-2 font-weight-bold text-right">
+    <label class="mr-3">Total Price:</label> <span class="price">{{totalPrice | currency:'USD':'symbol'}}</span>
+</div>
+<div class="list-blocks">
+    <div class="list-block" *ngFor="let detail of showItems;  let i = index; let list_index = index;">
+        <hr *ngIf="i==0" class="list-devider">
+        <div class="list-card text-left">
+            <div class="list-fields">
+                <div class="list-head-picture picture-small-1">
+                    <lib-mdds-file-display [downloadUrl]="detail['picture']" [isLarge]="false" [aspectRatio]="">
+                    </lib-mdds-file-display>
+                </div>
+                <div class="list-body-fields">
+                    <a class="my-1" [routerLink]="[detail['pageUrl']]">
+                        {{detail['name']}}
+                    </a>
+                    <div class="list-body-field preview-field">
+                        <div>Price:</div>
+                        <div class="ml-3 price">
+                            {{detail['price'] | currency:'USD':'symbol'}}
+                        </div>
+                    </div>
+                    <div class="list-body-field preview-field">
+                        <div>Quantity:</div>
+                        <div class="ml-3">
+                            {{detail['quantity']}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="list-devider">
+    </div>
+</div>

@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
-import { Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+
+import { ShowItem, ShoppingCartIntf } from '@hicoder/angular-shopping-framework';
 
 // The field name to parse the item information from response of item URL
 export interface ItemMeta {
@@ -25,16 +26,6 @@ export interface Item {
 }
 
 // Interface to show items when user see cart details
-export interface ShowItem {
-  picture: string; // url
-  name: string;
-  description: string;
-  quantity: number;
-  price: number;
-  stockNumber: number;
-  url: string;
-  pageUrl: string;
-}
 export interface ShowCart {
   totalPrice: number;
   showItems: ShowItem[];
@@ -47,42 +38,16 @@ const DEFAULTSTOCKNUMBER = 10000;
 @Injectable({
   providedIn: "root",
 })
-export class ShoppingCartService {
+export class ShoppingCartService implements ShoppingCartIntf {
   private items: Item[] = []; // items added to cart
   private showItems: ShowItem[]; // items to show in cart
+  private totalPrice: number; // total price of showItems
   private itemNumberPublisher: Subject<number> = new Subject<number>();
 
   constructor(private http: HttpClient) {
     this.items = JSON.parse(localStorage.getItem(SHOPPINGCARTKEY) || "[]");
   }
 
-  public formatCurrency(
-    num: number,
-    thouSep?: string,
-    decSep?: string,
-    decPlaces?: number
-  ): string {
-    decPlaces = isNaN((decPlaces = Math.abs(decPlaces))) ? 2 : decPlaces;
-    decSep = typeof decSep === "undefined" ? "." : decSep;
-    thouSep = typeof thouSep === "undefined" ? "," : thouSep;
-    const sign = num < 0 ? "-" : "";
-    // Integer part
-    const i = Math.abs(num).toFixed(0);
-    // Decimal part, with seperator
-    const d = decPlaces
-      ? decSep + Math.abs(num).toFixed(decPlaces).split(".")[1]
-      : "";
-
-    const l = i.length;
-    const j = l > 3 ? l % 3 : 0;
-
-    return (
-      sign +
-      (j ? i.substr(0, j) + thouSep : "") +
-      i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thouSep) +
-      d
-    );
-  }
   private store() {
     localStorage.setItem(SHOPPINGCARTKEY, JSON.stringify(this.items));
     this.itemNumberPublisher.next(this.getItemNumber());
@@ -141,6 +106,9 @@ export class ShoppingCartService {
   }
   public getCartItems(): Observable<ShowCart> {
     return new Observable(subscriber => {
+      this.showItems = [];
+      this.totalPrice = 0;
+    
       const promises: Promise<any>[] = [];
       for (const item of this.items) {
         const promise = this.http.get(item.url).toPromise();
@@ -187,11 +155,19 @@ export class ShoppingCartService {
               totalPrice += subPrice;
             }
           }
+          this.showItems = showItems;
+          this.totalPrice = totalPrice;
           subscriber.next({showItems, errorItems, totalPrice});
         });
       } catch (err) {
         subscriber.error(err);
       }
     });
+  }
+  public getShowItems(): ShowItem[] {
+    return this.showItems;
+  }
+  public getTotalPrice(): number {
+    return this.totalPrice;
   }
 }

@@ -7,51 +7,15 @@
 
     <div *ngIf="popup" class="cart-pop" [ngStyle]="popupStyle">
         <div class="d-flex justify-content-center my-3">
-            <button class="add-to-cart-button mx-2" [ngStyle]="style.button" (click)="viewCart()">
+            <button class="cart-button mx-2" [ngStyle]="style.button" (click)="viewCart()">
                 View Cart
             </button>
-            <button class="add-to-cart-button mx-2" [ngStyle]="style.button" (click)="checkout()">
+            <button class="cart-button mx-2" [ngStyle]="style.button" (click)="checkout()">
                 Checkout
             </button>
         </div>
-        <div *ngIf="totalPrice > 0" class="my-2 font-weight-bold text-right">
-            <label class="mr-3">Total Price:</label> <span class="total-price">{{totalPrice | currency:'USD':'symbol'}}</span>
-        </div>
-        <div class="list-blocks">
-            <div class="list-block" *ngFor="let detail of showItems;  let i = index; let list_index = index;">
-                <hr *ngIf="i==0" class="list-devider">
-                <div class="list-card text-left">
-                    <div class="list-fields">
-                        <div class="list-head-picture">
-                            <lib-mdds-file-display [downloadUrl]="detail['picture']" [isLarge]="false" [aspectRatio]="">
-                            </lib-mdds-file-display>
-                        </div>
-                        <div class="list-body-fields">
-                            <a class="my-1" [routerLink]="[detail['pageUrl']]">
-                                {{detail['name']}}
-                            </a>
-                            <!--
-                            <h6 class="my-1">
-                                {{detail['description']}}
-                            </h6>
-                            -->
-                            <div class="list-body-field">
-                                <label>Price:</label>
-                                <div class="ml-3">
-                                    {{detail['price'] | currency:'USD':'symbol'}}
-                                </div>
-                            </div>
-                            <div class="list-body-field">
-                                <label>Quantity:</label>
-                                <div class="ml-3">
-                                    {{detail['quantity']}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <hr class="list-devider">
-            </div>
+        <div class="cart-list">
+            <lib-mdds-cart-list></lib-mdds-cart-list>
         </div>
     </div>
 </div>

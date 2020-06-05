@@ -1,0 +1,5 @@
+/* list of items*/
+.list-blocks {
+    max-height: 300px;
+    overflow: scroll;
+}

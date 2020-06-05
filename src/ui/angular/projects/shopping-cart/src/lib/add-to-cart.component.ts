@@ -5,7 +5,7 @@ import { ShoppingCartService, Item, ItemMeta } from './shopping-cart.service';
 @Component({
   selector: 'lib-mdds-add-to-cart',
   templateUrl: 'add-to-cart.component.html',
-  styleUrls: ['add-to-cart.component.css']
+  styleUrls: ['./css/cart-button.css', 'add-to-cart.component.css']
 })
 export class AddToCartComponent implements OnInit {
   @Input() public style: any = {}; // {button: {}}

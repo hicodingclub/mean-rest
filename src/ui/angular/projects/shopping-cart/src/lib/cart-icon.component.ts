@@ -1,11 +1,16 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Inject } from '@angular/core';
+import { Router }    from '@angular/router';
 
-import { ShoppingCartService, Item, ShowItem } from './shopping-cart.service';
+import { ShowItem } from '@hicoder/angular-shopping-framework';
 
+import { ShoppingCartService } from './shopping-cart.service';
+import { SHOPPING_CART_CHECKOUT_PATH } from "./tokens"
+
+const SHOPPING_CART_ROOT_PATH = 'shopping-cart';
 @Component({
   selector: 'lib-mdds-cart-icon',
   templateUrl: 'cart-icon.component.html',
-  styleUrls: ['add-to-cart.component.css', 'cart-icon.component.css']
+  styleUrls: ['./css/cart-button.css', 'cart-icon.component.css']
 })
 export class CartIconComponent implements OnInit {
   @Input() public style: any = {}; // {button: {}}
@@ -13,28 +18,19 @@ export class CartIconComponent implements OnInit {
   public itemNumber: number = 0;
   public popup: boolean = false;
   public popupStyle: any = {};
-  public showItems: ShowItem[] = [];
-  public errorItems: ShowItem[] = [];
   public totalPrice: number = 0;
 
-  constructor(private scService: ShoppingCartService) {
+  constructor(
+    private router: Router,
+    private scService: ShoppingCartService,
+    @Inject(SHOPPING_CART_CHECKOUT_PATH) private checkoutPath: string) {
     this.itemNumber = this.scService.getItemNumber();
-    this.retrieveItems();
     this.scService.getItemNumberPublisher().subscribe((n: number) => {
       this.itemNumber = n;
-      this.retrieveItems();
     });
   }
 
   ngOnInit() {}
-
-  private retrieveItems() {
-    this.scService.getCartItems().subscribe(cartItems => {
-      this.showItems = cartItems.showItems;
-      this.errorItems = cartItems.errorItems;
-      this.totalPrice = cartItems.totalPrice;
-    });
-  }
 
   public toggle(event) {
     if (!this.popup) {
@@ -53,6 +49,12 @@ export class CartIconComponent implements OnInit {
     this.popup = false;
   }
 
-  public viewCart() {}
-  public checkout() {}
+  public viewCart() {
+    this.router.navigate([SHOPPING_CART_ROOT_PATH, 'view']);
+    this.popup = false;
+  }
+  public checkout() {
+    this.router.navigateByUrl(this.checkoutPath);
+    this.popup = false;
+  }
 }

@@ -39,51 +39,7 @@
     border-radius: .25rem;
 }
 
-/*** list view ***/
-.total-price {
-    color: red;
-}
-.list-blocks {
-    max-height: 315px;
-    overflow: scroll;
-}
-.list-block {
-    width: 100%;
-    margin: 0.5rem;
-  
-    word-break: break-word;
-    overflow-wrap: break-word;
-    /*border: 1px solid rgba(0,0,0,.125);
-    border-radius: .25rem;*/
-}
-.list-fields {
-    display: flex;
-    align-items: flex-start;
-  
-    min-width: 300px;
-    max-width: 85%;
-}
-.list-head-picture {
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: 6rem;
-    height: 4rem;
-    background-color: #e0dada9c;
-  
-    margin-right: 0.5rem;
-    overflow: hidden;
-}
-.list-body-fields {
-}
-.list-body-field {
-    font-size: 0.75rem;
-
-    margin-right: 1rem;
-    display: flex;
-    flex-wrap: wrap;
-}
-.list-devider {
-    width: 80%;
-    margin-top: 0.25rem;
-    margin-bottom: 0.25rem;
+/* list of items*/
+.cart-list {
+    width: 350px;
 }

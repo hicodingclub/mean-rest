@@ -1,0 +1,102 @@
+<div class="container">
+    <div class="h4 font-weight-bold my-3">Shopping Cart</div>
+
+    <div class="d-flex justify-content-end my-3">
+        <button class="cart-button button-size mx-2" [ngStyle]="style.button" (click)="continueShopping()">
+            Continue Shopping
+        </button>
+        <button class="cart-button button-size mx-2" [ngStyle]="style.button" (click)="checkout()">
+            Checkout
+        </button>
+    </div>
+    <div *ngIf="totalPrice > 0" class="my-2 font-weight-bold text-right">
+        <label class="mr-3">Total Price:</label> <span
+            class="price">{{totalPrice | currency:'USD':'symbol'}}</span>
+    </div>
+    <div>
+        <div class="list-block" *ngFor="let detail of showItems;  let i = index; let list_index = index;">
+            <hr *ngIf="i==0" class="list-devider my-3">
+            <div class="list-card text-left">
+                <div class="list-fields">
+                    <div class="list-head-picture picture-small-2 pointer" [routerLink]="[detail['pageUrl']]">
+                        <lib-mdds-file-display [downloadUrl]="detail['picture']" [isLarge]="false" [aspectRatio]="">
+                        </lib-mdds-file-display>
+                    </div>
+                    <div class="list-body-fields">
+                        <div>
+                            <a class="h5 my-1" [routerLink]="[detail['pageUrl']]">
+                                {{detail['name']}}
+                            </a>
+                        </div>
+                        <div>
+                            <a class="h6 my-1" [routerLink]="[detail['pageUrl']]">
+                                {{detail['description']}}
+                            </a>
+                        </div>
+                        <div class="list-body-field">
+                            <div>Price:</div>
+                            <div class="ml-3 price">
+                                {{detail['price'] | currency:'USD':'symbol'}}
+                            </div>
+                        </div>
+                        <div class="list-body-field">
+                            <div>Quantity:</div>
+                            <div class="ml-3">
+                                {{detail['quantity']}}
+                            </div>
+                            <div class="d-flex flex-wrap ml-3" style="font-size: 0.75rem">
+                                <div class="mx-2 read-more" (click)="changeQuantity(detail['url'])">Change quantity
+                                </div>
+                                <div class="mx-2 read-more" (click)="delete(detail['url'])">Delete</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="list-devider my-3">
+        </div>
+    </div>
+    <div *ngIf="showItems.length > 3">
+        <div *ngIf="totalPrice > 0" class="my-2 font-weight-bold text-right">
+            <label class="mr-3">Total Price:</label> <span
+                class="price">{{totalPrice | currency:'USD':'symbol'}}</span>
+        </div>
+        <div class="d-flex justify-content-end my-3">
+            <button class="cart-button button-size mx-2" [ngStyle]="style.button" (click)="continueShopping()">
+                Continue Shopping
+            </button>
+            <button class="cart-button button-size mx-2" [ngStyle]="style.button" (click)="checkout()">
+                Checkout
+            </button>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="quantityPop" class="new-modal">
+    <div class="card text-center new-card">
+        <div class="card-body">
+            <form #editForm="ngForm">
+                <input type="number" class="form-control border" min="0" [max]="maxQuantity" id="EditQuantityNew"
+                    libMddsMinNumber="0" [libMddsMaxNumber]="[maxQuantity]" required
+                    #EditQuantityNew="ngModel" [(ngModel)]="newQuantity" [ngModelOptions]="{standalone: true}"
+                    (keydown.enter)="$event.target.blur();quantityChanged();false">
+                <div [hidden]="EditQuantityNew.valid || EditQuantityNew.pristine"
+                    class="alert alert-danger small p-1">
+                    <div *ngIf="EditQuantityNew.errors && EditQuantityNew.errors.libMddsMaxNumber">
+                        Max qunatity allowed is {{maxQuantity}}.
+                    </div>
+                    <div *ngIf="EditQuantityNew.errors && EditQuantityNew.errors.libMddsMinNumber">
+                        Min qunatity allowed is 0.
+                    </div>
+                    <div *ngIf="EditQuantityNew.errors && EditQuantityNew.errors.required">
+                        Please enter the quantity number.
+                    </div>
+                </div>
+                <div class="d-flex my-3 justify-content-center">
+                    <button type="button" class="btn btn-outline-primary mx-1" [disabled]="!EditQuantityNew.valid" (click)="quantityChanged()">Confirm</button>
+                    <button type="button" class="btn btn-outline-secondary mx-1" (click)="quantityChangeCancelled()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
