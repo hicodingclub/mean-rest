@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 const program = require('commander');
 const inquirer = require('inquirer');
 const path = require('path');
@@ -26,17 +27,17 @@ async function replaceContent(file, reg, replaceTo) {
     return new Promise((resolve, reject) => {
         fs.readFile(file, 'utf8', (err, data) => {
             if (err) {
-              reject (err);
-              return;
+                reject(err);
+                return;
             }
             const result = data.replace(reg, replaceTo);
 
-            fs.writeFile(file, result, 'utf8', function (err) {
-               if (err) {
-                   reject (err);
-                   return;
-               }
-               resolve();
+            fs.writeFile(file, result, 'utf8', function(err) {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve();
             });
         });
     });
@@ -49,13 +50,11 @@ function cleanup(appDir) {
 async function newApp(name) {
     let appName = name;
     while (!appName) {
-        const answer = await inquirer.prompt([
-            {
-                type: 'text',
-                message: 'Please input the application name:',
-                name: 'appName',
-            }
-        ]);
+        const answer = await inquirer.prompt([{
+            type: 'text',
+            message: 'Please input the application name:',
+            name: 'appName',
+        }]);
         appName = answer.appName;
         appName = appName.trim().replace(/\s+/g, '_');
     }
@@ -71,17 +70,17 @@ async function newApp(name) {
         fs.mkdirSync(appDir);
 
         await downloadAndUnzip(
-            'https://codeload.github.com/hicodingclub/club-website-backend/zip/master',
+            'https://codeload.github.com/hicodingclub/backend-base/zip/master',
             appDir
         );
         await downloadAndUnzip(
-            'https://codeload.github.com/hicodingclub/club-website-frontend/zip/master',
+            'https://codeload.github.com/hicodingclub/frontend-base/zip/master',
             appDir
         );
 
-        const backEnd = path.join(appDir, 'club-website-backend-master');
+        const backEnd = path.join(appDir, 'backend-base-master');
         const backEndNew = path.join(appDir, 'backend');
-        const frontEnd = path.join(appDir, 'club-website-frontend-master');
+        const frontEnd = path.join(appDir, 'frontend-base-master');
         const frontEndNew = path.join(appDir, 'frontend');
         fs.renameSync(backEnd, backEndNew);
         fs.renameSync(frontEnd, frontEndNew);
@@ -113,12 +112,11 @@ async function newApp(name) {
 
 program.version(pjson.version);
 program
-  .command('new [appname]')
-  .description('create a new workspace for the given application.')
-  .action(newApp);
+    .command('new [appname]')
+    .description('create a new workspace for the given application.')
+    .action(newApp);
 program.command(
     'angular-gen [options] <inputfile>',
-    'generate Angular UI components with given input schema.',
-    {executableFile: './node_modules/.bin/hg-angular-cli'}
+    'generate Angular UI components with given input schema.', { executableFile: './node_modules/.bin/hg-angular-cli' }
 );
 program.parse(process.argv);
