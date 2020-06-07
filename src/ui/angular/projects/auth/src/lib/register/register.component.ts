@@ -1,9 +1,10 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, Inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
 import { AuthenticationService } from '../auth.service';
+import { AUTHENTICATION_REGISTRATION_PIPELINE } from '../tokens';
 
 const validatePasswords = (form) => {
     const passwordConf = form.controls.password_conf.value;
@@ -35,7 +36,8 @@ export class RegisterComponent implements OnInit {
         private formBuilder: FormBuilder,
         private router: Router,
         private route: ActivatedRoute,
-        private authenticationService: AuthenticationService
+        private authenticationService: AuthenticationService,
+        @Inject(AUTHENTICATION_REGISTRATION_PIPELINE) private regPipeline: string
         ) { }
 
 
@@ -78,6 +80,14 @@ export class RegisterComponent implements OnInit {
                 data => {
                     this.servererror = false;
                     if (!data.registrationEmailVerification) {
+                        if (this.regPipeline) {
+                            this.authenticationService.setTemporaryToken({
+                                token: data.temporaryToken,
+                                expiresIn: data.expiresIn,
+                            });
+                            this.router.navigate([this.regPipeline]);
+                            return;
+                        }
                         // this.alertService.success('Registration successful', true);
                         this.router.navigate(['../login'], {relativeTo: this.route, });
                         return;

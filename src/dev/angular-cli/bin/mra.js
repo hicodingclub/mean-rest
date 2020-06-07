@@ -109,7 +109,13 @@ const templates = {
   mainCustModule: [
     '../templates/main.cust.module.ts',
     '.cust.module.ts',
-    'main module file',
+    'main cust module file',
+    'A',
+  ],
+  mainExtModule: [
+    '../templates/main.ext.module.ts',
+    '.ext.module.ts',
+    'main external module file',
     'A',
   ],
   mainComponent: [
@@ -1305,6 +1311,11 @@ function main() {
     //console.info('Creating component directory '%s'...', componentDir);
     mkdir('.', subDirCust);
   }
+  let subDirExt = path.join(parentOutputDir, moduleNameCust, 'ext');
+  if (!fs.existsSync(subDirExt)) {
+    //console.info('Creating component directory '%s'...', componentDir);
+    mkdir('.', subDirExt);
+  }
 
   let overWrite = false;
   if (program.force) overWrite = true;
@@ -2183,6 +2194,7 @@ function main() {
   generateSourceFile(moduleName, templates.mainModule, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainCoreModule, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainCustModule, renderObj, outputDirCust);
+  generateSourceFile(moduleName, templates.mainExtModule, renderObj, outputDirCust);
   generateSourceFile(moduleName, templates.mainComponent, renderObj, outputDir);
   generateSourceFile(
     moduleName,

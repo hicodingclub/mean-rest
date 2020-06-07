@@ -30,7 +30,7 @@ export class <%-SchemaName%>ListWidgetSelComponent extends <%-SchemaName%>ListCo
   }
 
   ngOnInit() {
-    this.inputData == this.inputData || {} // expect stepTitle, preSelectedId
+    this.inputData = this.inputData || {} // expect stepTitle, preSelectedId
     this.selectedId = this.inputData.preSelectedId;
 
     super.ngOnInit();

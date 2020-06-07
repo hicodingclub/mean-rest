@@ -325,7 +325,17 @@ class AuthnController {
           return next(err1);
         }
       }
-      const returnObj = {registrationEmailVerification};
+
+      const tempExpiresIn = 60 * 60; // 1hour
+      let temporaryToken = jwt.sign(
+        {
+          "_id": result["_id"],
+        }, 
+        ACCESS_SECRETE, 
+        {expiresIn: tempExpiresIn} 
+      );
+  
+      const returnObj = {registrationEmailVerification, temporaryToken, expiresIn: tempExpiresIn};
       return res.send(returnObj);
     }); 
   };

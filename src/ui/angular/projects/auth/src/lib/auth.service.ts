@@ -6,7 +6,13 @@ import { Router, NavigationEnd  } from '@angular/router';
 
 import { AUTHENTICATION_SERVER_ROOT_URI } from './tokens';
 
-@Injectable()
+export interface temporayTokenIntf {
+  expiresIn: number;
+  token: string;
+}
+@Injectable({
+  providedIn: 'root',
+})
 export class AuthenticationService {
 
   private interruptedUrl: string;
@@ -17,6 +23,9 @@ export class AuthenticationService {
   private navigateEndTime: number;
 
   private adminInterface = false;
+
+  private temporayToken: temporayTokenIntf;
+  private temporayTokenAllowed: boolean = false;
 
   constructor(
             @Inject(AUTHENTICATION_SERVER_ROOT_URI) private authServerRootUri: string,
@@ -260,5 +269,26 @@ export class AuthenticationService {
 
   isAdminInterface(): boolean {
     return this.adminInterface;
+  }
+
+  setTemporaryToken(token: temporayTokenIntf) {
+    this.temporayToken = token;
+    this.temporayToken.expiresIn = token.expiresIn * 1000 + Date.now();
+  }
+  getTemporaryToken(): string {
+    if (!this.temporayTokenAllowed) {
+      return null;
+    }
+    if (!this.temporayToken) {
+      return null;
+    }
+    if ( Date.now() > this.temporayToken.expiresIn) {
+      return null;
+    }
+    this.temporayTokenAllowed = false; // only allow once
+    return this.temporayToken.token;
+  }
+  allowTemporayToken() {
+    this.temporayTokenAllowed = true;
   }
 }

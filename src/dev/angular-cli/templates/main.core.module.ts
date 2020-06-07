@@ -132,8 +132,6 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     { provide: <%-ModuleName%>_SERVER_ROOT_URI, useValue: <%-moduleName%>_server_root_uri },
   <%_ if (hasDate) {%>
     {provide: NgbDateParserFormatter, useClass: MraNgbDateFormatterService},<%}%>
-  <%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name] %>
-    <%-schm.SchemaName%>Service,<%}%>
   ],
   entryComponents: [<%_
   if (hasRef) {%><%_ referenceSchemas.forEach(function(reference){ let Ref = reference.Ref; let api = reference.api; %><% 

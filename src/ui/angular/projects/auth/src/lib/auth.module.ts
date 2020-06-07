@@ -47,7 +47,6 @@ import { ClickElsewhereDirective } from './auth-icon/click-elsewhere.directive';
         AuthIconComponent
     ],
     providers: [
-        AuthenticationService,
         AuthGuard,
         {
             provide: HTTP_INTERCEPTORS,

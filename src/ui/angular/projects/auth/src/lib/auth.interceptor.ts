@@ -28,10 +28,16 @@ export class TokenInterceptor implements HttpInterceptor {
     ) {}
 
   addAuthHeader(request) {
+    let token: string;
     if (this.authService.isAuthorized()) {
+      token = this.authService.getAccessToken();
+    } else {
+      token = this.authService.getTemporaryToken();
+    }
+    if (token) {
       request = request.clone({
         setHeaders: {
-          Authorization: `Bearer ${this.authService.getAccessToken()}`
+          Authorization: `Bearer ${token}`
         }
       });
     }
