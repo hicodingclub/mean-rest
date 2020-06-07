@@ -1,17 +1,17 @@
 {
   "name": "@hicoder/angular-shopping-cart",
-  "version": "0.9.6",
+  "version": "0.9.9",
   "peerDependencies": {
     "@angular/common": "^8.2.14",
     "@angular/core": "^8.2.14",
     "@angular/router": "^8.2.14",
-    "@hicoder/angular-file": "^0.9.6",
-    "@hicoder/angular-shopping-framework": "^0.9.6"
+    "@hicoder/angular-file": "0.9.9",
+    "@hicoder/angular-shopping-framework": "0.9.9"
   },
   "devDependencies": {
-    "@hicoder/angular-file": "^0.9.6",
-    "@hicoder/angular-core": "^0.9.6",
+    "@hicoder/angular-file": "0.9.9",
+    "@hicoder/angular-core": "0.9.9",
     "@ng-bootstrap/ng-bootstrap": "^5.1.4",
-    "@hicoder/angular-shopping-framework": "^0.9.6"
+    "@hicoder/angular-shopping-framework": "0.9.9"
   }
 }
