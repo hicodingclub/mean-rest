@@ -1,0 +1,41 @@
+<label [ngStyle]="style['stepTyle']">{{ inputData.stepTitle }}</label>
+<%_ let cate = listCategories[0] || {};
+	let { listCategoryField, listCategoryRef, listCategoryShowMore } = cate;
+	let cate2 = listCategories[1] || {};
+	let { listCategoryField: listCategoryField2, listCategoryRef: listCategoryRef2, listCategoryShowMore: listCategoryShowMore2 } = cate2;
+%>
+<form [ngStyle]="style['form']" class="d-flex">
+	<%_ if (listCategoryField2) {%>
+	<div *ngIf="categoryDisplays2.length > 0" class="sort-selection mr-3" [ngStyle]="style['cate2']">
+		<div class="dropdown" style="width: 100%;">
+			<button class="category2-dropdown btn btn-light btn-sm dropdown-toggle" type="button"
+				id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				{{categoryDisplays2[selectedCategory2 || 0]}}
+			</button>
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+				<a *ngFor="let ele of categoryDisplays2; let idx = index;" class="dropdown-item pointer"
+					(click)="categorySelected2(idx)">{{ele}}</a>
+			</div>
+		</div>
+	</div><%}%>
+	<%_ if (listCategoryField) {%>
+	<div *ngIf="categoryDisplays.length > 0" class="sort-selection mr-3" [ngStyle]="style['cate1']">
+		<div class="dropdown" style="width: 100%;">
+			<button class="category2-dropdown btn btn-light btn-sm dropdown-toggle" type="button"
+				id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				{{categoryDisplays[selectedCategory || 0]}}
+			</button>
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+				<a *ngFor="let ele of categoryDisplays; let idx = index;" class="dropdown-item pointer"
+					(click)="categorySelected(idx)">{{ele}}</a>
+			</div>
+		</div>
+	</div><%}%>
+	<div class="form-group list-selection" [ngStyle]="style['select']">
+		<select class="form-control" id="select<%-schemaName%>" [(ngModel)]="selectedId"
+			(change)="onDropdownSelected()"
+			name="elect<%-schemaName%>">
+	<option *ngFor="let ele of dropdownItems" [ngValue]="ele.id">{{ele.displayName}}</option>
+	</select>
+	</div>
+</form>
