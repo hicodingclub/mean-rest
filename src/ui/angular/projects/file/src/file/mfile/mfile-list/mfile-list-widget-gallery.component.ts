@@ -73,6 +73,7 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent implemen
     this.picturelinkFn = this.inputData[1];
     this.clickItemAction = "select";
     this.itemMultiSelect = false;
+    this.urlCate1 = "MddsUncategorized"; // search "uncategorized"
     super.ngOnInit();
   }
 

@@ -100,6 +100,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public categoryDisplays2: string[] = []; // stored display name of categories
   public selectedCategory2: number = undefined; // index in categories
 
+  public urlCate1: string; // pre-set candidate category
+  public urlCate2: string;
+
   public hiddenFields = []; // fields hide from view. Currrently used by 'Add' view of edit-sub
   public viewHiddenFields = []; // fields hidden from view. Hidden is defined in schema view with ()
 
@@ -1386,21 +1389,21 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     const cate1 = this.listCategory1 || {};
     const cate2 = this.listCategory2 || {};
 
-    const urlCate1 = this.route.snapshot.queryParams.cate;
-    const urlCate2 = this.route.snapshot.queryParams.cate2;
+    const urlCate1 = this.route.snapshot.queryParams.cate || this.urlCate1;
+    const urlCate2 = this.route.snapshot.queryParams.cate2 || this.urlCate2;
 
     const categoryProvided =
       typeof this.selectedCategory === "number" ? true : false;
     const listCategoryShowMore = typeof cate1.listCategoryShowMore
       ? true
       : false;
-    const categoryCandidate = categoryProvided || !urlCate1 ? "" : urlCate1;
+    const categoryCandidate = (categoryProvided || !urlCate1) ? "" : urlCate1;
     const categoryProvided2 =
       typeof this.selectedCategory2 === "number" ? true : false;
     const listCategoryShowMore2 = typeof cate2.listCategoryShowMore
       ? true
       : false;
-    const categoryCandidate2 = categoryProvided2 || !urlCate2 ? "" : urlCate2;
+    const categoryCandidate2 = (categoryProvided2 || !urlCate2) ? "" : urlCate2;
     const listCategoryField = cate1.listCategoryField;
     const listCategoryField2 = cate2.listCategoryField;
 

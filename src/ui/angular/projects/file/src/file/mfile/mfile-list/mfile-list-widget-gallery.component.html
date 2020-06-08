@@ -1,5 +1,5 @@
 
-  
+
 <div class="select-model show" (keyup.esc)="uiOnEscapeKey()" tabindex="0" #FilesModal>
   <div class="select-model-content">
     <div class="modal-content">
@@ -16,7 +16,8 @@
 
     <ul *ngIf="listCategory1.listCategoryField" class="nav nav-pills category-nav">
       <li *ngFor="let ele of categoryDisplays; let idx = index;" class="nav-item" >
-        <a *ngIf=" listCategory1.showEmptyCategory || (!listCategory1.showEmptyCategory && categoriesCounts[idx] > 0)"
+        <!-- not show idx 0 "All"-->
+        <a *ngIf="idx !==0 && (listCategory1.showEmptyCategory || (!listCategory1.showEmptyCategory && categoriesCounts[idx] > 0))"
           class="nav-link" [ngClass]="{'active': idx === selectedCategory }" [routerLink]="['.']" queryParamsHandling="preserve" (click)="categorySelected(idx)">
             {{ele}} <span *ngIf="listCategory1.showCategoryCounts">({{categoriesCounts[idx]}})</span>
         </a>
@@ -85,7 +86,7 @@
           <div>
             <div class="total_counts">
               <span *ngIf="list.length > 2">Total: <b>{{totalCount}}</b></span>
-              <a class="ml-3" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a>
+              <a class="ml-3" (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a>
             </div>
           </div>
         </div>
