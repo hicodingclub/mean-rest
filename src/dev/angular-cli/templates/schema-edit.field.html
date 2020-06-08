@@ -75,7 +75,7 @@
           <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
           <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
           <div libMddsRichtext="Edit<%-Fn%>" [content]="detail['<%-fn%>']"></div>
-          <div class="action-buttons" style="margin-top: 10px;">
+          <div class="action-buttons my-3" style="margin-top: 10px;">
             <button type="button" class="btn btn-outline-success" (click)="onEdtiorPreview('Edit<%-Fn%>')">Preview</button>
           </div>
         

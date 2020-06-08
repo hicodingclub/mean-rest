@@ -21,8 +21,6 @@ import { <%-ModuleName%>RoutingCoreModule } from './<%-moduleName%>-routing.core
 import { <%-ModuleName%>Component } from './<%-moduleName%>.component';
 <% if (hasRef) {%>import { <%-ModuleName%>RefSelectDirective } from './<%-moduleName%>.component';<%}%>
 
-import { <%-ModuleName%>_SERVER_ROOT_URI } from './<%-moduleName%>.tokens';
-import { <%-moduleName%>_server_root_uri } from '../<%-moduleName%>-cust/<%-moduleName%>.conf';
 <% for (let sel of allSelectors) { if (sel.usedFlag) {%>
 import { <%-sel.module%> } from '<%-sel.package%>';
 <%}}%>
@@ -37,7 +35,6 @@ import { <%-schm.SchemaName%>DetailWidget<%-widget[1]%>Component } from './<%-sc
   <%_ if (api.includes("R") || api.includes('L')) {%>import { <%-schm.SchemaName%>DetailFieldComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail-field.component';<%_ } %>
   <%_ if (api.includes("U") || api.includes("C")) {%>import { <%-schm.SchemaName%>EditComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-edit/<%-schm.schemaName%>-edit.component';<%_ } %>
   <%_ if (api.includes("R") && schm.assoRoutes.length > 0 ) {%>import { <%-schm.SchemaName%>AssoComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail-asso.component';<%}%>
-import { <%-schm.SchemaName%>Service } from './<%-schm.schemaName%>/<%-schm.schemaName%>.service';
 <%_ } %>
 <%_ referenceSchemas.forEach(function(schObj){ let ref = schObj.ref, Ref = schObj.Ref, api = schObj.api;%>
   <%_ if (api.includes("L")) {%>import { <%-Ref%>ListSelectComponent } from './<%-ref%>/<%-ref%>-list/<%-ref%>-list-select.component';<%_ } %>
@@ -129,9 +126,8 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
       Directive<%-ModuleName%>MapRequired,<%_ } %>
   ],
   providers: [
-    { provide: <%-ModuleName%>_SERVER_ROOT_URI, useValue: <%-moduleName%>_server_root_uri },
   <%_ if (hasDate) {%>
-    {provide: NgbDateParserFormatter, useClass: MraNgbDateFormatterService},<%}%>
+    { provide: NgbDateParserFormatter, useClass: MraNgbDateFormatterService },<%}%>
   ],
   entryComponents: [<%_
   if (hasRef) {%><%_ referenceSchemas.forEach(function(reference){ let Ref = reference.Ref; let api = reference.api; %><% 

@@ -31,7 +31,8 @@
 }
 
 .clicked-row {
-  /*background-color: #dcdfe0; */
+}
+.selected-row {
   background-color: rgba(167, 224, 169, 0.175);
   box-shadow: 0 0 0 2px #44B549;
 }

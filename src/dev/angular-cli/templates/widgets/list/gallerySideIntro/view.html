@@ -7,8 +7,10 @@
 		let field, fn, ft;%>
 		<div class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}">
 			<div class="text-left h-100"
-				[ngClass]="{'clickable-card pointer': clickItemAction, 
-							'clicked-row': clickItemAction === 'select' && checkedItem[idx]}">
+				[ngClass]="{
+					'clicked-row': clickedId==detail['_id'],
+					'selected-row': clickItemAction === 'select' && checkedItem[i],
+					'clickable-card pointer': clickItemAction}">
 				<div class="grid-fields" (click)="clickOneItem(idx)">
 					<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}"
 						[ngStyle]="style['picture']">

@@ -1,4 +1,4 @@
-<div *ngIf="!disableActionButtions" class="action-buttons">
+<div *ngIf="!disableActionButtions" class="action-buttons my-3">
     <% if (api.includes('L')) {%><a routerLink="<%-listRouterLink%>"><i class="fas fa-list" title="List"></i><!--  span>&nbsp;&nbsp;{{ItemCamelName}} List</span--></a><%}%>
     <% if (api.includes('U') && detailActionButtons[0]) {%><a [routerLink]="['../../edit', detail['_id'] ]" [skipLocationChange]="false" class="btn btn-outline-primary"><%-detailActionButtons[0]%></a><%}%>
     <% if (api.includes('C') && detailActionButtons[1]) {%><a [routerLink]="['../../new']" [queryParams]="{cid: detail['_id']}" [skipLocationChange]="false" class="btn btn-outline-primary"><%-detailActionButtons[1]%></a><%}%>

@@ -1,3 +1,11 @@
 import { InjectionToken } from '@angular/core';
 
-export const <%-ModuleName%>_SERVER_ROOT_URI = new InjectionToken('<%-ModuleName%>_SERVER_ROOT_URI');
+import { <%-moduleName%>_server_root_uri } from '../<%-moduleName%>-cust/<%-moduleName%>.tokens.value';
+
+export const <%-ModuleName%>_SERVER_ROOT_URI = new InjectionToken<string>(
+    '<%-ModuleName%>_SERVER_ROOT_URI',
+    {
+        factory: (): string => <%-moduleName%>_server_root_uri,
+        providedIn: 'root',
+    },
+);

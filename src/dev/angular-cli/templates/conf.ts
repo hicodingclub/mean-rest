@@ -8,12 +8,12 @@ import { <%
     let schDef = schemaMap[sch_name];
     if (['L', 'C', 'R', 'U', 'D'].some(x => schDef.api.includes(x))) {
   %>
-  <%-schDef.schemaName%>RoutingCorePath, <% } }%> 
+  <%-schDef.schemaName%>RoutingCorePath,<% } }%>
 } from '../<%-moduleName%>/<%-moduleName%>-routing.core.path';
 
 export const <%-ModuleName%>CoreRoutes: Routes = [
   { 
-    // Lazy Load: and add to app routing: 
+    // Lazy Load: and add to app routing:
     //     { path: '<%-moduleName%>', loadChildren: () => import('./<%-moduleName%>/<%-moduleName%>.module').then(m => m.<%-ModuleName%>Module) },
     path: '',
     // non lazy load config. Include module in app module.
@@ -36,7 +36,7 @@ import { <%-ModuleName%>RoutingCustPath } from './<%-moduleName%>-routing.cust.p
 
 export const <%-ModuleName%>Routes: Routes = [
   {
-    // Lazy Load: and add to app routing: 
+    // Lazy Load: and add to app routing:
     //     { path: '<%-moduleName%>', loadChildren: () => import('./<%-moduleName%>/<%-moduleName%>.module').then(m => m.<%-ModuleName%>Module) },
     path: 'cust',
     // non lazy load config. Include module in app module.
@@ -45,5 +45,3 @@ export const <%-ModuleName%>Routes: Routes = [
     children: <%-ModuleName%>RoutingCustPath,
   },
 ];
-
-export const <%-moduleName%>_server_root_uri: string = '/<%-apiBase%>';

@@ -12,7 +12,8 @@ table {
   background-color: rgba(0,0,0,.075); */
 }
 .selected-row {
-  background-color: #c9f5eb;
+  background-color: rgba(167, 224, 169, 0.175);
+  box-shadow: 0 0 0 2px #44B549;
 }
 
 tr th:first-child {

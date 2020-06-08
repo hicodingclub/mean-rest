@@ -93,6 +93,7 @@ const templates = {
   //key:[template_file, output_file_suffix, description, write_options]
   //write_options: W: write, A: append
   conf: ['../templates/conf.ts', '.conf.ts', 'module conf file', 'A'],
+  tokensValue: ['../templates/tokens.value.ts', '.tokens.value.ts', 'module token value file', 'A'],
 
   mainModule: [
     '../templates/main.module.ts',
@@ -2190,6 +2191,7 @@ function main() {
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
 
   generateSourceFile(moduleName, templates.conf, renderObj, outputDirCust);
+  generateSourceFile(moduleName, templates.tokensValue, renderObj, outputDirCust);
 
   generateSourceFile(moduleName, templates.mainModule, renderObj, outputDir);
   generateSourceFile(moduleName, templates.mainCoreModule, renderObj, outputDir);

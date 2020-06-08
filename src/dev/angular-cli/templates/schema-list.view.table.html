@@ -24,7 +24,9 @@
 	    	</tr>
 	    </thead>
 	    <tbody>
-	        <tr *ngFor="let detail of list;  let i = index; let list_index = index;" [ngClass]="{'clicked-row': clickedId==detail['_id']}">
+			<tr *ngFor="let detail of list;  let i = index; let list_index = index;"
+				[ngClass]="{'clicked-row': clickedId==detail['_id'],
+							'selected-row': clickItemAction === 'select' && checkedItem[i]}">
 	            <td scope="row" (click)="clickOneItem(i)"  class="pointer read-more mt-3">
 	            	{{(page-1)*perPage+i+1}}
 	            </td>

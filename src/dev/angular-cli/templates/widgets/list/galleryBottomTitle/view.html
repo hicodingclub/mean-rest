@@ -8,7 +8,10 @@
 		let field, fn, ft;
 		%>
 		<div class="text-left h-100"
-			[ngClass]="{'clicked-row': clickItemAction === 'select' && checkedItem[i]}">
+			[ngClass]="{
+				'clicked-row': clickedId==detail['_id'],
+				'selected-row': clickItemAction === 'select' && checkedItem[i]
+			}">
 			<div class="grid-fields">
 				<div class="grid-head-picture"
 					[ngClass]="{'grid-head-picture-large': options['largePicture'], 'clickable-card pointer': clickItemAction}"
