@@ -46,7 +46,7 @@
 
 			<div>
 				<div class="total_counts">
-					<span *ngIf="list.length > <%-SearchAndSortThreshold%>">Total: <b>{{totalCount}}</b></span><%_ if (typeof(disableRefreshIcon) == 'undefined' || !disableRefreshIcon) {
+					<span *ngIf="totalCount > <%-SearchAndSortThreshold%>">Total: <b>{{totalCount}}</b></span><%_ if (typeof(disableRefreshIcon) == 'undefined' || !disableRefreshIcon) {
 					%><%if(api.includes('D') || api.includes('A') ){%>
 					<span *ngIf="list.length > 1"><input type="checkbox" class="ml-3 mr-1" [(ngModel)]="checkAll" (change)="onCheckAllChange()">All</span><%}%>
 					<a class="ml-3" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a><%}%>
@@ -54,34 +54,37 @@
 			</div>
 		</div>
 
-		<div class="d-flex justify-content-center mt-2">
-				<div *ngIf="totalPages > 1">
-					<ul class="pagination justify-content-center">
-						<li class="page-item"
-								[ngClass]="{'disabled': page<=1}">
-						<a class="page-link" routerLink="." (click)="onPreviousPage()"
-							aria-label="Previous">
-							<span aria-hidden="true">&laquo;</span>
-							<span class="sr-only">Previous</span>
-						</a>
-						</li>
+		<div class="d-flex justify-content-center flex-wrap mt-2">
+			<div *ngIf="totalPages > 1">
+				<ul class="pagination justify-content-center">
+					<li class="page-item"
+							[ngClass]="{'disabled': page<=1}">
+					<a class="page-link" routerLink="." (click)="onPreviousPage()"
+						aria-label="Previous">
+						<span aria-hidden="true">&laquo;</span>
+						<span class="sr-only">Previous</span>
+					</a>
+					</li>
 
-						<li *ngIf="leftMore" class="page-item"><a class="page-link">...</a></li>
+					<li *ngIf="leftMore" class="page-item"><a class="page-link">...</a></li>
 
-						<li *ngFor="let p of pages;  let i = index" class="page-item"
-								[ngClass]="{'active': p==page}">
-							<a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
-						</li>
+					<li *ngFor="let p of pages;  let i = index" class="page-item"
+							[ngClass]="{'active': p==page}">
+						<a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
+					</li>
 
-						<li *ngIf="rightMore" class="page-item"><a class="page-link">...</a></li>
-						<li class="page-item"
-								[ngClass]="{'disabled': page>=totalPages}">
-						<a class="page-link" routerLink="." (click)="onNextPage()"
-							aria-label="Next">
-							<span aria-hidden="true">&raquo;</span>
-							<span class="sr-only">Next</span>
-						</a>
-						</li>
-					</ul>
-				</div>
+					<li *ngIf="rightMore" class="page-item"><a class="page-link">...</a></li>
+					<li class="page-item"
+							[ngClass]="{'disabled': page>=totalPages}">
+					<a class="page-link" routerLink="." (click)="onNextPage()"
+						aria-label="Next">
+						<span aria-hidden="true">&raquo;</span>
+						<span class="sr-only">Next</span>
+					</a>
+					</li>
+				</ul>
+			</div>
+			<div class="ml-3" *ngIf="totalPages > 1">
+				<small>Page</small>&nbsp;<input type="number" class="page-control form-control" [value]="page" (input)="onGotoPage($event.target.value)" />&nbsp;/&nbsp;{{totalPages}}
+			</div>
 		</div>

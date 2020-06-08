@@ -257,7 +257,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
   public populatePages(): void {
     this.pages = [];
-    const SHOW_PAGE = 9;
+    const SHOW_PAGE = 5;
     const HALF = (SHOW_PAGE - 1) / 2;
 
     let min: number;
