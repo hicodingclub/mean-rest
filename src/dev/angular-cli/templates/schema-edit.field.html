@@ -67,7 +67,20 @@
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.minlength">
                 <%-Fn%> must be at least <%-field.minlength%> characters long.
               </div>
-          </div><%}%>        
+          </div><%}%>
+
+          <%_ if (!field.enumValues && field.hint) {%>
+          <div class="new-area">
+              <div *ngIf="editHintFields['<%-fn%>'].length > 0" style="font-size: 0.9rem;">Type in new value or select from available ones: </div>
+              <ng-template ngFor let-hintEle [ngForOf]="editHintFields['<%-fn%>']" let-i="index">
+                <div class="badge badge-pill badge-primary pointer"
+                  *ngIf="detail['<%-fn%>'] !== hintEle['_id']" 
+                  (click)="detail['<%-fn%>'] = hintEle['_id']">
+                    {{hintEle['_id']}}
+                </div>
+              </ng-template>
+          </div><%_ }%>
+
         </fieldset>
       <%_ } else if (field.editor) { %>
         <fieldset class="form-group">

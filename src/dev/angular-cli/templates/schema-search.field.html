@@ -10,7 +10,7 @@
     <%_ if (field.type === "SchemaString") { %>
         <%_ if (field.enumValues) { %>
 	          <%_ field.enumValues.forEach( (f) => { %>
-	          <div class="form-check-inline">
+	        <div class="form-check-inline">
 		        <input type="radio" name="<%-sn%>Edit<%-Fn%>" 
 		        	class="form-check-input"
 					id="<%-sn%>Edit<%-Fn%><%-f%>" [value]="'<%-f%>'"

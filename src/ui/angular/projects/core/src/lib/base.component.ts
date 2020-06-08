@@ -1060,7 +1060,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       const field_value = undefined;
       const limit = 50;
       this.service.getFieldValues(f, field_value, sort, limit).subscribe((result: any) => {
-        this.editHintFields[f] = result;
+        this.editHintFields[f] = result; // format: {_id: "Beginner", count: 1}
       }, this.onServiceErrorSuppress);
     }
   }

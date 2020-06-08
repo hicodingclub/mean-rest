@@ -317,7 +317,6 @@ const ownerPatch = function (query, owner, req) {
 
 const searchObjPatch = function (query, mraBE) {
   const searchObj = mraBE.searchObj || {};
-  console.log('=== searchObj', searchObj);
   for (const p in searchObj) {
     query[p] = searchObj[p];
   }
@@ -1150,8 +1149,6 @@ class RestController {
     catQuery = ownerPatch(catQuery, owner, req);
     catQuery = searchObjPatch(catQuery, mraBE);
 
-    console.log('===catQuery', catQuery);
-
     const aggregatePipes = [
       { $match: catQuery },
       { $unwind: `$${__field}` }, // unwind will unpack the array, if field is of type array.
@@ -1162,7 +1159,6 @@ class RestController {
     ];
     // count for each value
     let cateCounts = await model.aggregate(aggregatePipes).exec();
-    console.log('===cateCounts', cateCounts);
     cateCounts = JSON.parse(JSON.stringify(cateCounts));
     return res.send(cateCounts);
   }
