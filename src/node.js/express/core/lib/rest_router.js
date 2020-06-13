@@ -57,6 +57,18 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
   expressRouter.restController = restController;
 
   if (!moduleName) moduleName = randomString(10);
+
+  const DB_CONFIG = sysDef.DB_CONFIG;
+  let db_app_name, db_module_name;
+  if (DB_CONFIG) {
+    db_app_name = DB_CONFIG.APP_NAME;
+    db_module_name = DB_CONFIG.MODULE_NAME;
+  }
+  if (!db_app_name || !db_module_name) {
+    throw new Error(`APP Name and Module Name not provided for database. Please provide "DB_CONFIG" for your schema definition in module ${moduleName}.`);
+  }
+  db_app_name = db_app_name.toLowerCase();
+  db_module_name = db_module_name.toLowerCase();
   
   const setModuleName = _setModuleName(moduleName)
   expressRouter.use(setModuleName);
@@ -103,7 +115,7 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
 
     const schm = schemaDef.schema;
     const mraBE = schemaDef.mraBE || {};
-    const collectionName = mraBE.collection;
+    let collectionName = mraBE.collection;
     let model;
     if (schm) {
       // apply archive
@@ -125,7 +137,15 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
       if (collectionName) {
         model = mongoose.model(schemaName, schm, collectionName );//model uses given name and given collection
       } else {
-        model = mongoose.model(schemaName, schm );//model uses given name
+        collectionName = '';
+        if (db_app_name) {
+          collectionName += `${db_app_name}_`;
+        }
+        if (db_module_name) {
+          collectionName += `${db_module_name}_`;
+        }
+        collectionName += name;
+        model = mongoose.model(schemaName, schm, collectionName );//model uses given name
       }
     }
     //schemaDef.views in [briefView, detailView, CreateView, EditView, SearchView] sequence

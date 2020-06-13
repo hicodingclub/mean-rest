@@ -403,7 +403,21 @@ class RestController {
       briefView: getViewPopulates(schema, views[0]),
       detailView: getViewPopulates(schema, views[1]),
     };
+
+    if (mraBE && mraBE.createObjects) {
+      let cnt = 0;
+      for (let obj of mraBE.createObjects) {
+        model.create(obj, function (err, result) {
+          if (err) {
+            console.error(` ～～ mraBE Initialization: failed to create object for schema ${schemaName}: `, err.message);
+            return;
+          }
+          console.log(` ～～ mraBE Initialization: create object for schema ${schemaName}: `, ++cnt);
+        });
+      }
+    }
   }
+
   getAll(req, res, next) {
     return this.searchAll(req, res, next, {});
   }
@@ -1475,9 +1489,19 @@ class RestController {
         if (err) {
           return next(err);
         }
+
+        let hasMap = false;
         for (let field in body) {
+          let income = body[field];
+          let existing = result[field];
+          if (existing instanceof Map) {
+            // first remove the map filed, and will update the second time.
+            income = undefined;
+            hasMap = true;
+          }
+
           //all fields from client
-          result[field] = body[field];
+          result[field] = income;
         }
         for (let field of viewFields) {
           if (!(field in body)) {
@@ -1487,11 +1511,20 @@ class RestController {
           }
         }
         result = ownerPatch(result, owner, req);
-        result.save(function (err, result) {
+        result.save(function (err) {
           if (err) {
             return next(err);
           }
-          return res.send();
+          if (!hasMap) {
+            return res.send();
+          }
+          // update second time for the map field
+          model.updateOne({ _id: id }, body, function (err) {
+            if (err) {
+              return next(err);
+            }
+            return res.send();
+          });
         });
       });
     } else {
