@@ -6,10 +6,21 @@ const sizeOf = require('image-size')
 const fs = require('fs');
 
 const schemas = require('../model/schema');
-const { fileSchema, fileGroupSchema} = schemas;
+const { fileSchema, fileGroupSchema, DB_CONFIG} = schemas;
 
-const File = mongoose.model('mfile', fileSchema);
-const FileGroup = mongoose.model('mfilegroup', fileGroupSchema);
+let db_app_name, db_module_name;
+if (DB_CONFIG) {
+  db_app_name = DB_CONFIG.APP_NAME;
+  db_module_name = DB_CONFIG.MODULE_NAME;
+}
+if (!db_app_name || !db_module_name) {
+  throw new Error(`APP Name and Module Name not provided for database. Please provide "DB_CONFIG" for your schema definition in module ${moduleName}.`);
+}
+db_app_name = db_app_name.toLowerCase();
+db_module_name = db_module_name.toLowerCase();
+
+const File = mongoose.model('mfile', fileSchema, `${db_app_name}_${db_module_name}_mfile`);
+const FileGroup = mongoose.model('mfilegroup', fileGroupSchema, `${db_app_name}_${db_module_name}_mfilegroup`);
 
 const MddsFileCrop= "mdds-file-crop";
 

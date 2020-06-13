@@ -64,4 +64,8 @@ const authz = {
   'download': {'LoginUser': {'others': '', 'own': ''}, 'Anyone': 'R'},
 };
 
-module.exports = {schemas, config, authz};
+const DB_CONFIG = {
+  APP_NAME: process.env.APP_NAME,
+  MODULE_NAME: 'FILE',
+};
+module.exports = {schemas, config, authz, DB_CONFIG};

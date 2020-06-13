@@ -21,7 +21,12 @@ const fileGroupSchema = new Schema({
 
 fileGroupSchema.index({ name: 1}, {unique: true});
 
+const DB_CONFIG = {
+  APP_NAME: process.env.APP_NAME,
+  MODULE_NAME: 'FILE',
+};
 module.exports = {
         fileSchema,
         fileGroupSchema,
+        DB_CONFIG,
 }
