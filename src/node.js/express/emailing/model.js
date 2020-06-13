@@ -110,4 +110,9 @@ const authz = {
   'emailLog': {'LoginUser': {'others': '', 'own': 'R'}, 'Anyone': ''},
 }
 
-module.exports = {schemas: schemas, config: config, authz: authz}
+const DB_CONFIG = {
+  APP_NAME: process.env.APP_NAME,
+  MODULE_NAME: 'EMAIL',
+};
+
+module.exports = {schemas: schemas, config: config, authz: authz, DB_CONFIG}
