@@ -78,4 +78,9 @@ const authz = { //only users with permission can see this module
   "module-authz": {"LoginUser": {"others": "", "own": ""}, "Anyone": ""},
 }
 
-module.exports = {schemas: schemas, config: config, authz: authz};
+const DB_CONFIG = {
+  APP_NAME: process.env.APP_NAME,
+  MODULE_NAME: 'AUTH',
+};
+
+module.exports = {schemas: schemas, config: config, authz: authz, DB_CONFIG};

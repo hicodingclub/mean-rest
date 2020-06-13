@@ -14,7 +14,7 @@ class AuthnController {
     this.mddsProperties = options || {};
   }
 
-  registerAuth(schemaName, schema, userFields, passwordField, profileFields) {
+  registerAuth(schemaName, schema, DB_CONFIG, userFields, passwordField, profileFields) {
     let a = {};
     a.schemaName = schemaName;
     a.userFields = userFields;
@@ -22,7 +22,19 @@ class AuthnController {
     a.profileFields = profileFields;
     
     a.schema = schema;
-    a.model = mongoose.model(schemaName, schema );//model uses given name
+
+    let db_app_name, db_module_name;
+    if (DB_CONFIG) {
+      db_app_name = DB_CONFIG.APP_NAME;
+      db_module_name = DB_CONFIG.MODULE_NAME;
+    }
+    if (!db_app_name || !db_module_name) {
+      throw new Error(`APP Name and Module Name not provided for database. Please provide "DB_CONFIG" for your schema definition in module ${moduleName}.`);
+    }
+    db_app_name = db_app_name.toLowerCase();
+    db_module_name = db_module_name.toLowerCase();
+
+    a.model = mongoose.model(schemaName, schema, `${db_app_name}_${db_module_name}_${schemaName.toLowerCase()}`);//model uses given name
     
     this.authSchemas[schemaName] = a;
   }

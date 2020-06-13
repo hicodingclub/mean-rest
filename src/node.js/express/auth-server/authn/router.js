@@ -32,7 +32,7 @@ const AuthnRouter = function(userDef, options, getUserRoleFunc) {
 
     if (schemaName == authSchemaName) {
       let schm = schemaDef.schema;
-      authnController.registerAuth(authSchemaName, schemaDef.schema, 
+      authnController.registerAuth(authSchemaName, schemaDef.schema, userDef.DB_CONFIG,
               authUserFields, authPasswordField, profileFields);
       authModelCreated = true;
       break;

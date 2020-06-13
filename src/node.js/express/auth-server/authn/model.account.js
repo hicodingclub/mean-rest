@@ -57,4 +57,8 @@ const authn = {
   authPasswordField: "password",
 };
 
-module.exports = {schemas: schemas, authn: authn};
+const DB_CONFIG = {
+  APP_NAME: process.env.APP_NAME,
+  MODULE_NAME: 'AUTH',
+};
+module.exports = {schemas: schemas, authn: authn, DB_CONFIG};
