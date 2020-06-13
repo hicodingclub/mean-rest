@@ -19,6 +19,13 @@ export class MddsCommonService {
     this.storage[name] = value;
     this.subject.next(name);
   }
+  public getFromLocalStorage(name: string): any {
+    return JSON.parse(localStorage.getItem(name));
+  }
+  public putToLocalStorage(name: string, value: any) {
+    localStorage.setItem(name, JSON.stringify(value));
+    this.subject.next(name);
+  }
   public notifier() {
     return this.subject;
   }
