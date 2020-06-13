@@ -1,0 +1,13 @@
+<div class="w-100">
+    <div class="font-weight-bold my-1" *ngIf="name" [ngStyle]="style['name']">{{name}}</div>
+    <div class="my-1">
+        <div class="font-weight-bold" *ngIf="title">{{title}}</div>
+        <div class="ml-3 my-1" [ngStyle]="style['address']">
+            <div>{{line1}}</div>
+            <div>{{line2}}</div>
+            <div>{{city}}, {{state}} {{zipCode}}</div>
+            <div *ngIf="country">{{country}}</div>
+        </div>
+    </div>
+    <div *ngIf="phone" class="font-weight-bold"><span class="mr-2" [ngStyle]="style['phone-label']">Phone Number:</span> <span [ngStyle]="style['phone-value']" >{{phone}}</span></div>
+</div>

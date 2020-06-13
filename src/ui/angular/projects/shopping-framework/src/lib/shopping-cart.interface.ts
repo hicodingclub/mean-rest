@@ -1,4 +1,4 @@
-export interface ShowItem {
+export interface ShoppingItem {
   picture: string; // url
   name: string;
   description: string;
@@ -9,7 +9,8 @@ export interface ShowItem {
   pageUrl: string;
 }
 
-export interface ShoppingCartIntf {
-  getShowItems(): ShowItem[];
-  getTotalPrice(): number;
+export interface ShoppingItems {
+  items: ShoppingItem[];
+  price: number;
+  ready: boolean;
 }

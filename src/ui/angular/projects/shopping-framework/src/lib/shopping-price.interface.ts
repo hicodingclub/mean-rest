@@ -3,11 +3,8 @@ import { ShoppingAddr } from './shopping-addr.interface'
 export interface PriceInfo {
   itemsPrice: number;
   shippingPrice: number;
+  totalBeforeTax: number,
   tax: number;
-}
-
-export interface ShoppingPriceIntf {
-  isReady(): boolean;
-  getPriceInfo(): PriceInfo;
-  setTaxDestination(addr: ShoppingAddr ): void;
+  totalPrice: number,
+  ready: boolean,
 }

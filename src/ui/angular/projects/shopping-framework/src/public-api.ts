@@ -7,3 +7,5 @@ export * from './lib/shopping-cart.interface';
 export * from './lib/shopping-payment.interface';
 export * from './lib/shopping-price.interface';
 export * from './lib/shopping-shipment.interface';
+
+export * from './lib/addr/addr.module';
