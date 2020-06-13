@@ -1,7 +1,7 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter } from '@angular/core';
 import { Router }    from '@angular/router';
 
-import { ShowItem } from '@hicoder/angular-shopping-framework';
+import { ShoppingItem, ShoppingItems } from '@hicoder/angular-shopping-framework';
 
 import { ShoppingCartService } from './shopping-cart.service';
 
@@ -11,11 +11,12 @@ const SHOPPING_CART_ROOT_PATH = 'shopping-cart';
   templateUrl: 'cart-list.component.html',
   styleUrls: ['./css/item-list.css', 'cart-list.component.css']
 })
-export class CartListComponent implements OnInit {
+export class CartListComponent implements OnInit, AfterViewInit {
   @Input() public style: any = {}; // {button: {}}
+  @Output() public shoppingItems: EventEmitter<ShoppingItems> = new EventEmitter<ShoppingItems>();
 
-  public showItems: ShowItem[] = [];
-  public errorItems: ShowItem[] = [];
+  public showItems: ShoppingItem[] = [];
+  public errorItems: ShoppingItem[] = [];
   public totalPrice: number = 0;
 
   constructor(private scService: ShoppingCartService) {
@@ -23,12 +24,27 @@ export class CartListComponent implements OnInit {
   }
 
   ngOnInit() {}
+  ngAfterViewInit() {
+    this.emitShoppintItems()
+  }
+
+  emitShoppintItems() {
+    if (this.showItems.length > 0 ) {
+      this.shoppingItems.emit({
+        items: this.showItems,
+        price: this.totalPrice,
+        ready: true,
+      });
+    }
+  }
 
   private retrieveItems() {
     this.scService.getCartItems().subscribe(cartItems => {
       this.showItems = cartItems.showItems;
       this.errorItems = cartItems.errorItems;
       this.totalPrice = cartItems.totalPrice;
+
+      this.emitShoppintItems();
     });
   }
 }

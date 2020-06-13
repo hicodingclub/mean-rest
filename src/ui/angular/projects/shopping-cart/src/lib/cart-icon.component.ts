@@ -1,8 +1,6 @@
 import { Component, OnInit, Input, Inject } from '@angular/core';
 import { Router }    from '@angular/router';
 
-import { ShowItem } from '@hicoder/angular-shopping-framework';
-
 import { ShoppingCartService } from './shopping-cart.service';
 import { SHOPPING_CART_CHECKOUT_PATH } from "./tokens"
 

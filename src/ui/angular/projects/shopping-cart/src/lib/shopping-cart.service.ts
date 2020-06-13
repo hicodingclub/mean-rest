@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, Subject } from 'rxjs';
 
-import { ShowItem, ShoppingCartIntf } from '@hicoder/angular-shopping-framework';
+import { ShoppingItem, ShoppingItems } from '@hicoder/angular-shopping-framework';
 
 // The field name to parse the item information from response of item URL
 export interface ItemMeta {
@@ -28,8 +28,8 @@ export interface Item {
 // Interface to show items when user see cart details
 export interface ShowCart {
   totalPrice: number;
-  showItems: ShowItem[];
-  errorItems: ShowItem[];
+  showItems: ShoppingItem[];
+  errorItems: ShoppingItem[];
 }
 
 const SHOPPINGCARTKEY = "mdds-shopping-cart";
@@ -38,9 +38,9 @@ const DEFAULTSTOCKNUMBER = 10000;
 @Injectable({
   providedIn: "root",
 })
-export class ShoppingCartService implements ShoppingCartIntf {
+export class ShoppingCartService {
   private items: Item[] = []; // items added to cart
-  private showItems: ShowItem[]; // items to show in cart
+  private showItems: ShoppingItem[]; // items to show in cart
   private totalPrice: number; // total price of showItems
   private itemNumberPublisher: Subject<number> = new Subject<number>();
 
@@ -117,10 +117,10 @@ export class ShoppingCartService implements ShoppingCartIntf {
       try {
         // for each promiss, catch errors for individule promiss and return it as result
         const results = Promise.all(promises.map((p) => p.catch((e) => e))).then( results => {
-          const showItems: ShowItem[] = [];
-          const errorItems: ShowItem[] = [];
+          const showItems: ShoppingItem[] = [];
+          const errorItems: ShoppingItem[] = [];
           let totalPrice = 0;
-          let showItem: ShowItem;
+          let showItem: ShoppingItem;
           for (let i = 0; i < this.items.length; i += 1) {
             const result: any = results[i];
             let subPrice = 0;
@@ -164,10 +164,11 @@ export class ShoppingCartService implements ShoppingCartIntf {
       }
     });
   }
-  public getShowItems(): ShowItem[] {
-    return this.showItems;
-  }
-  public getTotalPrice(): number {
-    return this.totalPrice;
+  public getShoppingItems(): ShoppingItems {
+    return {
+      items: this.showItems,
+      price: this.totalPrice,
+      ready: this.showItems.length > 0,
+    }
   }
 }

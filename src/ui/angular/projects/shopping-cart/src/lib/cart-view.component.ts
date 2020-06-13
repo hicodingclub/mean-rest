@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Inject } from "@angular/core";
 import { Router } from "@angular/router";
 
-import { ShowItem } from '@hicoder/angular-shopping-framework';
+import { ShoppingItem } from '@hicoder/angular-shopping-framework';
 
 import { SHOPPING_CART_CONTINUE_PATH } from "./tokens"
 import { SHOPPING_CART_CHECKOUT_PATH } from "./tokens"
@@ -21,11 +21,11 @@ const SHOPPING_CART_ROOT_PATH = 'shopping-cart';
 export class CartViewComponent implements OnInit {
   @Input() public style: any = {}; // {button: {}}
 
-  public showItems: ShowItem[] = [];
-  public errorItems: ShowItem[] = [];
+  public showItems: ShoppingItem[] = [];
+  public errorItems: ShoppingItem[] = [];
   public totalPrice: number = 0;
 
-  public quantityChangingItem: ShowItem;
+  public quantityChangingItem: ShoppingItem;
   public quantityPop: boolean = false;
   public newQuantity: number = 0;
   public maxQuantity: number = 0;
@@ -95,7 +95,7 @@ export class CartViewComponent implements OnInit {
     this.quantityPop = false;
   }
 
-  private findItem(items: ShowItem[], itemUrl: string): number {
+  private findItem(items: ShoppingItem[], itemUrl: string): number {
     for (let i = 0; i < items.length; i += 1) {
       if (items[i].url === itemUrl) {
         return i;
