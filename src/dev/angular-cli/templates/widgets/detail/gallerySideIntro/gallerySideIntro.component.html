@@ -43,9 +43,9 @@
 		
 				let fn = field.fieldName; let ft = field.type;;
 				%>
-			<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="detail['<%-fn%>']"<%}%> class="mr-3 d-inline-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (ft !== 'AngularSelector') {%>
-				<div class="field-label" [ngStyle]="style['<%-fn%>-label']"><%-field.displayName%>:</div><%}%>
-				<div class="ml-1" [ngStyle]="style['<%-fn%>-value']"><% include ../../../schema-display.field.html %></div>
+			<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="detail['<%-fn%>']"<%}%> class="mr-3 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (ft !== 'AngularSelector') {%>
+				<div class="field-label mr-2" [ngStyle]="style['<%-fn%>-label']"><%-field.displayName%>:</div><%}%>
+				<div [ngStyle]="style['<%-fn%>-value']"><% include ../../../schema-display.field.html %></div>
 			</div><%_  
 			}%>
 		</div>

@@ -375,6 +375,23 @@ const PredefinedPatchFields = {
   mmodule_name: { type: String, index: true },
 };
 
+const stripDisplayNames = function (viewStr) {
+  const displayNames = {};
+  const re = /([^\s]+)\[([^\]]*)\]/g; // handle 'field[field displayName]'
+  const s = viewStr;
+  let m;
+  do {
+    m = re.exec(s);
+    if (m) {
+      displayNames[m[1]] = m[2];
+    }
+  } while (m);
+
+  const viewStrDisplayNameHandled = viewStr.replace(/\[[^\]]*\]/g, ' ');
+
+  return [displayNames, viewStrDisplayNameHandled]
+};
+
 const generateSourceFile = function (keyname, template, renderObj, outputDir) {
   let renderOptions = {};
   let templateFile = basedirFile(template[0]);
@@ -575,18 +592,7 @@ const generateViewPicture = function (
   indexViewNames,
   selectors
 ) {
-  const displayNames = {};
-  const re = /([^\s]+)\[([^\]]*)\]/g; // handle 'field[field displayName]'
-  const s = viewStr;
-  let m;
-  do {
-    m = re.exec(s);
-    if (m) {
-      displayNames[m[1]] = m[2];
-    }
-  } while (m);
-
-  const viewStrDisplayNameHandled = viewStr.replace(/\[[^\]]*\]/g, ' ');
+  const [displayNames, viewStrDisplayNameHandled] = stripDisplayNames(viewStr);
 
   //process | in viewStr
   let fieldGroups = [];
@@ -646,7 +652,9 @@ const generateViewPicture = function (
     let textarea = false;
     let requiredField = false;
     let mraEmailRecipient = false;
-    let fieldDescription = false;
+    let fieldDescription = '';
+    let keyDescription = '';
+    let valueDescription = '';
     let importantInfo = false;
 
     let flagDate = false;
@@ -674,6 +682,14 @@ const generateViewPicture = function (
       if (fieldSchema.options.description) {
         //scope of map key defined
         fieldDescription = fieldSchema.options.description;
+      }
+      if (fieldSchema.options.keyDescription) {
+        //scope of map key defined
+        keyDescription = fieldSchema.options.keyDescription;
+      }
+      if (fieldSchema.options.valueDescription) {
+        //scope of map key defined
+        valueDescription = fieldSchema.options.valueDescription;
       }
       if (fieldSchema.options.important) {
         //scope of map key defined
@@ -873,6 +889,8 @@ const generateViewPicture = function (
       required: requiredField,
       defaultValue: defaultValue,
       description: fieldDescription,
+      keyDescription,
+      valueDescription,
       important: importantInfo,
       numberMin,
       numberMax,
@@ -1420,7 +1438,10 @@ function main() {
     let listToDetail = 'click';
     let defaultSortField, defaultSortOrder;
     let homeListNumber = 4;
-    let listCategories = []; // object {listCategoryField:xxx, listCategoryShowMore: 'field...', listCategoryRef: 'xxxx', showCategoryCounts: true, showEmptyCategory: false}
+    // object {listCategoryField:xxx, listCategoryShowMore: 'field...',
+    //          listCategoryRef: 'xxxx', showCategoryCounts: true,
+    //          showFieldInList: false, showEmptyCategory: false}
+    let listCategories = []; 
     let listSortFields; // sortable fields name inside the array. 'undefined' will use default sort fields.
 
     let detailActions = []; //extra buttons that trigger other pipelines
@@ -1430,7 +1451,7 @@ function main() {
     let detailRefBlackList = undefined;
     let detailRefName = {};
 
-    let selectActionViewType = 'dropdown';
+    let selectActionViewType = 'dropdown'; // used by list select widget
 
     // internal used
     let listTypes = ['list', 'grid', 'table'];
@@ -1802,11 +1823,22 @@ function main() {
     if (schemaHasEmailing) hasEmailing = true;
 
     //let detailFields = views[1].replace(/\|/g, ' ').match(/\S+/g) || [];
-    let detailSubViewStr = views[1];
-    let briefFields = views[0].replace(/\|/g, ' ').match(/\S+/g) || [];
+
+    let [displayNamesDetail, pureDetailViewStr] = stripDisplayNames(views[1]);
+    let [displayNamesBrief, pureBriefViewStr] = stripDisplayNames(views[0]);
+
+    let detailSubViewStr = pureDetailViewStr;
+    let briefFields = pureBriefViewStr.replace(/\|/g, ' ').match(/\S+/g) || [];
     for (let i of briefFields) {
-      detailSubViewStr = detailSubViewStr.replace(i, '');
+      detailSubViewStr = detailSubViewStr.replace(`(${i})`, '').replace(i, '');
     }
+    let detailSubViewFields = detailSubViewStr.replace(/\|/g, ' ').match(/\S+/g) || [];
+    for (let i of detailSubViewFields) {
+      if (i in displayNamesDetail) {
+        detailSubViewStr = detailSubViewStr.replace(i, `${i}[${displayNamesDetail[i]}]`);
+      }
+    }
+
 
     /* 6. handle fields in detailSubView */
     let [
@@ -1939,6 +1971,8 @@ function main() {
     }
     listCategories = tempListCategories;
     const listCategoryFields = listCategories.map(x=>x.listCategoryField);
+    const listCategoryFieldsNotShown = listCategories.filter(x=> !x.showFieldInList).map(x=>x.listCategoryField);
+
 
     allSelectors = allSelectors.concat(selectors.selectors);
 
@@ -2000,6 +2034,7 @@ function main() {
       listActionButtons,
       listCategories,
       listCategoryFields,
+      listCategoryFieldsNotShown,
       defaultSortField,
       defaultSortFieldDisplay,
       defaultSortOrder,

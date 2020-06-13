@@ -41,7 +41,7 @@
 		const otherFields = briefView.slice(3);
 		for (let [index, field] of otherFields.entries()){
 			if (field.hidden) continue;
-	        if (listCategoryFields.includes(field.fieldName)) continue;
+	        if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
 
 			let fn = field.fieldName; let ft = field.type;;
 			%>

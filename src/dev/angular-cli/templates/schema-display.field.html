@@ -46,6 +46,14 @@
                                 <div>{{detail['<%-fn%>']['selection'][element]}}</div>
                             </div>
                         </ng-template>
+                    </div><%} else if (field.elementType === 'SchemaNumber') {%>
+                    <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+                        <ng-template ngFor let-element [ngForOf]="objectKeys(detail['<%-fn%>']['selection'])" let-idx="index">
+                            <div class="d-flex">
+                                <div class="mr-2">{{element}}:</div>
+                                <div>{{detail['<%-fn%>']['selection'][element]}}</div>
+                            </div>
+                        </ng-template>
                     </div><%}%><%
                 } else if (ft === 'SchemaString') {
                         if (field.editor) {%>

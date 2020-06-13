@@ -4,7 +4,7 @@
 		        <th scope="col">#</th>
 <%_ for (let field of briefView){
 				if (field.hidden) continue;
-				if (listCategoryFields.includes(field.fieldName)) continue;
+				if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
 				if (field.sortable) { %>
 				<th class="pointer" scope="col" (click)="toggleListSort('<%-field.fieldName%>', '<%-field.displayName%>')">
 					<%-field.displayName%>

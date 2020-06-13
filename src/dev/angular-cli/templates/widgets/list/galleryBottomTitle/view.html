@@ -42,12 +42,12 @@
 					const otherFields = briefView.slice(3);
 					for (let [index, field] of otherFields.entries()){
 						if (field.hidden) continue;
-						if (listCategoryFields.includes(field.fieldName)) continue;
+						if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
 				
 						let fn = field.fieldName; let ft = field.type;;
 						%>
 					<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="detail['<%-fn%>']"<%}%> class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (ft !== 'AngularSelector') {%>
-						<div class="field-label text-right w-50" [ngStyle]="style['<%-fn%>-label']">
+						<div class="field-label bottome-field-label" [ngStyle]="style['<%-fn%>-label']">
 							<%-field.displayName%>:
 						</div><%}%>
 						<div class="<%_ if (ft !== 'AngularSelector') {%>ml-1 <%}%>text-left" [ngStyle]="style['<%-fn%>-value']">
