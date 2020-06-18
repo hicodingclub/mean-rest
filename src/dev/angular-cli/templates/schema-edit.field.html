@@ -1,25 +1,22 @@
-<div *ngIf="!hiddenFields.includes('<%-fn%>')">
     <%_ if (field.type === "SchemaString") { %><%
-      if (!field.editor && !field.picture && !field.file) { %>
-        <fieldset class="form-group">
-          <label for="Edit<%-Fn%>"><%-fD%></label>
-          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
-          <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
-        <%_ if (field.enumValues) { %>
-          <div class="form-check"
-            <%_ if (field.required) {%>
+      if (!field.editor && !field.picture && !field.file) { %><%_
+        if (field.enumValues) { %>
+          <div class="form-check"<%_
+            if (field.required) {%>
               [ngClass]="{'ng-valid': enums['<%-fn%>'].includes(detail['<%-fn%>']),
-                          'ng-invalid': !enums['<%-fn%>'].includes(detail['<%-fn%>'])}"
-            <% } else { %>
+                          'ng-invalid': !enums['<%-fn%>'].includes(detail['<%-fn%>'])}"<%
+            } else { %>
               [ngClass]="{'ng-valid': true} "<%_ } %>
-            >
-            <%_ field.enumValues.forEach( (f) => { %>
+            ><%_
+            field.enumValues.forEach( (f) => { %>
             <div class="form-check-inline">
               <input type="radio" name="Edit<%-Fn%>"
-                class="form-check-input"
-                <%if (field.required) {%>required<%}%>
-                id="Edit<%-Fn%><%-f%>" [value]="'<%-f%>'"
-                <%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%>
+                class="form-check-input"<%
+              if (field.required) {%>
+                required<%}%>
+                id="Edit<%-Fn%><%-f%>" [value]="'<%-f%>'"<%
+              if (field.validators) {%>
+                <%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%>
                 [(ngModel)]="detail['<%-fn%>']"
                 #Edit<%-Fn%>="ngModel">
               <label class="form-check-label"><%-f%></label>
@@ -29,47 +26,52 @@
               class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
               <i class="fas fa-times-circle" title="Clear"></i>
             </span> <%}%>
-          </div>
-        <%_ } else { %>
+          </div><%_
+        } else { %>
           <div class="input-group"><%if (!field.textarea) {%>
             <input type="text" class="form-control rounded" id="Edit<%-Fn%>" <%} else {%>
-            <textarea rows="8" class="form-control rounded" id="Edit<%-Fn%>"<%}%>
-                    <%if (field.required) {%>required<%}%>
-                    <%if (typeof field.minlength === 'number') {%>minlength="<%-field.minlength%>"<%}%>
-                    <%if (typeof field.maxlength === 'number') {%>maxlength="<%-field.maxlength%>"<%}%>
-                <%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%>
+            <textarea rows="8" class="form-control rounded" id="Edit<%-Fn%>"<%}%><%
+                  if (field.required) {%>
+                    required<%}%><%
+                  if (typeof field.minlength === 'number') {%>
+                    minlength="<%-field.minlength%>"<%}%><%
+                  if (typeof field.maxlength === 'number') {%>
+                    maxlength="<%-field.maxlength%>"<%}%><%
+                  if (field.validators) {%>
+                    <%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%>
                     [(ngModel)]="detail['<%-fn%>']" name="Edit<%-Fn%>"
-                    #Edit<%-Fn%>="ngModel"><%if (field.textarea) {%></textarea><%}%>
+                    #Edit<%-Fn%>="ngModel"><%if (field.textarea) {%>
+            </textarea><%}%>
             <div *ngIf="detail['<%-fn%>']"
                   class="input-group-append icon-clear-inside " (click)="clearValueFromDetail('<%-fn%>')">
                   <i class="fas fa-times-circle" title="Clear"></i>
             </div>
-          </div>
-        <%_ } %>
+          </div><%_
+        } %>
           <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.pristine || Edit<%-Fn%>.errors.minlength"
-           class="alert alert-danger">
-            <%_if (field.required) {%>
+           class="alert alert-danger"><%_
+            if (field.required) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.required">
               <%-Fn%> is required.
-              </div><%}%>
-          <%_if (field.validators) {%>
+            </div><%}%><%_
+            if (field.validators) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>">
                 {{Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>}}
-              </div><%}%> 
-            <%_if (typeof field.maxlength === 'number') {%>
+              </div><%}%><%_
+            if (typeof field.maxlength === 'number') {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.maxlength">
                 <%-Fn%> must be at most <%-field.maxlength%> characters long.
-              </div><%}%>
-          </div>
-          <%_if (typeof field.minlength === 'number') {%>
+            </div><%}%>
+          </div><%_
+          if (typeof field.minlength === 'number') {%>
           <div [hidden]="Edit<%-Fn%>.valid || !Edit<%-Fn%>.touched || !Edit<%-Fn%>.errors.minlength"
            class="alert alert-danger">
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.minlength">
                 <%-Fn%> must be at least <%-field.minlength%> characters long.
               </div>
-          </div><%}%>
+          </div><%}%><%_
 
-          <%_ if (!field.enumValues && field.hint) {%>
+          if (!field.enumValues && field.hint) {%>
           <div class="new-area">
               <div *ngIf="editHintFields['<%-fn%>'].length > 0" style="font-size: 0.9rem;">Type in new value or select from available ones: </div>
               <ng-template ngFor let-hintEle [ngForOf]="editHintFields['<%-fn%>']" let-i="index">
@@ -79,49 +81,38 @@
                     {{hintEle['_id']}}
                 </div>
               </ng-template>
-          </div><%_ }%>
-
-        </fieldset>
-      <%_ } else if (field.editor) { %>
-        <fieldset class="form-group">
-          <label for="Edit<%-Fn%>"><%-fD%></label>
-          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
-          <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
+          </div><%_ }%><%_
+      } else if (field.editor) { %>
           <div libMddsRichtext="Edit<%-Fn%>" [content]="detail['<%-fn%>']"></div>
           <div class="action-buttons my-3" style="margin-top: 10px;">
             <button type="button" class="btn btn-outline-success" (click)="onEdtiorPreview('Edit<%-Fn%>')">Preview</button>
           </div>
         
           <div [hidden]="Edit<%-Fn%>.valid"
-           class="alert alert-danger">
-            <%_if (field.required) {%>
+           class="alert alert-danger"><%_
+            if (field.required) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.required">
               <%-Fn%> is required.
-              </div><%}%>
-          <%_if (field.validators) {%>
+            </div><%}%><%_
+            if (field.validators) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>">
                 {{Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>}}
-              </div><%}%> 
-            <%_if (typeof field.maxlength === 'number') {%>
+            </div><%}%><%_
+            if (typeof field.maxlength === 'number') {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.maxlength">
                 <%-Fn%> must be at most <%-field.maxlength%> characters long.
-              </div><%}%>
-            <%_if (typeof field.minlength === 'number') {%>
-             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.minlength">
+            </div><%}%><%_
+            if (typeof field.minlength === 'number') {%>
+            <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.minlength">
                 <%-Fn%> must be at least <%-field.minlength%> characters long.
             </div><%}%>        
-          </div>
-        </fieldset>
-      <%_ } else if (field.picture) {%>
-        <fieldset class="form-group">
-          <label for="Edit<%-Fn%>"><%-fD%></label>
-          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
-          <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
-          <div class="form-check"
-              <%_ if (field.required) {%>
+          </div><%_
+      } else if (field.picture) {%>
+          <div class="form-check"<%_
+              if (field.required) {%>
                 [ngClass]="{'ng-valid': detail['<%-fn%>'],
-                            'ng-invalid': !detail['<%-fn%>']}"
-              <% } else { %>
+                            'ng-invalid': !detail['<%-fn%>']}"<%
+              } else { %>
                 [ngClass]="{'ng-valid': true} "<%_ } %>
               >
               <input type="text" class="form-control rounded" id="Edit<%-Fn%>" style="display: none;"
@@ -137,33 +128,30 @@
               </span>     
           </div>
           <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.pristine"
-            class="alert alert-danger">
-             <%_if (field.required) {%>
+            class="alert alert-danger"><%_
+              if (field.required) {%>
               <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.required">
                <%-Fn%> is required.
               </div><%}%>
-          </div>
-        </fieldset>				
-      <%_ } else if (field.file) { %>
-      <%_ } %>
-    <%_ } else if (field.type === "SchemaBoolean") { %>
-        <fieldset class="form-group">
-          <label for="Edit<%-Fn%>"><%-fD%></label>
-          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
-          <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
-          <div class="form-check"
-            <%_ if (field.required) {%>
+          </div><%_
+      } else if (field.file) { %>
+      <%_ } %><%_
+    } else if (field.type === "SchemaBoolean") { %>
+          <div class="form-check"<%_
+            if (field.required) {%>
               [ngClass]="{'ng-valid': detail['<%-fn%>'] == true || detail['<%-fn%>'] == false,
-                          'ng-invalid': detail['<%-fn%>'] != true && detail['<%-fn%>'] != false}"
-            <% } else { %>
+                          'ng-invalid': detail['<%-fn%>'] != true && detail['<%-fn%>'] != false}"<%
+            } else { %>
               [ngClass]="{'ng-valid': true} "<%_ } %>
             >
             <div class="form-check-inline">
               <input type="radio" name="Edit<%-Fn%>" 
                 class="form-check-input"
-                id="Edit<%-Fn%>Yes" [value]="true" 
-                <%if (field.required) {%>required<%}%>
-                <%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
+                id="Edit<%-Fn%>Yes" [value]="true"<%
+                if (field.required) {%>
+                required<%}%><%
+                if (field.validators) {%>
+                <%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
                 [(ngModel)]="detail['<%-fn%>']"
                 #Edit<%-Fn%>="ngModel">
               <label class="form-check-label">Yes</label>
@@ -171,9 +159,11 @@
             <div class="form-check-inline">
               <input type="radio" name="Edit<%-Fn%>" 
                 class="form-check-input"
-                id="Edit<%-Fn%>No" [value]="false"
-                <%if (field.required) {%>required<%}%>
-                <%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
+                id="Edit<%-Fn%>No" [value]="false"<%
+                if (field.required) {%>
+                required<%}%><%
+                if (field.validators) {%>
+                <%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
                 [(ngModel)]="detail['<%-fn%>']"
                 #Edit<%-Fn%>="ngModel">
               <label class="form-check-label">No</label>
@@ -184,61 +174,59 @@
             </div> <%}%>
           </div>
           <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.pristine"
-           class="alert alert-danger">
-            <%_if (field.required) {%>
+           class="alert alert-danger"><%_
+            if (field.required) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.required">
               <%-Fn%> is required.
             </div><%}%><%_if (field.validators) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>">
                 {{Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>}}
             </div><%}%> 
-          </div>
-        </fieldset>
-    <%_ } else if (field.type === "SchemaNumber") { %>
-        <fieldset class="form-group">
-          <label for="Edit<%-Fn%>"><%-fD%></label>
-          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
-          <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
-          <%if (field.mraType === 'currency'){%><span class="currency">$</span><%}%>
-          <input type="number" class="form-control" id="Edit<%-Fn%>" 
-                  <%if (typeof field.numberMin === 'number') {%>libMddsMinNumber="<%-field.numberMin%>" min="<%-field.numberMin%>"<%}%>
-                  <%if (typeof field.numberMax === 'number') {%>libMddsMaxNumber="<%-field.numberMax%>" max="<%-field.numberMax%>"<%}%>
-                  <%if (field.required) {%>required<%}%>
-              <%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
+          </div><%_
+    } else if (field.type === "SchemaNumber") { %><%
+          if (field.mraType === 'currency'){%>
+          <span class="currency">$</span><%}%>
+          <input type="number" class="form-control" id="Edit<%-Fn%>"<% 
+                if (typeof field.numberMin === 'number') {%>
+                  libMddsMinNumber="<%-field.numberMin%>" min="<%-field.numberMin%>"<%}%><%
+                if (typeof field.numberMax === 'number') {%>
+                  libMddsMaxNumber="<%-field.numberMax%>" max="<%-field.numberMax%>"<%}%><%
+                if (field.required) {%>
+                  required<%}%><%
+                if (field.validators) {%>
+                  <%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
                   [(ngModel)]="detail['<%-fn%>']" name="Edit<%-Fn%>"
                   #Edit<%-Fn%>="ngModel">
           <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.pristine || Edit<%-Fn%>.errors.libMddsMinNumber"
-           class="alert alert-danger">
-            <%_if (field.required) {%>
+           class="alert alert-danger"><%_
+            if (field.required) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.required">
               <%-Fn%> is required.
-              </div><%}%>
-          <%_if (field.validators) {%>
+              </div><%}%><%_
+            if (field.validators) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>">
                 {{Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>}}
-            </div><%}%> 
-            <%_if (typeof field.numberMax === 'number') {%>
+            </div><%}%><%_
+            if (typeof field.numberMax === 'number') {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.libMddsMaxNumber">
               <%-Fn%> must not be greater than <%-field.numberMax%>
             </div><%}%>
-          </div>
-          <%_if (typeof field.numberMin === 'number') {%>
+          </div><%_
+          if (typeof field.numberMin === 'number') {%>
           <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.untouched || !Edit<%-Fn%>.errors.libMddsMinNumber"
            class="alert alert-danger">
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.libMddsMinNumber">
               <%-Fn%> must not be less than <%-field.numberMin%>
             </div>
-          </div><%}%>
-        </fieldset>
-    <%_ } else if (field.type === "SchemaDate") { %>
-        <fieldset class="form-group">
-          <label for="Edit<%-Fn%>"><%-fD%> </label> <span> ({{dateFormat}})</span>
-          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
-          <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
+          </div><%}%><%_
+    } else if (field.type === "SchemaDate") { %>
+          <span> ({{dateFormat}})</span>
           <div class="input-group">
-            <input class="form-control" id="Edit<%-Fn%>" placeholder="{{dateFormat}}"
-                    <%if (field.required) {%>required<%}%>
-                <%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
+            <input class="form-control" id="Edit<%-Fn%>" placeholder="{{dateFormat}}"<%
+                if (field.required) {%>
+                  required<%}%><%
+                if (field.validators) {%>
+                  <%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
                   [(ngModel)]="detail['<%-fn%>']['date']" name="Edit<%-Fn%>"
                   ngbDatepicker [minDate]="minDate" #Edit<%-Fn%>Date="ngbDatepicker" #Edit<%-Fn%>="ngModel">
             <div class="input-group-append">
@@ -248,36 +236,33 @@
             </div>
           </div><!-- input group -->         
           <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.pristine || (Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.ngbDate)"
-               class="alert alert-danger">
-            <%_if (field.required) {%>
+               class="alert alert-danger"><%_
+            if (field.required) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.required && !(detail['<%-fn%>']?.date)">
               <%-Fn%> is required.
-              </div><%}%>
-          <%_if (field.validators) {%>
+            </div><%}%><%_
+            if (field.validators) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>">
                 {{Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>}}
-              </div><%}%> 
+            </div><%}%> 
           </div>
           <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.untouched || !(Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.ngbDate)"
            class="alert alert-danger">
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.ngbDate">
               <%-Fn%> must be in {{dateFormat}} format.
               </div>
-          </div>
-        </fieldset>
-    <%_ } else if (field.type === "ObjectId") { %>
-        <fieldset class="form-group">
-          <label for="Edit<%-Fn%>"><%-fD%> </label>
-          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
-          <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
+          </div><%_
+    } else if (field.type === "ObjectId") { %>
           <!-- <a class="icon-search" [routerLink]="['.']" (click)="onRefSelect('<%-field.fieldName%>')"><i class="fas fa-list" title="Search"></i></a>  -->
           <div class="input-group">
             <!--  [attr.disabled]="true" -->
               <input class="form-control rounded" id="Edit<%-Fn%>" 
                   [ngClass]="{'pointer ref-badge': detail['<%-fn%>']['_id']}"
-                  (focus)="onRefSelect('<%-fn%>')"
-                    <%if (field.required) {%>required<%}%>
-                <%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
+                  (focus)="onRefSelect('<%-fn%>')"<%
+                if (field.required) {%>
+                  required<%}%><%
+                if (field.validators) {%>
+                  <%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
                   [ngModel]="detail['<%-fn%>']['value']" name="Edit<%-Fn%>"
                   #Edit<%-Fn%>="ngModel"> 
               <div *ngIf="detail['<%-fn%>']['value']" 
@@ -286,26 +271,22 @@
               </div>
           </div>
           <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.pristine"
-               class="alert alert-danger">
-            <%_if (field.required) {%>
+               class="alert alert-danger"><%_
+            if (field.required) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.required && !(detail['<%-fn%>']?.date)">
               <%-Fn%> is required.
-              </div><%}%>
-          <%_if (field.validators) {%>
+            </div><%}%><%_
+            if (field.validators) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>">
                 {{Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>}}
-              </div><%}%> 
-          </div>
-        </fieldset>
-    <%_ } else if (field.type === "Map") { %>
-        <fieldset class="form-group">
-          <label for="Edit<%-Fn%>"><%-fD%></label>
-          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
-          <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
-        <%_ if (field.elementType === "SchemaString" || field.elementType === "SchemaNumber") { %>
+            </div><%}%> 
+          </div><%_
+    } else if (field.type === "Map") { %><%_
+        if (field.elementType === "SchemaString" || field.elementType === "SchemaNumber") { %>
           <div class="form-check"
-              ngModelGroup="Edit<%-Fn%>"
-              <%if (field.required) {%>directive<%-Mn%>MapRequired<%}%>
+              ngModelGroup="Edit<%-Fn%>"<%
+            if (field.required) {%>
+              directive<%-Mn%>MapRequired<%}%>
               #Edit<%-Fn%>="ngModelGroup"
           >
             <div class="row small">
@@ -323,17 +304,22 @@
                 <label class="form-check-label small col-12 col-md-5">{{key}}: </label>
                 <div class="col-12 col-md-5"><%_
                   if (field.elementType === "SchemaString") { %>
-                  <input type="text" class="form-control form-control-sm" id="<%-Fn%>Element{{idx}}"
-                      <%if (typeof field.minlength === 'number') {%>minlength="<%-field.minlength%>"<%}%>
-                      <%if (typeof field.maxlength === 'number') {%>maxlength="<%-field.maxlength%>"<%}%>
-                      <%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%>
+                  <input type="text" class="form-control form-control-sm" id="<%-Fn%>Element{{idx}}"<%
+                    if (typeof field.minlength === 'number') {%>
+                      minlength="<%-field.minlength%>"<%}%><%
+                    if (typeof field.maxlength === 'number') {%>
+                      maxlength="<%-field.maxlength%>"<%}%><%
+                    if (field.validators) {%>
+                      <%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%>
                       [(ngModel)]="detail['<%-fn%>']['selection'][key]" name="<%-Fn%>Element{{idx}}"
-                      #<%-Fn%>Element{{idx}}="ngModel"> <%_}
-                  else if (field.elementType === "SchemaNumber") { %>
-                  <input type="number" class="form-control  form-control-sm" id="<%-Fn%>Element{{idx}}"
-                      <%if (typeof field.numberMin === 'number') {%>libMddsMinNumber="<%-field.numberMin%>" min="<%-field.numberMin%>"<%}%>
-                      <%if (typeof field.numberMax === 'number') {%>libMddsMaxNumber="<%-field.numberMax%>" max="<%-field.numberMax%>"<%}%>
-                      <%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%>
+                      #<%-Fn%>Element{{idx}}="ngModel"> <%_
+                  } else if (field.elementType === "SchemaNumber") { %>
+                  <input type="number" class="form-control  form-control-sm" id="<%-Fn%>Element{{idx}}"<%
+                    if (typeof field.numberMin === 'number') {%>
+                      libMddsMinNumber="<%-field.numberMin%>" min="<%-field.numberMin%>"<%}%><%
+                    if (typeof field.numberMax === 'number') {%>
+                      libMddsMaxNumber="<%-field.numberMax%>" max="<%-field.numberMax%>"<%}%><%
+                    if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%>
                       [(ngModel)]="detail['<%-fn%>']['selection'][key]" name="<%-Fn%>Element{{idx}}"
                       #<%-Fn%>Element{{idx}}="ngModel"> <%_}%>
                 </div>
@@ -346,21 +332,21 @@
                            || Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].valid
                            || Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].pristine
                            || Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors.minlength"
-                    class="alert alert-danger small p-1">
-                <%_if (field.validators) {%>
+                    class="alert alert-danger small p-1"><%_
+                if (field.validators) {%>
                 <div *ngIf="Edit<%-Fn%>.control.controls && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx]
                           && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors
                           && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors.<%-mn%><%-Sn%>Directive<%-Fn%>">
                   {{Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors.<%-mn%><%-Sn%>Directive<%-Fn%>}}
-                </div><%}%>
-                <%_if (typeof field.maxlength === 'number') {%>
+                </div><%}%><%_
+                if (typeof field.maxlength === 'number') {%>
                 <div *ngIf="Edit<%-Fn%>.control.controls && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx]
                           && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors
                           && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors.maxlength">
                   Value must be at most <%-field.maxlength%> characters long.
                 </div><%}%>
-              </div>
-              <%_if (typeof field.minlength === 'number') {%>
+              </div><%_
+              if (typeof field.minlength === 'number') {%>
               <div [hidden]="!Edit<%-Fn%>.control.controls || !Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx]
                           || Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].valid
                           || !Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].touched
@@ -371,27 +357,27 @@
                           && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors.minlength">
                   Value must be at least <%-field.minlength%> characters long.
                 </div>
-              </div><%}%><%_}
-            else if (field.elementType === "SchemaNumber") { %>
+              </div><%}%><%_
+            } else if (field.elementType === "SchemaNumber") { %>
               <div [hidden]="!Edit<%-Fn%>.control.controls || !Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx]
                            || Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].valid
                            || Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].pristine
                            || Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors.libMddsMinNumber"
-                    class="alert alert-danger small p-1">
-                <%_if (field.validators) {%>
+                    class="alert alert-danger small p-1"><%_
+                if (field.validators) {%>
                 <div *ngIf="Edit<%-Fn%>.control.controls && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx]
                           && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors
                           && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors.<%-mn%><%-Sn%>Directive<%-Fn%>">
                   {{Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors.<%-mn%><%-Sn%>Directive<%-Fn%>}}
-                </div><%}%>
-                <%_if (typeof field.numberMax === 'number') {%>
+                </div><%}%><%_
+                if (typeof field.numberMax === 'number') {%>
                 <div *ngIf="Edit<%-Fn%>.control.controls && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx]
                           && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors
                           && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors.libMddsMaxNumber">
                   Value must not be greater than <%-field.numberMax%>.
                 </div><%}%>
-              </div>
-              <%_if (typeof field.numberMin === 'number') {%>
+              </div><%_
+              if (typeof field.numberMin === 'number') {%>
               <div [hidden]="!Edit<%-Fn%>.control.controls || !Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx]
                           || Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].valid
                           || !Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].touched
@@ -402,10 +388,10 @@
                           && Edit<%-Fn%>.control.controls['<%-Fn%>Element'+idx].errors.libMddsMinNumber">
                   Value must not be less than <%-field.numberMin%>.
                 </div>
-              </div><%}%>  <%_}%>
+              </div><%}%><%_
+            }%>
             </ng-template>
             </ng-template>
-
             <div class="row">
               <div class="input-group input-group-sm col-12 col-md-7">
                   <input type="search" class="form-control border"
@@ -423,26 +409,22 @@
             </div>
           </div><%_
         } else { %>
-          <div>Not supported yet.</div>
-        <%_ } %>
-          <%_if (field.required) {%>
+          <div>Not supported yet.</div><%_
+        } %><%_
+          if (field.required) {%>
           <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.required"
               class="alert alert-danger">
              <%-Fn%> is required.
-          </div><%}%>
-        </fieldset>
-    <%_ } else if (field.type === "SchemaArray") { %>
-        <fieldset class="form-group">
-          <label for="Edit<%-Fn%>"><%-fD%></label>
-          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
-          <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
-        <%_ if (field.elementType === "SchemaString" && field.enumValues && field.elementUnique) { %>
+          </div><%}%><%_
+    } else if (field.type === "SchemaArray") { %><%_
+        if (field.elementType === "SchemaString" && field.enumValues && field.elementUnique) { %>
           <div class="form-check"
-                ngModelGroup="Edit<%-Fn%>"
-                <%if (field.required) {%>directive<%-Mn%>MultiSelectionRequired<%}%>
+                ngModelGroup="Edit<%-Fn%>"<%
+              if (field.required) {%>
+                directive<%-Mn%>MultiSelectionRequired<%}%>
                 #Edit<%-Fn%>="ngModelGroup" 
-            >
-            <%_ field.enumValues.forEach( (f, index) => {
+            ><%_
+            field.enumValues.forEach( (f, index) => {
               const fd = f.trim().replace(/\s+/g, '');
             %>
             <div class="form-check-inline">
@@ -452,17 +434,17 @@
                 [(ngModel)]="detail['<%-fn%>']['selection']['<%-f%>']"
                 #Edit<%-Fn%><%-fd%>="ngModel">
               <label class="form-check-label"><%-f%></label>
-            </div>
-          <%_ }) %>
+            </div><%_ }) %>
             <span *ngIf="multiselectionSelected('<%-fn%>')" 
               class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
               <i class="fas fa-times-circle" title="Clear"></i>
             </span>
-          </div>
-        <%_ } else if (field.elementType === 'SchemaString' && field.picture) { %>
+          </div><%_
+        } else if (field.elementType === 'SchemaString' && field.picture) { %>
           <div class="form-check"
-                ngModelGroup="Edit<%-Fn%>"
-                <%if (field.required) {%>directive<%-Mn%>ArrayRequired<%}%>
+                ngModelGroup="Edit<%-Fn%>"<%
+              if (field.required) {%>
+                directive<%-Mn%>ArrayRequired<%}%>
                 #Edit<%-Fn%>="ngModelGroup" 
             >
             <div class="d-flex align-items-center">
@@ -493,11 +475,12 @@
                 (downloadUrlChange)="detail['<%-fn%>']['new'] = $event; onAddArrayItem('<%-fn%>')">
               </lib-mdds-file-select>
             </div>
-          </div>
-        <%_ } else if (field.elementType === 'SchemaString') { %>
+          </div><%_
+        } else if (field.elementType === 'SchemaString') { %>
           <div class="form-check"
-                ngModelGroup="Edit<%-Fn%>"
-                <%if (field.required) {%>directive<%-Mn%>ArrayRequired<%}%>
+                ngModelGroup="Edit<%-Fn%>"<%
+              if (field.required) {%>
+                directive<%-Mn%>ArrayRequired<%}%>
                 #Edit<%-Fn%>="ngModelGroup" 
             >
             <div class="badge-group" *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
@@ -514,8 +497,8 @@
 
             <hr>
 
-            <div class="new-area">
-              <%_ if (field.hint) {%>
+            <div class="new-area"><%
+              if (field.hint) {%>
                 <div *ngIf="editHintFields['<%-fn%>'].length > 0" style="font-size: 0.9rem;">Select from Available <%-fD%>: </div>
                 <ng-template ngFor let-hintEle [ngForOf]="editHintFields['<%-fn%>']" let-i="index">
                   <div class="badge badge-pill badge-primary pointer"
@@ -523,8 +506,7 @@
                     (click)="onAddArrayItemValue('<%-fn%>', hintEle['_id'])">
                       {{hintEle['_id']}}
                   </div>
-                </ng-template>
-                <%_ }%>
+                </ng-template><%_ }%>
                 <div class="mt-1">
                   <a class="pointer" routerLink="." (click)="onAddArrayItemClicked('<%-fn%>')"
                     style="font-size: 0.75rem;">
@@ -538,28 +520,30 @@
                 <div class="card-body">
                   <input type="search" class="form-control border"
                     id="Edit<%-Fn%>New" #Edit<%-Fn%>New="ngModel"
-                    [(ngModel)]="detail['<%-fn%>']['new']" [ngModelOptions]="{standalone: true}"
-                          <%if (typeof field.minlength === 'number') {%>minlength="<%-field.minlength%>"<%}%>
-                          <%if (typeof field.maxlength === 'number') {%>maxlength="<%-field.maxlength%>"<%}%>
-                      <%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
+                    [(ngModel)]="detail['<%-fn%>']['new']" [ngModelOptions]="{standalone: true}"<%
+                  if (typeof field.minlength === 'number') {%>
+                    minlength="<%-field.minlength%>"<%}%><%
+                  if (typeof field.maxlength === 'number') {%>
+                    maxlength="<%-field.maxlength%>"<%}%><%
+                  if (field.validators) {%>
+                    <%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
                     (keydown.enter)="$event.target.blur();onAddArrayItem('<%-fn%>');false"> 
-                  
                   <div [hidden]="Edit<%-Fn%>New.valid
                       || Edit<%-Fn%>New.pristine 
                       || Edit<%-Fn%>New.errors.minlength"
-                        class="alert alert-danger small p-1">
-                  <%_if (field.validators) {%>
+                        class="alert alert-danger small p-1"><%_
+                  if (field.validators) {%>
                     <div *ngIf="Edit<%-Fn%>New.errors 
                                 && Edit<%-Fn%>New.errors.<%-mn%><%-Sn%>Directive<%-Fn%>">
                         {{Edit<%-Fn%>New.errors.<%-mn%><%-Sn%>Directive<%-Fn%>}}
-                    </div><%}%> 
-                    <%_if (typeof field.maxlength === 'number') {%>
+                    </div><%}%><%_
+                  if (typeof field.maxlength === 'number') {%>
                     <div *ngIf="Edit<%-Fn%>New.errors 
                                 && Edit<%-Fn%>New.errors.maxlength">
                         Value must be at most <%-field.maxlength%> characters long.
                     </div><%}%>
-                  </div>
-                  <%_if (typeof field.minlength === 'number') {%>
+                  </div><%_
+                  if (typeof field.minlength === 'number') {%>
                   <div [hidden]="Edit<%-Fn%>New.valid 
                                 || !Edit<%-Fn%>New.touched 
                                 || !Edit<%-Fn%>New.errors.minlength"
@@ -569,7 +553,6 @@
                         Value must be at least <%-field.minlength%> characters long.
                     </div>
                   </div><%}%>
-
                   <div class="d-flex my-3 justify-content-center">
                     <button class="btn btn-outline-primary mx-1" [disabled]="!Edit<%-Fn%>New.valid" (click)="onAddArrayItem('<%-fn%>')">Confirm</button>
                     <button class="btn btn-outline-secondary mx-1" (click)="onAddArrayItemCancelled('<%-fn%>')">Cancel</button>
@@ -577,18 +560,18 @@
                 </div>
               </div>
             </div>
-
             <!-- fake hidden input ngModel for directive to check the values-->
             <input type="checkbox" name="Edit<%-Fn%>Selection" 
                style="display:none"
                id="Edit<%-Fn%>Selection"
                  [(ngModel)]="detail['<%-fn%>']['selection'].length" 
                  #Edit<%-Fn%>Selection="ngModel">
-          </div>
-         <%_ } else if (field.elementType === 'ObjectId') { %>
+          </div><%_
+        } else if (field.elementType === 'ObjectId') { %>
           <div class="form-check"
-            ngModelGroup="Edit<%-Fn%>"
-            <%if (field.required) {%>directive<%-Mn%>ArrayRequired<%}%>
+            ngModelGroup="Edit<%-Fn%>"<%
+          if (field.required) {%>
+            directive<%-Mn%>ArrayRequired<%}%>
             #Edit<%-Fn%>="ngModelGroup" 
           >
             <ng-template [ngIf]="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
@@ -610,24 +593,17 @@
               id="Edit<%-Fn%>Selection"
                 [(ngModel)]="detail['<%-fn%>']['selection'].length" 
                 #Edit<%-Fn%>Selection="ngModel">
-          </div>
-        <%_ } else { %>
-          <div>Not supported yet.</div>
-        <%_ } %>
+          </div><%_
+        } else { %>
+          <div>Not supported yet.</div><%_
+        } %>
           <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.pristine"
-           class="alert alert-danger">
-            <%_if (field.required) {%>
+           class="alert alert-danger"><%
+            if (field.required) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.required">
               <%-Fn%> is required.
-              </div><%}%>
-          </div>
-        </fieldset>
-    <%_ } else { %>
-          <fieldset class="form-group">
-          <label for="Edit<%-Fn%>"><%-fD%></label>
-          <%if (field.important) {%><span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%>
-          <%if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%>
-          <div>Not supported yet.</div>
-        </fieldset>
-    <%_ } %>    
-</div>
+            </div><%}%>
+          </div><%_
+    } else { %>
+          <div>Not supported yet.</div><%_
+    } %>

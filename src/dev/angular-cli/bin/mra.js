@@ -21,6 +21,8 @@ const readline = require('readline');
 const sortedObject = require('sorted-object');
 const util = require('util');
 
+const humanize = require('string-humanize')
+
 const MODE_0666 = parseInt('0666', 8);
 const MODE_0755 = parseInt('0755', 8);
 const TEMPLATE_DIR = path.join(__dirname, '..', 'templates');
@@ -77,10 +79,7 @@ const camelToDisplay = function (str) {
     'An',
     'The',
   ];
-  let arr = str
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/_/g, ' ')
-    .match(/\S+/g);
+  let arr = humanize(str).split(' ');
   arr = arr.map((x) => {
     let y = capitalizeFirst(x);
     if (words.includes(y)) y = lowerFirst(y);
@@ -377,7 +376,7 @@ const PredefinedPatchFields = {
 
 const stripDisplayNames = function (viewStr) {
   const displayNames = {};
-  const re = /([^\s]+)\[([^\]]*)\]/g; // handle 'field[field displayName]'
+  const re = /([^\s\|]+)\[([^\]]*)\]/g; // handle 'field[field displayName]'
   const s = viewStr;
   let m;
   do {
@@ -387,9 +386,41 @@ const stripDisplayNames = function (viewStr) {
     }
   } while (m);
 
-  const viewStrDisplayNameHandled = viewStr.replace(/\[[^\]]*\]/g, ' ');
+  const viewStrDisplayNameHandled = viewStr.replace(/\[[^\]]*\]/g, '');
 
   return [displayNames, viewStrDisplayNameHandled]
+};
+const stripFieldHidden = function (viewStr) {
+  const fieldHidden = {};
+  const re = /\(([^\)]*)\)/g; // handle 'field<fieldMeta>'
+  const s = viewStr;
+  let m;
+  do {
+    m = re.exec(s);
+    if (m) {
+      fieldHidden[m[1]] = true;
+    }
+  } while (m);
+
+  const viewStrHiddenHandled = viewStr.replace(/[\(\)]/g, '');
+
+  return [fieldHidden, viewStrHiddenHandled]
+};
+const stripFieldMeta = function (viewStr) {
+  const fieldMeta = {};
+  const re = /([^\s\|]+)<([^>]*)>/g; // handle 'field<fieldMeta>'
+  const s = viewStr;
+  let m;
+  do {
+    m = re.exec(s);
+    if (m) {
+      fieldMeta[m[1]] = m[2];
+    }
+  } while (m);
+
+  const viewStrMetaHandled = viewStr.replace(/<[^\>]*>/g, '');
+
+  return [fieldMeta, viewStrMetaHandled]
 };
 
 const generateSourceFile = function (keyname, template, renderObj, outputDir) {
@@ -553,36 +584,6 @@ const getPrimitiveField = function (fieldSchema) {
   ];
 };
 
-const processField = function (x) {
-  let hidden = false;
-  let field = x;
-  let matches = x.match(/\((.*?)\)/);
-  if (matches) {
-    hidden = true;
-    field = matches[1];
-  }
-  return [field, hidden];
-};
-
-const processFieldGroups = function (fieldGroups) {
-  //remove surrounding ()
-  for (let arr of fieldGroups) {
-    arr = arr.map((x) => {
-      let [f, hidden] = processField(x);
-      if (hidden) return '';
-      return f;
-    });
-    arr = arr.filter((x) => {
-      return !!x; //remove empty fields
-    });
-  }
-
-  fieldGroups.filter((x) => {
-    return x.length > 0; //remove empty groups
-  });
-
-  return fieldGroups;
-};
 const generateViewPicture = function (
   API,
   schemaName,
@@ -590,32 +591,38 @@ const generateViewPicture = function (
   schema,
   validators,
   indexViewNames,
-  selectors
+  selectors,
+  fieldMeta,
 ) {
-  const [displayNames, viewStrDisplayNameHandled] = stripDisplayNames(viewStr);
+  const [field2Meta, viewStrMetaHandled] = stripFieldMeta(viewStr);
+  const [displayNames, viewStrDisplayNameHandled] = stripDisplayNames(viewStrMetaHandled);
+  const [fieldHidden, viewStrPure] = stripFieldHidden(viewStrDisplayNameHandled);
 
   //process | in viewStr
   let fieldGroups = [];
-  if (viewStrDisplayNameHandled.indexOf('|') > -1) {
-    let strGroups = viewStrDisplayNameHandled.split('|');
+  if (viewStrPure.indexOf('|') > -1) {
+    let strGroups = viewStrPure.split('|');
     for (let str of strGroups) {
       let arr = str.match(/\S+/g);
       if (arr) {
-        fieldGroups.push(arr);
+        arr = arr.filter(x => !fieldHidden[x]);
+        if (arr.length > 0) {
+          fieldGroups.push(arr);
+        }
       }
     }
   }
 
   let viewDef =
-    viewStrDisplayNameHandled.replace(/\|/g, ' ').match(/\S+/g) || [];
+    viewStrPure.replace(/\|/g, ' ').match(/\S+/g) || [];
   if (fieldGroups.length == 0) {
     //no grouping
     for (let e of viewDef) {
-      fieldGroups.push([e]); //each element as a group
+      if (!fieldHidden[e]) {
+        fieldGroups.push([e]); //each element as a group
+      }
     }
   }
-
-  fieldGroups = processFieldGroups(fieldGroups);
 
   let view = [];
   let viewMap = {};
@@ -629,8 +636,8 @@ const generateViewPicture = function (
   let hasEmailing = false;
 
   for (let item of viewDef) {
-    let hidden = false;
-    [item, hidden] = processField(item);
+    let hidden = !!fieldHidden[item];
+    let usedMeta =  field2Meta[item];
 
     let validatorArray;
     if (validators && Array.isArray(validators[item])) {
@@ -672,8 +679,27 @@ const generateViewPicture = function (
     let sortable = false;
 
     let selector;
+    let meta = {};
 
     if (item in schema.paths) {
+      if (usedMeta && fieldMeta && fieldMeta[usedMeta]) { 
+        meta = fieldMeta[usedMeta];
+        let sel = meta.pipe || meta.selector;
+        if (sel) {
+          if (selectors.hasSelector(sel)) {
+            selector = selectors.getSelector(sel);
+            selector.usedCandidate(API);
+          } else {
+            warning(
+              `Selector ${sel} for Field ${item} is not defined. Skipped...`
+            );
+            continue;
+          }
+        }
+      } else if (usedMeta) {
+        warning(`Field meta ${usedMeta} is not defined for field ${item}...`);
+      }
+
       let fieldSchema = schema.paths[item];
       type = fieldSchema.constructor.name;
       requiredField = fieldSchema.originalRequiredValue === true ? true : false;
@@ -837,20 +863,17 @@ const generateViewPicture = function (
       //Handle as a string
       type = 'SchemaString';
       jstype = 'string';
-    } else if (item.startsWith('~')) {
+    } else if (usedMeta && selectors && selectors.hasSelector(usedMeta)) {
       // selector type:
       type = 'AngularSelector';
-      item = item.slice(1);
 
-      if (selectors && selectors.hasSelector(item)) {
-        selector = selectors.getSelector(item);
-        selector.usedCandidate(API);
-      } else {
-        warning(
-          `Field ${item} is not defined in selectors. Skipped...`
-        );
-        continue;
-      }
+      selector = selectors.getSelector(usedMeta);
+      selector.usedCandidate(API);
+    } else if (usedMeta) {
+      warning(
+        `Selector ${usedMeta} for Field ${item} is not defined. Skipped...`
+      );
+      continue;
     } else {
       warning(
         `Field ${item} is not defined in schema ${schemaName}. Skipped...`
@@ -910,6 +933,7 @@ const generateViewPicture = function (
 
       //selector
       selector,
+      meta,
     };
 
     if (fieldPicture.fieldName === 'student') {
@@ -1580,7 +1604,8 @@ function main() {
     if (schemaDef.selectors) {
       selectors = new Selectors(schemaDef.selectors);
     }
-
+    let fieldMeta = schemaDef.fieldMeta || {};
+    
     //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
     if (typeof views !== 'object' || !Array.isArray(views)) {
       console.error(
@@ -1642,7 +1667,8 @@ function main() {
       mongooseSchema,
       validators,
       indexViewNames,
-      selectors
+      selectors,
+      fieldMeta,
     );
     for (let s of indexView) {
       indexViewNames.push(s.fieldName);
@@ -1666,7 +1692,8 @@ function main() {
       mongooseSchema,
       validators,
       indexViewNames,
-      selectors
+      selectors,
+      fieldMeta,
     );
     //console.log('***briefView', briefView);
     //console.log('***hasRef1', hasRef1);
@@ -1692,7 +1719,8 @@ function main() {
       mongooseSchema,
       validators,
       indexViewNames,
-      selectors
+      selectors,
+      fieldMeta,
     );
 
     /* 4. handle fields in createView */
@@ -1714,7 +1742,8 @@ function main() {
       mongooseSchema,
       validators,
       indexViewNames,
-      selectors
+      selectors,
+      fieldMeta,
     );
     setFieldProperty(createView, editHintFields, true, 'hint', true); // if include is "true", set to "true"
 
@@ -1737,7 +1766,8 @@ function main() {
       mongooseSchema,
       validators,
       indexViewNames,
-      selectors
+      selectors,
+      fieldMeta,
     );
     setFieldProperty(editView, editHintFields, true, 'hint', true); // if include is "true", set to "true"
 
@@ -1760,7 +1790,8 @@ function main() {
       mongooseSchema,
       validators,
       indexViewNames,
-      selectors
+      selectors,
+      fieldMeta,
     );
 
     let schemaHasDate = hasDate5 || hasDate6;
@@ -1822,23 +1853,35 @@ function main() {
     if (schemaHasFileUpload) hasFileUpload = true;
     if (schemaHasEmailing) hasEmailing = true;
 
-    //let detailFields = views[1].replace(/\|/g, ' ').match(/\S+/g) || [];
+    let [stripFieldMetaDetail, viewStrMetaHandledDetail] = stripFieldMeta(views[1]);
+    let [displayNamesDetail, viewStrDisplayHandledDetail] = stripDisplayNames(viewStrMetaHandledDetail);
+    let [fieldHiddenDetail, viewStrPureDetail] = stripFieldHidden(viewStrDisplayHandledDetail);
 
-    let [displayNamesDetail, pureDetailViewStr] = stripDisplayNames(views[1]);
-    let [displayNamesBrief, pureBriefViewStr] = stripDisplayNames(views[0]);
+    let [stripFieldMetaBrief, viewStrMetaHandledBrief] = stripFieldMeta(views[0]);
+    let [displayNamesBrief, viewStrDisplayHandledBrief] = stripDisplayNames(viewStrMetaHandledBrief);
+    let [fieldHiddenBrief, viewStrPureBrief] = stripFieldHidden(viewStrDisplayHandledBrief);
 
-    let detailSubViewStr = pureDetailViewStr;
-    let briefFields = pureBriefViewStr.replace(/\|/g, ' ').match(/\S+/g) || [];
-    for (let i of briefFields) {
-      detailSubViewStr = detailSubViewStr.replace(`(${i})`, '').replace(i, '');
-    }
-    let detailSubViewFields = detailSubViewStr.replace(/\|/g, ' ').match(/\S+/g) || [];
-    for (let i of detailSubViewFields) {
-      if (i in displayNamesDetail) {
-        detailSubViewStr = detailSubViewStr.replace(i, `${i}[${displayNamesDetail[i]}]`);
-      }
-    }
+    let briefFields = viewStrPureBrief.replace(/\|/g, ' ').match(/\S+/g) || [];
+    let briefNoHiddenFields = briefFields.filter(x => !fieldHiddenBrief[x]);
 
+    let detailViewGroups = viewStrPureDetail.split('|');
+    detailViewGroups = detailViewGroups.map( detailViewGrp => {
+      let arr = detailViewGrp.match(/\S+/g) || [];
+      arr = arr.filter(x => !briefNoHiddenFields.includes(x) && !fieldHiddenDetail[x]);
+      arr = arr.map(x => {
+        let y = x;
+        if (displayNamesDetail[x]) {
+          y = `${y}[${displayNamesDetail[x]}]`;
+        }
+        if (stripFieldMetaDetail[x]) {
+          y = `${y}<${stripFieldMetaDetail[x]}>`;
+        }
+        return y
+      });
+      return arr.join(' ');
+    });
+    // detailViewGroups = detailViewGroups.filter( detailViewGrp => !!detailViewGrp.trim());
+    let detailSubViewStr = detailViewGroups.join('|');
 
     /* 6. handle fields in detailSubView */
     let [
@@ -1858,7 +1901,8 @@ function main() {
       mongooseSchema,
       validators,
       indexViewNames,
-      selectors
+      selectors,
+      fieldMeta,
     );
 
     let compositeEditView = [];
@@ -1976,6 +2020,11 @@ function main() {
 
     allSelectors = allSelectors.concat(selectors.selectors);
 
+    const selectorsObj = {};
+    selectors.selectors.forEach( x => {
+      selectorsObj[x.name] = x;
+    });
+  
     let schemaObj = {
       name: name,
       moduleName: moduleName,
@@ -2059,7 +2108,8 @@ function main() {
 
       api,
 
-      selectors,
+      selectors: selectorsObj,
+      fieldMeta,
 
       refApi: {},
       refListSelectType: {},
@@ -2190,13 +2240,14 @@ function main() {
   }
 
   const usedSelectors = [];
-  allSelectors = allSelectors.filter(x => {
-    if (x.isUsed() && !usedSelectors.includes(x.name)) {
-      usedSelectors.push(x.name);
+
+  const uniqeSelectors = allSelectors.filter(x => {
+    if (x.isUsed() && !usedSelectors.includes(x.module + x.package)) {
+      usedSelectors.push(x.module + x.package);
       return true;
     }
     return false;
-  })
+  });
 
   let renderObj = {
     moduleName,
@@ -2218,7 +2269,7 @@ function main() {
     timeFormat,
     authRequired,
     fileServer,
-    allSelectors,
+    uniqeSelectors,
 
     generateView,
   };

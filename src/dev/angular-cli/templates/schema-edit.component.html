@@ -12,16 +12,47 @@
 				{{options['subtitle']}}
 			</p>
 			<form (ngSubmit)="onSubmit()" #editForm="ngForm">
+				<ng-template [ngIf]="action == 'Edit'"><%_
+					editView.forEach( (field) => {
+						let fn=field.fieldName, ft = field.type, fD=field.displayName, Fn=field.FieldName;
+						let sn=schemaName, Sn=SchemaName, mn=moduleName, Mn=ModuleName; %>
+					<ng-template [ngIf]="!hiddenFields.includes('<%-fn%>')">
+				<fieldset class="form-group">
+					<label for="Edit<%-Fn%>"><%-fD%></label><%
+					if (field.important) {%>
+					<span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%><%
+					if (field.description) {%><span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%><%
 
-				<div *ngIf="action == 'Edit'">
-					<%_ editView.forEach( (field) => { let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName, Sn=SchemaName, mn=moduleName, Mn=ModuleName;
-%> <%_ include schema-edit.field.html %> <%_ }) %>
-				</div>
-				<div *ngIf="action == 'Create' || action == 'Add' ">
-					<%_ createView.forEach( (field) => { let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName,  Sn=SchemaName, mn=moduleName, Mn=ModuleName;
-%> <%_ include schema-edit.field.html %> <%_ }) %>
-				</div>
+					if (field.meta.readOnly) {%>
+					<div><%include schema-display.field.html %>
+					</div><%_}
+					else {%>
+						<% include schema-edit.field.html %><%}%>
+				</fieldset>
+					</ng-template><%
+					}) %>
+				</ng-template>
+				<ng-template [ngIf]="action == 'Create' || action == 'Add' "><%_
+					createView.forEach( (field) => {
+						let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName;
+						let sn=schemaName, Sn=SchemaName, mn=moduleName, Mn=ModuleName;%>
+					<ng-template [ngIf]="!hiddenFields.includes('<%-fn%>')">
+				<fieldset class="form-group">
+					<label for="Edit<%-Fn%>"><%-fD%></label><%
+					if (field.important) {%>
+					<span><i data-toggle="tooltip" title="<%-field.important%>" class="fas fa-exclamation-circle important-tip"></i></span><%}%><%
+					if (field.description) {%>
+					<span><i data-toggle="tooltip" title="<%-field.description%>" class="far fa-question-circle"></i></span><%}%><%
 
+					if (field.meta.readOnly) {%>
+					<div><%include schema-display.field.html %>
+					</div><%_}
+					else {%>
+						<% include schema-edit.field.html %><%}%>
+				</fieldset>
+					</ng-template><%
+					}) %>
+				</ng-template>
 				<div class="action-buttons-center my-3">
 					<button type="submit" class="btn btn-success" [disabled]="!editForm.form.valid">Submit</button>
 					<button class="btn btn-outline-success" type="button" (click)="editCancel()">Cancel</button>

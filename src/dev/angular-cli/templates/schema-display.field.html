@@ -1,4 +1,9 @@
-                <%_if(ft == 'ObjectId') {
+                <%_let fieldValue = `detail['${fn}']`;
+                    if (field.meta.pipe) {
+                        let pipeSelector = selectors[field.meta.pipe].selector;
+                        fieldValue = fieldValue + ` | ${pipeSelector}`;
+                    }
+                %><%_if(ft == 'ObjectId') {
                     if (typeof ref_link === 'undefined') ref_link = true;
                     let ref_l = false;
 
@@ -64,20 +69,22 @@
                             else isLarge = largePicture;%>
                     <lib-mdds-file-display [downloadUrl]="detail['<%-fn%>']" [isLarge]="<%-isLarge%>" [aspectRatio]="<%-field.aspectRatio%>"></lib-mdds-file-display><%
                         } else if (field.textarea) {%>
-                    <div [innerHTML]="detail['<%-fn%>']"></div><%
+                    <pre [innerHTML]="detail['<%-fn%>']"></pre><%
+                        } else if (field.meta.innerHtml) {%>
+                    <div [innerHTML]="<%-fieldValue%>"></div><%
                         } else if (field.mraType === 'httpurl') {%>
                     <a href="{{detail['<%-fn%>']}}">{{detail['<%-fn%>']}}</a><%
                         } else {%>
-                    {{detail['<%-fn%>']}}<%_
+                    {{<%-fieldValue%>}}<%_
                         }%><%
                 } else if (ft === 'SchemaNumber') {
                         if (field.mraType === 'currency') {%>
-                    $ {{formatCurrency(detail['<%-fn%>'])}}<%
+                    {{ detail['<%-fn%>'] | currency:'USD'}}<%
                         } else {%>
-                    {{detail['<%-fn%>']}}<%_
+                    {{<%-fieldValue%>}}<%_
                         }%><%
                 } else if (ft === 'AngularSelector') { let sel = field.selector;%>
                     <<%-sel.selector%><% for(let input of sel.inputs) {%>
                         [<%-input.key%>]="<%-input.value%>"<%}%>>
                     </<%-sel.selector%>><%
-                } else {%>{{detail['<%-fn%>']}} <%}%>
+                } else {%>{{<%-fieldValue%>}} <%}%>
