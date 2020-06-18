@@ -1,4 +1,4 @@
-export interface ShoppingAddr {
+export interface Address {
   name?: string,
 
   line1: string;
@@ -11,7 +11,7 @@ export interface ShoppingAddr {
   phone?: string,
 }
 
-export const ShoppingAddrToString = function (addr: ShoppingAddr): string {
+export const AddressToString = function (addr: Address): string {
   let str = '';
   if (addr.name) {
     str += `${addr.name}`;

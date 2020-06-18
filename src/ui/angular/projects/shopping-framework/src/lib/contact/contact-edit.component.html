@@ -1,0 +1,48 @@
+<form #editForm="ngForm" (ngSubmit)="onSubmit()">
+    <div>
+        <fieldset class="form-group">
+            <label for="EditName">Contact Person</label>
+            <div class="input-group">
+                <input type="text" class="form-control rounded" id="EditName" required
+                    [(ngModel)]="person" name="EditName" #EditName="ngModel">
+            </div>
+            <div [hidden]="EditName.valid || EditName.pristine || EditName.errors.minlength"
+                class="alert alert-danger">
+                <div *ngIf="EditName.errors && EditName.errors.required">
+                    Contact person is required.
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div>
+        <fieldset class="form-group">
+            <label for="EditEmail">Email</label>
+            <div class="input-group">
+                <input type="text" class="form-control rounded" id="EditEmail" required
+                    [(ngModel)]="email" name="EditEmail" #EditEmail="ngModel">
+            </div>
+            <div [hidden]="EditEmail.valid || EditEmail.pristine || EditEmail.errors.minlength"
+                class="alert alert-danger">
+                <div *ngIf="EditEmail.errors && EditEmail.errors.required">
+                    Email is required.
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div>
+        <fieldset class="form-group">
+            <label for="EditPhone">Phone Number</label>
+            <div class="input-group">
+                <input type="text" class="form-control rounded" id="EditPhone" [(ngModel)]="phone"
+                    name="EditPhone" #EditPhone="ngModel">
+            </div>
+            <div [hidden]="EditPhone.valid || EditPhone.pristine || EditPhone.errors.minlength"
+                class="alert alert-danger">
+            </div>
+        </fieldset>
+    </div>
+    <div class="action-buttons-center my-3">
+        <button type="submit" class="btn btn-success" [disabled]="!editForm.form.valid">Submit</button>
+        <button class="btn btn-outline-success" type="button" (click)="onCancel()">Cancel</button>
+    </div>
+</form>

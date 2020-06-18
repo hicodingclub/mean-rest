@@ -1,17 +1,17 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, Input } from '@angular/core';
 
-import { ShoppingAddr } from '../shopping-addr.interface';
+import { Address } from '../addr.interface';
 
 @Component({
   selector: 'lib-mdds-address-display',
-  templateUrl: './addr.component.html',
+  templateUrl: './addr-display.component.html',
   styleUrls: ['./addr.component.css'],
 })
-export class MDDSAddressDisplayComponent implements OnInit, ShoppingAddr {
+export class MDDSAddressDisplayComponent implements OnInit, OnChanges, Address {
 
   @Input() public style: any = {}; // { picture: {height: '16rem'}, title: {}, intro: {} }
 
-  @Input() public addr: ShoppingAddr;
+  @Input() public addr: Address;
 
   @Input() public name: string;
 
@@ -28,6 +28,9 @@ export class MDDSAddressDisplayComponent implements OnInit, ShoppingAddr {
   constructor() {}
 
   ngOnInit() {
+    this.ngOnChanges();
+  }
+  ngOnChanges() {
     if (this.addr) {
       this.name = this.addr.name;
       this.line1 = this.addr.line1;

@@ -1,0 +1,19 @@
+<div class="w-100">
+    <div class="font-weight-bold my-1" *ngIf="person" [ngStyle]="style['name']">{{person}}</div>
+    <div class="my-1">
+        <div class="ml-3" [ngStyle]="style['contact-info']">
+            <div *ngIf="email">
+                <span class="mr-2" [ngStyle]="style['email-label']">Email:</span>
+                <span [ngStyle]="style['email-value']">{{email}}</span>
+            </div>
+            <div *ngIf="phone">
+                <span  class="mr-2" [ngStyle]="style['phone-label']">Phone Number:</span>
+                <span [ngStyle]="style['phone-value']">{{phone}}</span>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="notes" class="">
+        <span class="mr-2" [ngStyle]="style['notes-label']">Notes:</span>
+        <span [ngStyle]="style['notes-value']" >{{notes}}</span>
+    </div>
+</div>

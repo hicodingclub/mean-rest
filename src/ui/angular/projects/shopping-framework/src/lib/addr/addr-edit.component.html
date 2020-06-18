@@ -1,0 +1,93 @@
+<form #editForm="ngForm" (ngSubmit)="onSubmit()">
+    <div>
+        <fieldset class="form-group">
+            <label for="EditName">Receipient Name</label>
+            <div class="input-group">
+                <input type="text" class="form-control rounded" id="EditName" required
+                    [(ngModel)]="name" name="EditName" #EditName="ngModel">
+            </div>
+            <div [hidden]="EditName.valid || EditName.pristine || EditName.errors.minlength"
+                class="alert alert-danger">
+                <div *ngIf="EditName.errors && EditName.errors.required">
+                    Name is required.
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div>
+        <fieldset class="form-group">
+            <label for="EditLine1">Address Line 1</label>
+            <div class="input-group">
+                <input type="text" class="form-control rounded" id="EditLine1" required
+                    [(ngModel)]="line1" name="EditLine1" #EditLine1="ngModel">
+            </div>
+            <div [hidden]="EditLine1.valid || EditLine1.pristine || EditLine1.errors.minlength"
+                class="alert alert-danger">
+                <div *ngIf="EditLine1.errors && EditLine1.errors.required">
+                    Address line 1 is required.
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div>
+        <fieldset class="form-group">
+            <label for="EditLine2">Address Line 2</label>
+            <div class="input-group">
+                <input type="text" class="form-control rounded" id="EditLine2" [(ngModel)]="line2"
+                    name="EditLine2" #EditLine2="ngModel">
+            </div>
+            <div [hidden]="EditLine2.valid || EditLine2.pristine || EditLine2.errors.minlength"
+                class="alert alert-danger">
+            </div>
+        </fieldset>
+    </div>
+    <div>
+        <fieldset class="form-group">
+            <label for="EditCity">City</label>
+            <div class="input-group">
+                <input type="text" class="form-control rounded" id="EditCity" required [(ngModel)]="city"
+                    name="EditCity" #EditCity="ngModel">
+            </div>
+            <div [hidden]="EditCity.valid || EditCity.pristine || EditCity.errors.minlength"
+                class="alert alert-danger">
+                <div *ngIf="EditCity.errors && EditCity.errors.required">
+                    City is required.
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div>
+        <fieldset class="form-group">
+            <label for="EditState">State</label>
+            <div class="input-group">
+                <input type="text" class="form-control rounded" id="EditState" required
+                    [(ngModel)]="state" name="EditState" #EditState="ngModel">
+            </div>
+            <div [hidden]="EditState.valid || EditState.pristine || EditState.errors.minlength"
+                class="alert alert-danger">
+                <div *ngIf="EditState.errors && EditState.errors.required">
+                    State is required.
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div>
+        <fieldset class="form-group">
+            <label for="EditZipCode">Zip Code</label>
+            <div class="input-group">
+                <input type="text" class="form-control rounded" id="EditZipCode" required
+                    [(ngModel)]="zipCode" name="EditZipCode" #EditZipCode="ngModel">
+            </div>
+            <div [hidden]="EditZipCode.valid || EditZipCode.pristine || EditZipCode.errors.minlength"
+                class="alert alert-danger">
+                <div *ngIf="EditZipCode.errors && EditZipCode.errors.required">
+                    ZipCode is required.
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="action-buttons-center my-3">
+        <button type="submit" class="btn btn-success" [disabled]="!editForm.form.valid">Submit</button>
+        <button class="btn btn-outline-success" type="button" (click)="onCancel()">Cancel</button>
+    </div>
+</form>
