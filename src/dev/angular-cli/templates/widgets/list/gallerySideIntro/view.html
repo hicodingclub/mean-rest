@@ -9,7 +9,7 @@
 			<div class="text-left h-100"
 				[ngClass]="{
 					'clicked-row': clickedId==detail['_id'],
-					'selected-row': clickItemAction === 'select' && checkedItem[i],
+					'selected-row': clickItemAction === 'select' && checkedItem[idx],
 					'clickable-card pointer': clickItemAction}">
 				<div class="grid-fields" (click)="clickOneItem(idx)">
 					<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}"

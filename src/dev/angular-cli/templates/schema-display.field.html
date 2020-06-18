@@ -69,7 +69,7 @@
                             else isLarge = largePicture;%>
                     <lib-mdds-file-display [downloadUrl]="detail['<%-fn%>']" [isLarge]="<%-isLarge%>" [aspectRatio]="<%-field.aspectRatio%>"></lib-mdds-file-display><%
                         } else if (field.textarea) {%>
-                    <pre [innerHTML]="detail['<%-fn%>']"></pre><%
+                    <div [innerHTML]="detail['<%-fn%>']"></div><%
                         } else if (field.meta.innerHtml) {%>
                     <div [innerHTML]="<%-fieldValue%>"></div><%
                         } else if (field.mraType === 'httpurl') {%>
