@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const express = require('express');
 const createError = require('http-errors');
 
+const { processViewStr } = require('./view-str');
+
 const {
   moveRouterStackTailToHead,
   moveRouterStackTailForward,
@@ -13,35 +15,6 @@ const RestRouter = require('./rest_sub_router')
 const PredefinedPatchFields = {
   muser_id: { type: String, index: true},
   mmodule_name: { type: String, index: true},
-}
-
-const processField = function(x) {
-  let hidden = false;
-  let field = x;
-  const matches = x.match(/\((.*?)\)/);
-  if (matches) {
-    hidden = true;
-    field = matches[1];
-  }
-  return [field, hidden];
-}
-
-var processViewStr = function(viewStr) {
-  if (!viewStr) return viewStr;
-
-  const viewStr_displayName_handled = viewStr.replace(/\[[^\]]*\]/g, ' ');
-
-  //1. remove virtical bar |, and split to array
-  let fields = viewStr_displayName_handled.replace(/\|/g, ' ').match(/\S+/g)
-  //2. process each field
-  fields = fields.map(x=>{
-    const [f, hidden] = processField(x);
-    return f;
-  })
-  //3. join to string
-  const newViewStr = fields.join(" ");
-  
-  return newViewStr;
 }
 
 const _setModuleName = function(name) {
