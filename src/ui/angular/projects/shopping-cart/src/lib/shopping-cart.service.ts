@@ -11,6 +11,7 @@ export interface ItemMeta {
   picture?: string;
   description?: string;
   stockNumber?: string;
+  skuID?: string;
 }
 
 export interface Item {
@@ -28,6 +29,7 @@ export interface Item {
 // Interface to show items when user see cart details
 export interface ShowCart {
   totalPrice: number;
+  totalQuantity: number;
   showItems: ShoppingItem[];
   errorItems: ShoppingItem[];
 }
@@ -42,6 +44,7 @@ export class ShoppingCartService {
   private items: Item[] = []; // items added to cart
   private showItems: ShoppingItem[]; // items to show in cart
   private totalPrice: number; // total price of showItems
+  private totalQuantity: number; // total quantity of showItems
   private itemNumberPublisher: Subject<number> = new Subject<number>();
 
   constructor(private http: HttpClient) {
@@ -108,6 +111,7 @@ export class ShoppingCartService {
     return new Observable(subscriber => {
       this.showItems = [];
       this.totalPrice = 0;
+      this.totalQuantity = 0;
     
       const promises: Promise<any>[] = [];
       for (const item of this.items) {
@@ -120,10 +124,12 @@ export class ShoppingCartService {
           const showItems: ShoppingItem[] = [];
           const errorItems: ShoppingItem[] = [];
           let totalPrice = 0;
+          let totalQuantity = 0;
           let showItem: ShoppingItem;
           for (let i = 0; i < this.items.length; i += 1) {
             const result: any = results[i];
             let subPrice = 0;
+            let subQuantity = 0
             if (result instanceof Error) {
               showItem = {
                 picture: '',
@@ -134,6 +140,7 @@ export class ShoppingCartService {
                 stockNumber: 0,
                 url: this.items[i].url,
                 pageUrl: this.items[i].pageUrl,
+                skuID: this.items[i].pageUrl.split('/').slice(-1)[0],
               };
               errorItems.push(showItem);
             } else {
@@ -147,17 +154,21 @@ export class ShoppingCartService {
                 stockNumber: meta.stockNumber? result[meta.stockNumber] : DEFAULTSTOCKNUMBER, // stock number not given. Use a very large number
                 url: this.items[i].url,
                 pageUrl: this.items[i].pageUrl,
+                skuID: meta.skuID? result[meta.skuID] : this.items[i].pageUrl.split('/').slice(-1)[0],
               };
               showItems.push(showItem);
               subPrice = showItem.price * showItem.quantity;
+              subQuantity = showItem.quantity;
             }
             if (!isNaN(subPrice)) {
               totalPrice += subPrice;
             }
+            totalQuantity += subQuantity;
           }
           this.showItems = showItems;
           this.totalPrice = totalPrice;
-          subscriber.next({showItems, errorItems, totalPrice});
+          this.totalQuantity = totalQuantity;
+          subscriber.next({showItems, errorItems, totalQuantity, totalPrice});
         });
       } catch (err) {
         subscriber.error(err);
@@ -167,6 +178,7 @@ export class ShoppingCartService {
   public getShoppingItems(): ShoppingItems {
     return {
       items: this.showItems,
+      quantity: this.totalQuantity,
       price: this.totalPrice,
       ready: this.showItems.length > 0,
     }

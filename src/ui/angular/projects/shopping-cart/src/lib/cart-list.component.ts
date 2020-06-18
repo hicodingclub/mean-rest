@@ -18,6 +18,7 @@ export class CartListComponent implements OnInit, AfterViewInit {
   public showItems: ShoppingItem[] = [];
   public errorItems: ShoppingItem[] = [];
   public totalPrice: number = 0;
+  public totalQuantity: number = 0;
 
   constructor(private scService: ShoppingCartService) {
     this.retrieveItems();
@@ -32,6 +33,7 @@ export class CartListComponent implements OnInit, AfterViewInit {
     if (this.showItems.length > 0 ) {
       this.shoppingItems.emit({
         items: this.showItems,
+        quantity: this.totalQuantity,
         price: this.totalPrice,
         ready: true,
       });
@@ -43,6 +45,7 @@ export class CartListComponent implements OnInit, AfterViewInit {
       this.showItems = cartItems.showItems;
       this.errorItems = cartItems.errorItems;
       this.totalPrice = cartItems.totalPrice;
+      this.totalQuantity = cartItems.totalQuantity;
 
       this.emitShoppintItems();
     });

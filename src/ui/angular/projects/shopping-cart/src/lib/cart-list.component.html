@@ -1,4 +1,5 @@
 <div *ngIf="totalPrice > 0" class="m-2 font-weight-bold text-right">
+    <label class="mr-3">Total Items:</label> <span>{{totalQuantity}}</span>
     <label class="mr-3">Total Price:</label> <span class="price">{{totalPrice | currency:'USD':'symbol'}}</span>
 </div>
 <div class="list-blocks">
