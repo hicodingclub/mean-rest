@@ -89,3 +89,35 @@ export class ErrorToast {
     }
 
 }
+
+import { MddsServiceError } from './base.service';
+
+export function onServiceError(error: MddsServiceError): void {
+    let errMsg: string;
+    let more: string;
+    if (error.clientErrorMsg) {
+      errMsg = error.clientErrorMsg;
+    } else if (error.serverError) {
+      if (error.status === 401) {
+        return;
+      } // Don't show unauthorized error
+      if (typeof error.serverError === 'object') {
+        errMsg = error.status + ': ' + JSON.stringify(error.serverError);
+      } else {
+        errMsg = error.status + ': ' + error.serverError;
+      }
+    }
+    if (!errMsg) {
+      errMsg = 'Unknown error.';
+    }
+    if (errMsg.length > 80) {
+      more = errMsg;
+      errMsg = errMsg.substring(0, 80) + '...';
+    }
+    const errorToastConfig: ErrorToastConfig = {
+      content: errMsg,
+      more,
+    };
+    const errorToast = new ErrorToast(errorToastConfig);
+    errorToast.show();
+  }

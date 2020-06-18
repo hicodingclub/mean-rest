@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/angular-core",
-  "version": "0.9.11",
+  "version": "0.9.15",
   "peerDependencies": {
     "@angular/common": "^8.2.14",
     "@angular/core": "^8.2.14"

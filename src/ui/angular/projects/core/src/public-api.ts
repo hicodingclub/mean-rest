@@ -11,7 +11,7 @@ export { MddsCoreModule } from './lib/mdds-core.module';
 export { MddsMaxNumberDirective, MddsMinNumberDirective } from './lib/mdds-common.directives';
 export { MddsRichTextSelectDirective, MddsRichTextShowDirective } from './lib/summernote.directive';
 
-export { ErrorToastConfig, ErrorToast } from './lib/util.errortoast';
+export { ErrorToastConfig, ErrorToast, onServiceError } from './lib/util.errortoast';
 export { ModalConfig, Modal } from './lib/util.modal';
 export { SnackBarConfig, SnackBar } from './lib/util.snackbar';
 export { stringToDateStructure, dateStructureToString } from './lib/ngb-date-formatter';
