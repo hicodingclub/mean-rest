@@ -4,6 +4,10 @@
 					if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
 					if (field.picture) continue;
 
+					if (field.type === 'AngularSelector') {
+						continue;
+					}
+
 			        if(field.type == 'SchemaString') { hasStringFields = true; stringFields.push(field.displayname);}
 			        else {noMoreSearchArea = false;}
 				}
@@ -42,6 +46,9 @@
 							if (field.hidden) return;
 							if (listCategoryFieldsNotShown.includes(field.fieldName)) return;
 							if (field.type == 'SchemaString') return;
+							if (field.type === 'AngularSelector') {
+								return;
+							}
 							let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName, Sn=SchemaName, mn=moduleName, Mn=ModuleName;
 							%> <%_ include schema-search.field.html %> 
 						<%_ }) %>

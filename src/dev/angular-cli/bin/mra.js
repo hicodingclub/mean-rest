@@ -21,7 +21,7 @@ const readline = require('readline');
 const sortedObject = require('sorted-object');
 const util = require('util');
 
-const humanize = require('string-humanize')
+const humanize = require('string-humanize');
 
 const MODE_0666 = parseInt('0666', 8);
 const MODE_0755 = parseInt('0755', 8);
@@ -29,6 +29,8 @@ const TEMPLATE_DIR = path.join(__dirname, '..', 'templates');
 const VERSION = require('../package').version;
 
 const { Selectors } = require('./selectors');
+
+let warningNumber = 0;
 
 const _exit = process.exit;
 
@@ -92,7 +94,12 @@ const templates = {
   //key:[template_file, output_file_suffix, description, write_options]
   //write_options: W: write, A: append
   conf: ['../templates/conf.ts', '.conf.ts', 'module conf file', 'A'],
-  tokensValue: ['../templates/tokens.value.ts', '.tokens.value.ts', 'module token value file', 'A'],
+  tokensValue: [
+    '../templates/tokens.value.ts',
+    '.tokens.value.ts',
+    'module token value file',
+    'A',
+  ],
 
   mainModule: [
     '../templates/main.module.ts',
@@ -388,7 +395,7 @@ const stripDisplayNames = function (viewStr) {
 
   const viewStrDisplayNameHandled = viewStr.replace(/\[[^\]]*\]/g, '');
 
-  return [displayNames, viewStrDisplayNameHandled]
+  return [displayNames, viewStrDisplayNameHandled];
 };
 const stripFieldHidden = function (viewStr) {
   const fieldHidden = {};
@@ -404,7 +411,7 @@ const stripFieldHidden = function (viewStr) {
 
   const viewStrHiddenHandled = viewStr.replace(/[\(\)]/g, '');
 
-  return [fieldHidden, viewStrHiddenHandled]
+  return [fieldHidden, viewStrHiddenHandled];
 };
 const stripFieldMeta = function (viewStr) {
   const fieldMeta = {};
@@ -420,7 +427,7 @@ const stripFieldMeta = function (viewStr) {
 
   const viewStrMetaHandled = viewStr.replace(/<[^\>]*>/g, '');
 
-  return [fieldMeta, viewStrMetaHandled]
+  return [fieldMeta, viewStrMetaHandled];
 };
 
 const generateSourceFile = function (keyname, template, renderObj, outputDir) {
@@ -495,7 +502,7 @@ const getPrimitiveField = function (fieldSchema) {
         });
       if (fieldSchema.options.editor == true) {
         editor = true;
-      }  else if (fieldSchema.options.textarea == true) {
+      } else if (fieldSchema.options.textarea == true) {
         textarea = true;
       } else if (fieldSchema.options.mraEmailRecipient == true) {
         mraEmailRecipient = true;
@@ -506,17 +513,19 @@ const getPrimitiveField = function (fieldSchema) {
             flagPicture = true;
             flagSharable = !!fieldSchema.options.mraSharable;
             aspectRatio = fieldSchema.options.aspectRatio;
-    
+
             break;
           case 'file':
             flagFile = true;
             flagSharable = !!fieldSchema.options.mraSharable;
-    
+
             break;
           case 'httpurl':
             break;
           default:
-            warning(`Unrecoganized mraType for SchemaString: ${fieldSchema.options.mraType}. Ignore...`);
+            warning(
+              `Unrecoganized mraType for SchemaString: ${fieldSchema.options.mraType}. Ignore...`
+            );
         }
       }
       break;
@@ -532,7 +541,9 @@ const getPrimitiveField = function (fieldSchema) {
           case 'currency':
             break;
           default:
-            warning(`Unrecoganized mraType for SchemaNumber: ${fieldSchema.options.mraType}. Ignore...`);
+            warning(
+              `Unrecoganized mraType for SchemaNumber: ${fieldSchema.options.mraType}. Ignore...`
+            );
         }
       }
       if (fieldSchema.validators)
@@ -592,11 +603,15 @@ const generateViewPicture = function (
   validators,
   indexViewNames,
   selectors,
-  fieldMeta,
+  fieldMeta
 ) {
   const [field2Meta, viewStrMetaHandled] = stripFieldMeta(viewStr);
-  const [displayNames, viewStrDisplayNameHandled] = stripDisplayNames(viewStrMetaHandled);
-  const [fieldHidden, viewStrPure] = stripFieldHidden(viewStrDisplayNameHandled);
+  const [displayNames, viewStrDisplayNameHandled] = stripDisplayNames(
+    viewStrMetaHandled
+  );
+  const [fieldHidden, viewStrPure] = stripFieldHidden(
+    viewStrDisplayNameHandled
+  );
 
   //process | in viewStr
   let fieldGroups = [];
@@ -605,7 +620,7 @@ const generateViewPicture = function (
     for (let str of strGroups) {
       let arr = str.match(/\S+/g);
       if (arr) {
-        arr = arr.filter(x => !fieldHidden[x]);
+        arr = arr.filter((x) => !fieldHidden[x]);
         if (arr.length > 0) {
           fieldGroups.push(arr);
         }
@@ -613,8 +628,7 @@ const generateViewPicture = function (
     }
   }
 
-  let viewDef =
-    viewStrPure.replace(/\|/g, ' ').match(/\S+/g) || [];
+  let viewDef = viewStrPure.replace(/\|/g, ' ').match(/\S+/g) || [];
   if (fieldGroups.length == 0) {
     //no grouping
     for (let e of viewDef) {
@@ -637,7 +651,7 @@ const generateViewPicture = function (
 
   for (let item of viewDef) {
     let hidden = !!fieldHidden[item];
-    let usedMeta =  field2Meta[item];
+    let usedMeta = field2Meta[item];
 
     let validatorArray;
     if (validators && Array.isArray(validators[item])) {
@@ -682,7 +696,7 @@ const generateViewPicture = function (
     let meta = {};
 
     if (item in schema.paths) {
-      if (usedMeta && fieldMeta && fieldMeta[usedMeta]) { 
+      if (usedMeta && fieldMeta && fieldMeta[usedMeta]) {
         meta = fieldMeta[usedMeta];
         let sel = meta.pipe || meta.selector;
         if (sel) {
@@ -1017,7 +1031,7 @@ const setFieldProperty = function (view, fieldArr, include, property, value) {
       f[property] = value;
     }
   }
-}
+};
 
 const getLoginUserPermission = function (permission) {
   let othersPermisson = permission['others'];
@@ -1308,7 +1322,7 @@ function main() {
     console.info('Using "%s" as generated module name...', moduleName);
   }
   let ModuleName = capitalizeFirst(moduleName);
-  let moduleNameCust = `${moduleName}-cust`
+  let moduleNameCust = `${moduleName}-cust`;
 
   let apiBase;
   if (!program.api) {
@@ -1465,7 +1479,7 @@ function main() {
     // object {listCategoryField:xxx, listCategoryShowMore: 'field...',
     //          listCategoryRef: 'xxxx', showCategoryCounts: true,
     //          showFieldInList: false, showEmptyCategory: false}
-    let listCategories = []; 
+    let listCategories = [];
     let listSortFields; // sortable fields name inside the array. 'undefined' will use default sort fields.
 
     let detailActions = []; //extra buttons that trigger other pipelines
@@ -1557,14 +1571,14 @@ function main() {
     listTypes = listTypes.map((x) => {
       return [x, capitalizeFirst(x)];
     });
-  
+
     let listTypeNormal = true;
     if (!['list', 'grid', 'table'].includes(listType)) {
       listTypeNormal = false;
     }
     let listWidgets = schemaDef.listWidgets || []; //widgets: clean, sld, sel, ...
     let ListType = capitalizeFirst(listType);
-    if ( !listTypeNormal && !listWidgets.includes(listType)) {
+    if (!listTypeNormal && !listWidgets.includes(listType)) {
       listWidgets.push(listType);
     }
     listWidgets = listWidgets.map((x) => {
@@ -1605,7 +1619,7 @@ function main() {
       selectors = new Selectors(schemaDef.selectors);
     }
     let fieldMeta = schemaDef.fieldMeta || {};
-    
+
     //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
     if (typeof views !== 'object' || !Array.isArray(views)) {
       console.error(
@@ -1633,7 +1647,7 @@ function main() {
     if (api.includes('R') || api.includes('L')) {
       subComponentDirs.push(schemaName + '-detail');
     }
-    if (api.includes('L')) { 
+    if (api.includes('L')) {
       subComponentDirs.push(schemaName + '-list');
     }
     if (api.includes('C') || api.includes('U')) {
@@ -1668,7 +1682,7 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta,
+      fieldMeta
     );
     for (let s of indexView) {
       indexViewNames.push(s.fieldName);
@@ -1693,7 +1707,7 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta,
+      fieldMeta
     );
     //console.log('***briefView', briefView);
     //console.log('***hasRef1', hasRef1);
@@ -1720,7 +1734,7 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta,
+      fieldMeta
     );
 
     /* 4. handle fields in createView */
@@ -1743,7 +1757,7 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta,
+      fieldMeta
     );
     setFieldProperty(createView, editHintFields, true, 'hint', true); // if include is "true", set to "true"
 
@@ -1767,7 +1781,7 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta,
+      fieldMeta
     );
     setFieldProperty(editView, editHintFields, true, 'hint', true); // if include is "true", set to "true"
 
@@ -1791,7 +1805,7 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta,
+      fieldMeta
     );
 
     let schemaHasDate = hasDate5 || hasDate6;
@@ -1853,22 +1867,36 @@ function main() {
     if (schemaHasFileUpload) hasFileUpload = true;
     if (schemaHasEmailing) hasEmailing = true;
 
-    let [stripFieldMetaDetail, viewStrMetaHandledDetail] = stripFieldMeta(views[1]);
-    let [displayNamesDetail, viewStrDisplayHandledDetail] = stripDisplayNames(viewStrMetaHandledDetail);
-    let [fieldHiddenDetail, viewStrPureDetail] = stripFieldHidden(viewStrDisplayHandledDetail);
+    let [stripFieldMetaDetail, viewStrMetaHandledDetail] = stripFieldMeta(
+      views[1]
+    );
+    let [displayNamesDetail, viewStrDisplayHandledDetail] = stripDisplayNames(
+      viewStrMetaHandledDetail
+    );
+    let [fieldHiddenDetail, viewStrPureDetail] = stripFieldHidden(
+      viewStrDisplayHandledDetail
+    );
 
-    let [stripFieldMetaBrief, viewStrMetaHandledBrief] = stripFieldMeta(views[0]);
-    let [displayNamesBrief, viewStrDisplayHandledBrief] = stripDisplayNames(viewStrMetaHandledBrief);
-    let [fieldHiddenBrief, viewStrPureBrief] = stripFieldHidden(viewStrDisplayHandledBrief);
+    let [stripFieldMetaBrief, viewStrMetaHandledBrief] = stripFieldMeta(
+      views[0]
+    );
+    let [displayNamesBrief, viewStrDisplayHandledBrief] = stripDisplayNames(
+      viewStrMetaHandledBrief
+    );
+    let [fieldHiddenBrief, viewStrPureBrief] = stripFieldHidden(
+      viewStrDisplayHandledBrief
+    );
 
     let briefFields = viewStrPureBrief.replace(/\|/g, ' ').match(/\S+/g) || [];
-    let briefNoHiddenFields = briefFields.filter(x => !fieldHiddenBrief[x]);
+    let briefNoHiddenFields = briefFields.filter((x) => !fieldHiddenBrief[x]);
 
     let detailViewGroups = viewStrPureDetail.split('|');
-    detailViewGroups = detailViewGroups.map( detailViewGrp => {
+    detailViewGroups = detailViewGroups.map((detailViewGrp) => {
       let arr = detailViewGrp.match(/\S+/g) || [];
-      arr = arr.filter(x => !briefNoHiddenFields.includes(x) && !fieldHiddenDetail[x]);
-      arr = arr.map(x => {
+      arr = arr.filter(
+        (x) => !briefNoHiddenFields.includes(x) && !fieldHiddenDetail[x]
+      );
+      arr = arr.map((x) => {
         let y = x;
         if (displayNamesDetail[x]) {
           y = `${y}[${displayNamesDetail[x]}]`;
@@ -1876,7 +1904,7 @@ function main() {
         if (stripFieldMetaDetail[x]) {
           y = `${y}<${stripFieldMetaDetail[x]}>`;
         }
-        return y
+        return y;
       });
       return arr.join(' ');
     });
@@ -1902,7 +1930,7 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta,
+      fieldMeta
     );
 
     let compositeEditView = [];
@@ -2014,17 +2042,18 @@ function main() {
       tempListCategories.push(cate);
     }
     listCategories = tempListCategories;
-    const listCategoryFields = listCategories.map(x=>x.listCategoryField);
-    const listCategoryFieldsNotShown = listCategories.filter(x=> !x.showFieldInList).map(x=>x.listCategoryField);
-
+    const listCategoryFields = listCategories.map((x) => x.listCategoryField);
+    const listCategoryFieldsNotShown = listCategories
+      .filter((x) => !x.showFieldInList)
+      .map((x) => x.listCategoryField);
 
     allSelectors = allSelectors.concat(selectors.selectors);
 
     const selectorsObj = {};
-    selectors.selectors.forEach( x => {
+    selectors.selectors.forEach((x) => {
       selectorsObj[x.name] = x;
     });
-  
+
     let schemaObj = {
       name: name,
       moduleName: moduleName,
@@ -2241,7 +2270,7 @@ function main() {
 
   const usedSelectors = [];
 
-  const uniqeSelectors = allSelectors.filter(x => {
+  const uniqeSelectors = allSelectors.filter((x) => {
     if (x.isUsed() && !usedSelectors.includes(x.module + x.package)) {
       usedSelectors.push(x.module + x.package);
       return true;
@@ -2277,12 +2306,32 @@ function main() {
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
 
   generateSourceFile(moduleName, templates.conf, renderObj, outputDirCust);
-  generateSourceFile(moduleName, templates.tokensValue, renderObj, outputDirCust);
+  generateSourceFile(
+    moduleName,
+    templates.tokensValue,
+    renderObj,
+    outputDirCust
+  );
 
   generateSourceFile(moduleName, templates.mainModule, renderObj, outputDir);
-  generateSourceFile(moduleName, templates.mainCoreModule, renderObj, outputDir);
-  generateSourceFile(moduleName, templates.mainCustModule, renderObj, outputDirCust);
-  generateSourceFile(moduleName, templates.mainExtModule, renderObj, outputDirCust);
+  generateSourceFile(
+    moduleName,
+    templates.mainCoreModule,
+    renderObj,
+    outputDir
+  );
+  generateSourceFile(
+    moduleName,
+    templates.mainCustModule,
+    renderObj,
+    outputDirCust
+  );
+  generateSourceFile(
+    moduleName,
+    templates.mainExtModule,
+    renderObj,
+    outputDirCust
+  );
   generateSourceFile(moduleName, templates.mainComponent, renderObj, outputDir);
   generateSourceFile(
     moduleName,
@@ -2299,9 +2348,24 @@ function main() {
   generateSourceFile(moduleName, templates.tokens, renderObj, outputDir);
 
   generateSourceFile(moduleName, templates.routingModule, renderObj, outputDir);
-  generateSourceFile(moduleName, templates.routingCoreModule, renderObj, outputDir);
-  generateSourceFile(moduleName, templates.routingCorePath, renderObj, outputDir);
-  generateSourceFile(moduleName, templates.routingCustPath, renderObj, outputDirCust);
+  generateSourceFile(
+    moduleName,
+    templates.routingCoreModule,
+    renderObj,
+    outputDir
+  );
+  generateSourceFile(
+    moduleName,
+    templates.routingCorePath,
+    renderObj,
+    outputDir
+  );
+  generateSourceFile(
+    moduleName,
+    templates.routingCustPath,
+    renderObj,
+    outputDirCust
+  );
 
   if (
     hasDate ||
@@ -2647,6 +2711,13 @@ function main() {
     }
   } /*End of generate source for each schema*/
 
+  console.log();
+  if (warningNum() > 0) {
+    console.log('+++ total warnings:', warningNum());
+  } else {
+    console.log('+++ Done!');
+  }
+  console.log();
   return;
 
   // Generate application
@@ -2702,14 +2773,16 @@ function renamedOption(originalName, newName) {
  *
  * @param {String} message
  */
-
 function warning(message) {
   message.split('\n').forEach(function (line) {
     console.error('  warning: %s', line);
   });
   console.error();
+  warningNumber += 1;
 }
-
+function warningNum() {
+  return warningNumber;
+}
 /**
  * echo str > file.
  *
