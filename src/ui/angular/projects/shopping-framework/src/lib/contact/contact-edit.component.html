@@ -19,12 +19,16 @@
             <label for="EditEmail">Email</label>
             <div class="input-group">
                 <input type="text" class="form-control rounded" id="EditEmail" required
+                    [pattern]="emailPattern"
                     [(ngModel)]="email" name="EditEmail" #EditEmail="ngModel">
             </div>
             <div [hidden]="EditEmail.valid || EditEmail.pristine || EditEmail.errors.minlength"
                 class="alert alert-danger">
                 <div *ngIf="EditEmail.errors && EditEmail.errors.required">
                     Email is required.
+                </div>
+                <div *ngIf="EditEmail.errors && EditEmail.errors.pattern">
+                    Please enter a valid email address.
                 </div>
             </div>
         </fieldset>
@@ -34,10 +38,14 @@
             <label for="EditPhone">Phone Number</label>
             <div class="input-group">
                 <input type="text" class="form-control rounded" id="EditPhone" [(ngModel)]="phone"
+                    [pattern]="phonePattern"
                     name="EditPhone" #EditPhone="ngModel">
             </div>
             <div [hidden]="EditPhone.valid || EditPhone.pristine || EditPhone.errors.minlength"
                 class="alert alert-danger">
+                <div *ngIf="EditPhone.errors && EditPhone.errors.pattern">
+                    Please enter a valid phone number.
+                </div>
             </div>
         </fieldset>
     </div>

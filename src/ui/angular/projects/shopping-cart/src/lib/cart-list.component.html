@@ -1,6 +1,6 @@
-<div *ngIf="totalPrice > 0" class="m-2 font-weight-bold text-right">
-    <label class="mr-3">Total Items:</label> <span>{{totalQuantity}}</span>
-    <label class="mr-3">Total Price:</label> <span class="price">{{totalPrice | currency:'USD':'symbol'}}</span>
+<div *ngIf="totalPrice > 0" class="m-2 d-flex flex-column align-items-end">
+    <div class="w-60 d-flex justify-content-between"><label class="mr-3">Total Items:</label> <span>{{totalQuantity}}</span></div>
+    <div class="w-60 d-flex justify-content-between"><label class="mr-3">Total Price:</label> <span class="price">{{totalPrice | currency:'USD':'symbol'}}</span></div>
 </div>
 <div class="list-blocks">
     <div class="list-block" *ngFor="let detail of showItems;  let i = index; let list_index = index;">

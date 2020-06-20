@@ -55,6 +55,11 @@ export class ShoppingCartService {
     localStorage.setItem(SHOPPINGCARTKEY, JSON.stringify(this.items));
     this.itemNumberPublisher.next(this.getItemNumber());
   }
+  private clear() {
+    localStorage.removeItem(SHOPPINGCARTKEY);
+    this.itemNumberPublisher.next(this.getItemNumber());
+  }
+
   private findItem(itemUrl: string): number {
     for (let i = 0; i < this.items.length; i += 1) {
       if (this.items[i].url === itemUrl) {
@@ -182,5 +187,12 @@ export class ShoppingCartService {
       price: this.totalPrice,
       ready: this.showItems.length > 0,
     }
+  }
+  public clearCart(): void {
+    this.items = [];
+    this.showItems = [];
+    this.totalPrice = 0;
+    this.totalQuantity = 0;
+    this.clear();
   }
 }

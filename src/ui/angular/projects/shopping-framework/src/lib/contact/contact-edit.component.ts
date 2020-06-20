@@ -20,12 +20,14 @@ export class MDDSContactEditComponent implements OnInit, ContactPerson {
   @Input() public phone: string;
   @Input() public notes: string;
 
+  public emailPattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+  public phonePattern = /^(\d+-?)+\d+$/;
   constructor() {}
 
   ngOnInit() {
     if (this.contactPersonIn) {
       this.person = this.contactPersonIn.person;
-      this.phone = this.contactPersonIn.email;
+      this.phone = this.contactPersonIn.phone;
       this.email = this.contactPersonIn.email;
       this.notes = this.contactPersonIn.notes;
     }
@@ -34,7 +36,7 @@ export class MDDSContactEditComponent implements OnInit, ContactPerson {
   onSubmit() {
     const contactPersonIn: ContactPerson = {
       person: this.person,
-      phone: this.person,
+      phone: this.phone,
       email: this.email,
       notes: this.notes,
     }

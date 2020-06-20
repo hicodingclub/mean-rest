@@ -26,7 +26,7 @@ export class MDDSContactDisplayComponent implements OnInit, OnChanges, ContactPe
   ngOnChanges() {
     if (this.contactPerson) {
       this.person = this.contactPerson.person;
-      this.phone = this.contactPerson.email;
+      this.phone = this.contactPerson.phone;
       this.email = this.contactPerson.email;
       this.notes = this.contactPerson.notes;
     }
