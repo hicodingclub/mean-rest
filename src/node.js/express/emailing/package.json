@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/express-emailing",
-  "version": "0.9.20",
+  "version": "0.9.22",
   "description": "Send emails",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,8 @@
   "author": "xibin liu",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.533.0"
+    "aws-sdk": "^2.533.0",
+    "jsonwebtoken": "^8.4.0"
   },
   "devDependencies": {
     "@hicoder/express-core": "0.9.20"

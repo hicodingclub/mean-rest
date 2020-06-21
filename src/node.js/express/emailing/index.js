@@ -1,7 +1,11 @@
 const AWS = require('aws-sdk');
+const jwt = require('jsonwebtoken');
+
 const meanRestExpress = require('@hicoder/express-core');
 
 const emailSystemDef = require('./model');
+
+const MDDS_EMAIL_TOKEN = 'this is a normal one used for mdds normal';
 
 function modelExecuteSuccess(taskStr) {
   function doSomething(result) {
@@ -153,8 +157,24 @@ class MddsEmailer {
     let replacements = [];
     let defaultReplacement = {};
 
-    if (substitutions && tags.length > 0) { // if there are per recipient substitution
+    if (tags.includes('mddsEmailToken')) { //reserved tokens
+      if (!substitutions) {
+        substitutions = [];
+      }
       for (let [idx, t] of to.entries()) {
+        if (substitutions.length === idx) {
+          substitutions.push({});
+        }
+        substitutions[idx].mddsEmailToken = jwt.sign(
+          {email: t}, 
+          MDDS_EMAIL_TOKEN,
+          {expiresIn: 60*60*24*30} // 30 days
+        );
+      }
+    }
+
+    if (substitutions && tags.length > 0) { // if there are per recipient substitution
+      for (let idx = 0; idx < to.length; idx++) {
         let sub = substitutions[idx];
         let replacement = {};
         for (let ele of tags) {

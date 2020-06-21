@@ -1512,7 +1512,7 @@ class RestController {
       try {
         body = JSON.parse(body);
       } catch (e) {
-        return next(createError(404, 'Bad ' + name + ' document.'));
+        return next(createError(400, 'Bad ' + name + ' document.'));
       }
     }
     body = ownerPatch(body, owner, req);

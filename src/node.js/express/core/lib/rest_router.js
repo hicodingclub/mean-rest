@@ -155,12 +155,14 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     } else {
       api = "LCRUDA";
     }
+    const mraBE = schemaDef.mraBE || {};
+    const filters = mraBE.filters || {};
 
     if (!api) continue;
     sub_routes.push("/" + name);
     
     if (!schemaDef.schema) continue;
-    restRouter = RestRouter(restController, schemaName, authzFunc, api);
+    restRouter = RestRouter(restController, schemaName, authzFunc, api, filters);
     expressRouter.use("/" + name, restRouter)
   }
   

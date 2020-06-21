@@ -8,7 +8,7 @@ const _setSchemaName = function(name) {
   }
 }
 
-const RestRouter = function(restController, schemaName, authzFunc, api) {  
+const RestRouter = function(restController, schemaName, authzFunc, api, filters) {  
   let router = express.Router();
   if (!api) return router;
 
@@ -27,10 +27,20 @@ const RestRouter = function(restController, schemaName, authzFunc, api) {
     router.get('/:' + idParam, restController.getDetailsById.bind(restController));
   }
   if (api.includes('C')) {
-    router.put('/', restController.Create.bind(restController));
+    let middlewares = [];
+    if (filters.create) {
+      middlewares = middlewares.concat(filters.create);
+    }
+    middlewares.push(restController.Create.bind(restController));
+    router.put('/', middlewares);
   }
   if (api.includes('U')) {
-    router.post('/:' + idParam, restController.Update.bind(restController));
+    let middlewares = [];
+    if (filters.update) {
+      middlewares = middlewares.concat(filters.update);
+    }
+    middlewares.push(restController.Update.bind(restController));
+    router.post('/:' + idParam, middlewares);
     router.get('/mddsaction/post/:' + idParam, restController.getDetailsById.bind(restController));
   }
   if (api.includes('D')) {
