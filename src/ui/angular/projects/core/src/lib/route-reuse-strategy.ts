@@ -2,7 +2,15 @@ import { ActivatedRouteSnapshot, DetachedRouteHandle, RouteReuseStrategy } from 
 
 import { InjectionToken, Inject } from '@angular/core';
 
-export const MDDS_ROUTE_REUSE_RUIs = new InjectionToken<Array<string>>('MDDS_ROUTE_REUSE_RUIs');
+export const MDDS_ROUTE_REUSE_RUIs = new InjectionToken<Array<string>>(
+    'MDDS_ROUTE_REUSE_RUIs',
+    {
+        providedIn: 'root',
+        factory: () => {
+            return ['/'];
+        }
+    },
+);
 const COMPONENT_CACHE_DURATION = 30 * 1000;
 
 function getResolvedUrl(route: ActivatedRouteSnapshot): string {
