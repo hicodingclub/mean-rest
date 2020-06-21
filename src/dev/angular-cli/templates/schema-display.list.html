@@ -2,6 +2,7 @@
     let pictureFields = viewFields.filter(x => x.picture);
     let indexedFields = viewFields.filter(x => !x.picture && x.isIndexField);
     let otherFields = viewFields.filter(x => !x.picture && !x.isIndexField);
+    let otherFieldsName = otherFields.map(x=>x.fieldName);
     for (let field of pictureFields){
       if (field.hidden) continue;
       if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
@@ -23,16 +24,23 @@
           </div><%_  
     }%>
         </h5><%
-    for (let [index, field] of otherFields.entries()){
-        if (field.hidden) continue;
-        if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
-
-        let fn = field.fieldName; let ft = field.type;;
-        %>
-        <div <%_ if (ft !== 'AngularSelector') {%> *ngIf="detail['<%-fn%>']"<%}%> class="mr-3 d-inline-flex flex-wrap"><%_ if (ft !== 'AngularSelector') {%>
-          <div><label><%-field.displayName%>:</label></div><%}%>
-          <div class="ml-3"><% include schema-display.field.html %>
-          </div>
+    for (let fieldGrp of viewGrp) {
+          let fieldGrpProcessed = fieldGrp.filter(x=> {
+            return otherFieldsName.includes(x.fieldName) && !x.hidden && !listCategoryFieldsNotShown.includes(x.fieldName)
+          });
+          if (fieldGrpProcessed.length < 1) {
+            continue;
+          }%>
+        <div><%
+        for (let [index, field] of fieldGrpProcessed.entries()){
+              let fn = field.fieldName; let ft = field.type;;
+          %>
+          <div <%_ if (ft !== 'AngularSelector') {%> *ngIf="detail['<%-fn%>']"<%}%> class="mr-3 d-inline-flex flex-wrap"><%_ if (ft !== 'AngularSelector') {%>
+            <div><label><%-field.displayName%>:</label></div><%}%>
+            <div class="ml-3"><% include schema-display.field.html %>
+            </div>
+          </div><%_
+        }%>
         </div><%_  
     }%><% if (cardHasLink) {%>
         <div class="read-more mt-3" (click)="onDetailLinkClicked(detail['_id'])">

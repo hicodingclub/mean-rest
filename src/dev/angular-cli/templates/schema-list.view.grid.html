@@ -6,7 +6,7 @@
 							'selected-row': clickItemAction === 'select' && checkedItem[i],
 							'clickable-card': clickItemAction}" >
 				<div class="grid-fields" [ngClass]="{pointer: clickItemAction}" (click)="clickOneItem(i)" >
-			<%_ viewFields = briefView; %><%_ include schema-display.grid.html %>
+			<%_ viewFields = briefView; let viewGrp = briefViewGrp; %><%_ include schema-display.grid.html %>
 				</div><%if(canUpdate || canDelete || canArchive || canCheck){%>
 				<div class="card-action-icons">
 					<%if(canUpdate){%><% if (embeddedEdit) {%>

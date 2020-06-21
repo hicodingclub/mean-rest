@@ -39,8 +39,8 @@
           <div><%for (let field of fieldGrpProcessed) {
             let fn = field.fieldName; let ft = field.type;;
             %>
-            <div class="d-inline-flex flex-wrap mr-5" style="min-width: 200px;">
-                <div><label><%-field.displayName%>:</label></div>
+            <div class="d-inline-flex flex-wrap mr-5" style="min-width: 200px;"><%_ if (ft !== 'AngularSelector') {%>
+                <div><label><%-field.displayName%>:</label></div><%}%>
                 <div class="ml-3"><% include schema-display.field.html %></div>
             </div><%}%>
           </div><%}%>

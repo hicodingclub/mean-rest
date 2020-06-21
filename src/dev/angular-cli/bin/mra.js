@@ -631,9 +631,13 @@ const generateViewPicture = function (
   let viewDef = viewStrPure.replace(/\|/g, ' ').match(/\S+/g) || [];
   if (fieldGroups.length == 0) {
     //no grouping
-    for (let e of viewDef) {
-      if (!fieldHidden[e]) {
-        fieldGroups.push([e]); //each element as a group
+    if ( API === 'L') {
+      fieldGroups.push(viewDef); // all elements as a group
+    } else {
+      for (let e of viewDef) {
+        if (!fieldHidden[e]) {
+          fieldGroups.push([e]); //each element as a group
+        }
       }
     }
   }
