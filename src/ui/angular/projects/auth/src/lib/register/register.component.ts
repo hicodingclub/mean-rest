@@ -5,6 +5,7 @@ import { first } from 'rxjs/operators';
 
 import { AuthenticationService } from '../auth.service';
 import { AUTHENTICATION_REGISTRATION_PIPELINE } from '../tokens';
+import { AUTHENTICATION_REGISTRATION_REQUIRED } from '../tokens';
 
 const validatePasswords = (form) => {
     const passwordConf = form.controls.password_conf.value;
@@ -37,19 +38,36 @@ export class RegisterComponent implements OnInit {
         private router: Router,
         private route: ActivatedRoute,
         private authenticationService: AuthenticationService,
-        @Inject(AUTHENTICATION_REGISTRATION_PIPELINE) private regPipeline: string
+        @Inject(AUTHENTICATION_REGISTRATION_PIPELINE) private regPipeline: string,
+        @Inject(AUTHENTICATION_REGISTRATION_REQUIRED) public regRequired: any,
         ) { }
 
 
     ngOnInit() {
         const phoneNumber = /^(\d+-?)+\d+$/;
         const userName = /^[A-Za-z]((?!(@)).)*$/;
+
+        const firstNameValidators = [];
+        const lastNameValidators = [];
+        const phoneValidators = [Validators.pattern(phoneNumber)];
+        if (typeof this.regRequired === 'object' ) {
+            if (this.regRequired.firstName) {
+                firstNameValidators.push(Validators.required);
+            }
+            if (this.regRequired.lastName) {
+                lastNameValidators.push(Validators.required);
+            }
+            if (this.regRequired.phone) {
+                phoneValidators.push(Validators.required);
+            }
+        }
+
         this.registerForm = this.formBuilder.group({
             username: ['', [Validators.pattern(userName), Validators.required]],
-            firstname: ['', []],
-            lastname: ['', []],
+            firstname: ['', firstNameValidators],
+            lastname: ['', lastNameValidators],
             email: ['', [Validators.email, Validators.required]],
-            phone: ['', Validators.pattern(phoneNumber)],
+            phone: ['', phoneValidators],
             password: ['', [Validators.required, Validators.minLength(6)]],
             password_conf: ['', [Validators.required, Validators.minLength(6)]]
         }, {validator: validatePasswords });
