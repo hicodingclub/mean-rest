@@ -1,9 +1,10 @@
-﻿import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit, Inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
 import { AuthenticationService } from '../auth.service';
+import { AUTHENTICATION_REGISTRATION_REQUIRED } from '../tokens';
 
 @Component(
     {templateUrl: 'profile.component.html',
@@ -26,7 +27,8 @@ export class ProfileComponent implements OnInit {
         private formBuilder: FormBuilder,
         private router: Router,
         private route: ActivatedRoute,
-        private authenticationService: AuthenticationService
+        private authenticationService: AuthenticationService,
+        @Inject(AUTHENTICATION_REGISTRATION_REQUIRED) public regRequired: any,
         ) { }
 
 
@@ -53,10 +55,26 @@ export class ProfileComponent implements OnInit {
 
     onEdit() {
         const phoneNumber = /^(\d+-?)+\d+$/;
+
+        const firstNameValidators = [];
+        const lastNameValidators = [];
+        const phoneValidators = [Validators.pattern(phoneNumber)];
+        if (typeof this.regRequired === 'object' ) {
+            if (this.regRequired.firstName) {
+                firstNameValidators.push(Validators.required);
+            }
+            if (this.regRequired.lastName) {
+                lastNameValidators.push(Validators.required);
+            }
+            if (this.regRequired.phone) {
+                phoneValidators.push(Validators.required);
+            }
+        }
+
         this.registerForm = this.formBuilder.group({
-            firstname: [this.profile.firstname, []],
-            lastname: [this.profile.lastname, []],
-            phone: [this.profile.phone, Validators.pattern(phoneNumber)],
+            firstname: [this.profile.firstname, firstNameValidators],
+            lastname: [this.profile.lastname, lastNameValidators],
+            phone: [this.profile.phone, phoneValidators],
         }, {});
 
         this.showProfile = false;

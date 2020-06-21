@@ -33,12 +33,14 @@ const accountSchema = new Schema({
   status:    {type: String, enum: ['Enabled', 'Disabled', 'Pending'], default: 'Enabled'},
   since: { type: Date, default: Date.now },
   password: { type: String, required: true }
+  firstname: {type: String, maxlength: 100},
+  lastname: {type: String, maxlength: 100},
 });
 
-const accountBrief = "username email phone since status";
-const accountDetail = "username email phone since status";
-const accountCreat = "username email phone status password";
-const accountEdit = "username email phone status";
+const accountBrief = "username email phone firstname lastname since status";
+const accountDetail = "username email phone firstname lastname since status";
+const accountCreat = "username email phone firstname lastname status password";
+const accountEdit = "username email phone firstname lastname status";
 const accountTextSearch = "username email phone";
 const accountIndex = "username";
 
@@ -54,6 +56,7 @@ const schemas = {
 const authn = {
   authUserSchema: "maccount",
   authUserFields: "username email phone",
+  authProfileFields: "firstname lastname phone email",
   authPasswordField: "password",
 };
 

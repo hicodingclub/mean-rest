@@ -3,14 +3,17 @@
     <h2>Your Profile</h2>
     <div class="mt-5">
         <div class="form-group">
-            <label for="firstname">First Name</label> <span>{{profile.firstname}}</span>
+            <label for="email"><b>Email:</b></label> <span>{{profile.email || 'Not provided'}}</span>
         </div>
         <div class="form-group">
-            <label for="lastname">Last Name</label> <span>{{profile.lastname}}</span>
+            <label for="firstname"><b>First Name:</b></label> <span>{{profile.firstname || 'Not provided'}}</span>
+        </div>
+        <div class="form-group">
+            <label for="lastname"><b>Last Name:</b></label> <span>{{profile.lastname || 'Not provided'}}</span>
         </div>
 
         <div class="form-group">
-            <label for="phone">Phone Number</label>  <span>{{profile.phone}}</span>
+            <label for="phone"><b>Phone Number:</b></label>  <span>{{profile.phone || 'Not provided'}}</span>
         </div>
 
         <div *ngIf="servererror" style="display: block;" class="invalid-feedback">
@@ -26,19 +29,29 @@
 <div *ngIf="!showProfile">
     <h2>Update Profile</h2>
     <form *ngIf="!registrationSucc" [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="mt-5">
-        <div class="form-group">
-            <label for="firstname">First Name</label>
-            <input type="text" formControlName="firstname" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.firstname.errors }" />
+        <div class="form-group" *ngIf="profile.email" >
+            <label for="email"><b>Email:</b></label> <span>{{profile.email || 'Not provided'}}</span>
         </div>
         <div class="form-group">
-            <label for="lastname">Last Name</label>
+            <label for="firstname">First Name<span *ngIf="regRequired && regRequired.firstName">*</span></label>
+            <input type="text" formControlName="firstname" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.firstname.errors }" />
+            <div *ngIf="submitted && f.firstname.errors" class="invalid-feedback">
+                <div *ngIf="f.firstname.errors.required">First name is required</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="lastname">Last Name<span *ngIf="regRequired && regRequired.lastName">*</span></label>
             <input type="text" formControlName="lastname" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.lastname.errors }" />
+            <div *ngIf="submitted && f.lastname.errors" class="invalid-feedback">
+                <div *ngIf="f.lastname.errors.required">Last name is required</div>
+            </div>
         </div>
 
         <div class="form-group">
-            <label for="phone">Phone Number</label>
+            <label for="phone">Phone Number<span *ngIf="regRequired && regRequired.phone">*</span></label>
             <input type="text" formControlName="phone" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.phone.errors }" />
             <div *ngIf="submitted && f.phone.errors" class="invalid-feedback">
+                <div *ngIf="f.phone.errors.required">Phone number is required</div>
                 <div *ngIf="f.phone.errors.pattern">Please enter a valid phone number (digits only)</div>
             </div>
         </div>
