@@ -1573,6 +1573,9 @@ function main() {
     let embeddedViewOnly = schemaDef.embeddedViewOnly ? true : false;
     let viewName = schemaDef.name; //Display name on UI
     let api = schemaDef.api || 'LCRUDA'; //APIs exposed to front end ('LCRUDA')
+    if (schemaDef.mraUI && schemaDef.mraUI.api) {
+      api = schemaDef.mraUI.api;
+    }
     api = api.toUpperCase();
     let singleRecord = schemaDef.singleRecord || false;
     if (singleRecord) {
