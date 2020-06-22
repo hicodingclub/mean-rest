@@ -33,18 +33,33 @@
           }%>
         <div><%
         for (let [index, field] of fieldGrpProcessed.entries()){
-              let fn = field.fieldName; let ft = field.type;;
-          %>
-          <div <%_ if (ft !== 'AngularSelector') {%> *ngIf="detail['<%-fn%>']"<%}%> class="mr-3 d-inline-flex flex-wrap"><%_ if (ft !== 'AngularSelector') {%>
-            <div><label><%-field.displayName%>:</label></div><%}%>
-            <div class="ml-3"><% include schema-display.field.html %>
-            </div>
-          </div><%_
+              let fn = field.fieldName; let ft = field.type;
+          %><%
+          if (field.ref) {%>
+          <div *ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem"><%}%>
+            <div <%_ if (ft !== 'AngularSelector') {%> *ngIf="detail['<%-fn%>']"<%}%> class="mr-3 d-inline-flex flex-wrap"><%_ if (ft !== 'AngularSelector') {%>
+              <div><label><%-field.displayName%>:</label></div><%}%>
+              <div class="ml-3"><% include schema-display.field.html %>
+              </div>
+            </div><%
+          if (field.ref) {%>
+          </div><%}%><%_
         }%>
         </div><%_  
-    }%><% if (cardHasLink) {%>
-        <div class="read-more mt-3" (click)="onDetailLinkClicked(detail['_id'])">
-        Read more ...
+    }%>
+        <div class="d-flex flex-row mt-1"><% if (includeSubDetail) {%>
+          <div class="read-more mr-5">
+            <span class="pointer" (click)="toggleShowDetailItem(i)">
+              <i *ngIf="!detail.mddsShowDetail" class="fas fa-caret-down" title="More"></i>
+              <i *ngIf="detail.mddsShowDetail" class="fas fa-caret-up" title="Less"></i>
+            </span>
+          </div><%}%><% if (cardHasLink) {%>
+            <div class="read-more" (click)="onDetailLinkClicked(detail['_id'])">
+              Detail <i class="fas fa-arrow-right" ></i>
+            </div><%}%>
+        </div><%_ if (includeSubDetail) {%>
+        <div *ngIf="detail.mddsShowDetail" >
+            <app-<%-schemaName%>-detail-sub [inputData]="detail['_id']"></app-<%-schemaName%>-detail-sub>
         </div><%}%>
       </div><%
   }%>

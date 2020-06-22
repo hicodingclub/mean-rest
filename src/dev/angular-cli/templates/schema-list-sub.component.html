@@ -25,64 +25,27 @@
 	<div class="container search">
 		<%_ let disableRefreshIcon = true; let disableSortSelection = true; let disableViewSwitch = true;%><% include schema-list.pagination.html %>
 	</div>
-	<table *ngIf="list.length > 0" class="table">
-	    <thead>
-	    	<tr>
-		        <th scope="col">#</th>
-<%_ for (let field of briefView){
-			if (field.hidden) continue;
-			%>
-		        <th <%_if (field.ref) {%> *ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem" <%}%> scope="col">
-		        	<%-field.displayName%>
-		        </th><%_ } %>      
-                <th scope="col" style="width:2rem;"></th>
-				<%_ let putDelete = embeddedViewOnly && api.includes('D');
-					let putRead = !embeddedViewOnly && api.includes('R');
-					let putArchive = embeddedViewOnly && api.includes('A');
-					let lastColumnWidth = 0;
-					if (putDelete) { lastColumnWidth += 2;}
-					if (putArchive) { lastColumnWidth += 2;}
-					if (putRead) { lastColumnWidth = 5;}
-					if (lastColumnWidth) {
-					%>
-		        <th scope="col" style="width: <%-lastColumnWidth%>rem;"></th><%}%>
-	        </tr>
-	    </thead>
-	    <tbody>
-	      <ng-template ngFor let-detail [ngForOf]="list" let-i="index">
-	        <tr [ngClass]="{'clicked-row': clickedId==detail['_id']}"> <!-- *ngFor="let detail of list;  let i = index" -->
-	            <td scope="row">{{(page-1)*perPage+i+1}}</td>
-<%_ let view = 'list'; for (let field of briefView){
-			if (field.hidden) continue;
-			let fn = field.fieldName, ft = field.type;; %>
-	            <td <%_if (field.ref) {%> *ngIf="referenceFieldsMap['<%-fn%>'] != parentItem" <%}%> >
-	            	<% include schema-display.field.html %>
-                </td><%_ } %>
-	            <td>
-                    <%_ if (detailSubView.length != 0) {%>
-                    	<%if(api.includes('R')){%>
-			        <span class="pointer" (click)="toggleCheckedItem(i)">
-			            <i *ngIf="!checkedItem[i]" class="fas fa-caret-down" title="More"></i>
-			            <i *ngIf="checkedItem[i]" class="fas fa-caret-up" title="Less"></i>
-			        </span><%}%><%}%>
-                </td>
-                <%_ if (lastColumnWidth) {%>
-	            <td><%_ if (putRead) {%>
-					<span class="read-more font-size-75 mt-3" (click)="onDetailLinkClicked(detail['_id'])">Detail <i class="fas fa-arrow-right" ></i></span><%_ }
-				if (putDelete) {%>
-	            	<a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%_ }
-				if (putArchive) {%>
-					<a routerLink="." (click)="onArchive(detail['_id'], i)"><i class="fa fa-archive" title="Archive"></i></a><%_ }%>
-                </td><%}%>
-	        </tr>
-	        <%_ let colspan = briefView.length %><%if(api.includes("R")){%>
-	        <tr *ngIf="checkedItem[i]" >
-	        	<td colspan="<%-colspan%>"><app-<%-schemaName%>-detail-sub [inputData]="detail['_id']"></app-<%-schemaName%>-detail-sub></td>
-	        </tr><%}%>
-	      </ng-template>
-	    </tbody>
-	</table>
-	
+	<%_ let view = 'list'; %>
+	<div *ngIf="list.length > 0"><%
+		let clickToDetail = false;
+		let cardHasLink = !embeddedViewOnly && api.includes('R');
+
+		let clickToCheck = false;
+
+		let canUpdate = false;
+		let canDelete = embeddedViewOnly && api.includes('D');
+		let canArchive = embeddedViewOnly && api.includes('A');
+		let canCheck = false;
+
+		let includeSubDetail = detailSubView.length != 0 && api.includes('R');
+
+		let embeddedEdit = false;
+
+	for (const lt of listTypes) { let viewType = lt[0];%><%_if (viewType === 'list') {%>
+<% include schema-list.view.list.html %><%} else if (viewType === 'table') {%>
+<% include schema-list.view.table.html %><%}%>
+	<%_ } %>
+	</div>
 	<div class="container">
 		<%_ disableRefreshIcon = true; disableSortSelection = true; disableViewSwitch = true;%><% include schema-list.pagination.html %>
 	</div>

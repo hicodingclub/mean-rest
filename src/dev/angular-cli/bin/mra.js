@@ -31,6 +31,7 @@ const VERSION = require('../package').version;
 const { Selectors } = require('./selectors');
 
 let warningNumber = 0;
+let errorNumber = 0;
 
 const _exit = process.exit;
 
@@ -446,6 +447,7 @@ const generateSourceFile = function (keyname, template, renderObj, outputDir) {
         keyname,
         err
       );
+      increaseError();
       return;
     }
     if (options == 'W') {
@@ -2716,8 +2718,10 @@ function main() {
   } /*End of generate source for each schema*/
 
   console.log();
-  if (warningNum() > 0) {
-    console.log('+++ total warnings:', warningNum());
+  const [wNum, eNum] = warningNum();
+  if (wNum + eNum > 0) {
+    console.log('+++ total warnings:', wNum);
+    console.log('+++ total errors:', eNum);
   } else {
     console.log('+++ Done!');
   }
@@ -2784,8 +2788,12 @@ function warning(message) {
   console.error();
   warningNumber += 1;
 }
+function increaseError() {
+  errorNumber += 1;
+}
+
 function warningNum() {
-  return warningNumber;
+  return [warningNumber, errorNumber];
 }
 /**
  * echo str > file.
