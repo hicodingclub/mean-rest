@@ -48,6 +48,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public checkAll = false;
   // used to mark deleted items, or items that will show sub-detail, etc.
   public checkedItem: boolean[] = [];
+  public showDetailItem: boolean[] = [];
 
   // For edit and view details
   public detail: any = {};
@@ -2727,6 +2728,10 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   /*Sub detail show flag*/
   public toggleCheckedItem(i: number): void {
     this.checkedItem[i] = !this.checkedItem[i];
+  }
+
+  toggleShowDetailItem(i: number): void {
+    this.list[i].mddsShowDetail = !this.list[i].mddsShowDetail;
   }
 
   public onAdd() {
