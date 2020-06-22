@@ -11,7 +11,9 @@
                	  <%if (ref_l){%><a routerLink="."  (click)="onDisplayRefClicked('<%-fn%>', detail['<%-fn%>'], $event)"><%_}%>
 	            	{{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}}
 	              <%if (ref_l){%></a><%_}%><%_
-                } else if (ft === 'SchemaDate') {%>  {{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}}<%_
+                } else if (ft === 'SchemaDate') {
+                    let fmraT = field.mraType;
+                    %>  {{detail['<%-fn%>']? (detail['<%-fn%>']['originalValue'] | date:'<%-fmraT%>') : ''}}<%_
                 } else if (ft === 'SchemaArray') {
                         if (field.enumValues && field.elementUnique) {%>
                     <div class="badge badge-pill badge-secondary" *ngFor="let element of enums['<%-fn%>']">

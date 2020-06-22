@@ -568,6 +568,11 @@ const getPrimitiveField = function (fieldSchema) {
     case 'SchemaDate':
       jstype = 'string';
       flagDate = true;
+      if (fieldSchema.options.mraType) {
+        mraType = fieldSchema.options.mraType; //https://angular.io/api/common/DatePipe
+      } else {
+        mraType = 'medium'; // 'medium': equivalent to 'MMM d, y, h:mm:ss a' (Jun 15, 2015, 9:03:01 AM).
+      }
       break;
     default:
       warning(`Field type ${type} is not recoganized...`);

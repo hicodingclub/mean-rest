@@ -517,6 +517,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     return {
       date: { day: d, month: M, year: yyyy },
       value,
+      originalValue: field,
       from: undefined,
       to: undefined,
       pop: false,
