@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, OnChanges, Input } from '@angular/core';
 
 import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
 
@@ -40,8 +40,13 @@ const validateInputs = (form) => {
     templateUrl: 'action-email.component.html',
     styleUrls: ['action-email.component.css']
 })
-export class ActionEmailComponent extends ActionBase implements OnInit {
+export class ActionEmailComponent extends ActionBase implements OnInit, OnChanges {
     @Input() emailFields = [];
+    @Input() recordNumber: number = 0;
+    @Input() stringFields: string[] = [];
+
+    recipientNumber: number = 0;
+
     showDialog = false;
     showTemplate = true;
     emailForm: FormGroup;
@@ -83,7 +88,14 @@ export class ActionEmailComponent extends ActionBase implements OnInit {
                 }
             }
             this.emailData.emailFields = emailFields;
+            this.recipientNumber = this.recordNumber * emailFields.length;
         });
+
+        this.recipientNumber = this.recordNumber * 1;
+    }
+
+    ngOnChanges(data) {
+        this.recipientNumber = this.recordNumber * 1;
     }
 
     buttonClicked() {
@@ -112,8 +124,8 @@ export class ActionEmailComponent extends ActionBase implements OnInit {
         this.emitEvent({
             actionType: 'emailing',
             actionData: this.emailData,
-            succMessage: 'Email sent!',
-            resultFields: ['success', 'fail'],
+            succMessage: 'Email processed!',
+            resultFields: ['success', 'fail', 'queuing'],
         });
         this.showDialog = false;
     }

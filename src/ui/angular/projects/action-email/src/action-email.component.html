@@ -4,7 +4,7 @@
     <div class="modal-front">
         <form [formGroup]="emailForm" (ngSubmit)="onSubmit()">
             <div *ngIf="emailFields.length > 0" class="form-group">
-                <label>Send emails to the following email recipients:</label>
+                <label>Send emails to the recipients identified by the following fields:</label>
                 <div class="email-recipients">
                     <label  class="radio-checkbox" *ngFor="let control of ec; let i=index">
                         <input type="checkbox" [formControl]="control">
@@ -14,6 +14,9 @@
                 <div *ngIf="submitted && f.emailFields.errors" class="invalid-feedback">
                     <div *ngIf="f.emailFields.errors.required">Please select the email recipients.</div>
                 </div>
+            </div>
+            <div class="form-group">
+                <label>Note: Estimated number of emails to send out: <span style="color: red;">{{recipientNumber}}</span>.</label>
             </div>
             <div class="form-group">
                 <label>How do you want to enter the email content?</label>
@@ -45,7 +48,6 @@
                     </div>
                 </div>
 
-
                 <div class="form-group input-group">
                     <label for="content">Email Content</label>
                     <!--
@@ -59,12 +61,16 @@
                     </div>
                 </div>
             </div>
-
+            <div *ngIf="stringFields.length > 0">
+                You can use the following tokens in the composed email content to substitute the actual field value:
+                <div>
+                    <span *ngFor="let f of stringFields; let i = index;">{{'{'+'{'+f+'}'+'}'}}&nbsp;</span>
+                </div>
+            </div>
             <div class="form-group action-buttons-center">
                 <button class="btn btn-success">Submit</button>
                 <button class="btn btn-outline-success" type="button" (click)="cancel()" >Cancel</button>
             </div>
-
         </form>
     </div>
 </div>
