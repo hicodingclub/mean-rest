@@ -494,48 +494,89 @@ class RestController {
         return next(createError(400, 'Bad document in body.'));
       }
     }
+
+    if (actionType === '/mddsaction/emailing') {
+      try {
+        this.emailAllCheck(req);
+      } catch (err) {
+        return next(err);
+      }
+    } else if (actionType === '/mddsaction/export') {
+      ;
+    } else {
+      return next(createError(400, `Action ${actionType} not supported.`));
+    }
+
     const searchContext = body ? body.search : {};
 
     let rows = [];
+    let emailAllResult = {success: 0, fail: 0, queuing: 0, error: null}
 
-    const PER_PAGE = 500; //query 1000 each time
+    const PER_PAGE = 400; //query 400 each time. SES limit is 500;
     for (let p = 1; ; p++) {
       req.query['__page'] = String(p);
       req.query['__per_page'] = String(PER_PAGE);
+      let output;
       try {
-        let output = await this.searchAll(req, res, next, searchContext, true); // set furtherAction parameter to true
+        output = await this.searchAll(req, res, next, searchContext, true); // set furtherAction parameter to true
         if (!output.page) {
           // not expected result. must be next() called by searchAll. Just return it.
           return output;
         }
-        rows = rows.concat(output.items);
-
-        let { page, total_pages, total_count } = output;
-        if (page === total_pages) {
-          //done all query
-          break;
-        }
       } catch (err) {
-        return next(err);
+        //handle DB query error
+        if (actionType === '/mddsaction/export') {
+          return next(err);
+        } else if (actionType === '/mddsaction/emailing') {
+          return this.emailAllError(req, res, next, emailAllResult, err);
+        }
+      }
+
+      rows = rows.concat(output.items);
+
+      // handle each search chunk
+      if (actionType === '/mddsaction/emailing') {
+        try {
+          let result = await this.emailAll(req, output.items);
+          emailAllResult.success += result.success;
+          emailAllResult.fail += result.fail;
+          emailAllResult.queuing += result.queuing;
+          emailAllResult.error = result.error;
+        } catch (err) {
+          return this.emailAllError(req, res, next, emailAllResult, err);
+        }
+      }
+      let { page, total_pages, total_count } = output;
+      if (page === total_pages) {
+        //done all query
+        break;
       }
     }
 
+    // handle all chunk;
     if (actionType === '/mddsaction/export') {
       return this.exportAll(req, res, next, rows);
-    }
-    if (actionType === '/mddsaction/emailing') {
-      return this.emailAll(req, res, next, rows);
+    } else if (actionType === '/mddsaction/emailing') {
+      return res.send(emailAllResult);
     }
     return next(createError(400, `Action ${actionType} not supported.`));
   }
 
-  async emailAll(req, res, next, rows) {
+  emailAllError(req, res, next, emailAllResult, err) {
+    if (emailAllResult.success + emailAllResult.fail + emailAllResult.queuing > 0) {
+      emailAllResult.error = err;
+      return res.send(emailAllResult);
+    }
+    return next(err);
+  }
+  // throw error, return actionData
+  emailAllCheck(req) {
     let body = req.body;
     if (typeof body === 'string') {
       try {
         body = JSON.parse(body);
       } catch (e) {
-        return next(createError(400, 'Bad document in body.'));
+        throw createError(400, 'Bad document in body.');
       }
     }
     const actionData = body ? body.actionData : {};
@@ -562,22 +603,36 @@ class RestController {
     }
 
     if (badRequest) {
-      return next(createError(400, 'Bad action data for emailing'));
+      throw createError(400, 'Bad action data for emailing');
     }
 
     const { emailer, emailerObj } = this.mddsProperties || {};
-
     if (!emailer) {
-      return next(createError(503, 'Emailing service is not available'));
+      throw createError(503, 'Emailing service is not available');
     }
+    return actionData;
+  }
+
+  async emailAll(req, rows) {
+    const {
+      emailInput,
+      emailTemplate,
+      subject,
+      content,
+      emailFields,
+    } = this.emailAllCheck(req);
+
+    const { emailer, emailerObj } = this.mddsProperties || {};
 
     const recipients = [];
+    const substitutions = [];
     for (let i = 0; i < rows.length; i++) {
       for (let j = 0; j < emailFields.length; j++) {
         const emailField = emailFields[j];
         const eml = rows[i][emailField];
         if (eml) {
           recipients.push(eml);
+          substitutions.push(rows[i]);
         }
       }
     }
@@ -589,29 +644,36 @@ class RestController {
         result = await emailer.sendEmailTemplate(
           recipients,
           emailTemplate,
-          emailerObj || {}
+          emailerObj || {},
+          substitutions,
         );
       } else {
         result = await emailer.sendEmail(
           undefined,
           recipients,
           subject,
-          content
+          content,
+          emailerObj || {},
+          substitutions,
         );
       }
-      // result: {success: 1, fail: 0, errors: []}
-      const err =
-        result.errors[0] || new Error(`Email send failed: unknown error.`);
-      if (result.success > 0) {
-        return res.send({
+      // result: {success: 1, fail: 0, queuing: 1, errors: []}
+      let err = new Error(`Email send failed: unknown error.`);
+      if (result.errors.length > 0 ) {
+        err = result.errors[0];
+      }
+      if (result.success + result.fail + result.queuing > 0) {
+        return {
           success: result.success,
+          queuing: result.queuing,
           fail: result.fail,
           error: err,
-        });
+        };
+      } else {
+        throw err;
       }
-      return next(err);
     } catch (err2) {
-      return next(err2);
+      throw (err2);
     }
   }
 
@@ -1549,9 +1611,14 @@ class RestController {
         reject(err);
       });
     }
+    // For APIs that return Promise
     if (apiName == 'create') {
-      return model.create(params);
+      return model.create.apply(model, params);
+    } else if (apiName == 'insertMany') {
+      return model.insertMany.apply(model, params);
     }
+
+    // For APIs that return Query
     let dbExe = model[apiName].apply(model, params);
     return dbExe.exec();
   }
