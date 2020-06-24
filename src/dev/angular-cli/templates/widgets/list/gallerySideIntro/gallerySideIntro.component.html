@@ -54,10 +54,10 @@ if (listCategoryRef && listCategoryShowMore) {%>
 
 					if(api.includes('C') && listActionButtons[0]){%>
 					<a [routerLink]="['../new' ]" [skipLocationChange]="false" class="btn btn-outline-primary"><%-listActionButtons[0]%></a><%}%><%
-					<%if(api.includes('D') && listActionButtons[1]){%>
+					if(api.includes('D') && listActionButtons[1]){%>
 					<a routerLink="." class="btn btn-outline-primary" (click)="onDeleteSelected()"
 						[ngClass]="{'disabled': !isItemSelected()}"><%-listActionButtons[1]%></a><%}%><%
-					<%if(api.includes('A') && listActionButtons[3]){%>
+					if(api.includes('A') && listActionButtons[3]){%>
 					<a routerLink="." class="btn btn-outline-primary" (click)="onArchiveSelected()"
 						[ngClass]="{'disabled': !isItemSelected()}">
 							<span *ngIf="!archivedSearch"><%-listActionButtons[3]%></span>
