@@ -908,6 +908,12 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     return cpy;
   }
 
+  public fieldHasValue(value: any) {
+    if (typeof value === 'undefined') return false;
+    if (typeof value === 'string') return !!value;
+    return true;
+  }
+
   public stringifyField(field: any): string {
     let str = "";
 
