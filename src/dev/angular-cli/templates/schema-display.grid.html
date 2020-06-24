@@ -34,7 +34,7 @@
 
           let fn = field.fieldName; let ft = field.type;;
           %>
-          <div <%_ if (ft !== 'AngularSelector') {%> *ngIf="detail['<%-fn%>']"<%}%> class="d-flex flex-wrap"><%_ if (ft !== 'AngularSelector') {%>
+          <div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%> class="d-flex flex-wrap"><%_ if (ft !== 'AngularSelector') {%>
             <div class=""><label><%-field.displayName%>:</label></div><%}%>
             <div class="ml-3"><% include schema-display.field.html %></div>
           </div><%_ 

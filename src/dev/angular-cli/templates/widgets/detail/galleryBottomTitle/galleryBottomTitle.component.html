@@ -38,7 +38,7 @@
 					
 							let fn = field.fieldName; let ft = field.type;;
 							%>
-						<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="detail['<%-fn%>']"<%}%> class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (ft !== 'AngularSelector') {%>
+						<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%> class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (ft !== 'AngularSelector') {%>
 							<div class="field-label text-right w-50" [ngStyle]="style['<%-fn%>-label']">
 								<%-field.displayName%>:
 							</div><%}%>

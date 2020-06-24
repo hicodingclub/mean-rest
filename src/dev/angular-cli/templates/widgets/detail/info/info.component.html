@@ -5,7 +5,7 @@
 		<div class="card-header grid-head" [ngStyle]="style['card-header']"><%_{
 				let view='detail'; let largePicture=true;
 				let field = detailView[0]; let fn = field.fieldName; let ft = field.type;;%>
-		  <div *ngIf="detail['<%-fn%>']" class="grid-head-picture"><% include ../../../schema-display.field.html %>
+		  <div *ngIf="fieldHasValue(detail['<%-fn%>'])" class="grid-head-picture"><% include ../../../schema-display.field.html %>
 		  </div><%_}%>
 		  <div class="ml-1">
 			<h2><%_{

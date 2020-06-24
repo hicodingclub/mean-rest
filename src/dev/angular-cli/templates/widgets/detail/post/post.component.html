@@ -3,7 +3,7 @@
 	<div class="card transparent-border"><%
 		{ let view = 'detail'; let largePicture = true;
 		field = detailView[0]; let fn = field.fieldName; let ft = field.type;;%>
-		<div class="post-head-picture" *ngIf="detail['<%-fn%>']">
+		<div class="post-head-picture" *ngIf="fieldHasValue(detail['<%-fn%>'])">
 			<% include ../../../schema-display.field.html %>
 		</div><%
 		}%>
