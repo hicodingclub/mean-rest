@@ -106,6 +106,21 @@ async function newApp(name) {
         cleanup(appName);
         return;
     }
+    const marGenScript = [
+        [path.join(appDir, 'frontend', 'front-pub', 'mra.sh')],
+        [path.join(appDir, 'frontend', 'front-adm', 'mra.sh')],
+    ];
+    try {
+        for (let i = 0; i < marGenScript.length; i++) {
+            const ele = marGenScript[i];
+            const mraGen = ele[0];
+            await replaceContent(mraGen, /backend-base/g, 'backend');
+        }
+    } catch (err) {
+        console.error(`Error! Failed to change mra.sh input directory to backend: ${err.message}`);
+        cleanup(appName);
+        return;
+    }
 
     console.log(`Done! Application ${appName} is created in ${appDir} directory.`);
 }
