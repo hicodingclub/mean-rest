@@ -52,6 +52,26 @@ const edit2 = 'subject content template';
 const textSearch2 = 'subject content';
 const index2 = 'module';
 
+const queueSchema = new Schema({
+  from: { type: String },
+  to: { type: String },
+  number: { type: Number },
+  subject: { type: String },
+  content: { type: String, editor: true },
+  replacements: {type: String},
+  defaultReplacement: {type: String},
+  processed: { type: Boolean, default: false },
+  sent: { type: Number, default: 0 },
+  fail: { type: Number, default: 0 },
+  result: { type: String,},
+}, {timestamps: true});
+const brief4 = 'subject processed number sent createdAt';
+const detail4 = 'subject from to  processed number sent result createdAt updatedAt content replacements defaultReplacement';
+const create4 = 'subject from to subject processed number sent result content replacements defaultReplacement';
+const edit4 = 'subject from to processed number sent result content replacements defaultReplacement';
+const textSearch4 = 'subject content';
+const index4 = 'subject';
+
 const emailSettingsSchema = new Schema({
   settingName: { type: String, required: true },
   hiddenUnique: { type: String, default: 'unique'}, // hidden filed to make sure it is unique
@@ -88,12 +108,20 @@ const schemas = {
     singleRecord: true, //single record for configuration
     api: 'LRU', // don't allow delete and create - single record
   },
+  'emailQueue': {
+    schema: queueSchema,
+    views: [brief4, detail4, create4, edit4, textSearch4, index4],
+    name: 'Email Queue',
+    api: 'LR',
+  },
+  /*
   'emailLog': {
     schema: emailLogSchema,
     views: [brief2, detail2, create2, edit2, textSearch2, index2],
     name: 'Email Log',
     api: 'LR',
   },
+  */
 };
 
 const dateFormat = 'MM-DD-YYYY';
