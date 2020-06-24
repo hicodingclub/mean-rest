@@ -471,8 +471,8 @@ class AuthnController {
       link: emailerObj.serverUrlRegVerification + verificationToken
     };
     const result = await emailer.sendEmailTemplate([email], tag, obj);
-    // result: {success: 1, fail: 0, errors: []}
-    if (result.success !== 1) {
+    // result: {success: 1, fail: 0, pending: 0, errors: []}
+    if (result.fail === 1) {
       throw result.errors[0] || new Error('Email send failed: unknown error.');
     }
     return;
@@ -609,8 +609,8 @@ class AuthnController {
       };
       try {
         const result = await emailer.sendEmailTemplate([email], tag, obj);
-        // result: {success: 1, fail: 0, errors: []}
-        if (result.success !== 1) {
+        // result: {success: 1, fail: 0, pending: 1, errors: []}
+        if (result.fail === 1) {
           return next(result.errors[0] || new Error('Email send failed: unknown error.'));
         }
       } catch (err2) {

@@ -32,7 +32,7 @@ const accountSchema = new Schema({
   },
   status:    {type: String, enum: ['Enabled', 'Disabled', 'Pending'], default: 'Enabled'},
   since: { type: Date, default: Date.now },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
   firstname: {type: String, maxlength: 100},
   lastname: {type: String, maxlength: 100},
 });
