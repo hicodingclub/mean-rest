@@ -103,7 +103,6 @@ class MddsEmailer {
     let template;
 
     let success = 0, fail = 0, errors = [];
-
     try {
       template = await this.restController.ModelExecute(
         "emailTemplate",

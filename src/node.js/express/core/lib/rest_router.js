@@ -73,10 +73,11 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
   
   //console.log("*******sysDef", sysDef)
   let schemas = sysDef.schemas;
+  expressRouter.schemas = schemas;
 
   let sub_routes = [];
   for (let schemaName in schemas) {
-    var schemaDef = schemas[schemaName];
+    const schemaDef = schemas[schemaName];
     
     let name = schemaName.toLowerCase();
     let api;
@@ -197,6 +198,18 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     }
     // no predefined template at this time.
     // emailer.populateTemplatesToDB(templates);
+    let schemas = expressRouter.schemas;
+    for (let schemaName in schemas) {
+      const schemaDef = schemas[schemaName];
+      const mraBE = schemaDef.mraBE || {};
+      const emailerConf = mraBE.emailer || {};
+      const templates = emailerConf.templates || [];
+      const replacement = emailerConf.replacement || {};
+      const hooks = emailerConf.hooks || {};
+      if (templates.length > 0){
+        emailer.populateTemplatesToDB(templates);
+      }
+    }
 
     restController.mddsProperties.emailer = emailer;
 

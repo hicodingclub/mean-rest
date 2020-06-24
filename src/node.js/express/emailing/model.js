@@ -112,7 +112,7 @@ const schemas = {
     schema: queueSchema,
     views: [brief4, detail4, create4, edit4, textSearch4, index4],
     name: 'Email Queue',
-    api: 'LR',
+    api: 'LRU',
     mraUI: {
       defaultListSort: { createdAt: 'desc' },
     }

@@ -622,7 +622,7 @@ class RestController {
       emailFields,
     } = this.emailAllCheck(req);
 
-    const { emailer, emailerObj } = this.mddsProperties || {};
+    const { emailer, emailerObj, replacement } = this.mddsProperties || {};
 
     const recipients = [];
     const substitutions = [];
@@ -644,7 +644,7 @@ class RestController {
         result = await emailer.sendEmailTemplate(
           recipients,
           emailTemplate,
-          emailerObj || {},
+          replacement || emailerObj || {},
           substitutions,
         );
       } else {
@@ -653,7 +653,7 @@ class RestController {
           recipients,
           subject,
           content,
-          emailerObj || {},
+          replacement || emailerObj || {},
           substitutions,
         );
       }
@@ -1516,10 +1516,11 @@ class RestController {
       }
     }
     body = ownerPatch(body, owner, req);
-    model.create(body, function (err, result) {
+    model.create(body, (err, result) => {
       if (err) {
         return next(err);
       }
+      this.handleInsertHooks(result, mraBE);
       return res.send(result);
     });
   }
@@ -1648,6 +1649,21 @@ class RestController {
     }
     return dbExe.exec();
   }
+
+  handleInsertHooks(data, mraBE) {
+    // 1. check emailer hooks
+    const { emailer, emailerObj } = this.mddsProperties || {};
+    if (!emailer) return;
+    const emailerConf = mraBE.emailer || {};
+    const replacement = emailerConf.replacement || {};
+    const hooks = emailerConf.hooks || {};
+    if (hooks.insert) {
+      hooks.insert(emailer, data, replacement, emailerObj);
+    }
+
+    // 2. check .... hooks
+  }
+
 }
 
 module.exports = RestController;
