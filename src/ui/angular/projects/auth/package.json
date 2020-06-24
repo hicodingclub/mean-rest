@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/angular-auth",
-  "version": "0.9.16",
+  "version": "0.9.20",
   "peerDependencies": {
     "@angular/common": "^8.2.14",
     "@angular/core": "^8.2.14",
