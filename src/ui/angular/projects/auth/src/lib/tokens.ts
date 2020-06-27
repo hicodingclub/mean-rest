@@ -61,3 +61,12 @@ export const AUTHENTICATION_REGISTRATION_REQUIRED = new InjectionToken<any>(
     },
   },
 );
+export const AUTHENTICATION_REGISTRATION_DISABLE = new InjectionToken<boolean>(
+  'AUTHENTICATION_REGISTRATION_PIPELINE',
+  {
+    providedIn: 'root',
+    factory: () => {
+      return false;
+    },
+  },
+);
