@@ -55,6 +55,9 @@ const schemas = {
     views: [userBrief, userDetail, userCreat, userEdit, userTextSearch, userIndex],
     name: 'User',
     api: 'LRCUM', // M - email
+    mraUI: {
+      listType: 'table',
+    },
   }
 };
 

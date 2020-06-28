@@ -50,6 +50,9 @@ const schemas = {
     views: [accountBrief, accountDetail, accountCreat, accountEdit, accountTextSearch, accountIndex],
     name: 'Account',
     api: 'LRCUDM', // M - email
+    mraUI: {
+      listType: 'table',
+    },
   },
 };
 

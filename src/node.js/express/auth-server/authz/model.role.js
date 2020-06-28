@@ -51,17 +51,26 @@ const schemas = {
   "mrole": {
     schema: roleSchema,
     views: [roleBrief, roleDetail, roleCreat, roleEdit, roleTextSearch, roleIndex],
-    name: 'Role'
+    name: 'Role',
+    mraUI: {
+      listType: 'table',
+    },
   },
   "mmodule": {
     schema: moduleSchema,
     views: [moduleBrief, moduleDetail, moduleCreat, moduleEdit, moduleTextSearch, moduleIndex],
-    name: 'System Module'
+    name: 'System Module',
+    mraUI: {
+      listType: 'table',
+    },
   },
   "mpermission": {
     schema: permissionSchema,
     views: [permBrief, permDetail, permCreat, permEdit, permTextSearch, permIndex],
-    name: 'Permission'
+    name: 'Permission',
+    mraUI: {
+      listType: 'table',
+    },
   }
 };
 
@@ -102,7 +111,10 @@ const GetAuthzModuleDef = function(userSchemaName, userSchema) {
     schema: accountRoleSchema,
     views: [accountRoleBrief, accountRoleDetail, accountRoleCreat, 
       accountRoleEdit, accountRoleTextSearch, accountRoleIndex],
-    name: 'Account Role'
+    name: 'Account Role',
+    mraUI: {
+      listType: 'table',
+    },
   }
   
   return {schemas: schemas, config: config, authz: authz, DB_CONFIG};
