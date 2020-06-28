@@ -1,4 +1,4 @@
-						<%_ 
+						<%_
 							let lineClass = 'two-column-search';
 
 							let labelCol = 'col-12 col-sm-3';
@@ -10,8 +10,18 @@
 								labelCol = 'col-12 col-lg-3';
 								inputCol = 'col-11 col-lg-8';
 							}
+
+							let formControl = 'form-control form-control-sm';
+							let lineSize = 'small';
+							if (typeof size === 'undefined') {
+								;
+							} else if (size === 'normal') {
+								formControl = 'form-control';
+								lineSize = '';
+							}
+							
 						%>
-						<div class="container <%-lineClass%>">
+						<div class="container <%-lineClass%> <%-lineSize%>">
 							<div class="row col-gutter align-items-center">
 								<div class="<%-labelCol%>">
 									<label for="<%-sn%>Edit<%-Fn%>">
@@ -29,7 +39,7 @@
 										<span class="form-check-label"><%-f%></span>
 									</div><%_ }) %><%_
 								} else { %>
-									<input type="text" class="form-control" id="<%-sn%>Edit<%-Fn%>"
+									<input type="text" class="<%-formControl%>" id="<%-sn%>Edit<%-Fn%>"
 										<%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>="" <%}%> 
 											[(ngModel)]="detail['<%-fn%>']" name="<%-sn%>Edit<%-Fn%>" #<%-sn%>Edit<%-Fn%>="ngModel"><%_
 								}
@@ -45,20 +55,21 @@
 										<span class="form-check-label">No</span>
 									</div><%_
 							} else if (field.type === "SchemaNumber") { %>
-									<div class="input-group">
+									<div class="input-group align-items-center">
 										<%if (field.mraType === 'currency'){%><span class="currency">$</span><%}%>
-									<input type="number" class="form-control" id="<%-sn%>Edit<%-Fn%>"
-										[(ngModel)]="detail['__mra_<%-fn%>_from']" name="<%-sn%>Edit<%-Fn%>"
-										#<%-sn%>Edit<%-Fn%>="ngModel">
+										<input type="number" class="<%-formControl%>" id="<%-sn%>Edit<%-Fn%>"
+											[(ngModel)]="detail['__mra_<%-fn%>_from']" name="<%-sn%>Edit<%-Fn%>"
+											#<%-sn%>Edit<%-Fn%>="ngModel">
 										<span>&nbsp; ~ &nbsp;</span>
-										<input type="number" class="form-control" id="<%-sn%>Edit<%-Fn%>"
-											[(ngModel)]="detail['__mra_<%-fn%>_to']" name="<%-sn%>Edit<%-Fn%>" #<%-sn%>Edit<%-Fn%>="ngModel">
+										<input type="number" class="<%-formControl%>" id="<%-sn%>Edit<%-Fn%>"
+											[(ngModel)]="detail['__mra_<%-fn%>_to']" name="<%-sn%>Edit<%-Fn%>"
+											#<%-sn%>Edit<%-Fn%>="ngModel">
 									</div><%_
 							} else if (field.type === "SchemaDate") { %>
 									<div class="row">
 										<div class="input-group col-12 col-md-6 align-items-center">
 											<span class="small mx-1" style="width:2rem">From</span>
-											<input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
+											<input class="<%-formControl%>" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
 												[(ngModel)]="detail['<%-fn%>']['from']" name="<%-sn%>Edit<%-Fn%>" ngbDatepicker [minDate]="minDate"
 												#<%-sn%>Edit<%-Fn%>="ngModel">
 											<div class="input-group-append">
@@ -69,7 +80,7 @@
 										</div>
 										<div class="input-group col-12 col-md-6 align-items-center">
 											<span class="small mx-1" style="width:2rem">to</span>
-											<input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
+											<input class="<%-formControl%>" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
 												[(ngModel)]="detail['<%-fn%>']['to']" name="<%-sn%>Edit<%-Fn%>" ngbDatepicker [minDate]="minDate"
 												#<%-sn%>Edit<%-Fn%>="ngModel">
 	
@@ -96,7 +107,7 @@
 									</div><%_
 								} else if (field.type === "ObjectId") { %>
 									<div class="input-group">
-										<input class="form-control rounded" id="<%-sn%>Edit<%-Fn%>"
+										<input class="<%-formControl%> rounded" id="<%-sn%>Edit<%-Fn%>"
 											[ngClass]="{'pointer ref-badge': detail['<%-fn%>']['_id']}" (focus)="onRefSelect('<%-fn%>')"
 											<%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>="" <%}%> 
 											[ngModel]="detail['<%-fn%>']['value']" name="<%-sn%>Edit<%-Fn%>" #<%-sn%>Edit<%-Fn%>="ngModel">
@@ -150,7 +161,7 @@
 									<div *ngIf="detail['<%-fn%>']['adding']" class="new-modal">
 										<div class="card text-center new-card">
 											<div class="card-body">
-												<input type="search" class="form-control border" id="Edit<%-Fn%>New" #Edit<%-Fn%>New="ngModel"
+												<input type="search" class="<%-formControl%> border" id="Edit<%-Fn%>New" #Edit<%-Fn%>New="ngModel"
 													[(ngModel)]="detail['<%-fn%>']['new']" [ngModelOptions]="{standalone: true}"
 													(keydown.enter)="$event.target.blur();onAddArrayItem('<%-fn%>');false">
 

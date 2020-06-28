@@ -16,17 +16,12 @@
 				if (api.includes('A') && listActionButtons[3]) {
 					noMoreSearchArea = false;
 				}
-			%><%_ if (showSearchBox) { %>
+			%><%_ if (showSearchBox) {%>
 			    <div class="input-group">
 	              <input type="search" class="form-control border border-secondary" id="<%-schemaName%>TextSearch" 
 						#<%-schemaName%>TextSearch [(ngModel)]="searchText"
-						(keydown.enter)="$event.target.blur();searchList();false"
-					    placeholder="Search for <%for (let [idx,nm] of stringBoxFields.entries()){%><%if (idx!=0) {%>, <%}%><%-nm%><%}%>"> 
-				  <div *ngIf="searchText" class="input-group-append icon-clear-inside">
-					<span >
-					    <i class="fas fa-times-circle" (click)="onSearchTextClear()" title="Clear"></i>
-				    </span>
-				  </div>
+						(search)="$event.target.blur();searchList();"
+					    placeholder="Search for <%for (let [idx,nm] of stringBoxFields.entries()){%><%if (idx!=0) {%>, <%}%><%-nm%><%}%>">
 				  <div class="input-group-append">
 				    <button type="button" class="btn btn-outline-secondary" (click)="searchList()"><i class="fas fa-search"></i></button>
 				  </div>
@@ -44,7 +39,7 @@
 			    <div class="shadow" *ngIf="moreSearchOpened">
 					<div class="card">
 						<div class="card-body">
-							<div class="d-flex flex-wrap">
+							<div class="d-flex flex-wrap align-items-center">
 								<%_ briefView.forEach( (field) => {
 									if (field.hidden) return;
 									if (listCategoryFieldsNotShown.includes(field.fieldName)) return;
@@ -53,7 +48,12 @@
 										return;
 									}
 									let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName, Sn=SchemaName, mn=moduleName, Mn=ModuleName;
-									%> <%_ include schema-search.field.html %> 
+
+									let obj = {
+										field, fn, fD, Fn, sn, Sn, mn, Mn,
+									}
+									%><%-
+									include('/widgets/search/normal/schema-search.field.html', obj) %> 
 								<%_ }) %>
 							</div>
 							<%_ if(api.includes('A') && listActionButtons[3]) {%>

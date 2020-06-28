@@ -1,0 +1,69 @@
+			<%_ let showSearchBox = false; let stringBoxFields = []; let noMoreSearchArea = true;
+			    for (let field of briefView){
+					if (field.hidden) continue;
+					if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
+					if (field.picture) continue;
+
+					if (field.type === 'AngularSelector') {
+						continue;
+					}
+
+			        if(field.type == 'SchemaString' && !ownSearchStringFields.includes(field.fieldName)) {
+						showSearchBox = true;
+						stringBoxFields.push(field.displayname);
+					} else {noMoreSearchArea = false;}
+				}
+				if (api.includes('A') && listActionButtons[3]) {
+					noMoreSearchArea = false;
+				}
+				
+			%><%_ if (showSearchBox) { %>
+			    <div class="input-group">
+	              <input type="search" class="form-control border border-secondary" id="<%-schemaName%>TextSearch" 
+						#<%-schemaName%>TextSearch [(ngModel)]="searchText"
+						(search)="$event.target.blur();searchList();"
+					    placeholder="Search for <%for (let [idx,nm] of stringBoxFields.entries()){%><%if (idx!=0) {%>, <%}%><%-nm%><%}%>">
+				</div>
+			<%}%><%_ if (typeof noMoreSearchArea == 'undefined' || !noMoreSearchArea) { %>
+			    <div class="mt-1 virtual-card">
+						<div class="d-flex flex-wrap align-items-center"><%_
+							briefView.forEach( (field) => {
+								if (field.hidden) return;
+								if (listCategoryFieldsNotShown.includes(field.fieldName)) return;
+								if (field.type == 'SchemaString' && !ownSearchStringFields.includes(field.fieldName)) return;
+								if (field.type === 'AngularSelector') {
+									return;
+								}
+								let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName, Sn=SchemaName, mn=moduleName, Mn=ModuleName;
+
+								let obj = {
+									field, fn, fD, Fn, sn, Sn, mn, Mn,
+								}
+								%><%-
+								include('/widgets/search/normal/schema-search.field.html', obj) %> 
+							<%_ }) %>
+						</div>
+						<%_ if(api.includes('A') && listActionButtons[3]) {%>
+						<hr>
+						<div class="one-column-search mt-3">
+							<div class="row">
+								<div class="col-3"><label for="Archived">Archived</label></div>
+								<div class="col-8">
+									<label class="mr-1">No</label>
+									<label class="switch">
+										<input type="checkbox"
+											[(ngModel)]="detail['archived']"
+											#EditArchived="ngModel">
+										<span class="slider round"></span>
+									</label>
+									<label class="ml-1">Yes</label>
+								</div>
+							</div>
+						</div>
+						<hr><%}%>
+
+						<div class="action-buttons">
+							<button type="button" class="btn btn-outline-success" (click)="searchList()">Search</button>
+						</div>
+		        </div>
+		    <%}%>

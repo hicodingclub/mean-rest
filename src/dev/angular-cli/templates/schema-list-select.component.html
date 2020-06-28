@@ -11,12 +11,8 @@
 
 <!--  model body starts -->
 
-	<div class="container search">
-		<div class="row">
-			<div class="col">
-				<%_ let noMoreSearchArea = true; %> <%_ include schema-search.bar.html %>
-			</div>
-		</div>
+	<div class="container search"><%_ let noMoreSearchArea = true; %><%_
+		include('/schema-search.include.html') %>
 		<hr/>
 		<%_ let disableRefreshIcon = true; let disableSortSelection = true; let disableViewSwitch = true;%><% include schema-list.pagination.html %>
 	</div>

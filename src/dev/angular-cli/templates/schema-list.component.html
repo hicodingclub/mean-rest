@@ -41,12 +41,8 @@ if (listCategoryRef && listCategoryShowMore) {%>
 </div> <%}%>
 
 <div>
-	<div *ngIf="!options['disableListHead']" class="container search"><% if (!disableListSearch) {%>
-		<div class="row" *ngIf="!options['disableListSearch']">
-			<div class="col">
-				<%_ include schema-search.bar.html %>
-			</div>
-		</div><%}%>
+	<div *ngIf="!options['disableListHead']" class="container search"><%-
+		include('/schema-search.include.html'); %>
 		<div class="row" *ngIf="!options['disableActionButtions']">
 			<div class="col">
 		        <div class="action-buttons"><%

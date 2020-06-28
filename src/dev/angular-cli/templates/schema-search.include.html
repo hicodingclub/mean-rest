@@ -1,0 +1,7 @@
+	<%_if (!disableListSearch) {%>
+		<div class="row" *ngIf="!options['disableListSearch']">
+			<div class="col"><%-
+			include(`/widgets/search/${listSearchType}/${listSearchType}.html`) %>
+			</div>
+		</div><%
+	}%>

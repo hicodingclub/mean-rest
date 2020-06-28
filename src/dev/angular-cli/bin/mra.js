@@ -30,6 +30,8 @@ const VERSION = require('../package').version;
 
 const { Selectors } = require('./selectors');
 
+const ROOTDIR = __dirname.replace(/bin$/, 'templates');
+
 let warningNumber = 0;
 let errorNumber = 0;
 
@@ -432,7 +434,7 @@ const stripFieldMeta = function (viewStr) {
 };
 
 const generateSourceFile = function (keyname, template, renderObj, outputDir) {
-  let renderOptions = {};
+  let renderOptions = {root: ROOTDIR};
   let templateFile = basedirFile(template[0]);
   let output = generatedFile(outputDir, keyname, template[1]);
   let description = template[2];
@@ -1485,6 +1487,8 @@ function main() {
     let listRouterLink = '../../list';
     let disableListSearch = false;
     let listToDetail = 'click';
+    let listSearchType = 'normal';
+
     let defaultSortField, defaultSortOrder;
     let homeListNumber = 4;
     // object {listCategoryField:xxx, listCategoryShowMore: 'field...',
@@ -1556,6 +1560,7 @@ function main() {
       listCategories = mraUI.listCategories || listCategories;
       listSortFields = mraUI.listSortFields;
       homeListNumber = mraUI.homeListNumber || homeListNumber;
+      listSearchType = mraUI.listSearchType || listSearchType;
 
       if (mraUI.defaultListSort) {
         const keys = Object.keys(mraUI.defaultListSort);
@@ -2137,6 +2142,7 @@ function main() {
       defaultSortOrder,
       listWidgets,
       listSelectWidgets,
+      listSearchType,
 
       detailType, // normal, post, info, slide, term...
       DetailType,
@@ -2170,7 +2176,7 @@ function main() {
 
       fileServer: fileServer,
 
-      FIELD_NUMBER_FOR_SELECT_VIEW: FIELD_NUMBER_FOR_SELECT_VIEW,
+      FIELD_NUMBER_FOR_SELECT_VIEW,
     };
     //console.log('======schemaObj', schemaObj);
 
