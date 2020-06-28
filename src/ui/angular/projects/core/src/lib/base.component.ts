@@ -1,16 +1,16 @@
-import { Router, ActivatedRoute, ParamMap } from "@angular/router";
-import { Injector, EventEmitter, Type } from "@angular/core";
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import { Injector, EventEmitter, Type } from '@angular/core';
 
-import { Location } from "@angular/common";
+import { Location } from '@angular/common';
 
-import { ModalConfig, Modal } from "./util.modal";
-import { SnackBarConfig, SnackBar } from "./util.snackbar";
-import { ErrorToastConfig, ErrorToast } from "./util.errortoast";
+import { ModalConfig, Modal } from './util.modal';
+import { SnackBarConfig, SnackBar } from './util.snackbar';
+import { ErrorToastConfig, ErrorToast } from './util.errortoast';
 
-import { MddsBaseService, MddsServiceError } from "./base.service";
-import { MddsCommonService } from "./mdds-common.service";
-import { MddsBaseComponentInterface } from "./base.interface";
-import { Util } from "./util.tools";
+import { MddsBaseService, MddsServiceError } from './base.service';
+import { MddsCommonService } from './mdds-common.service';
+import { MddsBaseComponentInterface } from './base.interface';
+import { Util } from './util.tools';
 
 export enum ViewType {
   LIST,
@@ -18,8 +18,8 @@ export enum ViewType {
   EDIT,
 }
 
-export const MddsUncategorized = "MddsUncategorized";
-export const MddsAll = "MddsAll";
+export const MddsUncategorized = 'MddsUncategorized';
+export const MddsAll = 'MddsAll';
 
 export class MddsBaseComponent implements MddsBaseComponentInterface {
   public objectKeys = Object.keys;
@@ -74,13 +74,13 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public emailFields = []; // [displayName, fieldName]
   public editHintFields = {}; // fields that need hint for their values
   public fieldDisplayNames = {}; // display names of field
-  public dateFormat = "MM/DD/YYYY";
-  public timeFormat = "hh:mm:ss";
+  public dateFormat = 'MM/DD/YYYY';
+  public timeFormat = 'hh:mm:ss';
   public datePickerDisplayMonths = 2;
 
   public briefFieldsInfo = []; // from base contructor. All breifFields
 
-  public listViewFilter = "table"; // list, or grid
+  public listViewFilter = 'table'; // list, or grid
   public listSortField: string;
   public listSortFieldDisplay: string;
   public listSortOrder: string; // 'asc', 'desc'
@@ -215,18 +215,18 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       if (error.status === 401) {
         return;
       } // Don't show unauthorized error
-      if (typeof error.serverError === "object") {
-        errMsg = error.status + ": " + JSON.stringify(error.serverError);
+      if (typeof error.serverError === 'object') {
+        errMsg = error.status + ': ' + JSON.stringify(error.serverError);
       } else {
-        errMsg = error.status + ": " + error.serverError;
+        errMsg = error.status + ': ' + error.serverError;
       }
     }
     if (!errMsg) {
-      errMsg = "Unknown error.";
+      errMsg = 'Unknown error.';
     }
     if (errMsg.length > 80) {
       more = errMsg;
-      errMsg = errMsg.substring(0, 80) + "...";
+      errMsg = errMsg.substring(0, 77) + '...';
     }
     const errorToastConfig: ErrorToastConfig = {
       content: errMsg,
@@ -246,14 +246,14 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       if (error.status === 401) {
         return;
       } // Don't show unauthorized error
-      if (typeof error.serverError === "object") {
-        errMsg = error.status + ": " + JSON.stringify(error.serverError);
+      if (typeof error.serverError === 'object') {
+        errMsg = error.status + ': ' + JSON.stringify(error.serverError);
       } else {
-        errMsg = error.status + ": " + error.serverError;
+        errMsg = error.status + ': ' + error.serverError;
       }
     }
     if (!errMsg) {
-      errMsg = "Unknown error.";
+      errMsg = 'Unknown error.';
     }
     console.error(errMsg);
   }
@@ -294,8 +294,8 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
 
   private getKey(key: string): string {
-    const url = this.router.url.split(";")[0].split("?")[0];
-    return url + ":" + this.schemaName + ":" + key;
+    const url = this.router.url.split(';')[0].split('?')[0];
+    return url + ':' + this.schemaName + ':' + key;
   }
   private putToStorage(key: string, value: any): void {
     if (this.majorUi) {
@@ -313,7 +313,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     }
   }
   private routeToPage(page: number): void {
-    this.putToStorage("page", page);
+    this.putToStorage('page', page);
     this.populateList();
   }
 
@@ -357,38 +357,48 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       this.datePickerDisplayMonths = 1;
     }
     if (this.windowWidth < 992) {
-      if (this.listViewFilter === "table") {
-        this.listViewFilter = "list"; // use list instead
+      if (this.listViewFilter === 'table') {
+        this.listViewFilter = 'list'; // use list instead
       }
     }
   }
 
   public stringify(detail: any): string {
-    let str = "";
+    let str = '';
     for (const fnm of this.indexFields) {
-      if (detail[fnm] && typeof detail[fnm] !== "object") {
-        str += " " + detail[fnm];
+      if (detail[fnm] && typeof detail[fnm] !== 'object') {
+        str += ' ' + detail[fnm];
       }
     }
     if (!str) {
       for (const prop in detail) {
         if (
-          prop !== "_id" &&
+          prop !== '_id' &&
           detail[prop] &&
-          typeof detail[prop] !== "object"
+          typeof detail[prop] !== 'object'
         ) {
-          str += " " + detail[prop];
+          str += ' ' + detail[prop];
         }
       }
     }
     if (!str) {
-      str = detail._id ? detail._id : "...";
+      str = detail._id ? detail._id : '...';
     }
-    str = str.replace(/^\s+|\s+$/g, "");
-    if (str.length > 30) {
-      str = str.substr(0, 27) + "...";
+    str = str.replace(/^\s+|\s+$/g, '');
+    if (str.length > 50) {
+      str = str.substr(0, 47) + '...';
     }
     return str;
+  }
+
+  public objectReduce(detail: any): any {
+    let obj: any = {
+      _id: detail._id,
+    };
+    for (const fnm of this.indexFields) {
+      obj[fnm] = detail[fnm];
+    }
+    return obj;
   }
 
   /***Start: handle textarea fields***/
@@ -396,8 +406,8 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     for (const fnm of this.textareaFields) {
       if (detail[fnm]) {
         detail[fnm] = detail[fnm]
-          .replace(/\r\n/g, "<br/>")
-          .replace(/\n/g, "<br/>");
+          .replace(/\r\n/g, '<br/>')
+          .replace(/\n/g, '<br/>');
       }
     }
     return detail;
@@ -405,32 +415,53 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   /***Start: handle reference fields***/
   public formatReferenceField(field: any, fieldName: string): any {
     let id: string;
-    const value: any = undefined;
-    if (typeof field === "string") {
+    if (typeof field === 'string') {
       // assume this is the '_id', let see we have the cached details for this ref from service
       const refDetail = this.commonService.getFromStorage(field);
-      if (refDetail && typeof refDetail === "object") {
+      if (refDetail && typeof refDetail === 'object') {
         field = refDetail;
       } else {
         id = field;
-        field = { _id: id, value: id };
+        field = {
+          _id: id,
+          value: id,
+          valueMedium: id,
+          valueLong: id,
+        };
       }
-    } else if (field && typeof field === "object") {
+    } else if (field && typeof field === 'object') {
       id = field._id;
-      let referIndex = "";
+      let referIndexShort = '';
+      let referIndexMedium = '';
+      let referIndexLong = '';
       for (const k in field) {
-        if (k !== "_id") {
-          referIndex += " " + field[k];
+        if (k !== '_id') {
+          referIndexLong += ' ' + field[k];
         }
       }
-      referIndex = referIndex.replace(/^\s+|\s+$/g, "");
-      if (referIndex.length >= 20) {
-        referIndex = referIndex.substring(0, 20) + "...";
+      referIndexLong = referIndexLong.replace(/^\s+|\s+$/g, '');
+      referIndexMedium = referIndexLong;
+      referIndexShort = referIndexLong;
+      if (referIndexLong.length >= 20) {
+        referIndexShort = referIndexLong.substring(0, 17) + '...';
       }
-      field = { _id: id, value: referIndex ? referIndex : id };
+      if (referIndexLong.length >= 50) {
+        referIndexMedium = referIndexLong.substring(0, 47) + '...';
+      }
+      field = {
+        _id: id,
+        value: referIndexLong ? referIndexLong : id,
+        valueMedium: referIndexMedium? referIndexMedium : id,
+        valueShort: referIndexShort ? referIndexShort: id,
+      };
     } else {
       // not defined
-      field = { _id: id, value };
+      field = {
+        _id: id,
+        value: undefined,
+        valueMedium: undefined,
+        valueLong: undefined,
+      };
     }
     return field;
   }
@@ -442,13 +473,13 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
   public deFormatReference(detail: any): any {
     for (const fnm of this.referenceFields) {
-      if (typeof detail[fnm] !== "object") {
+      if (typeof detail[fnm] !== 'object') {
         // not defined
         // let date values undefined
         delete detail[fnm];
       } else {
         const id = detail[fnm]._id;
-        if (typeof id !== "string") {
+        if (typeof id !== 'string') {
           delete detail[fnm];
         } else {
           detail[fnm] = id;
@@ -466,7 +497,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
 
   public isDefinedFieldReference(field: any): any {
-    if ("_id" in field && typeof field._id === "string") {
+    if ('_id' in field && typeof field._id === 'string') {
       return true;
     }
     return false;
@@ -498,11 +529,11 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     m = dt.getMinutes();
     s = dt.getSeconds();
 
-    dd = d < 10 ? "0" + d : d.toString();
-    MM = M < 10 ? "0" + M : M.toString();
-    hh = h < 10 ? "0" + h : h.toString();
-    mm = m < 10 ? "0" + m : m.toString();
-    ss = s < 10 ? "0" + s : s.toString();
+    dd = d < 10 ? '0' + d : d.toString();
+    MM = M < 10 ? '0' + M : M.toString();
+    hh = h < 10 ? '0' + h : h.toString();
+    mm = m < 10 ? '0' + m : m.toString();
+    ss = s < 10 ? '0' + s : s.toString();
 
     const value = fmt
       .replace(/yyyy/gi, yyyy.toString())
@@ -536,7 +567,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
   public formatDate(detail: any): any {
     for (const fnm of this.dateFields) {
-      if (typeof detail[fnm] !== "string") {
+      if (typeof detail[fnm] !== 'string') {
         // not defined
         // important: let date values undefined. 'from' and 'to' used for search context. pop: show the selection popup
         detail[fnm] = {
@@ -566,9 +597,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     d = date.day;
 
     if (
-      typeof yyyy !== "number" ||
-      typeof M !== "number" ||
-      typeof d !== "number"
+      typeof yyyy !== 'number' ||
+      typeof M !== 'number' ||
+      typeof d !== 'number'
     ) {
       return null;
     } else {
@@ -579,7 +610,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
   public deFormatDate(detail: any): any {
     for (const fnm of this.dateFields) {
-      if (typeof detail[fnm] !== "object") {
+      if (typeof detail[fnm] !== 'object') {
         // not defined
         // let date values undefined
         delete detail[fnm];
@@ -605,14 +636,14 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     return field;
   }
   public isDefinedFieldDate(field: any): any {
-    if (typeof field === "object") {
-      if (typeof field.date === "object") {
+    if (typeof field === 'object') {
+      if (typeof field.date === 'object') {
         return true;
       }
-      if (typeof field.from === "object") {
+      if (typeof field.from === 'object') {
         return true;
       }
-      if (typeof field.to === "object") {
+      if (typeof field.to === 'object') {
         return true;
       }
     }
@@ -637,7 +668,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       const toFld = `__mra_${fnm}_to`;
       delete detail[fromFld];
       delete detail[toFld];
-      if (typeof detail[fnm] !== "number") {
+      if (typeof detail[fnm] !== 'number') {
         delete detail[fnm];
       }
     }
@@ -654,7 +685,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   /***Start: handle array of multi-selection fields***/
   public formatArrayMultiSelectionField(field: any, enums: any): any {
     const selectObj = {};
-    let value = "";
+    let value = '';
     for (const e of enums) {
       selectObj[e] = false; // not exist
     }
@@ -663,7 +694,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       for (const e of field) {
         selectObj[e] = true; // exist.
       }
-      value = field.join(" | ");
+      value = field.join(' | ');
     }
     return { selection: selectObj, value };
   }
@@ -679,7 +710,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
   public deFormatArrayMultiSelection(detail: any): any {
     for (const fnm of this.multiSelectionFields) {
-      if (typeof detail[fnm] !== "object") {
+      if (typeof detail[fnm] !== 'object') {
         // not defined
         delete detail[fnm];
       } else {
@@ -714,7 +745,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
 
   public isDefinedFieldArrayMultiSelection(field: any): any {
-    if ("selection" in field && typeof field.selection === "object") {
+    if ('selection' in field && typeof field.selection === 'object') {
       const keys = Object.keys(field.selection);
       return keys.some((e) => field.selection[e]);
     }
@@ -723,7 +754,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public multiselectionSelected(fieldName: string | number) {
     if (
       !this.detail[fieldName] ||
-      typeof this.detail[fieldName].selection !== "object"
+      typeof this.detail[fieldName].selection !== 'object'
     ) {
       return false;
     }
@@ -734,16 +765,16 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public formatMapField(field: any, elementType: string): any {
     let selectObj = {};
     let values = [];
-    if (typeof field === "object") {
+    if (typeof field === 'object') {
       selectObj = field;
       for (const e in field) {
-        if (elementType === "SchemaString") {
-          values.push(e + "(" + field[e] + ")");
+        if (elementType === 'SchemaString') {
+          values.push(e + '(' + field[e] + ')');
         }
       }
     }
     values = values.filter((x) => !!x);
-    const value = values.join(" | ");
+    const value = values.join(' | ');
     return { selection: selectObj, value, keys: [] };
   }
   public formatMapFields(detail: any): any {
@@ -760,7 +791,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       const fnm = f[0];
       const elementType = f[1];
 
-      if (typeof detail[fnm] !== "object") {
+      if (typeof detail[fnm] !== 'object') {
         // not defined
         delete detail[fnm];
       } else {
@@ -794,7 +825,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
 
   public isDefinedFieldMap(field: any): any {
-    if ("selection" in field && typeof field.selection === "object") {
+    if ('selection' in field && typeof field.selection === 'object') {
       return Object.keys(field.selection).length > 0;
     }
     return false;
@@ -802,7 +833,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public mapSelected(fieldName: string | number) {
     if (
       !this.detail[fieldName] ||
-      typeof this.detail[fieldName].selection !== "object"
+      typeof this.detail[fieldName].selection !== 'object'
     ) {
       return false;
     }
@@ -816,18 +847,18 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     if (Array.isArray(field)) {
       // not defined
       for (const e of field) {
-        if (elementType === "ObjectId") {
-          const ref = this.formatReferenceField(e, "...");
+        if (elementType === 'ObjectId') {
+          const ref = this.formatReferenceField(e, '...');
           selectArray.push(ref);
           values.push(ref.value);
-        } else if (elementType === "SchemaString") {
+        } else if (elementType === 'SchemaString') {
           selectArray.push(e);
           values.push(e);
         }
       }
     }
     values = values.filter((x) => !!x);
-    const value = values.join(" | ");
+    const value = values.join(' | ');
     return { selection: selectArray, value };
   }
   public formatArrayFields(detail: any): any {
@@ -844,7 +875,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       const fnm = f[0];
       const elementType = f[1];
 
-      if (typeof detail[fnm] !== "object") {
+      if (typeof detail[fnm] !== 'object') {
         // not defined
         delete detail[fnm];
       } else {
@@ -853,11 +884,11 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         } else {
           const selectArray = [];
           for (const e of detail[fnm].selection) {
-            if (elementType === "ObjectId") {
-              if (e && e._id && typeof e._id === "string") {
+            if (elementType === 'ObjectId') {
+              if (e && e._id && typeof e._id === 'string') {
                 selectArray.push(e._id);
               }
-            } else if (elementType === "SchemaString") {
+            } else if (elementType === 'SchemaString') {
               if (e) {
                 selectArray.push(e);
               }
@@ -885,7 +916,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
 
   public isDefinedFieldArray(field: any): any {
-    if ("selection" in field && Array.isArray(field.selection)) {
+    if ('selection' in field && Array.isArray(field.selection)) {
       return field.selection.length > 0;
     }
     return false;
@@ -920,27 +951,27 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
 
   public stringifyField(field: any): string {
-    let str = "";
+    let str = '';
 
     if (!field) {
       return str;
     }
     if (
-      typeof field === "number" ||
-      typeof field === "string" ||
-      typeof field === "boolean" ||
-      typeof field === "bigint"
+      typeof field === 'number' ||
+      typeof field === 'string' ||
+      typeof field === 'boolean' ||
+      typeof field === 'bigint'
     ) {
       return String(field);
     }
-    if (typeof field === "object" && Array.isArray(field)) {
+    if (typeof field === 'object' && Array.isArray(field)) {
       for (const e of field) {
-        str += " | " + this.stringifyField(e);
+        str += ' | ' + this.stringifyField(e);
       }
       return str;
     }
-    if (typeof field === "object") {
-      return field.value || field._id || "";
+    if (typeof field === 'object') {
+      return field.value || field._id || '';
     }
     return str;
   }
@@ -948,8 +979,8 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     detail: any,
     fieldName: string
   ): string {
-    if (typeof detail !== "object") {
-      return "";
+    if (typeof detail !== 'object') {
+      return '';
     }
     return this.stringifyField(detail[fieldName]);
   }
@@ -978,7 +1009,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
     this.detail = this.formatDetail(detail);
     this.extraFieldsUnload(this.detail); // unload data to text editors, etc
-    if (action === "edit") {
+    if (action === 'edit') {
       this.extraInfoPopulate(); // collect other info required for edit view
     } else {
       this.detail = this.formatTextareaFields(this.detail);
@@ -986,14 +1017,14 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     if (this.refreshing) {
       this.refreshing = false;
       const snackBarConfig: SnackBarConfig = {
-        content: "Detail refreshed",
+        content: 'Detail refreshed',
       };
       const snackBar = new SnackBar(snackBarConfig);
       snackBar.show();
     }
     this.loaded = true;
     this.eventEmitter.emit({
-      type: "detail",
+      type: 'detail',
       result: this.detail,
     });
   }
@@ -1006,7 +1037,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       o[field] = searchObj[field];
       searchContext.$and[1].$and.push(o);
     }
-    const actionType = "get";
+    const actionType = 'get';
     this.service
       .getList(
         1,
@@ -1044,7 +1075,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       const field_value = undefined;
       const limit = 50;
       this.service.getFieldValues(f, field_value, sort, limit).subscribe((result: any) => {
-        this.editHintFields[f] = result; // format: {_id: "Beginner", count: 1}
+        this.editHintFields[f] = result; // format: {_id: 'Beginner', count: 1}
       }, this.onServiceErrorSuppress);
     }
   }
@@ -1075,9 +1106,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       const fieldName = fieldDef[0]; // this.<keyRefName>.<keyRefSubField>
       const mapKeyType = fieldDef[2]; // this.<keyRefName>.<keyRefSubField>
       let keyArray = [];
-      if (mapKeyType === "ObjectId") {
+      if (mapKeyType === 'ObjectId') {
         const keyRefName = fieldDef[3];
-        const recordKey = "key-id-" + keyRefName;
+        const recordKey = 'key-id-' + keyRefName;
         const refService = this.injector.get<typeof fieldDef[4]>(fieldDef[4]);
         const id = this.detail[keyRefName]
           ? this.detail[keyRefName]._id
@@ -1098,7 +1129,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
             if (mapField.selection) {
               for (const k of keyArray) {
                 if (!(k in mapField.selection)) {
-                  mapField.selection[k] = "";
+                  mapField.selection[k] = '';
                 }
               }
             }
@@ -1158,13 +1189,13 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
     if (cate1.listCategoryField) {
       const field = cate1.listCategoryField;
-      if (typeof this.selectedCategory === "number") {
+      if (typeof this.selectedCategory === 'number') {
         d[field] = this.categories[this.selectedCategory][field];
       }
     }
     if (cate2.listCategoryField) {
       const field = cate2.listCategoryField;
-      if (typeof this.selectedCategory2 === "number") {
+      if (typeof this.selectedCategory2 === 'number') {
         d[field] = this.categories2[this.selectedCategory2][field];
       }
     }
@@ -1184,7 +1215,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     const orSearchContext = [];
     const andSearchContext = [];
     for (const field in d) {
-      if (typeof d[field] === "string"
+      if (typeof d[field] === 'string'
         && !listCategoryFields.includes(field)
         && !this.ownSearchStringFields.includes(field)) {
         // listCategoryField, as well as the strings fields requring own search, will be put to 'and' context
@@ -1255,10 +1286,10 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     // Handle date range selection. These fields are not in d2, because field.date is undefined.
     for (const prop of this.dateFields) {
       const o = {};
-      let valueToShow = "";
+      let valueToShow = '';
 
       o[prop] = {};
-      if (typeof d[prop] !== "object") {
+      if (typeof d[prop] !== 'object') {
         // not defined
         continue;
       }
@@ -1270,7 +1301,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         o[prop].from = this.deFormatDateField(d[prop].from);
         valueToShow += this.formatDateField(o[prop].from).value;
       }
-      valueToShow += " ~ ";
+      valueToShow += ' ~ ';
       if (d[prop].to) {
         o[prop].to = this.deFormatDateField(d[prop].to);
         valueToShow += this.formatDateField(o[prop].to).value;
@@ -1281,23 +1312,23 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     // Handle number range selection. These fields are not in d2.
     for (const fnm of this.numberFields) {
       const o = {};
-      let valueToShow = "";
+      let valueToShow = '';
 
       o[fnm] = {};
 
       const fromFld = `__mra_${fnm}_from`;
       const toFld = `__mra_${fnm}_to`;
 
-      if (typeof d[fromFld] !== "number" && typeof d[toFld] !== "number") {
+      if (typeof d[fromFld] !== 'number' && typeof d[toFld] !== 'number') {
         // not filled
         continue;
       }
-      if (typeof d[fromFld] === "number") {
+      if (typeof d[fromFld] === 'number') {
         o[fnm].from = d[fromFld];
         valueToShow += d[fromFld];
       }
-      valueToShow += " ~ ";
-      if (typeof d[toFld] === "number") {
+      valueToShow += ' ~ ';
+      if (typeof d[toFld] === 'number') {
         o[fnm].to = d[toFld];
         valueToShow += d[toFld];
       }
@@ -1310,14 +1341,14 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     };
     /* searchContext ={'$and', [{'$or', []},{'$and', []}]}
      */
-    const context = this.getFromStorage("searchContext");
+    const context = this.getFromStorage('searchContext');
     if (context && context.$and) {
       let cachedOr: any;
       let cachedAnd: any;
       for (const sub of context.$and) {
-        if ("$and" in sub) {
+        if ('$and' in sub) {
           cachedAnd = sub.$and;
-        } else if ("$or" in sub) {
+        } else if ('$or' in sub) {
           cachedOr = sub.$or;
         }
       }
@@ -1332,43 +1363,43 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     if (orSearchContext.length === 0 && andSearchContext.length === 0) {
       searchContext = null;
     }
-    this.putToStorage("searchContext", searchContext);
-    this.putToStorage("searchText", this.searchText);
-    this.putToStorage("page", 1); // start from 1st page
-    this.putToStorage("searchMoreDetail", this.searchMoreDetail);
-    this.putToStorage("detail", this.detail);
+    this.putToStorage('searchContext', searchContext);
+    this.putToStorage('searchText', this.searchText);
+    this.putToStorage('page', 1); // start from 1st page
+    this.putToStorage('searchMoreDetail', this.searchMoreDetail);
+    this.putToStorage('detail', this.detail);
   }
   public searchList(): EventEmitter<any> {
     this.processSearchContext();
     // update the URL
     if (!this.isEmptyRoutingPath()) {
-      this.router.navigate([".", {}], {
+      this.router.navigate(['.', {}], {
         relativeTo: this.route,
-        queryParamsHandling: "preserve",
+        queryParamsHandling: 'preserve',
       }); // start from 1st page
     }
-    this.putToStorage("page", 1); // start from 1st page
+    this.putToStorage('page', 1); // start from 1st page
     return this.populateList();
   }
   public loadUIFromCache(): void {
     // Now let's reload the search condition to UI
-    this.searchText = this.getFromStorage("searchText");
-    this.searchMoreDetail = this.getFromStorage("searchMoreDetail");
+    this.searchText = this.getFromStorage('searchText');
+    this.searchMoreDetail = this.getFromStorage('searchMoreDetail');
 
-    const listSortField = this.getFromStorage("listSortField");
+    const listSortField = this.getFromStorage('listSortField');
     if (listSortField) {
       this.listSortField = listSortField;
     }
-    const listSortOrder = this.getFromStorage("listSortOrder");
+    const listSortOrder = this.getFromStorage('listSortOrder');
     if (listSortOrder) {
       this.listSortOrder = listSortOrder;
     }
-    const listSortFieldDisplay = this.getFromStorage("listSortFieldDisplay");
+    const listSortFieldDisplay = this.getFromStorage('listSortFieldDisplay');
     if (listSortFieldDisplay) {
       this.listSortFieldDisplay = listSortFieldDisplay;
     }
 
-    const detail = this.getFromStorage("detail");
+    const detail = this.getFromStorage('detail');
     if (detail) {
       this.detail = detail;
     }
@@ -1382,17 +1413,17 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     const urlCate2 = this.route.snapshot.queryParams.cate2 || this.urlCate2;
 
     const categoryProvided =
-      typeof this.selectedCategory === "number" ? true : false;
+      typeof this.selectedCategory === 'number' ? true : false;
     const listCategoryShowMore = typeof cate1.listCategoryShowMore
       ? true
       : false;
-    const categoryCandidate = (categoryProvided || !urlCate1) ? "" : urlCate1;
+    const categoryCandidate = (categoryProvided || !urlCate1) ? '' : urlCate1;
     const categoryProvided2 =
-      typeof this.selectedCategory2 === "number" ? true : false;
+      typeof this.selectedCategory2 === 'number' ? true : false;
     const listCategoryShowMore2 = typeof cate2.listCategoryShowMore
       ? true
       : false;
-    const categoryCandidate2 = (categoryProvided2 || !urlCate2) ? "" : urlCate2;
+    const categoryCandidate2 = (categoryProvided2 || !urlCate2) ? '' : urlCate2;
     const listCategoryField = cate1.listCategoryField;
     const listCategoryField2 = cate2.listCategoryField;
 
@@ -1417,8 +1448,8 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     let newPage: number;
     let searchContext: any;
 
-    const urlPage = parseInt(this.route.snapshot.paramMap.get("page"), 10);
-    const cachedPage = parseInt(this.getFromStorage("page"), 10);
+    const urlPage = parseInt(this.route.snapshot.paramMap.get('page'), 10);
+    const cachedPage = parseInt(this.getFromStorage('page'), 10);
 
     if (cachedPage) {
       newPage = cachedPage;
@@ -1433,19 +1464,19 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       if (newPage !== 1) {
         segmentParams = { page: newPage };
       }
-      this.router.navigate([".", segmentParams], {
+      this.router.navigate(['.', segmentParams], {
         relativeTo: this.route,
-        queryParamsHandling: "preserve",
+        queryParamsHandling: 'preserve',
       }); // update the url
     }
 
-    searchContext = this.getFromStorage("searchContext");
+    searchContext = this.getFromStorage('searchContext');
     this.loadUIFromCache();
 
     const cateInfo = this.getCategoryInfo();
     // cate1: [listCategoryField, listCategoryShowMore, categoryProvided, categoryCandidate],
 
-    const actionType = "get";
+    const actionType = 'get';
 
     this.archivedSearch = this.detail.archived;
     this.service
@@ -1497,7 +1528,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
               categoriesBrief: result.categoriesBrief,
               categoryCandidate: cateInfo.cate1[3],
 
-              selectedCategoryName: "",
+              selectedCategoryName: '',
 
               categoriesOut: this.categories,
               categoryDisplays: this.categoryDisplays,
@@ -1513,7 +1544,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
               categoriesBrief: result.categoriesBrief2,
               categoryCandidate: cateInfo.cate2[3],
 
-              selectedCategoryName: "",
+              selectedCategoryName: '',
 
               categoriesOut: this.categories2,
               categoryDisplays: this.categoryDisplays2,
@@ -1562,9 +1593,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
                   c.listCategoryField
                 );
                 if (display === MddsUncategorized) {
-                  display = "Uncategorized";
+                  display = 'Uncategorized';
                 } else if (display === MddsAll) {
-                  display = "All";
+                  display = 'All';
                 }
                 return display;
               });
@@ -1577,7 +1608,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
                 for (let i = 0; i < c.categoriesOut.length; i++) {
                   const ct = c.categoriesOut[i][c.listCategoryField];
                   if (
-                    (typeof ct === "object" &&
+                    (typeof ct === 'object' &&
                       ct._id === c.categoryCandidate) ||
                     ct === c.categoryCandidate
                   ) {
@@ -1595,7 +1626,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
             if (c.listCategoryField) {
               const ct =
                 c.categoriesOut[c.selectedCategory][c.listCategoryField];
-              if (typeof ct === "object") {
+              if (typeof ct === 'object') {
                 c.selectedCategoryName = ct._id;
               } else {
                 c.selectedCategoryName = ct;
@@ -1621,10 +1652,10 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
             if (cateGroup[1].selectedCategoryName) {
               queryParams.cate2 = cateGroup[1].selectedCategoryName;
             }
-            this.router.navigate(["."], {
+            this.router.navigate(['.'], {
               relativeTo: this.route,
               queryParams,
-              queryParamsHandling: "merge",
+              queryParamsHandling: 'merge',
             }); // update the url
           }
 
@@ -1646,13 +1677,13 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
           if (this.refreshing) {
             this.refreshing = false;
             const snackBarConfig: SnackBarConfig = {
-              content: "List refreshed",
+              content: 'List refreshed',
             };
             const snackBar = new SnackBar(snackBarConfig);
             snackBar.show();
           }
           this.eventEmitter.emit({
-            type: "list",
+            type: 'list',
             result: this.list,
           });
           this.loaded = true;
@@ -1665,10 +1696,10 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   /*UI operations handlers*/
   public setListViewFilter(view: string): void {
     this.listViewFilter = view;
-    this.putToStorage("listViewFilter", view);
+    this.putToStorage('listViewFilter', view);
   }
   public isShowListView(view: string): boolean {
-    const cached = this.getFromStorage("listViewFilter");
+    const cached = this.getFromStorage('listViewFilter');
     return cached ? cached === view : this.listViewFilter === view;
   }
   public setListSort(
@@ -1683,9 +1714,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     this.listSortField = field;
     this.listSortFieldDisplay = fieldDisplay;
     this.listSortOrder = order;
-    this.putToStorage("listSortField", field);
-    this.putToStorage("listSortFieldDisplay", fieldDisplay);
-    this.putToStorage("listSortOrder", order);
+    this.putToStorage('listSortField', field);
+    this.putToStorage('listSortFieldDisplay', fieldDisplay);
+    this.putToStorage('listSortOrder', order);
 
     return refresh;
   }
@@ -1701,12 +1732,12 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
   public toggleListSort(field: string, fieldDisplay: string): void {
     if (field !== this.listSortField) {
-      this.listSortOrder = "asc";
+      this.listSortOrder = 'asc';
     } else {
-      if (this.listSortOrder === "asc") {
-        this.listSortOrder = "desc";
+      if (this.listSortOrder === 'asc') {
+        this.listSortOrder = 'desc';
       } else {
-        this.listSortOrder = "asc";
+        this.listSortOrder = 'asc';
       }
     }
     this.setListSort(field, fieldDisplay, this.listSortOrder);
@@ -1721,22 +1752,22 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     } else if (this.view === ViewType.DETAIL) {
       this.refreshing = true;
       if (!this.id) {
-        this.id = this.route.snapshot.paramMap.get("id");
+        this.id = this.route.snapshot.paramMap.get('id');
       }
       if (this.id) {
         this.populateDetail(this.id);
       } else {
-        console.error("Routing error for detail view... no id...");
+        console.error('Routing error for detail view... no id...');
       }
     }
   }
 
   public onExport(): void {
-    const searchContext = this.getFromStorage("searchContext");
+    const searchContext = this.getFromStorage('searchContext');
     this.loadUIFromCache();
 
     const cateInfo = this.getCategoryInfo();
-    const actionType = "export";
+    const actionType = 'export';
     this.service
       .getList(
         0,
@@ -1767,7 +1798,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
           let rawData;
           let filename: string;
           if (
-            typeof data === "object" &&
+            typeof data === 'object' &&
             data.gotFileNameFromContentDisposition
           ) {
             // got file name from Content-Disposition
@@ -1779,15 +1810,15 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
           // TODO: get type from content type
           const blob = new Blob([rawData], {
             type:
-              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
           });
           const downloadUrl = window.URL.createObjectURL(blob);
 
           if (filename) {
             // use HTML5 a[download] attribute to specify filename
-            const a = document.createElement("a");
+            const a = document.createElement('a');
             // safari doesn't support this yet
-            if (typeof a.download === "undefined") {
+            if (typeof a.download === 'undefined') {
               window.open(downloadUrl);
             } else {
               a.href = downloadUrl;
@@ -1812,7 +1843,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     succMessage: any,
     resultFields: string[]
   ): void {
-    const searchContext = this.getFromStorage("searchContext");
+    const searchContext = this.getFromStorage('searchContext');
     this.loadUIFromCache();
 
     const cateInfo = this.getCategoryInfo();
@@ -1838,7 +1869,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         this.ignoreField
       )
       .subscribe((data: { [x: string]: any }) => {
-        let additionalInfo = "";
+        let additionalInfo = '';
         if (resultFields && resultFields.length > 0) {
           for (const f of resultFields) {
             additionalInfo += ` ${f} ${data[f]};`;
@@ -1858,7 +1889,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public onTermChecked(): void {
     // no changing value because two binded already
     this.eventEmitter.emit({
-      type: "check",
+      type: 'check',
       result: this.termChecked,
     });
   }
@@ -1891,7 +1922,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public notifyItemSelected() {
     // no changing value because already handled with other function or two way bindings
     this.eventEmitter.emit({
-      type: "selection",
+      type: 'selection',
       result: this.getSelectedItems(),
     });
   }
@@ -1905,24 +1936,24 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     });
 
     const modalConfig: ModalConfig = {
-      title: "Delete Confirmation",
+      title: 'Delete Confirmation',
       content:
-        "Are you sure you want to delete selected items from the system?",
+        'Are you sure you want to delete selected items from the system?',
       // list of button text
-      buttons: ["Delete", "Cancel"],
+      buttons: ['Delete', 'Cancel'],
       // list of button returns when clicked
       returns: [true, false],
       callBack: (result: any) => {
         if (result) {
           this.service.deleteManyByIds(deletedItem).subscribe((_: any) => {
             const snackBarConfig: SnackBarConfig = {
-              content: this.ItemCamelName + " deleted",
+              content: this.ItemCamelName + ' deleted',
             };
             const snackBar = new SnackBar(snackBarConfig);
             snackBar.show();
 
             if (this.view !== ViewType.LIST) {
-              this.router.navigate(["../../list"], { relativeTo: this.route });
+              this.router.navigate(['../../list'], { relativeTo: this.route });
             } else {
               const len = this.checkedItem.length;
               for (let i = 0; i < len; i++) {
@@ -1945,26 +1976,26 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
   public onDelete(id: string, idx: number): void {
     const modalConfig: ModalConfig = {
-      title: "Delete Confirmation",
+      title: 'Delete Confirmation',
       content:
-        "Are you sure you want to delete this " +
+        'Are you sure you want to delete this ' +
         this.itemCamelName +
-        " from the system?",
+        ' from the system?',
       // list of button text
-      buttons: ["Delete", "Cancel"],
+      buttons: ['Delete', 'Cancel'],
       // list of button returns when clicked
       returns: [true, false],
       callBack: (result: any) => {
         if (result) {
           this.service.deleteOne(id).subscribe((_: any) => {
             const snackBarConfig: SnackBarConfig = {
-              content: this.ItemCamelName + " deleted",
+              content: this.ItemCamelName + ' deleted',
             };
             const snackBar = new SnackBar(snackBarConfig);
             snackBar.show();
 
             if (this.view !== ViewType.LIST) {
-              this.router.navigate(["../../list"], { relativeTo: this.route });
+              this.router.navigate(['../../list'], { relativeTo: this.route });
             } else if (idx !== null && this.list) {
               this.list.splice(idx, 1);
               this.checkedItem.splice(idx, 1);
@@ -1981,14 +2012,14 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
   public onArchive(id: string, idx: number, archived): void {
     const modalConfig: ModalConfig = {
-      title: "Archive Confirmation",
+      title: 'Archive Confirmation',
       content:
-        `Are you sure you want to ${archived ? "unarchive" : "archive"} ` +
+        `Are you sure you want to ${archived ? 'unarchive' : 'archive'} ` +
         `this ${this.itemCamelName} and ${
-          archived ? "restore" : "remove"
+          archived ? 'restore' : 'remove'
         } it from search result?`,
       // list of button text
-      buttons: [archived ? "Unarchive" : "Archive", "Cancel"],
+      buttons: [archived ? 'Unarchive' : 'Archive', 'Cancel'],
       // list of button returns when clicked
       returns: [true, false],
       callBack: (result: any) => {
@@ -1996,7 +2027,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
           this.service.archiveOne(id, archived).subscribe((_: any) => {
             const snackBarConfig: SnackBarConfig = {
               content:
-                this.ItemCamelName + (archived ? " unarchived" : " archived"),
+                this.ItemCamelName + (archived ? ' unarchived' : ' archived'),
             };
             const snackBar = new SnackBar(snackBarConfig);
             snackBar.show();
@@ -2026,16 +2057,16 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     });
 
     const modalConfig: ModalConfig = {
-      title: "Archive Confirmation",
+      title: 'Archive Confirmation',
       content:
         `Are you sure you want to ${
-          this.archivedSearch ? "unarchive" : "archive"
+          this.archivedSearch ? 'unarchive' : 'archive'
         }` +
         `  selected items and ${
-          this.archivedSearch ? "restore" : "remove"
+          this.archivedSearch ? 'restore' : 'remove'
         } them from search results?`,
       // list of button text
-      buttons: [this.archivedSearch ? "Unarchive" : "Archive", "Cancel"],
+      buttons: [this.archivedSearch ? 'Unarchive' : 'Archive', 'Cancel'],
       // list of button returns when clicked
       returns: [true, false],
       callBack: (result: any) => {
@@ -2046,13 +2077,13 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
               const snackBarConfig: SnackBarConfig = {
                 content:
                   this.ItemCamelName +
-                  (this.archivedSearch ? " unarchived" : " archived"),
+                  (this.archivedSearch ? ' unarchived' : ' archived'),
               };
               const snackBar = new SnackBar(snackBarConfig);
               snackBar.show();
 
               if (this.view !== ViewType.LIST) {
-                this.router.navigate(["../../list"], {
+                this.router.navigate(['../../list'], {
                   relativeTo: this.route,
                 });
               } else {
@@ -2086,7 +2117,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         .updateOne(this.id, this.cloneDetail)
         .subscribe((result: any) => {
           const snackBarConfig: SnackBarConfig = {
-            content: this.ItemCamelName + " updated.",
+            content: this.ItemCamelName + ' updated.',
           };
           const snackBar = new SnackBar(snackBarConfig);
           snackBar.show();
@@ -2095,7 +2126,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
             this.doneData.emit(result);
             this.done.emit(true);
           } else {
-            this.router.navigate(["../../detail", this.id], {
+            this.router.navigate(['../../detail', this.id], {
               relativeTo: this.route,
             });
           }
@@ -2104,7 +2135,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       this.service
         .createOne(this.cloneDetail)
         .subscribe((result: { [x: string]: string }) => {
-          const action = this.embeddedView ? " added" : " created.";
+          const action = this.embeddedView ? ' added' : ' created.';
 
           const snackBarConfig: SnackBarConfig = {
             content: this.ItemCamelName + action,
@@ -2119,7 +2150,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
             this.doneData.emit(result);
             this.done.emit(true);
           } else {
-            this.router.navigate(["../detail", this.id], {
+            this.router.navigate(['../detail', this.id], {
               relativeTo: this.route,
             });
           }
@@ -2148,9 +2179,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         }
       }
       if (this.modulePath) {
-        this.router.navigate([this.modulePath, ref, "detail", d._id]); // {relativeTo: this.getParentActivatedRouter() };
+        this.router.navigate([this.modulePath, ref, 'detail', d._id]); // {relativeTo: this.getParentActivatedRouter() };
       } else {
-        this.router.navigate([ref, "detail", d._id], {
+        this.router.navigate([ref, 'detail', d._id], {
           relativeTo: this.getParentActivatedRouter(),
         });
       }
@@ -2163,9 +2194,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public onDetailLinkClicked(id: string): void {
     this.clickedId = id;
     if (this.modulePath) {
-      this.router.navigate([this.modulePath, this.schemaName, "detail", id]); // {relativeTo: this.getParentActivatedRouter() }
+      this.router.navigate([this.modulePath, this.schemaName, 'detail', id]); // {relativeTo: this.getParentActivatedRouter() }
     } else {
-      this.router.navigate([this.itemName, "detail", id], {
+      this.router.navigate([this.itemName, 'detail', id], {
         relativeTo: this.getParentActivatedRouter(),
       });
     }
@@ -2185,10 +2216,10 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     if (!this.detail.hasOwnProperty(field)) {
       return;
     }
-    if (typeof this.detail[field] === "undefined") {
+    if (typeof this.detail[field] === 'undefined') {
       return;
     }
-    if (typeof this.detail[field] === "object") {
+    if (typeof this.detail[field] === 'object') {
       // reference field or date
       if (this.multiSelectionFields.includes(field)) {
         this.detail[field] = this.clearFieldArrayMultiSelection(
@@ -2214,7 +2245,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       this.detail[field].selection = this.detail[field].selection.filter(
         (x: any, i: number) => i !== idx
       );
-      this.detail[field].value = this.detail[field].selection.join(" | ");
+      this.detail[field].value = this.detail[field].selection.join(' | ');
       // check if any info needs to change after clear certain values;
       this.extraInfoPopulate();
     }
@@ -2284,7 +2315,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         if (!this.detail[fieldName].selection.includes(item)) {
           this.detail[fieldName].selection.push(item);
 
-          this.detail[fieldName].value = this.detail[fieldName].selection.join(" | ");
+          this.detail[fieldName].value = this.detail[fieldName].selection.join(' | ');
           // see if related info needs to change after the change of this value
           this.extraInfoPopulate();
         }
@@ -2327,21 +2358,21 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
   public onRefSelect(fieldName: string) {
     if (!this.refSelectDirective) {
-      console.warn("No reference directive for field: ", fieldName);
+      console.warn('No reference directive for field: ', fieldName);
       return;
     }
     const viewContainerRef = this.refSelectDirective.viewContainerRef;
     viewContainerRef.clear();
 
     if (!this.selectComponents[fieldName]) {
-      console.warn("No reference defined for field: ", fieldName);
+      console.warn('No reference defined for field: ', fieldName);
       return;
     }
     let componentRef = this.selectComponents[fieldName].componentRef;
     if (!componentRef) {
-      const comType = this.selectComponents[fieldName]["select-type"];
+      const comType = this.selectComponents[fieldName]['select-type'];
       if (!comType) {
-        console.warn("No component type found for reference field ", fieldName);
+        console.warn('No component type found for reference field ', fieldName);
       }
 
       const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
@@ -2370,25 +2401,19 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         const outputData = componentInstance.outputData;
         if (outputData) {
           switch (outputData.action) {
-            case "selected":
+            case 'selected':
+              // outputData.detail is an array
               if (this.arrayFields.some((x) => x[0] === fieldName)) {
-                this.detail[fieldName].selection.push(outputData.value);
-
-                let values = [];
-                if (this.detail[fieldName].value) {
-                  values = this.detail[fieldName].value.split(" | ");
-                }
-                values.push(outputData.value.value); // display value
-                values = values.filter((x) => !!x);
-                this.detail[fieldName].value = values.join(" | ");
+                let arr = this.detail[fieldName].selection.concat(outputData.detail);
+                this.detail[fieldName] = this.formatArrayField(arr, 'ObjectId');
               } else if (this.referenceFields.includes(fieldName)) {
-                this.detail[fieldName] = outputData.value;
+                this.detail[fieldName] = this.formatReferenceField(outputData.detail[0], '');
               }
               // trigger extraInfo populate, once reference changed.
               this.extraInfoPopulate();
               break;
-            case "view":
-              this.onRefShow(fieldName, "select", outputData.value); // value is _id
+            case 'view':
+              this.onRefShow(fieldName, 'select', outputData.value); // value is _id
               break;
             default:
               break;
@@ -2403,16 +2428,16 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       id = this.detail[fieldName]._id;
     }
     if (!id) {
-      console.error("Show reference but no id is given.");
+      console.error('Show reference but no id is given.');
       return;
     }
     const viewContainerRef = this.refSelectDirective.viewContainerRef;
     viewContainerRef.clear();
 
-    const detailType = action + "-detail-type"; // eg: select-detail-type, pop-detail-type
+    const detailType = action + '-detail-type'; // eg: select-detail-type, pop-detail-type
     const comType = this.selectComponents[fieldName][detailType];
     if (!comType) {
-      console.error("No component type found for: %s", detailType);
+      console.error('No component type found for: %s', detailType);
       return;
     }
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(
@@ -2432,24 +2457,18 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       const outputData = componentInstance.outputData;
       if (outputData) {
         switch (outputData.action) {
-          case "selected":
+          case 'selected':
+            // outputData.detail is an array
             if (this.arrayFields.some((x) => x[0] === fieldName)) {
-              this.detail[fieldName].selection.push(outputData.value);
-
-              let values = [];
-              if (this.detail[fieldName].value) {
-                values = this.detail[fieldName].value.split(" | ");
-              }
-              values.push(outputData.value.value); // display value
-              values = values.filter((x) => !!x);
-              this.detail[fieldName].value = values.join(" | ");
+              let arr = this.detail[fieldName].selection.concat(outputData.detail);
+              this.detail[fieldName] = this.formatArrayField(arr, 'ObjectId');
             } else if (this.referenceFields.includes(fieldName)) {
-              this.detail[fieldName] = outputData.value;
+              this.detail[fieldName] = this.formatReferenceField(outputData.detail[0], '');
             }
             // trigger extraInfo populate, once reference changed.
             this.extraInfoPopulate();
             break;
-          case "back":
+          case 'back':
             this.onRefSelect(fieldName);
             break;
           default:
@@ -2488,9 +2507,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     const detail = this.list[i];
     this.clickedId = detail._id;
 
-    if (this.clickItemAction === "select") {
+    if (this.clickItemAction === 'select') {
       this.selectOneItem(i);
-    } else if (this.clickItemAction === "detail") {
+    } else if (this.clickItemAction === 'detail') {
       this.onDetailLinkClicked(this.clickedId);
     }
   }
@@ -2525,22 +2544,17 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   // Second step of two-step selection
   selectItemConfirmed() {
     let values = this.getSelectedItems();
-    let value;
-    let id;
-    if (values.length > 0) {
-      value = this.itemMultiSelect? values : values[0];
-      id = values[0]._id;
-    }
+    values = values.map(x => this.objectReduce(x));
     this.outputData = {
-      action: "selected",
-      value: { _id: id, value: this.stringify(value) },
-      detail: value,
+      action: 'selected',
+      value: undefined,
+      detail: values, // array
     };
     this.done.emit(true);
   }
   // One-step selection - select and confirm
   selectItemSelected(num: number) {
-    if (typeof num !== "number") {
+    if (typeof num !== 'number') {
       return;
     }
     this.selectOneItem(num);
@@ -2549,11 +2563,11 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
   // selected from detail view
   detailSelSelected() {
-    const detail = this.detail;
+    let detail = this.objectReduce(this.detail);
     this.outputData = {
-      action: "selected",
+      action: 'selected',
       value: { _id: detail._id, value: this.stringify(detail) },
-      detail,
+      detail: [detail],
     };
     this.done.emit(true);
   }
@@ -2562,12 +2576,12 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   selectViewDetail(num: number) {
     const detail = this.list[num];
     this.clickedId = detail._id;
-    this.outputData = { action: "view", value: detail._id };
+    this.outputData = { action: 'view', value: detail._id };
     this.done.emit(true);
   }
 
   detailSelBack() {
-    this.outputData = { action: "back", value: null };
+    this.outputData = { action: 'back', value: null };
     this.done.emit(true);
   }
 
@@ -2629,7 +2643,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
           continue;
         }
         if (
-          "minlength" in validatorObj &&
+          'minlength' in validatorObj &&
           text.length < validatorObj.minlength
         ) {
           fieldState.valid = false;
@@ -2638,7 +2652,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
           continue;
         }
         if (
-          "maxlength" in validatorObj &&
+          'maxlength' in validatorObj &&
           text.length > validatorObj.maxlength
         ) {
           fieldState.valid = false;
@@ -2646,7 +2660,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
           result = false;
           continue;
         }
-        if ("validators" in validatorObj) {
+        if ('validators' in validatorObj) {
           const error = validatorObj.validators.validateValue(text);
           if (error) {
             fieldState.valid = false;
@@ -2698,7 +2712,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       if (
         routeSnapshot.data &&
         routeSnapshot.data.mraLevel === 1 &&
-        "id" in routeSnapshot.params
+        'id' in routeSnapshot.params
       ) {
         parentItemId = routeSnapshot.params.id;
         break;

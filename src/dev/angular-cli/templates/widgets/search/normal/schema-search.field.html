@@ -23,7 +23,7 @@
 						%>
 						<div class="container <%-lineClass%> <%-lineSize%>">
 							<div class="row col-gutter align-items-center">
-								<div class="<%-labelCol%>">
+								<div class="<%-labelCol%> text-right">
 									<label for="<%-sn%>Edit<%-Fn%>">
 										<%-fD%>
 									</label>
@@ -110,7 +110,7 @@
 										<input class="<%-formControl%> rounded" id="<%-sn%>Edit<%-Fn%>"
 											[ngClass]="{'pointer ref-badge': detail['<%-fn%>']['_id']}" (focus)="onRefSelect('<%-fn%>')"
 											<%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>="" <%}%> 
-											[ngModel]="detail['<%-fn%>']['value']" name="<%-sn%>Edit<%-Fn%>" #<%-sn%>Edit<%-Fn%>="ngModel">
+											[ngModel]="detail['<%-fn%>']['valueMedium']" name="<%-sn%>Edit<%-Fn%>" #<%-sn%>Edit<%-Fn%>="ngModel">
 									</div>
 									<!-- (focus)="detail['<%-fn%>']['_id']?onRefShow('<%-field.fieldName%>', 'select', detail['<%-fn%>']['_id']):onRefSelect('<%-fn%>')" --><%_
 								} else if (field.type === "SchemaArray") {

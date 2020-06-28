@@ -1488,6 +1488,7 @@ function main() {
     let disableListSearch = false;
     let listToDetail = 'click';
     let listSearchType = 'normal';
+    let listSearchFieldsBlackList = [];
 
     let defaultSortField, defaultSortOrder;
     let homeListNumber = 4;
@@ -1561,6 +1562,7 @@ function main() {
       listSortFields = mraUI.listSortFields;
       homeListNumber = mraUI.homeListNumber || homeListNumber;
       listSearchType = mraUI.listSearchType || listSearchType;
+      listSearchFieldsBlackList = mraUI.listSearchFieldsBlackList || listSearchFieldsBlackList;
 
       if (mraUI.defaultListSort) {
         const keys = Object.keys(mraUI.defaultListSort);
@@ -2143,6 +2145,7 @@ function main() {
       listWidgets,
       listSelectWidgets,
       listSearchType,
+      listSearchFieldsBlackList,
 
       detailType, // normal, post, info, slide, term...
       DetailType,

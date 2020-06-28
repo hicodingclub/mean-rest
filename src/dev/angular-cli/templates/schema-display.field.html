@@ -9,7 +9,7 @@
 
                     if (refApi[field.ref] && refApi[field.ref].includes("R") && ref_link) {ref_l = true;}%>
                	  <%if (ref_l){%><a routerLink="."  (click)="onDisplayRefClicked('<%-fn%>', detail['<%-fn%>'], $event)"><%_}%>
-	            	{{detail['<%-fn%>']?detail['<%-fn%>']['value']:""}}
+	            	{{detail['<%-fn%>']?detail['<%-fn%>']['valueMedium']:""}}
 	              <%if (ref_l){%></a><%_}%><%_
                 } else if (ft === 'SchemaDate') {
                     let fmraT = field.mraType;
@@ -40,7 +40,7 @@
                         <ng-template ngFor let-element [ngForOf]="detail['<%-fn%>']['selection']" let-idx="index">
                             <div class="badge-click badge badge-pill badge-secondary" 
                                 (click)="onDisplayRefClicked('<%-fn%>', detail['<%-fn%>']['selection'][idx], $event)">
-                                {{element.value}}
+                                {{element.valueMedium}}
                             </div>
                         </ng-template>
                     </div><%}%><%

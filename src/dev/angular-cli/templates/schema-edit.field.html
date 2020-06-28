@@ -263,9 +263,9 @@
                   required<%}%><%
                 if (field.validators) {%>
                   <%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
-                  [ngModel]="detail['<%-fn%>']['value']" name="Edit<%-Fn%>"
+                  [ngModel]="detail['<%-fn%>']['valueMedium']" name="Edit<%-Fn%>"
                   #Edit<%-Fn%>="ngModel"> 
-              <div *ngIf="detail['<%-fn%>']['value']" 
+              <div *ngIf="detail['<%-fn%>']['valueMedium']" 
                 class="input-group-append icon-clear-inside " (click)="clearValueFromDetail('<%-fn%>')">
                 <i class="fas fa-times-circle" title="Clear"></i>
               </div>
@@ -576,7 +576,7 @@
           >
             <ng-template [ngIf]="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
                   <div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
-                    {{element.value}}
+                    {{element.valueMedium}}
                   <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
                 </div>
             </ng-template>

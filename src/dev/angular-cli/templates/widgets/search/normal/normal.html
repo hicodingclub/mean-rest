@@ -1,9 +1,14 @@
-			<%_ let showSearchBox = false; let stringBoxFields = []; let noMoreSearchArea = true;
+			<%_ let showSearchBox = false;
+				let stringBoxFields = [];
+				let ownSearchFields = [];
+				let noMoreSearchArea = true;
 			    for (let field of briefView){
 					if (field.hidden) continue;
 					if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
 					if (field.picture) continue;
-
+					if (listSearchFieldsBlackList.includes(field.fieldName)) {
+						continue;
+					}
 					if (field.type === 'AngularSelector') {
 						continue;
 					}
@@ -11,7 +16,10 @@
 			        if(field.type == 'SchemaString' && !ownSearchStringFields.includes(field.fieldName)) {
 						showSearchBox = true;
 						stringBoxFields.push(field.displayname);
-					} else {noMoreSearchArea = false;}
+					} else {
+						noMoreSearchArea = false;
+						ownSearchFields.push(field);
+					}
 				}
 				if (api.includes('A') && listActionButtons[3]) {
 					noMoreSearchArea = false;
@@ -40,13 +48,7 @@
 					<div class="card">
 						<div class="card-body">
 							<div class="d-flex flex-wrap align-items-center">
-								<%_ briefView.forEach( (field) => {
-									if (field.hidden) return;
-									if (listCategoryFieldsNotShown.includes(field.fieldName)) return;
-									if (field.type == 'SchemaString' && !ownSearchStringFields.includes(field.fieldName)) return;
-									if (field.type === 'AngularSelector') {
-										return;
-									}
+								<%_ ownSearchFields.forEach( (field) => {
 									let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName, Sn=SchemaName, mn=moduleName, Mn=ModuleName;
 
 									let obj = {

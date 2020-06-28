@@ -1,32 +1,41 @@
 /*  Search part */
 
+
+.icon-clear-badge {
+	cursor: pointer;
+	margin-left: 1rem;
+}
+.icon-clear-badge:hover {
+  color: red;
+}
+
 .refine-search-text {
-    font-size: 0.8rem; /*rgba(0,0,0,.125); */
-    color: #868181;
-  }
-  
-  .vitrual-card {
-  }
-  
-  .virtual-card label {
-    font-weight: bold;
-  }
-  
-  .one-column-search {
-    flex-grow: 1;
-    flex-basis: 80%;
-  }
+  font-size: 0.8rem; /*rgba(0,0,0,.125); */
+  color: #868181;
+}
+
+.vitrual-card {
+}
+
+.virtual-card label {
+  font-weight: bold;
+}
+
+.one-column-search {
+  flex-grow: 1;
+  flex-basis: 80%;
+}
+.two-column-search {
+  flex-grow: 1;
+  flex-basis: 80%;
+}
+
+@media (min-width: 992px) {
   .two-column-search {
-    flex-grow: 1;
-    flex-basis: 80%;
+    flex-basis: 40%;
   }
-  
-  @media (min-width: 992px) {
-    .two-column-search {
-      flex-basis: 40%;
-    }
-  }
-  
-  .two-column-search > .row, .one-column-search > .row {
-    padding-bottom: 2px;
-  }  
+}
+
+.two-column-search > .row, .one-column-search > .row {
+  padding-bottom: 2px;
+}  
