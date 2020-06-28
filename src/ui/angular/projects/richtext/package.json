@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/angular-richtext",
-  "version": "0.9.20",
+  "version": "0.9.25",
   "peerDependencies": {
     "@angular/common": "^8.2.14",
     "@angular/core": "^8.2.14"

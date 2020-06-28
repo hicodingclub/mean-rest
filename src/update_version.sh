@@ -1,6 +1,6 @@
 #!/bin/sh
 
-
+check="N"
 install="N"
 publish="N"
 build="N"
@@ -11,6 +11,10 @@ do
 key="$1"
 
 case $key in
+    -c|--check)
+    check="Y"
+    shift # past value
+    ;;
     -i|--install)
     install="Y"
     shift # past value
@@ -31,13 +35,20 @@ esac
 done
 set -- "${POSITIONAL[@]}"
 
-if [ "$#" -ne 1 ]; then
-  echo "Usage: $0 -i|--install -b|--build -p|--publish VERSION" >&2
+if [ $check != "Y" ] && [ "$#" -ne 1 ]; then
+  echo "Usage: $0 -c|--check -i|--install -b|--build -p|--publish VERSION" >&2
   exit 1
 fi
 
-VERSION=$1
-echo "Upgrade to VERSION $VERSION..."
+delay=5
+if [ $check = "Y" ];then
+  echo "Check the existing versions..."
+  delay=1 
+else
+  VERSION=$1
+  echo "Upgrade to VERSION $VERSION..."
+fi
+
 BASEDIR=$PWD
 
 packages=(
@@ -102,6 +113,13 @@ replacePackages()
     npm install
   fi
 }
+printPackageVer()
+{
+  dir=$1
+  cd $dir
+  sed -n -e "/\"version\":[[:space:]]*\".*\"/p" package.json
+}
+
 
 number=0
 for element in "${packages[@]}"
@@ -109,16 +127,20 @@ do
     number=$(($number+1))
     echo "=========$number: Processing $element ..."
 
-    sleep 5
+    sleep $delay
 
     DIR=$BASEDIR/$element
     if ! [ -d $DIR ]; then
       echo "Error: Directory $DIR doesn't exist."
     else
-      replacePackages $DIR
-      if [ $publish = "Y" ];then
-        npm publish --access=public
-      fi
+      if [ $check = "Y" ];then
+        printPackageVer $DIR
+      else
+        replacePackages $DIR
+        if [ $publish = "Y" ];then
+          npm publish --access=public
+        fi
+      fi 
     fi
 done
 
@@ -136,22 +158,26 @@ do
     if ! [ -d $DIR ]; then
       echo "Error: Directory $DIR doesn't exist."
     else
-      replacePackages $DIR;
-      if [ $install = "Y" ];then
-        cd $DIR
-        rm -rf node_modules
-        npm install
-      fi
+      if [ $check = "Y" ];then
+        printPackageVer $DIR
+      else
+        replacePackages $DIR;
+        if [ $install = "Y" ];then
+          cd $DIR
+          rm -rf node_modules
+          npm install
+        fi
 
-      if [ $build = "Y" ] || [ $publish = "Y" ];then
-        cd $BASEDIR/$ANDROIDDIR
-        ng build $libName
-      fi
+        if [ $build = "Y" ] || [ $publish = "Y" ];then
+          cd $BASEDIR/$ANDROIDDIR
+          ng build $libName
+        fi
 
-      if [ $publish = "Y" ];then
-        cd $BASEDIR
-        cd $DISTDIR
-        npm publish --access=public
+        if [ $publish = "Y" ];then
+          cd $BASEDIR
+          cd $DISTDIR
+          npm publish --access=public
+        fi
       fi
     fi
 done
