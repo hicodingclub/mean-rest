@@ -1,5 +1,5 @@
 <div class="select-model show" (keyup.esc)="uiOnEscapeKey()" tabindex="0" #<%-ModuleName%>Modal>
-  <div class="select-model-content">
+  <div class="container select-model-content">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Selected {{ItemCamelName}}</h5>
@@ -14,8 +14,8 @@
 
 
 <div class="detail" *ngIf="detail">
-	<div class="action-buttons my-3">
-        <% if(api.includes("L")) {%><a routerLink="." (click)="detailSelBack()"><i class="fas fa-angle-double-left" title="Back to list">&nbsp; {{ItemCamelName}} List</i></a><%}%>
+	<div class="action-buttons">
+    <% if(api.includes("L")) {%><a class="action-go-list" routerLink="." (click)="detailSelBack()"><i class="fas fa-angle-double-left" title="Back to list">&nbsp; {{ItemCamelName}} List</i></a><%}%>
 		<a routerLink="." class="btn btn-outline-primary" (click)="detailSelSelected()">Select</a>
 	</div>
 	

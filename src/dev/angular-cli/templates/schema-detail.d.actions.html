@@ -1,6 +1,6 @@
-<div *ngIf="!disableActionButtions && !options['disableActionButtions']" class="action-buttons my-3"><%
+<div *ngIf="!disableActionButtions && !options['disableActionButtions']" class="action-buttons"><%
     if (api.includes('L')) {%>
-    <a *ngIf="!options['disableActionList']" routerLink="<%-listRouterLink%>"><i class="fas fa-list" title="List"></i><!--  span>&nbsp;&nbsp;{{ItemCamelName}} List</span--></a><%}%><%
+    <a *ngIf="!options['disableActionList']" routerLink="<%-listRouterLink%>" class="action-go-list"><i class="fas fa-list" title="List"></i><!--  span>&nbsp;&nbsp;{{ItemCamelName}} List</span--></a><%}%><%
     if (api.includes('U') && detailActionButtons[0]) {%>
     <a *ngIf="!options['disableActionEdit']" [routerLink]="['../../edit', detail['_id'] ]" [skipLocationChange]="false" class="btn btn-outline-primary"><%-detailActionButtons[0]%></a><%}%><%
     if (api.includes('C') && detailActionButtons[1]) {%>

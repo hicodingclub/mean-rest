@@ -1,7 +1,4 @@
 <div class="edit" *ngIf="detail">
-	<div *ngIf="!embeddedView" class="action-buttons my-3">
-	</div>
-
 	<div class="card" style="text-align: left;">
 		<div class="card-body">
 			<h4 class="card-title" *ngIf="!embeddedView && !options['title']">{{action}} <%-SchemaCamelName%></h4>
@@ -53,7 +50,7 @@
 					</ng-template><%
 					}) %>
 				</ng-template>
-				<div class="action-buttons-center my-3">
+				<div class="action-buttons-center">
 					<button type="submit" class="btn btn-success" [disabled]="!editForm.form.valid">Submit</button>
 					<button class="btn btn-outline-success" type="button" (click)="editCancel()">Cancel</button>
 				</div>

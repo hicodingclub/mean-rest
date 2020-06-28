@@ -1,179 +1,190 @@
-	    <div class="single-line-edit">
-	      <div class="row col-gutter">
-			<div class="col-3">
-				<label for="<%-sn%>Edit<%-Fn%>">
-				<%-fD%>
-				</label>
-			</div>
-	        <div class="col-8">
+						<%_ 
+							let lineClass = 'two-column-search';
 
-    <%_ if (field.type === "SchemaString") { %>
-        <%_ if (field.enumValues) { %>
-	          <%_ field.enumValues.forEach( (f) => { %>
-	        <div class="form-check-inline">
-		        <input type="radio" name="<%-sn%>Edit<%-Fn%>" 
-		        	class="form-check-input"
-					id="<%-sn%>Edit<%-Fn%><%-f%>" [value]="'<%-f%>'"
-					[(ngModel)]="detail['<%-fn%>']"
-		        	#<%-sn%>Edit<%-Fn%>="ngModel">
-		      	<span class="form-check-label"><%-f%></span>
-		      <%_ }) %>
-		    </div>
-        <%_ } else { %>
-	        <input type="text" class="form-control" id="<%-sn%>Edit<%-Fn%>" 
-		        	<%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
-	                [(ngModel)]="detail['<%-fn%>']" name="<%-sn%>Edit<%-Fn%>"
-	                #<%-sn%>Edit<%-Fn%>="ngModel">
-        <%_ } %>
-    <%_ } else if (field.type === "SchemaBoolean") { %>
-	        <div class="form-check-inline">
-		      	<input type="radio" name="<%-sn%>Edit<%-Fn%>" 
-		        	class="form-check-input"
-		        	id="<%-sn%>Edit<%-Fn%>Yes" [value]="true" 
-		        	[(ngModel)]="detail['<%-fn%>']"
-		        	#<%-sn%>Edit<%-Fn%>="ngModel">
-		      	<span class="form-check-label">Yes</span>
-		      </div>
-	        <div class="form-check-inline">
-		        <input type="radio" name="<%-sn%>Edit<%-Fn%>" 
-		        	class="form-check-input"
-		        	id="<%-sn%>Edit<%-Fn%>No" [value]="false"
-		        	[(ngModel)]="detail['<%-fn%>']"
-		        	#<%-sn%>Edit<%-Fn%>="ngModel">
-		      	<span class="form-check-label">No</span>
-		      </div>
-    <%_ } else if (field.type === "SchemaNumber") { %>
-			<div class="input-group">
-			  <%if (field.mraType === 'currency'){%><span class="currency">$</span><%}%>
-		      <input type="number" class="form-control" id="<%-sn%>Edit<%-Fn%>"
-		             [(ngModel)]="detail['__mra_<%-fn%>_from']" name="<%-sn%>Edit<%-Fn%>"
-		             #<%-sn%>Edit<%-Fn%>="ngModel">
-		      <span>&nbsp; ~ &nbsp;</span>
-		      <input type="number" class="form-control" id="<%-sn%>Edit<%-Fn%>"
-		             [(ngModel)]="detail['__mra_<%-fn%>_to']" name="<%-sn%>Edit<%-Fn%>"
-		             #<%-sn%>Edit<%-Fn%>="ngModel">
-		    </div><!-- input group --> 
-    <%_ } else if (field.type === "SchemaDate") { %> 
-	        <div class="input-group">
-		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
-		             [(ngModel)]="detail['<%-fn%>']['from']" name="<%-sn%>Edit<%-Fn%>"
-		             ngbDatepicker [minDate]="minDate" #<%-sn%>Edit<%-Fn%>="ngModel">
-		      <span>&nbsp; ~ &nbsp;</span>
-		      <input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
-		             [(ngModel)]="detail['<%-fn%>']['to']" name="<%-sn%>Edit<%-Fn%>"
-		             ngbDatepicker [minDate]="minDate" #<%-sn%>Edit<%-Fn%>="ngModel">
+							let labelCol = 'col-12 col-sm-3';
+							let inputCol = 'col-11 col-sm-8';
+							let clearCol = 'col-1';
 
-		      <div class="input-group-append">
-		        <button class="btn btn-outline-secondary" (click)="onDateSelectionToggle('<%-fn%>')" type="button">
-		          <i class="fas fa-calendar-alt"></i>
-		        </button>
-		      </div>
-		    </div><!-- input group --> 
-		    <div class="date-selection-pop" *ngIf="detail['<%-fn%>']['pop']">
-			    <ngb-datepicker #dp [minDate]="minDate" (select)="onDateSelection('<%-fn%>', $event)" [displayMonths]="2" [dayTemplate]="<%-sn%>Edit<%-Fn%>T">
-				</ngb-datepicker>
-				<ng-template #<%-sn%>Edit<%-Fn%>T let-<%-sn%>Edit<%-Fn%>Date="date" let-<%-sn%>Edit<%-Fn%>Focused="focused">
-				  <span class="custom-day"
-				        [class.focused]="<%-sn%>Edit<%-Fn%>Focused"
-				        [class.range]="isRange('<%-fn%>', <%-sn%>Edit<%-Fn%>Date)"
-				        [class.faded]="isHovered('<%-fn%>', <%-sn%>Edit<%-Fn%>Date) || isInside('<%-fn%>', <%-sn%>Edit<%-Fn%>Date)"
-				        (mouseenter)="hoveredDate = <%-sn%>Edit<%-Fn%>Date"
-				        (mouseleave)="hoveredDate = null">
-				    {{ <%-sn%>Edit<%-Fn%>Date.day }}
-				  </span>
-				</ng-template>
-		    </div>      
-    <%_ } else if (field.type === "ObjectId") { %>
-		    <div class="input-group">
-		        <input class="form-control rounded" id="<%-sn%>Edit<%-Fn%>" 
-		             [ngClass]="{'pointer ref-badge': detail['<%-fn%>']['_id']}"
-		             (focus)="onRefSelect('<%-fn%>')"
-		        	 <%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>=""<%}%> 
-		             [ngModel]="detail['<%-fn%>']['value']" name="<%-sn%>Edit<%-Fn%>"
-		             #<%-sn%>Edit<%-Fn%>="ngModel"> 
-			</div><!-- (focus)="detail['<%-fn%>']['_id']?onRefShow('<%-field.fieldName%>', 'select', detail['<%-fn%>']['_id']):onRefSelect('<%-fn%>')" -->
-    <%_ } else if (field.type === "SchemaArray") { %>
-	  <%_ if (field.elementType === "SchemaString") { %>
-        <%_ if (field.enumValues && field.elementUnique) { %>
-	        <%_ field.enumValues.forEach( (f, index) => { 
-				const fd = f.trim().replace(/\s+/g, '');
-			%>
-	        <div class="form-check-inline">
-		        <input type="checkbox" name="<%-sn%>Edit<%-Fn%><%-fd%>" 
-		        	class="form-check-input"
-		        	id="<%-sn%>Edit<%-Fn%><%-fd%>"
-		        	[(ngModel)]="detail['<%-fn%>']['selection']['<%-f%>']"
-		        	#<%-sn%>Edit<%-Fn%><%-fd%>="ngModel">
-		      	<span class="form-check-label"><%-f%></span>
-		    </div>
-		    <%_ }) %>
-        <%_ } else if (!field.picture) { %>
-			<div class="badge-group" *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
-				<div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
-					{{element}}
-					<i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
-				</div>
-			</div>
-			<hr>
+							if (field.type === "SchemaDate") {
+								lineClass = 'one-column-search';
+								labelCol = 'col-12 col-lg-3';
+								inputCol = 'col-11 col-lg-8';
+							}
+						%>
+						<div class="container <%-lineClass%>">
+							<div class="row col-gutter align-items-center">
+								<div class="<%-labelCol%>">
+									<label for="<%-sn%>Edit<%-Fn%>">
+										<%-fD%>
+									</label>
+								</div>
+								<div class="<%-inputCol%>"><%_
+
+							if (field.type === "SchemaString") {
+								if (field.enumValues) {
+									field.enumValues.forEach( (f) => { %>
+									<div class="form-check-inline">
+										<input type="radio" name="<%-sn%>Edit<%-Fn%>" class="form-check-input" id="<%-sn%>Edit<%-Fn%><%-f%>"
+											[value]="'<%-f%>'" [(ngModel)]="detail['<%-fn%>']" #<%-sn%>Edit<%-Fn%>="ngModel">
+										<span class="form-check-label"><%-f%></span>
+									</div><%_ }) %><%_
+								} else { %>
+									<input type="text" class="form-control" id="<%-sn%>Edit<%-Fn%>"
+										<%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>="" <%}%> 
+											[(ngModel)]="detail['<%-fn%>']" name="<%-sn%>Edit<%-Fn%>" #<%-sn%>Edit<%-Fn%>="ngModel"><%_
+								}
+							} else if (field.type === "SchemaBoolean") { %>
+									<div class="form-check-inline">
+										<input type="radio" name="<%-sn%>Edit<%-Fn%>" class="form-check-input" id="<%-sn%>Edit<%-Fn%>Yes"
+											[value]="true" [(ngModel)]="detail['<%-fn%>']" #<%-sn%>Edit<%-Fn%>="ngModel">
+										<span class="form-check-label">Yes</span>
+									</div>
+									<div class="form-check-inline">
+										<input type="radio" name="<%-sn%>Edit<%-Fn%>" class="form-check-input" id="<%-sn%>Edit<%-Fn%>No"
+											[value]="false" [(ngModel)]="detail['<%-fn%>']" #<%-sn%>Edit<%-Fn%>="ngModel">
+										<span class="form-check-label">No</span>
+									</div><%_
+							} else if (field.type === "SchemaNumber") { %>
+									<div class="input-group">
+										<%if (field.mraType === 'currency'){%><span class="currency">$</span><%}%>
+									<input type="number" class="form-control" id="<%-sn%>Edit<%-Fn%>"
+										[(ngModel)]="detail['__mra_<%-fn%>_from']" name="<%-sn%>Edit<%-Fn%>"
+										#<%-sn%>Edit<%-Fn%>="ngModel">
+										<span>&nbsp; ~ &nbsp;</span>
+										<input type="number" class="form-control" id="<%-sn%>Edit<%-Fn%>"
+											[(ngModel)]="detail['__mra_<%-fn%>_to']" name="<%-sn%>Edit<%-Fn%>" #<%-sn%>Edit<%-Fn%>="ngModel">
+									</div><%_
+							} else if (field.type === "SchemaDate") { %>
+									<div class="row">
+										<div class="input-group col-12 col-md-6 align-items-center">
+											<span class="small mx-1" style="width:2rem">From</span>
+											<input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
+												[(ngModel)]="detail['<%-fn%>']['from']" name="<%-sn%>Edit<%-Fn%>" ngbDatepicker [minDate]="minDate"
+												#<%-sn%>Edit<%-Fn%>="ngModel">
+											<div class="input-group-append">
+												<button class="btn btn-outline-secondary" (click)="onDateSelectionToggle('<%-fn%>')" type="button">
+													<i class="fas fa-calendar-alt"></i>
+												</button>
+											</div>
+										</div>
+										<div class="input-group col-12 col-md-6 align-items-center">
+											<span class="small mx-1" style="width:2rem">to</span>
+											<input class="form-control" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
+												[(ngModel)]="detail['<%-fn%>']['to']" name="<%-sn%>Edit<%-Fn%>" ngbDatepicker [minDate]="minDate"
+												#<%-sn%>Edit<%-Fn%>="ngModel">
 	
-			<div class="available-hints">
-				<%_ if (field.hint) {%>
-				<div *ngIf="editHintFields['<%-fn%>'].length > 0" style="font-size: 0.9rem;">Select from Available <%-fD%>: </div>
-				<ng-template ngFor let-hintEle [ngForOf]="editHintFields['<%-fn%>']" let-i="index">
-					<div class="badge badge-pill badge-primary pointer"
-						*ngIf="!detail['<%-fn%>']['selection'].includes(hintEle['_id'])" 
-						(click)="onAddArrayItemValue('<%-fn%>', hintEle['_id'])">
-						{{hintEle['_id']}}
-					</div>
-				</ng-template><%_ }%>
-				<%_ if (!field.hint) {%>
-				<div class="mt-1">
-					<a class="pointer" routerLink="." (click)="onAddArrayItemClicked('<%-fn%>')"
-						style="font-size: 0.75rem;">
-						<i class="fas fa-plus-square" title="New"></i>
-						New
-					</a>
-				</div><%_ }%>
-			</div>
-			<%_ if (!field.hint) {%>
-			<div *ngIf="detail['<%-fn%>']['adding']" class="new-modal">
-				<div class="card text-center new-card">
-					<div class="card-body">
-					<input type="search" class="form-control border"
-						id="Edit<%-Fn%>New" #Edit<%-Fn%>New="ngModel"
-						[(ngModel)]="detail['<%-fn%>']['new']" [ngModelOptions]="{standalone: true}"
-						(keydown.enter)="$event.target.blur();onAddArrayItem('<%-fn%>');false"> 
+											<div class="input-group-append">
+												<button class="btn btn-outline-secondary" (click)="onDateSelectionToggle('<%-fn%>')" type="button">
+													<i class="fas fa-calendar-alt"></i>
+												</button>
+											</div>
+										</div>
+									</div>
+									<div class="date-selection-pop" *ngIf="detail['<%-fn%>']['pop']">
+										<ngb-datepicker #dp [minDate]="minDate" (select)="onDateSelection('<%-fn%>', $event)"
+											[displayMonths]="datePickerDisplayMonths" [dayTemplate]="<%-sn%>Edit<%-Fn%>T">
+										</ngb-datepicker>
+										<ng-template #<%-sn%>Edit<%-Fn%>T let-<%-sn%>Edit<%-Fn%>Date="date"
+											let-<%-sn%>Edit<%-Fn%>Focused="focused">
+											<span class="custom-day" [class.focused]="<%-sn%>Edit<%-Fn%>Focused"
+												[class.range]="isRange('<%-fn%>', <%-sn%>Edit<%-Fn%>Date)"
+												[class.faded]="isHovered('<%-fn%>', <%-sn%>Edit<%-Fn%>Date) || isInside('<%-fn%>', <%-sn%>Edit<%-Fn%>Date)"
+												(mouseenter)="hoveredDate = <%-sn%>Edit<%-Fn%>Date" (mouseleave)="hoveredDate = null">
+												{{ <%-sn%>Edit<%-Fn%>Date.day }}
+											</span>
+										</ng-template>
+									</div><%_
+								} else if (field.type === "ObjectId") { %>
+									<div class="input-group">
+										<input class="form-control rounded" id="<%-sn%>Edit<%-Fn%>"
+											[ngClass]="{'pointer ref-badge': detail['<%-fn%>']['_id']}" (focus)="onRefSelect('<%-fn%>')"
+											<%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>="" <%}%> 
+											[ngModel]="detail['<%-fn%>']['value']" name="<%-sn%>Edit<%-Fn%>" #<%-sn%>Edit<%-Fn%>="ngModel">
+									</div>
+									<!-- (focus)="detail['<%-fn%>']['_id']?onRefShow('<%-field.fieldName%>', 'select', detail['<%-fn%>']['_id']):onRefSelect('<%-fn%>')" --><%_
+								} else if (field.type === "SchemaArray") {
+									if (field.elementType === "SchemaString") {
+										if (field.enumValues && field.elementUnique) {
+											field.enumValues.forEach( (f, index) => {
+												const fd = f.trim().replace(/\s+/g, '');%>
+									<div class="form-check-inline">
+										<input type="checkbox" name="<%-sn%>Edit<%-Fn%><%-fd%>" class="form-check-input"
+											id="<%-sn%>Edit<%-Fn%><%-fd%>" [(ngModel)]="detail['<%-fn%>']['selection']['<%-f%>']"
+											#<%-sn%>Edit<%-Fn%><%-fd%>="ngModel">
+										<span class="form-check-label"><%-f%></span>
+									</div><%_
+											}) %><%_
+										} else if (!field.picture) { %>
+									<div class="badge-group" *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+										<div class="badge badge-pill badge-secondary"
+											*ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
+											{{element}}
+											<i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)"
+												title="Remove"></i>
+										</div>
+									</div>
+									<hr>
 
-					<div class="d-flex my-3 justify-content-center">
-						<button class="btn btn-outline-primary mx-1" [disabled]="!Edit<%-Fn%>New.valid" (click)="onAddArrayItem('<%-fn%>')">Confirm</button>
-						<button class="btn btn-outline-secondary mx-1" (click)="onAddArrayItemCancelled('<%-fn%>')">Cancel</button>
-					</div>
-					</div>
-				</div>
-			</div><%_ }%>
+									<div class="available-hints"><%_
+											if (field.hint) {%>
+										<div *ngIf="editHintFields['<%-fn%>'].length > 0" style="font-size: 0.9rem;">Select from Available
+											<%-fD%>: </div>
+										<ng-template ngFor let-hintEle [ngForOf]="editHintFields['<%-fn%>']" let-i="index">
+											<div class="badge badge-pill badge-primary pointer"
+												*ngIf="!detail['<%-fn%>']['selection'].includes(hintEle['_id'])"
+												(click)="onAddArrayItemValue('<%-fn%>', hintEle['_id'])">
+												{{hintEle['_id']}}
+											</div>
+										</ng-template><%_ }
+											if (!field.hint) {%>
+										<div class="mt-1">
+											<a class="pointer" routerLink="." (click)="onAddArrayItemClicked('<%-fn%>')"
+												style="font-size: 0.75rem;">
+												<i class="fas fa-plus-square" title="New"></i>
+												New
+											</a>
+										</div><%_
+											}%>
+									</div><%_
+											if (!field.hint) {%>
+									<div *ngIf="detail['<%-fn%>']['adding']" class="new-modal">
+										<div class="card text-center new-card">
+											<div class="card-body">
+												<input type="search" class="form-control border" id="Edit<%-Fn%>New" #Edit<%-Fn%>New="ngModel"
+													[(ngModel)]="detail['<%-fn%>']['new']" [ngModelOptions]="{standalone: true}"
+													(keydown.enter)="$event.target.blur();onAddArrayItem('<%-fn%>');false">
 
-        <%_ } %>
-      <%_ } else if (field.elementType === "ObjectId") { %>
-            <ng-template [ngIf]="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
-                <div class="badge badge-pill badge-secondary" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
-                    {{element.value}}
-				    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
-				</div>
-            </ng-template>
-			<button type="button" class="btn btn-light ml-3" (click)="onRefSelect('<%-fn%>')">
-				<i class="fas fa-plus" title="Add"></i>
-			</button>
-      <%_ } else { %> 
-	        <div>Not supported yet.</div>
-      <%_ } %> 
-    <%_ } %>
-	      </div>
-	      
-	      <div class="col-1">
-		    <div class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')"
-		        *ngIf="checkValueDefinedFromDetail('<%-fn%>')"
-		        ><i class="fas fa-times-circle" title="Clear"></i></div>
-	      </div>
-	    </div>
-      </div>
-      
+												<div class="d-flex my-3 justify-content-center">
+													<button class="btn btn-outline-primary mx-1" [disabled]="!Edit<%-Fn%>New.valid"
+														(click)="onAddArrayItem('<%-fn%>')">Confirm</button>
+													<button class="btn btn-outline-secondary mx-1"
+														(click)="onAddArrayItemCancelled('<%-fn%>')">Cancel</button>
+												</div>
+											</div>
+										</div>
+									</div><%_
+											}
+										}
+									} else if (field.elementType === "ObjectId") { %>
+									<ng-template [ngIf]="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+										<div class="badge badge-pill badge-secondary"
+											*ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
+											{{element.value}}
+											<i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromArrayField('<%-fn%>', i)"
+												title="Remove"></i>
+										</div>
+									</ng-template>
+									<button type="button" class="btn btn-light ml-3" (click)="onRefSelect('<%-fn%>')">
+										<i class="fas fa-plus" title="Add"></i>
+									</button><%_
+									} else { %>
+									<div>Not supported yet.</div><%_
+									}
+								} %>
+								</div>
+								<div class="<%-clearCol%>">
+									<div class="pointer" (click)="clearValueFromDetail('<%-fn%>')"
+										*ngIf="checkValueDefinedFromDetail('<%-fn%>')"><i class="fas fa-times-circle" title="Clear"></i></div>
+								</div>
+							</div>
+						</div>

@@ -174,12 +174,14 @@ tr:hover td i.fa-trash-alt:hover,
 
 .action-buttons {
   width: 100%;
-  float: right;
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  flex-flow: wrap;
+  align-items: center;
+  margin: 0.5rem 0;
 }
 .action-buttons .btn {
-  display: inline-block;
-  margin-left: 1rem;
+  margin: 0.25rem;
 }
 
 .pagination li {
@@ -208,26 +210,6 @@ tr:hover td i.fa-trash-alt:hover,
 
 ::-ms-clear {
   display: none;
-}
-
-.icon-clear {
-  cursor: pointer;
-  margin-top: 0.5rem;
-}
-
-.icon-clear-inside {
-  z-index: 3;
-  vertical-align: middle;
-  padding: 0.5rem 0.5rem 0rem 0.5rem;
-  cursor: pointer;
-  position: relative;
-  margin-left: -2rem; /* text 1 + left 0.5 + right 0.5 = 2 rem*/
-  border: 0;
-}
-
-.icon-clear-badge {
-  cursor: pointer;
-  margin-left: 1rem;
 }
 
 .pointer {
@@ -267,20 +249,30 @@ tr:hover td i.fa-trash-alt:hover,
 
 .select-model-content {
   position: relative;
-  float: right;
   background-color: #fefefe;
   /*margin: auto;*/
-  margin-right: 50px;
   padding: 0;
   border: 1px solid #888;
-  width: 60%;
+  width: 90%;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-.single-line-edit {
+.one-column-search {
+  flex-grow: 1;
+  flex-basis: 80%;
+}
+.two-column-search {
+  flex-grow: 1;
+  flex-basis: 80%;
 }
 
-.single-line-edit > .row {
+@media (min-width: 992px) {
+  .two-column-search {
+    flex-basis: 40%;
+  }
+}
+
+.two-column-search > .row, .one-column-search > .row {
   padding-bottom: 2px;
 }
 

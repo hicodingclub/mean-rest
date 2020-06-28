@@ -4,7 +4,9 @@
           };<%_
 for (let field of theView) { let fn = field.fieldName;
         if (field.enumValues) {%>
-          this.enums['<%-fn%>'] = [<%for (let ev of field.enumValues) {%>'<%-ev%>', <%}%>];<%}}%><%_
+          this.enums['<%-fn%>'] = [<%for (let ev of field.enumValues) {%>
+            '<%-ev%>',<%}%>
+          ];<%}}%><%_
 for (let field of theView) { let fn = field.fieldName;
         if (field.type == "SchemaString") {%>
           this.stringFields.push('<%-fn%>');<%}}%><%_
@@ -13,19 +15,25 @@ let refObjects = [];
         if (field.type === "ObjectId"){ refObjects.push([field.fieldName, field.ref]);}
     }
     if (refObjects.length > 0) {%>
-          this.referenceFields = [<%for (let itm of refObjects) {%>'<%-itm[0]%>', <%}%>];<%}%><%_
+          this.referenceFields = [<%for (let itm of refObjects) {%>
+            '<%-itm[0]%>',<%}%>
+          ];<%}%><%_
 let dateObjects = [];
     for (let field of theView) { 
         if (field.type === "SchemaDate") dateObjects.push(field.fieldName);
     }
     if (dateObjects.length > 0) {%>
-          this.dateFields = [<%for (let fnm of dateObjects) {%>'<%-fnm%>', <%}%>];<%}%><%_
+          this.dateFields = [<%for (let fnm of dateObjects) {%>
+            '<%-fnm%>',<%}%>
+          ];<%}%><%_
 let numberObjects = [];
     for (let field of theView) { 
         if (field.type === "SchemaNumber") numberObjects.push(field.fieldName);
     }
     if (numberObjects.length > 0) {%>
-          this.numberFields = [<%for (let fnm of numberObjects) {%>'<%-fnm%>', <%}%>];<%}%><%_
+          this.numberFields = [<%for (let fnm of numberObjects) {%>
+            '<%-fnm%>',<%}%>
+          ];<%}%><%_
 let mapFields = [];
     for (let field of theView) { 
         if (field.type === "Map") {
@@ -50,7 +58,9 @@ let multiSelectionFields = [];
         if (field.type === "SchemaArray" && field.enumValues && field.elementUnique) multiSelectionFields.push(field.fieldName);
     }
     if (multiSelectionFields.length > 0) {%>
-          this.multiSelectionFields = [<%for (let fnm of multiSelectionFields) {%>'<%-fnm%>', <%}%>];<%}%><%_
+          this.multiSelectionFields = [<%for (let fnm of multiSelectionFields) {%>
+            '<%-fnm%>', <%}%>
+          ];<%}%><%_
 let arrayFields = []; let arrayRefFields = [];
     for (let field of theView) {
         if (field.type === "SchemaArray" && !(field.enumValues && field.elementUnique)) {
@@ -61,7 +71,9 @@ let arrayFields = []; let arrayRefFields = [];
         }
     }
     if (arrayFields.length > 0) {%>
-          this.arrayFields = [<%for (let f of arrayFields) {%>['<%-f[0]%>', '<%-f[1]%>'],<%}%>];<%}
+          this.arrayFields = [<%for (let f of arrayFields) {%>
+            ['<%-f[0]%>', '<%-f[1]%>'],<%}%>
+          ];<%}
     if (arrayRefFields.length > 0) { 
         for (let itm of arrayRefFields) {%>
           this.referenceFieldsMap['<%-itm[0]%>'] = '<%-itm[1]%>';
@@ -71,13 +83,17 @@ let viewHiddenFields = [];
         if (field.hidden) viewHiddenFields.push(field.fieldName);
     }
     if (viewHiddenFields.length > 0) {%>
-          this.viewHiddenFields = [<%for (let fnm of viewHiddenFields) {%>'<%-fnm%>', <%}%>];<%}%><%_
+          this.viewHiddenFields = [<%for (let fnm of viewHiddenFields) {%>
+            '<%-fnm%>',<%}%>
+          ];<%}%><%_
 let textareaFields = [];
     for (let field of theView) { 
         if (field.textarea) textareaFields.push(field.fieldName);
     }
     if (textareaFields.length > 0) {%>
-          this.textareaFields = [<%for (let fnm of textareaFields) {%>'<%-fnm%>', <%}%>];<%}%><%_ 
+          this.textareaFields = [<%for (let fnm of textareaFields) {%>
+            '<%-fnm%>',<%}%>
+          ];<%}%><%_ 
 let hintFields = [];
     for (let field of theView) {
         if (field.hint) {
@@ -87,4 +103,8 @@ let hintFields = [];
     if (hintFields.length > 0) {%>
           this.editHintFields = {<%for (let itm of hintFields) {%>
             '<%-itm%>': [],<%}%>
-          };<%}%>
+          };<%}%><%_ 
+if (ownSearchStringFields.length > 0) {%>
+          this.ownSearchStringFields = [<%for (let itm of ownSearchStringFields) {%>
+            '<%-itm%>',<%}%>
+          ];<%}%>

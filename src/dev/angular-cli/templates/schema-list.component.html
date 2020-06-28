@@ -49,9 +49,9 @@ if (listCategoryRef && listCategoryShowMore) {%>
 		</div><%}%>
 		<div class="row" *ngIf="!options['disableActionButtions']">
 			<div class="col">
-		        <div class="action-buttons my-3"><%
+		        <div class="action-buttons"><%
 					if (api.includes('M') && listActionButtons[2] && schemaHasEmailing){%>
-					<lib-mdds-action-email *ngIf="emailFields.length > 0" 
+					<lib-mdds-action-email *ngIf="emailFields.length > 0" class="m-1"
 						[emailFields]="emailFields" [stringFields]="stringFields" [recordNumber]="totalCount"
 						(componentEvents)="onActionBaseEvent($event)">
 					</lib-mdds-action-email><%}%><%
@@ -109,7 +109,7 @@ if (listCategoryRef && listCategoryShowMore) {%>
 </div>
 
 <%_ if (schemaHasRef) {%>
-<ng-template *ngIf="!options['disableRefs']" <%-moduleName%>-ref-select></ng-template><%}%>
+<ng-template <%-moduleName%>-ref-select></ng-template><%}%>
 <%
 	// only generate content when listType if one of the default three types.	
 }%>

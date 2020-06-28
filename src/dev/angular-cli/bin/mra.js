@@ -1500,6 +1500,8 @@ function main() {
     let detailRefBlackList = undefined;
     let detailRefName = {};
 
+    let ownSearchStringFields = []; //list of strings that should have own search field in the search area
+
     let selectActionViewType = 'dropdown'; // used by list select widget
 
     // internal used
@@ -1565,8 +1567,11 @@ function main() {
       if (typeof mraUI.homeListNumber === 'number') {
         homeListNumber = mraUI.homeListNumber;
       }
-      if (mraUI.detailActions) {
+      if (!!mraUI.detailActions) {
         detailActions = mraUI.detailActions;
+      }
+      if (!!mraUI.ownSearchStringFields) {
+        ownSearchStringFields = mraUI.ownSearchStringFields;
       }
     }
 
@@ -2143,6 +2148,8 @@ function main() {
       detailWidgets,
 
       editHintFields,
+
+      ownSearchStringFields,
 
       homeListNumber,
 

@@ -6,27 +6,18 @@
 
 .action-buttons {
   width: 100%;
-  float: right;
-  text-align: right;
-  margin-bottom: 1.25rem;
+  display: flex;
+  justify-content: flex-end;
+  flex-flow: wrap;
+  align-items: center;
+  margin: 0.5rem 0;
 }
 .action-buttons .btn {
-  display: inline-block;
-  margin-left: 1rem;
+  margin: 0.25rem;
 }
-.action-buttons .fa-angle-double-left,
-.fa-list {
-  float: left;
-  display: inline-block;
-  /*margin-left: 2.5rem;*/
-  margin-top: 0.75rem;
-}
-
-.action-buttons span {
-  float: left;
-  display: inline-block;
-  margin-left: 0rem;
-  margin-top: 0.5rem;
+.action-go-list {
+  margin-left: 2rem;
+  margin-right: auto;
 }
 
 .card-title {
@@ -67,13 +58,11 @@
 
 .select-model-content {
   position: relative;
-  float: right;
   background-color: #fefefe;
   /*margin: auto;*/
-  margin-right: 50px;
   padding: 0;
   border: 1px solid #888;
-  width: 60%;
+  width: 90%;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
