@@ -4,18 +4,14 @@ export const AUTHENTICATION_SERVER_ROOT_URI = new InjectionToken<string>(
   'AUTHENTICATION_SERVER_ROOT_URI',
   {
     providedIn: 'root',
-    factory: () => {
-      return '/api/auth';
-    },
+    factory: () => '/api/auth',
   },
 );
 export const AUTHENTICATION_AUTH_PAGE_ROOT_URI = new InjectionToken<string>(
   'AUTHENTICATION_AUTH_PAGE_ROOT_URI',
   {
     providedIn: 'root',
-    factory: () => {
-      return '/auth';
-    },
+    factory: () => '/auth',
   },
 );
 export const AUTHENTICATION_INTERFACES = new InjectionToken(
@@ -25,27 +21,21 @@ export const AUTHENTICATION_DROPDOWN_ITEMS = new InjectionToken<any[]>(
   'AUTHENTICATION_DROPDOWN_ITEMS',
   {
     providedIn: 'root',
-    factory: () => {
-      return [];
-    },
+    factory: () => [],
   },
 );
 export const AUTHENTICATION_LOGIN_PIPELINE = new InjectionToken<string>(
   'AUTHENTICATION_LOGIN_PIPELINE',
   {
     providedIn: 'root',
-    factory: () => {
-      return undefined;
-    },
+    factory: () => '',
   },
 );
 export const AUTHENTICATION_REGISTRATION_PIPELINE = new InjectionToken<string>(
   'AUTHENTICATION_REGISTRATION_PIPELINE',
   {
     providedIn: 'root',
-    factory: () => {
-      return undefined;
-    },
+    factory: () => '',
   },
 );
 export const AUTHENTICATION_REGISTRATION_REQUIRED = new InjectionToken<any>(
@@ -65,8 +55,6 @@ export const AUTHENTICATION_REGISTRATION_DISABLE = new InjectionToken<boolean>(
   'AUTHENTICATION_REGISTRATION_PIPELINE',
   {
     providedIn: 'root',
-    factory: () => {
-      return false;
-    },
+    factory: () => false,
   },
 );
