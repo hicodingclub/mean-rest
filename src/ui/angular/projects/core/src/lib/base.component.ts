@@ -76,6 +76,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public fieldDisplayNames = {}; // display names of field
   public dateFormat = "MM/DD/YYYY";
   public timeFormat = "hh:mm:ss";
+  public datePickerDisplayMonths = 2;
 
   public briefFieldsInfo = []; // from base contructor. All breifFields
 
@@ -129,9 +130,10 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public searchText: string;
   public searchMoreDetail: any;
   public moreSearchOpened = false;
+  public ownSearchStringFields = []; //list of strings that should have own search field in the search area
 
   // windows width adjust for list (replace table view, which is not good for narrow screen)
-  public widowWidth = 600;
+  public windowWidth = 600;
 
   // to show more details of the associationed field (an object) from list view
   public associationField: any;
@@ -350,8 +352,11 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
 
   public adjustListViewForWindowSize() {
-    this.widowWidth = window.innerWidth;
-    if (this.widowWidth < 600) {
+    this.windowWidth = window.innerWidth;
+    if (this.windowWidth < 768) {
+      this.datePickerDisplayMonths = 1;
+    }
+    if (this.windowWidth < 992) {
       if (this.listViewFilter === "table") {
         this.listViewFilter = "list"; // use list instead
       }
@@ -1170,7 +1175,8 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     ];
     if (!this.searchDetailReady) {
       for (const s of this.stringFields) {
-        if (!listCategoryFields.includes(s)) {
+        if (!listCategoryFields.includes(s) &&!this.ownSearchStringFields.includes(s)) {
+          // listCategoryField, as well as the strings fields requring own search, will be put to 'and' context
           d[s] = this.searchText;
         }
       }
@@ -1178,8 +1184,10 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     const orSearchContext = [];
     const andSearchContext = [];
     for (const field in d) {
-      if (typeof d[field] === "string" && !listCategoryFields.includes(field)) {
-        // listCategoryField will be put to 'and' context
+      if (typeof d[field] === "string"
+        && !listCategoryFields.includes(field)
+        && !this.ownSearchStringFields.includes(field)) {
+        // listCategoryField, as well as the strings fields requring own search, will be put to 'and' context
         const o = {};
         o[field] = d[field];
         orSearchContext.push(o);
@@ -1191,18 +1199,19 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     for (const field of Object.keys(d2)) {
       let oValue: any;
       let oValueRaw: any[] = [];
+      let valueToShow: any;
       if (this.stringFields.indexOf(field) >= 0) {
-        if (listCategoryFields.includes(field)) {
+        if (listCategoryFields.includes(field) || this.ownSearchStringFields.includes(field)) {
           // put category field to 'and'
           oValue = d[field];
           oValueRaw = [oValue];
+
+          valueToShow = oValue;
         } else {
-          continue; // string fields already put to orSearchContext
+          continue; // other string fields already put to orSearchContext
         }
       } else {
         // Non string fields
-        let valueToShow: any;
-
         oValue = d2[field];
         oValueRaw = [oValue];
 
@@ -1228,11 +1237,12 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         } else {
           valueToShow = d[field]; // take directly from what we get
         }
-        if (!listCategoryFields.includes(field)) {
-          // don't show category field
-          this.searchMoreDetail.push([this.fieldDisplayNames[field] || field, valueToShow, field]);
-        }
       }
+      if (!listCategoryFields.includes(field)) {
+        // don't show category field
+        this.searchMoreDetail.push([this.fieldDisplayNames[field] || field, valueToShow, field]);
+      }
+
       if (oValueRaw.includes(MddsUncategorized)) {
         oValue = null;
       }
@@ -2226,20 +2236,24 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
   public checkValueDefinedFromDetail(field: string): boolean {
     const d = this.detail;
-    if (!d.hasOwnProperty(field)) {
-      return false;
-    }
-    if (typeof d[field] === "undefined") {
-      return false;
-    }
+    const fromFld = `__mra_${field}_from`;
+    const toFld = `__mra_${field}_to`;
     if (
-      typeof this.detail[field] === "number" ||
-      typeof d[field] === "string" ||
-      typeof d[field] === "boolean"
+      typeof this.detail[field] === 'number' ||
+      typeof d[field] === 'string' ||
+      typeof d[field] === 'boolean' ||
+      typeof d[fromFld] === 'number' ||
+      typeof d[toFld] === 'number'
     ) {
       return true;
     }
-    if (typeof d[field] === "object") {
+    if (!d.hasOwnProperty(field)) {
+      return false;
+    }
+    if (typeof d[field] === 'undefined') {
+      return false;
+    }
+    if (typeof d[field] === 'object') {
       if (this.multiSelectionFields.includes(field)) {
         return this.isDefinedFieldArrayMultiSelection(d[field]);
       } else if (this.arrayFields.some((x) => x[0] === field)) {
