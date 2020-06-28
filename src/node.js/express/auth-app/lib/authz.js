@@ -242,22 +242,25 @@ const verifyRolePermission = function(req, res, next) {
       if (rolePermission && rolePermission.includes(operation)) { //any role allows it
         return next();
       }
-      if (rolePermission) roleDisallow = true; //disallowed by any least one row.
+      if (rolePermission) roleDisallow = true; //disallowed by at least one row.
     }
     if (roleDisallow) {
       return next(createError(403, "Forbidden."));
     }
     
-    // not allowed or forbidden by any role
+    // not allowed or disallowed by the roles (ie, not defined role permission)
 
     // check LoginUser Role
     let loginPermission = getPermission(mddsModulePermissions, 'role', "LoginUser", schemaName, mddsAllModulePermissions);
     if (loginPermission) {
       if (loginPermission.includes(operation)) {
-        return next(); //allowed by allModulePermission
-      } 
+        return next(); //allowed by LoginUser
+      }
+      // disallowed by LoginUser
       return next(createError(403, "Forbidden."));
     }
+
+    // not allowed or disallowed by roles, and by LoginUser. Got to check "Anyone"
   }
 
   // check anyOneUser
@@ -266,9 +269,11 @@ const verifyRolePermission = function(req, res, next) {
     if (anyOnePermission.includes(operation)) {
       return next(); //allowed by allModulePermission
     }
-    return next(createError(403, "Forbidden."));
   }
 
+  if (!loggedIn) {
+    return next(createError(401, "Not Authorized.")); // so user can login to get it
+  }
   return next(createError(403, "Forbidden."));
 }
 
