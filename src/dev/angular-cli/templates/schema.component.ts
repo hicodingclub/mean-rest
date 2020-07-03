@@ -110,8 +110,7 @@ export class <%-SchemaName%>Component extends MddsBaseComponent implements OnIni
       public injector: Injector,
       public router: Router,
       public route: ActivatedRoute,
-      public location: Location,
-      public view: ViewType ) {
+      public location: Location) {
 
         super(<%-schemaName%>Service, injector, router, route, location);
         this.setItemNames(itemCamelName);

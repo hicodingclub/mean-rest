@@ -97,7 +97,7 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>EditCustCompone
       public location: Location) {
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
                 <%-schemaName%>Service, injector, router, route, location);
-                this.view = ViewType.EDIT;
+          this.view = ViewType.EDIT;
 <% let theView = compositeEditView; let isEditView = true;%><%_ include schema-construct.component.ts %>
 <% for (let field of compositeEditView) { let fn=field.fieldName, Fn=field.FieldName; 
     if (field.type === 'SchemaString' && field.editor) { %>

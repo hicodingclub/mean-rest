@@ -2,22 +2,23 @@
   "name": "@hicoder/angular-file",
   "version": "0.9.25",
   "dependencies": {
-    "cropperjs": "^1.5.6"
-  },
+    "cropperjs": "^1.5.6",
+    "tslib": "^2.0.0"
+},
   "peerDependencies": {
-    "@angular/common": "^9.1.11",
-    "@angular/core": "^9.1.11",
-    "@angular/forms": "^9.1.11",
-    "@angular/router": "^9.1.11",
+    "@angular/common": "^10.0.2",
+    "@angular/core": "^10.0.2",
+    "@angular/forms": "^10.0.2",
+    "@angular/router": "^10.0.2",
     "@hicoder/angular-core": "0.9.25",
-    "@ng-bootstrap/ng-bootstrap": "^5.1.4"
+    "@ng-bootstrap/ng-bootstrap": "^6.1.0"
   },
   "devDependencies": {
-    "@angular/common": "^9.1.11",
-    "@angular/core": "^9.1.11",
-    "@angular/forms": "^9.1.11",
-    "@angular/router": "^9.1.11",
+    "@angular/common": "^10.0.2",
+    "@angular/core": "^10.0.2",
+    "@angular/forms": "^10.0.2",
+    "@angular/router": "^10.0.2",
     "@hicoder/angular-core": "0.9.25",
-    "@ng-bootstrap/ng-bootstrap": "^5.1.4"
+    "@ng-bootstrap/ng-bootstrap": "^6.1.0"
   }
 }

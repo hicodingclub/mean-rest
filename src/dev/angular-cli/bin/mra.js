@@ -433,8 +433,67 @@ const stripFieldMeta = function (viewStr) {
   return [fieldMeta, viewStrMetaHandled];
 };
 
+const analizeSearch = function (
+  briefView,
+  listCategoryFieldsNotShown,
+  listSearchFieldsBlackList,
+  ownSearchStringFields,
+  api,
+  listActionButtons
+) {
+  let showSearchBox = false;
+  let stringBoxFields = [];
+  let ownSearchFields = [];
+  let noMoreSearchArea = true;
+  let hasArchive = false;
+  let hasArray = false;
+  let hasDate = false;
+
+  for (let field of briefView) {
+    if (field.hidden) continue;
+    if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
+    if (field.picture) continue;
+    if (listSearchFieldsBlackList.includes(field.fieldName)) {
+      continue;
+    }
+    if (field.type === 'AngularSelector') {
+      continue;
+    }
+
+    if (field.type === 'SchemaArray') {
+      hasArray = true;
+    }
+    if (field.type === 'SchemaDate') {
+      hasDate = true;
+    }
+    if (
+      field.type == 'SchemaString' &&
+      !ownSearchStringFields.includes(field.fieldName)
+    ) {
+      showSearchBox = true;
+      stringBoxFields.push(field.displayname);
+    } else {
+      noMoreSearchArea = false;
+      ownSearchFields.push(field);
+    }
+  }
+  if (api.includes('A') && listActionButtons[3]) {
+    noMoreSearchArea = false;
+    hasArchive = true;
+  }
+  return {
+    showSearchBox,
+    stringBoxFields,
+    noMoreSearchArea,
+    ownSearchFields,
+    hasArchive,
+    hasArray,
+    hasDate,
+  };
+};
+
 const generateSourceFile = function (keyname, template, renderObj, outputDir) {
-  let renderOptions = {root: ROOTDIR};
+  let renderOptions = { root: ROOTDIR };
   let templateFile = basedirFile(template[0]);
   let output = generatedFile(outputDir, keyname, template[1]);
   let description = template[2];
@@ -640,7 +699,7 @@ const generateViewPicture = function (
   let viewDef = viewStrPure.replace(/\|/g, ' ').match(/\S+/g) || [];
   if (fieldGroups.length == 0) {
     //no grouping
-    if ( API === 'L') {
+    if (API === 'L') {
       fieldGroups.push(viewDef); // all elements as a group
     } else {
       for (let e of viewDef) {
@@ -1562,7 +1621,8 @@ function main() {
       listSortFields = mraUI.listSortFields;
       homeListNumber = mraUI.homeListNumber || homeListNumber;
       listSearchType = mraUI.listSearchType || listSearchType;
-      listSearchFieldsBlackList = mraUI.listSearchFieldsBlackList || listSearchFieldsBlackList;
+      listSearchFieldsBlackList =
+        mraUI.listSearchFieldsBlackList || listSearchFieldsBlackList;
 
       if (mraUI.defaultListSort) {
         const keys = Object.keys(mraUI.defaultListSort);
@@ -2080,6 +2140,14 @@ function main() {
       selectorsObj[x.name] = x;
     });
 
+    const searchBarObj = analizeSearch( 
+      briefView,
+      listCategoryFieldsNotShown,
+      listSearchFieldsBlackList,
+      ownSearchStringFields,
+      api,
+      listActionButtons);
+
     let schemaObj = {
       name: name,
       moduleName: moduleName,
@@ -2146,6 +2214,7 @@ function main() {
       listSelectWidgets,
       listSearchType,
       listSearchFieldsBlackList,
+      searchBarObj,
 
       detailType, // normal, post, info, slide, term...
       DetailType,

@@ -40,7 +40,7 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>DetailCustCom
       public location: Location) {
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
                 <%-schemaName%>Service, injector, router, route, location);
-                this.view = ViewType.DETAIL;
+          this.view = ViewType.DETAIL;
 <% let theView = detailView; let isEditView = false;%><%_ include schema-construct.component.ts %>
   }
 

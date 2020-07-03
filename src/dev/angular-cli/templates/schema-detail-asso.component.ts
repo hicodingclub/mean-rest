@@ -35,7 +35,8 @@ export class <%-SchemaName%>AssoComponent extends <%-SchemaName%>Component imple
       public route: ActivatedRoute,
       public location: Location) {
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
-                <%-schemaName%>Service, injector, router, route, location, ViewType.DETAIL);
+                <%-schemaName%>Service, injector, router, route, location);
+          this.view = ViewType.DETAIL;
 <% let theView = detailView; let isEditView = false;%><%_ include schema-construct.component.ts %>
   }
 

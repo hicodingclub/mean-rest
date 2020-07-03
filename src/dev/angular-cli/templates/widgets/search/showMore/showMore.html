@@ -1,41 +1,22 @@
-			<%_ let showSearchBox = false;
-				let stringBoxFields = [];
-				let ownSearchFields = [];
-				let noMoreSearchArea = true;
-			    for (let field of briefView){
-					if (field.hidden) continue;
-					if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
-					if (field.picture) continue;
-					if (listSearchFieldsBlackList.includes(field.fieldName)) {
-						continue;
-					}
-					if (field.type === 'AngularSelector') {
-						continue;
-					}
-
-			        if(field.type == 'SchemaString' && !ownSearchStringFields.includes(field.fieldName)) {
-						showSearchBox = true;
-						stringBoxFields.push(field.displayname);
-					} else {
-						ownSearchFields.push(field);
-						noMoreSearchArea = false;
-					}
-				}
-				if (api.includes('A') && listActionButtons[3]) {
-					noMoreSearchArea = false;
-				}
-				
-			%><%_ if (showSearchBox) { %>
+			<%_  let sbo = searchBarObj; if (sbo.showSearchBox) { %>
 			    <div class="input-group">
 	              <input type="search" class="form-control border border-secondary" id="<%-schemaName%>TextSearch" 
 						#<%-schemaName%>TextSearch [(ngModel)]="searchText"
 						(search)="$event.target.blur();searchList();"
-					    placeholder="Search for <%for (let [idx,nm] of stringBoxFields.entries()){%><%if (idx!=0) {%>, <%}%><%-nm%><%}%>">
+						placeholder="Search for <%for (let [idx,nm] of sbo.stringBoxFields.entries()){%><%if (idx!=0) {%>, <%}%><%-nm%><%}%>">
+				  <div *ngIf="searchText" class="input-group-append icon-search-clear">
+						<span >
+							<i class="fas fa-times-circle" (click)="onSearchTextClear()" title="Clear"></i>
+						</span>
+				  </div>
+				  <div class="input-group-append">
+				    <button type="button" class="btn btn-outline-secondary" (click)="searchList()"><i class="fas fa-search"></i></button>
+				  </div>
 				</div>
 			<%}%><%_ if (typeof noMoreSearchArea == 'undefined' || !noMoreSearchArea) { %>
 			    <div class="mt-1 virtual-card">
 						<div class="d-flex flex-wrap align-items-center"><%_
-							ownSearchFields.forEach( (field) => {
+							sbo.ownSearchFields.forEach( (field) => {
 								let fn=field.fieldName, fD=field.displayName, Fn=field.FieldName, sn=schemaName, Sn=SchemaName, mn=moduleName, Mn=ModuleName;
 
 								let obj = {
@@ -45,23 +26,9 @@
 								include('/widgets/search/normal/schema-search.field.html', obj) %> 
 							<%_ }) %>
 						</div>
-						<%_ if(api.includes('A') && listActionButtons[3]) {%>
+						<%_ if(sbo.hasArchive) {%>
 						<hr>
-						<div class="one-column-search mt-3">
-							<div class="row">
-								<div class="col-3"><label for="Archived">Archived</label></div>
-								<div class="col-8">
-									<label class="mr-1">No</label>
-									<label class="switch">
-										<input type="checkbox"
-											[(ngModel)]="detail['archived']"
-											#EditArchived="ngModel">
-										<span class="slider round"></span>
-									</label>
-									<label class="ml-1">Yes</label>
-								</div>
-							</div>
-						</div>
+						<%- include('/widgets/search/normal/schema-search.archive.html'); %>
 						<hr><%}%>
 
 						<div class="action-buttons">

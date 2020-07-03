@@ -1,5 +1,8 @@
-/*  Search part */
 
+hr {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
 
 .icon-clear-badge {
 	cursor: pointer;
@@ -30,12 +33,13 @@
   flex-basis: 80%;
 }
 
+.two-column-search > .row,
+.one-column-search > .row {
+  padding-bottom: 4px;
+}
+
 @media (min-width: 992px) {
   .two-column-search {
     flex-basis: 40%;
   }
 }
-
-.two-column-search > .row, .one-column-search > .row {
-  padding-bottom: 2px;
-}  

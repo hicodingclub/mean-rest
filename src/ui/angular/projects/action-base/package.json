@@ -2,7 +2,10 @@
   "name": "@hicoder/angular-action-base",
   "version": "0.9.25",
   "peerDependencies": {
-    "@angular/common": "^9.1.11",
-    "@angular/core": "^9.1.11"
+    "@angular/common": "^10.0.2",
+    "@angular/core": "^10.0.2"
+  },
+  "dependencies": {
+    "tslib": "^2.0.0"
   }
 }

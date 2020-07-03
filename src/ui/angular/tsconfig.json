@@ -1,82 +1,71 @@
+/*
+  This is a "Solution Style" tsconfig.json file, and is used by editors and TypeScript’s language server to improve development experience.
+  It is not intended to be used to perform a compilation.
+
+  To learn more about this file see: https://angular.io/config/solution-tsconfig.
+*/
 {
-  "compileOnSave": false,
-  "compilerOptions": {
-    "baseUrl": "./",
-    "outDir": "./dist/out-tsc",
-    "sourceMap": true,
-    "declaration": false,
-    "downlevelIteration": true,
-    "experimentalDecorators": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "importHelpers": true,
-    "target": "es2015",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "es2018",
-      "dom"
-    ],
-    "paths": {
-      "core": [
-        "dist/core"
-      ],
-      "core/*": [
-        "dist/core/*"
-      ],
-      "auth": [
-        "dist/auth"
-      ],
-      "auth/*": [
-        "dist/auth/*"
-      ],
-      "action-base": [
-        "dist/action-base"
-      ],
-      "action-base/*": [
-        "dist/action-base/*"
-      ],
-      "action-email": [
-        "dist/action-email"
-      ],
-      "action-email/*": [
-        "dist/action-email/*"
-      ],
-      "composite": [
-        "dist/composite"
-      ],
-      "composite/*": [
-        "dist/composite/*"
-      ],
-      "file": [
-        "dist/file"
-      ],
-      "file/*": [
-        "dist/file/*"
-      ],
-      "richtext": [
-        "dist/richtext"
-      ],
-      "richtext/*": [
-        "dist/richtext/*"
-      ],
-      "shopping-cart": [
-        "dist/shopping-cart"
-      ],
-      "shopping-cart/*": [
-        "dist/shopping-cart/*"
-      ],
-      "shopping-framework": [
-        "dist/shopping-framework"
-      ],
-      "shopping-framework/*": [
-        "dist/shopping-framework/*"
-      ]
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/core/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/core/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/auth/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/auth/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/action-base/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/action-base/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/action-email/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/action-email/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/composite/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/composite/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/file/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/file/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/richtext/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/richtext/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/shopping-cart/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/shopping-cart/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/shopping-framework/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/shopping-framework/tsconfig.spec.json"
     }
-  },
-  "angularCompilerOptions": {
-    "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true
-  }
+  ]
 }

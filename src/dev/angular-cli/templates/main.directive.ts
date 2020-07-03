@@ -1,3 +1,4 @@
+import { Injectable } from "@angular/core";
 <%_if (hasRequiredArray || hasRequiredMultiSelection || hasRequiredMap) {%>
 import { Directive } from '@angular/core';
 import { NG_VALIDATORS, Validator, ValidationErrors, AbstractControl, FormGroup } from '@angular/forms';<%_} %>
@@ -5,6 +6,7 @@ import { NG_VALIDATORS, Validator, ValidationErrors, AbstractControl, FormGroup 
 import { NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { dateStructureToString, stringToDateStructure } from '@hicoder/angular-core';
 
+@Injectable()
 export class MraNgbDateFormatterService extends NgbDateParserFormatter {
     private dateFormat = '<%-dateFormat%>';
     private timeFormat = '<%-timeFormat%>';

@@ -25,7 +25,8 @@ export class <%-SchemaName%>DetailFieldComponent extends <%-SchemaName%>Componen
         public route: ActivatedRoute,
         public location: Location) {
           super(<%if (schemaHasRef) {%>null,<%}%>
-                <%-schemaName%>Service, injector, router, route, location, ViewType.DETAIL);
+                <%-schemaName%>Service, injector, router, route, location);
+          this.view = ViewType.DETAIL;
           <% let theView = detailView; let isEditView = false;%><%_ include schema-construct.component.ts %>
     }
 

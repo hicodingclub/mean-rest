@@ -12,18 +12,20 @@
 							}
 
 							let formControl = 'form-control form-control-sm';
+							let inputGroup = 'input-group input-group-sm'
 							let lineSize = 'small';
 							if (typeof size === 'undefined') {
 								;
 							} else if (size === 'normal') {
 								formControl = 'form-control';
+								inputGroup = 'input-group';
 								lineSize = '';
 							}
 							
 						%>
 						<div class="container <%-lineClass%> <%-lineSize%>">
 							<div class="row col-gutter align-items-center">
-								<div class="<%-labelCol%> text-right">
+								<div class="<%-labelCol%>">
 									<label for="<%-sn%>Edit<%-Fn%>">
 										<%-fD%>
 									</label>
@@ -55,7 +57,7 @@
 										<span class="form-check-label">No</span>
 									</div><%_
 							} else if (field.type === "SchemaNumber") { %>
-									<div class="input-group align-items-center">
+									<div class="<%-inputGroup%> align-items-center">
 										<%if (field.mraType === 'currency'){%><span class="currency">$</span><%}%>
 										<input type="number" class="<%-formControl%>" id="<%-sn%>Edit<%-Fn%>"
 											[(ngModel)]="detail['__mra_<%-fn%>_from']" name="<%-sn%>Edit<%-Fn%>"
@@ -67,7 +69,7 @@
 									</div><%_
 							} else if (field.type === "SchemaDate") { %>
 									<div class="row">
-										<div class="input-group col-12 col-md-6 align-items-center">
+										<div class="<%-inputGroup%> col-12 col-md-6 align-items-center">
 											<span class="small mx-1" style="width:2rem">From</span>
 											<input class="<%-formControl%>" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
 												[(ngModel)]="detail['<%-fn%>']['from']" name="<%-sn%>Edit<%-Fn%>" ngbDatepicker [minDate]="minDate"
@@ -78,7 +80,7 @@
 												</button>
 											</div>
 										</div>
-										<div class="input-group col-12 col-md-6 align-items-center">
+										<div class="<%-inputGroup%> col-12 col-md-6 align-items-center">
 											<span class="small mx-1" style="width:2rem">to</span>
 											<input class="<%-formControl%>" id="<%-sn%>Edit<%-Fn%>" placeholder="{{dateFormat}}"
 												[(ngModel)]="detail['<%-fn%>']['to']" name="<%-sn%>Edit<%-Fn%>" ngbDatepicker [minDate]="minDate"
@@ -106,7 +108,7 @@
 										</ng-template>
 									</div><%_
 								} else if (field.type === "ObjectId") { %>
-									<div class="input-group">
+									<div class="<%-inputGroup%>">
 										<input class="<%-formControl%> rounded" id="<%-sn%>Edit<%-Fn%>"
 											[ngClass]="{'pointer ref-badge': detail['<%-fn%>']['_id']}" (focus)="onRefSelect('<%-fn%>')"
 											<%if (field.validators) {%><%-mn%><%-Sn%>Directive<%-Fn%>="" <%}%> 
@@ -138,7 +140,7 @@
 
 									<div class="available-hints"><%_
 											if (field.hint) {%>
-										<div *ngIf="editHintFields['<%-fn%>'].length > 0" style="font-size: 0.9rem;">Select from Available
+										<div *ngIf="editHintFields['<%-fn%>'].length > 0" class="small">Select from Available
 											<%-fD%>: </div>
 										<ng-template ngFor let-hintEle [ngForOf]="editHintFields['<%-fn%>']" let-i="index">
 											<div class="badge badge-pill badge-primary pointer"
@@ -149,8 +151,7 @@
 										</ng-template><%_ }
 											if (!field.hint) {%>
 										<div class="mt-1">
-											<a class="pointer" routerLink="." (click)="onAddArrayItemClicked('<%-fn%>')"
-												style="font-size: 0.75rem;">
+											<a class="pointer small" routerLink="." (click)="onAddArrayItemClicked('<%-fn%>')">
 												<i class="fas fa-plus-square" title="New"></i>
 												New
 											</a>

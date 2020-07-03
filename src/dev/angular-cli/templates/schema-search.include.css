@@ -1,3 +1,18 @@
-<%_if (!disableListSearch) {%><%-
-include(`/widgets/search/${listSearchType}/${listSearchType}.css`) %><%
+<%_ if (!disableListSearch) {
+    let sbo = searchBarObj;
+    if (!sbo.noMoreSearchArea) {%><%-
+include(`/widgets/search/${listSearchType}/${listSearchType}.css`); %><%
+    }
+    if (sbo.showSearchBox) {%><%-
+include('/css/searchbox.css');%><%
+    }
+    if (sbo.hasArchive) {%><%-
+include('/css/slider.css');%><%
+    }
+    if (sbo.hasDate) {%><%-
+include('/css/datepicker.css');%><%
+    }
+    if (sbo.hasArray) {%><%-
+include('/css/array-values.css');%><%
+    }
 }%>

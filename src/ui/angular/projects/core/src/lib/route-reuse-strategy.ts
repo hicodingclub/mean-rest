@@ -1,4 +1,5 @@
 import { ActivatedRouteSnapshot, DetachedRouteHandle, RouteReuseStrategy } from '@angular/router'
+import { Directive } from '@angular/core';
 
 import { Inject } from '@angular/core';
 
@@ -12,6 +13,7 @@ function getResolvedUrl(route: ActivatedRouteSnapshot): string {
         .join('/');
 }
 
+@Directive() //This decoratoin makes Ivy compiler happy for the @Injected constructor param.
 export class MddsRouteReuseStrategy implements RouteReuseStrategy {
 
     constructor(@Inject(MDDS_ROUTE_REUSE_RUIs) public reuseURIs: Array<string>) { }

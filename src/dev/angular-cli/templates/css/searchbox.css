@@ -1,0 +1,21 @@
+/*  Search part */
+/* clears the 'X' from Internet Explorer */
+input[type=search]::-ms-clear {  display: none; width : 0; height: 0; }
+input[type=search]::-ms-reveal {  display: none; width : 0; height: 0; }
+
+/* clears the 'X' from Chrome */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration { display: none; }
+
+.icon-search-clear {
+  z-index: 3;
+  vertical-align: middle;
+  padding: 0.5rem 0.5rem 0rem 0.5rem;
+  cursor: pointer;
+  position: relative;
+  margin-left: -2rem;   /* text 1 + left 0.5 + right 0.5 = 2 rem*/
+  border: 0;
+  height: 2rem;
+}
