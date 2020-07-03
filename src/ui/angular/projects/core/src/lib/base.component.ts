@@ -108,6 +108,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public hiddenFields = []; // fields hide from view. Currrently used by 'Add' view of edit-sub
   public viewHiddenFields = []; // fields hidden from view. Hidden is defined in schema view with ()
 
+  public itemCamelName: string;
   public ItemCamelName: string;
   public itemName: string;
   public parentItem: string;
@@ -183,24 +184,27 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   // archived search
   public archivedSearch = false;
 
+  public view: ViewType;
+
   constructor(
     public service: MddsBaseService,
     public injector: Injector,
     public router: Router,
     public route: ActivatedRoute,
-    public location: Location,
-    public view: ViewType,
-    public itemCamelName: string
-  ) {
-    this.ItemCamelName =
-      itemCamelName.charAt(0).toUpperCase() + itemCamelName.substr(1);
-    this.itemName = itemCamelName.toLowerCase();
+    public location: Location) {
+    
     this.parentItem = this.getParentRouteItem();
     if (injector) {
       this.commonService = injector.get<MddsCommonService>(
         MddsCommonService as Type<MddsCommonService>
       );
     }
+  }
+
+  public setItemNames(itemCamelName: string): void {
+    this.itemCamelName = itemCamelName;
+    this.ItemCamelName = itemCamelName.charAt(0).toUpperCase() + itemCamelName.substr(1);
+    this.itemName = itemCamelName.toLowerCase();
   }
 
   public onServiceError(error: MddsServiceError): void {

@@ -22,7 +22,8 @@ export class MfilegroupListComponent extends MfilegroupComponent implements OnIn
       public router: Router,
       public route: ActivatedRoute,
       public location: Location) {
-          super(mfilegroupService, injector, router, route, location, ViewType.LIST);
+          super(mfilegroupService, injector, router, route, location);
+          this.view = ViewType.LIST;
 
           this.stringFields.push('name');
           this.listViewFilter = 'list';

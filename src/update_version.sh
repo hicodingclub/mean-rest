@@ -170,7 +170,7 @@ do
 
         if [ $build = "Y" ] || [ $publish = "Y" ];then
           cd $BASEDIR/$ANDROIDDIR
-          ng build $libName
+          ng build $libName --prod
         fi
 
         if [ $publish = "Y" ];then

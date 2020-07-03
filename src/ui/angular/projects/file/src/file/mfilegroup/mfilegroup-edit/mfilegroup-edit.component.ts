@@ -37,7 +37,8 @@ export class MfilegroupEditComponent extends MfilegroupComponent implements OnIn
       public router: Router,
       public route: ActivatedRoute,
       public location: Location) {
-          super(mfilegroupService, injector, router, route, location, ViewType.EDIT);
+          super(mfilegroupService, injector, router, route, location);
+          this.view = ViewType.EDIT;
 
           this.stringFields.push('name');
           const detail = {};

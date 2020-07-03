@@ -2,16 +2,16 @@
   "name": "@hicoder/angular-action-email",
   "version": "0.9.25",
   "peerDependencies": {
-    "@angular/common": "^8.2.14",
-    "@angular/core": "^8.2.14",
-    "@angular/forms": "^8.2.14",
+    "@angular/common": "^9.1.11",
+    "@angular/core": "^9.1.11",
+    "@angular/forms": "^9.1.11",
     "@hicoder/angular-richtext": "0.9.25",
     "@hicoder/angular-action-base": "0.9.25"
   },
   "devDependencies": {
-    "@angular/common": "^8.2.14",
-    "@angular/core": "^8.2.14",
-    "@angular/forms": "^8.2.14",
+    "@angular/common": "^9.1.11",
+    "@angular/core": "^9.1.11",
+    "@angular/forms": "^9.1.11",
     "@hicoder/angular-action-base": "0.9.25",
     "@hicoder/angular-richtext": "0.9.25"
   }

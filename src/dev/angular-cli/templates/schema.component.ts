@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MddsBaseComponent, ViewType } from '@hicoder/angular-core';
-import { OnInit, Injector, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Injector, Input, Output, EventEmitter } from '@angular/core';
 import { <%-SchemaName%>Service } from './<%-schemaName%>.service';
 
 const itemCamelName = '<%-schemaCamelName%>';
@@ -23,6 +23,9 @@ import { <%-ModuleName%>RefSelectDirective } from '../<%-moduleName%>.component'
       %>import { <%-field.Ref%>ListSelect<%-ListSelTypeRef%>Component } from '../<%-field.ref%>/<%-field.ref%>-list/<%-field.ref%>-list-select-<%-listSelTypeRef%>.component';<%}%><%}%><%}}%>
 <%}%>
 
+@Component({
+    template: '',
+})
 export class <%-SchemaName%>Component extends MddsBaseComponent implements OnInit {
     // *** common input fields
     @Input()
@@ -110,7 +113,8 @@ export class <%-SchemaName%>Component extends MddsBaseComponent implements OnIni
       public location: Location,
       public view: ViewType ) {
 
-        super(<%-schemaName%>Service, injector, router, route, location, view, itemCamelName);
+        super(<%-schemaName%>Service, injector, router, route, location);
+        this.setItemNames(itemCamelName);
 
         <% include schema-base-construct.component.ts%>
 

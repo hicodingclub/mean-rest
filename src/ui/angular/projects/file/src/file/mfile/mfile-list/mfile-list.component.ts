@@ -24,8 +24,8 @@ export class MfileListComponent extends MfileComponent implements OnInit {
       public route: ActivatedRoute,
       public location: Location) {
           super(componentFactoryResolver,
-                mfileService, injector, router, route, location, ViewType.LIST);
-
+                mfileService, injector, router, route, location);
+          this.view = ViewType.LIST;
           this.stringFields.push('name');
           this.stringFields.push('type');
           this.stringFields.push('link');

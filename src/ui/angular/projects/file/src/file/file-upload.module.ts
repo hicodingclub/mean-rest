@@ -13,12 +13,14 @@ import { FileSelectComponent, MddsFileSelectDirective } from './file-select.comp
 
 import { MfileListComponent } from './mfile/mfile-list/mfile-list.component'
 import { MfileListWidgetGalleryComponent } from './mfile/mfile-list/mfile-list-widget-gallery.component'
+import { MfileComponent } from './mfile/mfile.component'
 
 import { MfilegroupListComponent } from './mfilegroup/mfilegroup-list/mfilegroup-list.component';
 import { MfilegroupEditComponent } from './mfilegroup/mfilegroup-edit/mfilegroup-edit.component';
 import { MfilegroupService } from './mfilegroup/mfilegroup.service';
 import { MfilegroupListSelectComponent } from './mfilegroup/mfilegroup-list/mfilegroup-list-select.component';
 import { MfilegroupListSelectIndexComponent } from './mfilegroup/mfilegroup-list/mfilegroup-list-select-index.component';
+import { MfilegroupComponent } from './mfilegroup/mfilegroup.component';
 
 import { MfileService } from './mfile/mfile.service';
 
@@ -44,11 +46,13 @@ import { SafeUrlPipe } from './pipes';
         FileDisplayComponent,
         FileSelectComponent,
         MddsFileSelectDirective,
+        MfileComponent,
 
         MfilegroupListSelectComponent,
         MfilegroupListSelectIndexComponent,
         MfilegroupEditComponent,
         MfilegroupListComponent,
+        MfilegroupComponent,
 
         MddsCropperComponent,
     ],

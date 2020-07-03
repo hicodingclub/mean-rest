@@ -1,7 +1,7 @@
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MddsBaseComponent, ViewType } from '@hicoder/angular-core';
-import { Injector } from '@angular/core';
+import { Component, Injector } from '@angular/core';
 import { MfileService } from './mfile.service';
 
 const itemCamelName = 'picture';
@@ -10,6 +10,9 @@ export { ViewType };
 
 import { ComponentFactoryResolver } from '@angular/core';
 
+@Component({
+  template: '',
+})
 export class MfileComponent extends MddsBaseComponent {
 
     constructor(
@@ -18,11 +21,10 @@ export class MfileComponent extends MddsBaseComponent {
       public injector: Injector,
       public router: Router,
       public route: ActivatedRoute,
-      public location: Location,
-      public view: ViewType ) {
+      public location: Location) {
 
-        super(mfileService, injector, router, route, location, view, itemCamelName);
-
+        super(mfileService, injector, router, route, location);
+        this.setItemNames(itemCamelName);
         this.briefFieldsInfo = [];
         this.briefFieldsInfo.push(['name', 'Name']);
         this.briefFieldsInfo.push(['type', 'Type']);

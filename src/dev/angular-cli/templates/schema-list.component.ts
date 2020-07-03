@@ -44,7 +44,8 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustCompone
       public route: ActivatedRoute,
       public location: Location) {
           super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
-                <%-schemaName%>Service, injector, router, route, location, ViewType.LIST);
+                <%-schemaName%>Service, injector, router, route, location);
+                this.view = ViewType.LIST;
 <% let theView = briefView; %><%_ include schema-construct.component.ts %>
 
           this.listViewFilter = '<%-listTypes[0][0]%>';<% if (defaultSortField) { %>
