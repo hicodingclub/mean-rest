@@ -21,6 +21,10 @@ const readline = require('readline');
 const sortedObject = require('sorted-object');
 const util = require('util');
 
+const js_beautify = require('js-beautify').js;
+const html_beautify = require('js-beautify').html;
+const css_beautify = require('js-beautify').css;
+
 const humanize = require('string-humanize');
 
 const MODE_0666 = parseInt('0666', 8);
@@ -511,10 +515,37 @@ const generateSourceFile = function (keyname, template, renderObj, outputDir) {
       increaseError();
       return;
     }
+
+    let beautified_str = str;
+    let beautify_option = {
+      indent_size: 2,
+      space_in_empty_paren: true,
+      preserve_newlines: false,
+    };
+    const extension = output.split('.').pop();
+    switch (extension) {
+      case 'ts':
+      case 'js':
+        beautified_str = js_beautify(str, beautify_option);
+        break;
+      case 'html':
+        beautified_str = html_beautify(str, beautify_option);
+        break;
+      case 'css':
+        beautified_str = css_beautify(str, beautify_option);
+        break;
+      default:
+        console.error(
+          'ERROR! Cannot beautify. Unrecognized file extention: %s',
+          output,
+        );
+        increaseError();
+    }
+
     if (options == 'W') {
-      write(output, str);
+      write(output, beautified_str);
     } else if (options == 'A') {
-      append(output, str);
+      append(output, beautified_str);
     }
   });
 };
@@ -1214,10 +1245,17 @@ program
     'api base that will be used for rest calls. Default is "/api/<module_name>".'
   )
   .option('-o, --output <output_dir>', 'output directory of generated files')
-  .option('-f, --force', 'force to overwrite existing files')
   .option(
     '-v, --view <view name>',
     'admin, or public. Define the views to generate.'
+  )
+  .option(
+    '-f, --framework <ui framework>',
+    'Angular, React. Default is Angular.'
+  )
+  .option(
+    '-d, --design <ui design>',
+    'For Angular - Bootstrap, AngularMeterial, ngBootstrap. Default is Bootstrap'
   )
   .parse(process.argv);
 
@@ -1381,6 +1419,28 @@ function main() {
     _exit(1);
   }
 
+  // ui framework
+  let uiFramework = program.framework || 'angular';
+  uiFramework = uiFramework.toLowerCase();
+  let uiDesign;
+  switch (uiFramework) {
+    case 'angular':
+      uiDesign = program.design || 'bootstrap';
+      break;
+    case 'react':
+      uiDesign = program.design || 'bootstrap';
+      break;
+    default:
+      ;
+  }
+  uiDesign = uiDesign.toLowerCase();
+  
+  let uiTemplateDir = path.join(ROOTDIR, 'ui', uiFramework, uiDesign);
+  if (!fs.existsSync(uiTemplateDir)) {
+    console.error(`Combination of UI Framework "${program.framework}" and UI Design "${program.design}" is not supported.`);
+    _exit(1);
+  }
+
   let moduleName;
   if (!program.module) {
     let startPosition = inputFile.lastIndexOf(path.sep) + 1;
@@ -1415,7 +1475,7 @@ function main() {
     generateView = program.view;
     if (generateView !== 'public') generateView = 'admin';
   }
-  console.log('Note: generateView for ', generateView);
+  console.log('NOTE: generateView for ', generateView);
 
   // output directory
   let outputDir;
@@ -1445,9 +1505,6 @@ function main() {
     //console.info('Creating component directory '%s'...', componentDir);
     mkdir('.', subDirExt);
   }
-
-  let overWrite = false;
-  if (program.force) overWrite = true;
 
   let relativePath = relative(__dirname, inputFile);
   let inputFileModule = relativePath.substring(0, relativePath.length - 3);
@@ -2249,6 +2306,9 @@ function main() {
       fileServer: fileServer,
 
       FIELD_NUMBER_FOR_SELECT_VIEW,
+
+      uiFramework,
+      uiDesign,
     };
     //console.log('======schemaObj', schemaObj);
 
@@ -2400,6 +2460,9 @@ function main() {
     uniqeSelectors,
 
     generateView,
+
+    uiFramework,
+    uiDesign,
   };
   //console.log('***renderObj', renderObj);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
@@ -2532,6 +2595,10 @@ function main() {
         subComponentDir
       );
       if (referenceSchemas.indexOf(schemaName) != -1) {
+        //Don't search ref any more on select view. Disable more search area
+        const noMoreSearchArea = schemaObj.searchBarObj.noMoreSearchArea;
+        schemaObj.searchBarObj.noMoreSearchArea = true;
+
         //referenced by others, provide select component
         generateSourceFile(
           schemaName,
@@ -2570,6 +2637,9 @@ function main() {
           generateSourceFile(schemaName, html, schemaObj, subComponentDir);
           generateSourceFile(schemaName, css, schemaObj, subComponentDir);
         }
+
+        // restore noMoreSearchArea
+        schemaObj.searchBarObj.noMoreSearchArea = noMoreSearchArea;
       }
       if (schemaObj.schemaHasRef) {
         generateSourceFile(
