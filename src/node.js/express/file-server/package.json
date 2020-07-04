@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/express-file-server",
-  "version": "0.9.25",
+  "version": "0.9.30",
   "description": "Model Driver Development Stack - File server which stores files in MongoDB through Mongoose.",
   "main": "index.js",
   "scripts": {
