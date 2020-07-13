@@ -3,14 +3,16 @@
 	<div class="card text-left transparent-border ">
 		<div class="info-term-text"><%_{
 			let view='detail'; let largePicture=false;
-			let field = detailView[0]; let fn = field.fieldName; let ft = field.type;;%>
-			<div><% include ../../../schema-display.field.html %>
+			let field = detailView[0]; let fn = field.fieldName; let ft = field.type;
+			let fieldObj = {field, fn, ft, ref_link: true,};%>
+			<div><%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 			</div><%_ }%><%_{
 			let view='detail'; let largePicture=false;
-			let field = detailView[1]; let fn = field.fieldName; let ft = field.type;;%>
+			let field = detailView[1]; let fn = field.fieldName; let ft = field.type;
+			let fieldObj = {field, fn, ft, ref_link: true,};%>
 			<div class="mt-3">
 				<input class="term-check mr-3" *ngIf="fieldHasValue(detail['<%-fn%>'])" type="checkbox" [(ngModel)]="termChecked" (change)="onTermChecked()"/>				
-				<label><% include ../../../schema-display.field.html %>
+				<label><%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 				</label>
 			</div><%_ }%>
 		</div>

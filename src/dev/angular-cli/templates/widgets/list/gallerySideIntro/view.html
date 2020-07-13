@@ -4,7 +4,7 @@
 		let field0 = briefView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
 		let field1 = briefView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
 		let field2 = briefView[2]; let fn2 = field2.fieldName; let ft2 = field2.type;
-		let field, fn, ft;%>
+		let field, fn, ft, fieldObj;%>
 		<div class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}">
 			<div class="text-left h-100"
 				[ngClass]="{
@@ -26,16 +26,18 @@
 				[ngStyle]="style['title']">
 				<%
 				field = field1; fn = fn1; ft = ft1;
+				fieldObj = {field, fn, ft, ref_link: true,};
 				%>
-				<% include ../../../schema-display.field.html %>
+				<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 			</div>
 			<div *ngIf="!options['notShowSubTitle']" class="grid-picture-subtitle"
 				[ngClass]="{'grid-picture-subtitle-large': options['largePicture']}"
 				[ngStyle]="style['intro']">
 				<%
 				field = field2; fn = fn2; ft = ft2;
+				fieldObj = {field, fn, ft, ref_link: true,};
 				%>
-				<% include ../../../schema-display.field.html %>
+				<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 			</div>
 		</div><%_
 		const otherFields = briefView.slice(3);
@@ -43,12 +45,13 @@
 			if (field.hidden) continue;
 	        if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
 
-			let fn = field.fieldName; let ft = field.type;;
+			let fn = field.fieldName; let ft = field.type;
+			let fieldObj = {field, fn, ft, ref_link: true,};
 			%>
 		<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%> class="mr-3 d-inline-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (ft !== 'AngularSelector') {%>
 			<div class="field-label" [ngStyle]="style['<%-fn%>-label']"><%-field.displayName%>:</div><%}%>
 			<div class="<%_ if (ft !== 'AngularSelector') {%>ml-1<%}%>" [ngStyle]="style['<%-fn%>-value']">
-				<% include ../../../schema-display.field.html %>
+				<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 			</div>
 		</div><%_  
 		}%>

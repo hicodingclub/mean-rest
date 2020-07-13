@@ -8,7 +8,7 @@
 		let fieldMP = detailView[1]; let fnMP = fieldMP.fieldName;
 		let fieldTitle = detailView[2];
 		let fieldSubtitle = detailView[3];
-		let field, fn, ft;%>
+		let field, fn, ft, fieldObj;%>
 		<div class="d-flex align-items-center">
 			<div class="d-flex flex-column">
 				<div class="grid-head-picture grid-head-picture-column-small"
@@ -49,29 +49,32 @@
 				[ngStyle]="style['title']">
 				<%
 				field = fieldTitle; fn = fieldTitle.fieldName; ft = fieldTitle.type;
+				fieldObj = {field, fn, ft, ref_link: true,};
 				%>
-				<% include ../../../schema-display.field.html %>
+				<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 			</div>
 			<div class="grid-picture-subtitle grid-picture-subtitle-large"
 				[ngStyle]="style['intro']">
 				<%
 				field = fieldSubtitle; fn = fieldSubtitle.fieldName; ft = fieldSubtitle.type;
+				fieldObj = {field, fn, ft, ref_link: true,};
 				%>
-				<% include ../../../schema-display.field.html %>
+				<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 			</div><%if (detailView.length > 3) {%>
 			<hr/><%}%><%_
 			const otherFields = detailView.slice(4);
 			for (let [index, field] of otherFields.entries()){
 				if (field.hidden) continue;
 		
-				let fn = field.fieldName; let ft = field.type;;
+				let fn = field.fieldName; let ft = field.type;
+				let fieldObj = {field, fn, ft, ref_link: true,};
 				%>
 			<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%> class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (ft !== 'AngularSelector') {%>
 				<div class="field-label mr-2" [ngStyle]="style['<%-fn%>-label']">
 					<%-field.displayName%>:
 				</div><%}%>
 				<div class="" [ngStyle]="style['<%-fn%>-value']">
-					<% include ../../../schema-display.field.html %>
+					<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 				</div>
 			</div><%_  
 			}%>

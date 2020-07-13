@@ -37,7 +37,7 @@ if (listCategoryRef && listCategoryShowMore) {%>
 </div> <%}%>
 
 <div>
-	<div *ngIf="!options['disableListHead']" class="container search"><%_
+	<div *ngIf="!options['disableListHead']" class="container search"><%-
 		include('/schema-search.include.html') %>
 		<div class="row" *ngIf="!options['disableActionButtions']">
 			<div class="col">

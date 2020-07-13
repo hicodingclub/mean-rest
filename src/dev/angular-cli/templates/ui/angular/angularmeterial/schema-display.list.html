@@ -1,0 +1,68 @@
+  <%_{
+    let pictureFields = viewFields.filter(x => x.picture);
+    let indexedFields = viewFields.filter(x => !x.picture && x.isIndexField);
+    let otherFields = viewFields.filter(x => !x.picture && !x.isIndexField);
+    let otherFieldsName = otherFields.map(x=>x.fieldName);
+    for (let field of pictureFields){
+      if (field.hidden) continue;
+      if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
+      let fn = field.fieldName; let ft = field.type;
+      let fieldObj = {field, fn, ft, ref_link: true,};
+      %>
+      <div class="list-head-picture"><%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
+      </div>
+    <%}%>
+      <div class="list-body-fields">
+        <h5><%
+    for (let [index, field] of indexedFields.entries()){
+        if (field.hidden) continue;
+        if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
+
+        let fn = field.fieldName; let ft = field.type;
+        let fieldObj = {field, fn, ft, ref_link: true,};
+        %>
+          <div class="mr-1 d-inline-block">
+            <%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
+          </div><%_  
+    }%>
+        </h5><%
+    for (let fieldGrp of viewGrp) {
+          let fieldGrpProcessed = fieldGrp.filter(x=> {
+            return otherFieldsName.includes(x.fieldName) && !x.hidden && !listCategoryFieldsNotShown.includes(x.fieldName)
+          });
+          if (fieldGrpProcessed.length < 1) {
+            continue;
+          }%>
+        <div><%
+        for (let [index, field] of fieldGrpProcessed.entries()){
+              let fn = field.fieldName; let ft = field.type;
+              let fieldObj = {field, fn, ft, ref_link: true,};
+          %><%
+          if (field.ref) {%>
+          <div *ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem"><%}%>
+            <div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%> class="mr-3 d-inline-flex flex-wrap"><%_ if (ft !== 'AngularSelector') {%>
+              <div><label><%-field.displayName%>:</label></div><%}%>
+              <div class="ml-3"><%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
+              </div>
+            </div><%
+          if (field.ref) {%>
+          </div><%}%><%_
+        }%>
+        </div><%_  
+    }%>
+        <div class="d-flex flex-row mt-1"><% if (includeSubDetail) {%>
+          <div class="read-more mr-5">
+            <span class="pointer" (click)="toggleShowDetailItem(i)">
+              <i *ngIf="!detail.mddsShowDetail" class="fas fa-caret-down" title="More"></i>
+              <i *ngIf="detail.mddsShowDetail" class="fas fa-caret-up" title="Less"></i>
+            </span>
+          </div><%}%><% if (cardHasLink) {%>
+            <div class="read-more" (click)="onDetailLinkClicked(detail['_id'])">
+              Detail <i class="fas fa-arrow-right" ></i>
+            </div><%}%>
+        </div><%_ if (includeSubDetail) {%>
+        <div *ngIf="detail.mddsShowDetail" >
+            <app-<%-schemaName%>-detail-sub [inputData]="detail['_id']"></app-<%-schemaName%>-detail-sub>
+        </div><%}%>
+      </div><%
+  }%>

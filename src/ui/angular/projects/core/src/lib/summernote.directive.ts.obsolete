@@ -1,0 +1,27 @@
+import { ElementRef, Renderer2, Directive, Input, OnChanges} from '@angular/core';
+
+
+@Directive({
+    selector: '[libMddsRichtextShow]',
+})
+export class MddsRichTextShowDirective implements OnChanges {
+  @Input('libMddsRichtextShow') name: string;
+  @Input() index: number;
+  @Input() content: string;
+  constructor(private el: ElementRef, private render: Renderer2) {
+  }
+
+  ngOnChanges() {
+    this.setContent(this.content);
+  }
+
+  setContent(content: string) {
+    const id = Date.now() + (Math.random() * 1000).toFixed(0);
+    const displayHtml = `
+      <div id="mraeditordisplay` + id + `"></div>
+    `;
+
+    this.render.setProperty(this.el.nativeElement, 'innerHTML', displayHtml);
+    $('#mraeditordisplay' + id).html(content);
+  }
+}

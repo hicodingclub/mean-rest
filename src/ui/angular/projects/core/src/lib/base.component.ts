@@ -167,9 +167,6 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
   public clickItemAction: string = '';
   public itemMultiSelect: boolean = false;
-  /* This is for editor related */
-  public textEditors: any; // type of QueryList<T>
-  public textEditorMap: any = {};
 
   /*Date Range Selection */
   hoveredDate: any;
@@ -1012,7 +1009,6 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     } // cache it
 
     this.detail = this.formatDetail(detail);
-    this.extraFieldsUnload(this.detail); // unload data to text editors, etc
     if (action === 'edit') {
       this.extraInfoPopulate(); // collect other info required for edit view
     } else {
@@ -1099,7 +1095,6 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     this.service.getDetail(copyId).subscribe((detail: any) => {
       this.detail = this.formatDetail(detail);
       delete this.detail._id;
-      this.extraFieldsUnload(this.detail); // unload data to text editors, etc
       this.extraInfoPopulate(); // collect other info required for create view
     }, this.onServiceError);
   }
@@ -2111,10 +2106,6 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
 
   public onSubmit(): void {
-    if (!this.extraFieldsLoad()) {
-      return;
-    } // error from other non ngModel fields;
-
     this.cloneDetail = this.deFormatDetail(this.detail);
     if (this.id) {
       this.service
@@ -2604,92 +2595,6 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     const detail = {};
     this.detail = this.formatDetail(detail);
     this.searchList();
-  }
-
-  public extraFieldsUnload(detail: any) {
-    // from server
-    /* content has been set to directive directly so this code snippet is obsolete
-        if (this.textEditors) {
-            this.textEditors.forEach(editor=>{
-
-                let fieldName = editor.name;
-                let validatorObj = this.textEditorMap[fieldName];
-                if (!validatorObj) return;
-
-                let content = detail[validatorObj.fieldName]
-                if (content) editor.setContent(content);
-            });
-        }
-        */
-  }
-
-  public extraFieldsLoad() {
-    // to server
-    let result = true;
-    if (this.textEditors) {
-      const array = this.textEditors.toArray();
-      for (const editor of array) {
-        const fieldName = editor.name;
-        const [content, text] = editor.getContent();
-        const validatorObj = this.textEditorMap[fieldName];
-        if (!validatorObj) {
-          continue;
-        }
-
-        const fieldState = validatorObj.fieldState;
-        fieldState.errors = {};
-        if (!content) {
-          if (validatorObj.required) {
-            fieldState.errors.required = true;
-            fieldState.valid = false;
-            result = false;
-          }
-          continue;
-        }
-        if (
-          'minlength' in validatorObj &&
-          text.length < validatorObj.minlength
-        ) {
-          fieldState.valid = false;
-          fieldState.errors.minlength = true;
-          result = false;
-          continue;
-        }
-        if (
-          'maxlength' in validatorObj &&
-          text.length > validatorObj.maxlength
-        ) {
-          fieldState.valid = false;
-          fieldState.errors.maxlength = true;
-          result = false;
-          continue;
-        }
-        if ('validators' in validatorObj) {
-          const error = validatorObj.validators.validateValue(text);
-          if (error) {
-            fieldState.valid = false;
-            fieldState.errors = error;
-            result = false;
-            continue;
-          }
-        }
-        fieldState.valid = true;
-        fieldState.errors = undefined;
-        this.detail[validatorObj.fieldName] = content;
-      }
-    }
-    return result;
-  }
-  onEdtiorPreview(editorName: string) {
-    if (this.textEditors) {
-      this.textEditors.forEach(
-        (editor: { name: string; preview: () => void }) => {
-          if (editor.name === editorName) {
-            editor.preview();
-          }
-        }
-      );
-    }
   }
 
   /*Parent router related*/

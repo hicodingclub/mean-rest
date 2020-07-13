@@ -10,7 +10,7 @@
 				let field0 = detailView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
 				let field1 = detailView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
 				let field2 = detailView[2]; let fn2 = field2.fieldName; let ft2 = field2.type;
-				let field, fn, ft;%>
+				let field, fn, ft, fieldObj;%>
 					<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}">
 						<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']"
 							[style]="{img: {'object-fit': 'contain', width: '100%'}}">
@@ -20,30 +20,33 @@
 						<div class="grid-picture-title"
 							[ngClass]="{'grid-picture-title-large': options['largePicture']}">
 							<%
-						    field = field1; fn = fn1; ft = ft1;
+							field = field1; fn = fn1; ft = ft1;
+							fieldObj = {field, fn, ft, ref_link: true,};
 							%>
-							<% include ../../../schema-display.field.html %>
+							<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 						</div>
 						<div class="grid-picture-subtitle"
 							[ngClass]="{'grid-picture-subtitle-large': options['largePicture']}">
 							<%
 							field = field2; fn = fn2; ft = ft2;
+							fieldObj = {field, fn, ft, ref_link: true,};
 							%>
-							<% include ../../../schema-display.field.html %>
+							<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 						</div><%if (detailView.length > 3) {%>
 						<hr/><%}%><%_
 						const otherFields = detailView.slice(3);
 						for (let [index, field] of otherFields.entries()){
 							if (field.hidden) continue;
 					
-							let fn = field.fieldName; let ft = field.type;;
+							let fn = field.fieldName; let ft = field.type;
+							let fieldObj = {field, fn, ft, ref_link: true,};
 							%>
 						<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%> class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (ft !== 'AngularSelector') {%>
 							<div class="field-label text-right w-50" [ngStyle]="style['<%-fn%>-label']">
 								<%-field.displayName%>:
 							</div><%}%>
 							<div class="ml-1 text-left" [ngStyle]="style['<%-fn%>-value']">
-								<% include ../../../schema-display.field.html %>
+								<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 							</div>
 						</div><%_  
 						}%>

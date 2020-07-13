@@ -57,7 +57,7 @@
             if (field.validators) {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>">
                 {{Edit<%-Fn%>.errors.<%-mn%><%-Sn%>Directive<%-Fn%>}}
-              </div><%}%><%_
+            </div><%}%><%_
             if (typeof field.maxlength === 'number') {%>
             <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.maxlength">
                 <%-Fn%> must be at most <%-field.maxlength%> characters long.
@@ -83,11 +83,22 @@
               </ng-template>
           </div><%_ }%><%_
       } else if (field.editor) { %>
-          <div libMddsRichtext="Edit<%-Fn%>" [content]="detail['<%-fn%>']"></div>
-          <div class="action-buttons" style="margin-top: 10px;">
-            <button type="button" class="btn btn-outline-success" (click)="onEdtiorPreview('Edit<%-Fn%>')">Preview</button>
-          </div>
-        
+          <lib-richtext-editor [(ngModel)]="detail['<%-fn%>']" name="Edit<%-Fn%>"<%
+            if (field.required) {%>
+              [required]="true"<%
+            }
+            if (field.validators) {%>
+              <%-mn%><%-Sn%>Directive<%-Fn%>=""<%
+            }
+            if (typeof field.minlength === 'number') {%>
+              [minlength]="<%-field.minlength%>"<%
+            }
+            if (typeof field.maxlength === 'number') {%>
+              [maxlength]="<%-field.maxlength%>"<%
+            }%>
+            #Edit<%-Fn%>="ngModel">
+          </lib-richtext-editor>
+
           <div [hidden]="Edit<%-Fn%>.valid"
            class="alert alert-danger"><%_
             if (field.required) {%>

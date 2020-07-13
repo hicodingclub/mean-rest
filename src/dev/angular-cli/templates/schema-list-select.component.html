@@ -11,7 +11,7 @@
 
 <!--  model body starts -->
 
-	<div class="container search"><%_ let noMoreSearchArea = true; %><%_
+	<div class="container search"><%-
 		include('/schema-search.include.html') %>
 		<hr/>
 		<%_ let disableRefreshIcon = true; let disableSortSelection = true; let disableViewSwitch = true;%><% include schema-list.pagination.html %>
@@ -32,8 +32,9 @@
 	        	[ngClass]="{'clicked-row': detail['_id']==clickedId}" >
 	            <td scope="row" (click)="selectItemSelected(i)"  class="pointer">{{(page-1)*perPage+i+1}}</td>
 <%_ let view='list'; for (let field of briefView.slice(0,FIELD_NUMBER_FOR_SELECT_VIEW)){ 
-				let fn = field.fieldName, ft = field.type; let ref_link = false; %>
-	            <td (click)="selectItemSelected(i)"  class="pointer"><% include schema-display.field.html %>
+				let fn = field.fieldName, ft = field.type; let ref_link = false;
+				let fieldObj = {field, fn, ft, ref_link,};%>
+	            <td (click)="selectItemSelected(i)"  class="pointer"><%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 	            </td><%_ } %>
 	            <%_ if (api.includes("R")) { %>
 	            <td><a routerLink="." class="btn" 

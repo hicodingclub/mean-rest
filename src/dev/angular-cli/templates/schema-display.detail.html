@@ -11,9 +11,10 @@
       for (let field of pictureFields){
         if (field.hidden) continue;
 
-        let fn = field.fieldName; let ft = field.type;;
+        let fn = field.fieldName; let ft = field.type;
+        let fieldObj = {field, fn, ft, ref_link: true,};
         %>
-        <div class="grid-head-picture"><% include schema-display.field.html %>
+        <div class="grid-head-picture"><%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
         </div><%
       }%>
         <div class="ml-1">
@@ -21,10 +22,11 @@
       for (let [index, field] of indexedFields.entries()){
           if (field.hidden) continue;
 
-          let fn = field.fieldName; let ft = field.type;;
+          let fn = field.fieldName; let ft = field.type;
+          let fieldObj = {field, fn, ft, ref_link: true,};
           %>
             <div class="mr-1 d-inline-block">
-              <% include schema-display.field.html %>
+              <%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
             </div><%_
       }%>
           </h5>
@@ -37,11 +39,12 @@
             continue;
           }%>
           <div><%for (let field of fieldGrpProcessed) {
-            let fn = field.fieldName; let ft = field.type;;
+            let fn = field.fieldName; let ft = field.type;
+            let fieldObj = {field, fn, ft, ref_link: true,};
             %>
             <div class="d-inline-flex flex-wrap mr-5" style="min-width: 160px;"><%_ if (ft !== 'AngularSelector') {%>
                 <div><label><%-field.displayName%>:</label></div><%}%>
-                <div class="ml-3"><% include schema-display.field.html %></div>
+                <div class="ml-3"><%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %></div>
             </div><%}%>
           </div><%}%>
       </div><%

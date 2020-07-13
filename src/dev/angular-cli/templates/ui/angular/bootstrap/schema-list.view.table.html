@@ -1,0 +1,79 @@
+	<table *ngIf="isShowListView('table')" class="table table-bordered table-hover">
+	    <thead class="thead-light">
+	    	<tr>
+		        <th scope="col">#</th>
+<%_ for (let field of briefView){
+				if (field.hidden) continue;
+				if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
+				if (field.sortable) { %>
+				<th class="pointer" scope="col" (click)="toggleListSort('<%-field.fieldName%>', '<%-field.displayName%>')"<%_
+					if (field.ref) {%>
+					*ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem" <%}%> >
+					<%-field.displayName%>
+					<span *ngIf="listSortField === '<%-field.fieldName%>'">
+						<i *ngIf="listSortOrder === 'asc'" class="fas fa-arrow-up th-sort-arrow"></i>
+						<i *ngIf="listSortOrder === 'desc'" class="fas fa-arrow-down th-sort-arrow"></i>
+					</span>
+				</th><%} else {%>
+				<th scope="col"<%_
+					if (field.ref) {%>
+					*ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem"<%}%> >
+					<%-field.displayName%>
+				</th><%_
+				}
+}%><% if (includeSubDetail) {%>
+				<th style="width: 2rem;"></th><%}%><% let widthTh = 1.8;
+				if (canDelete) {widthTh += 2;}
+				if (canArchive) {widthTh += 2;}
+				if (canCheck) {widthTh += 2;}
+				if (canUpdate) {widthTh += 2;}
+				if (cardHasLink) {widthTh += 3;}
+				if (widthTh > 1.8){%>
+				<th scope="col" style="width:<%-widthTh%>rem;"></th><%}%>
+	    	</tr>
+	    </thead>
+	    <tbody>
+			<ng-template ngFor let-detail [ngForOf]="list" let-i="index">
+			<tr [ngClass]="{'clicked-row': clickedId==detail['_id'],
+							'selected-row': clickItemAction === 'select' && checkedItem[i]}">
+	            <td scope="row" (click)="clickOneItem(i)"  class="pointer read-more mt-3">
+	            	{{(page-1)*perPage+i+1}}
+	            </td><%_
+let view = 'list'; for (let field of briefView){ 
+				if (field.hidden) continue;
+				let fn = field.fieldName, ft = field.type;
+				let fieldObj = {field, fn, ft, ref_link: true,};%>
+				<td (click)="clickOneItem(i)"  [ngClass]="{'pointer': clickItemAction}"<%_
+					if (field.ref) {%>
+					*ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem"<%}%>
+					>
+	            	<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
+				</td><%_
+} %><% if (includeSubDetail) {%>
+				<td>
+					<span class="pointer" (click)="toggleShowDetailItem(i)">
+						<i *ngIf="!detail.mddsShowDetail" class="fas fa-caret-down" title="More"></i>
+						<i *ngIf="detail.mddsShowDetail" class="fas fa-caret-up" title="Less"></i>
+					</span>
+				</td><%}%><%if(canDelete || canArchive || canUpdate || canCheck || cardHasLink){%>
+	            <td>
+					<%if(canUpdate){%><% if (embeddedEdit) {%>
+						<a [routerLink]="['.']" queryParamsHandling="preserve" (click)="onEdit(detail._id)"><i class="fas fa-edit" title="Edit"></i></a><%} else {%>
+						<a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>
+					<%}%>
+	            	<%if(canDelete){%><a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
+	            	<%if(canArchive){%><a routerLink="." (click)="onArchive(detail['_id'], i, archivedSearch)">
+						<i *ngIf="!archivedSearch" class="fa fa-archive" title="Archive"></i>
+						<i *ngIf="archivedSearch" class="fas fa-trash-restore" title="Unarchive"></i>	
+					</a><%}%>
+					<%if(canCheck){%><input class="list-check-box" type="checkbox"  [ngModel]="checkedItem[i]" (click)="selectOneItem(i)"/><%}%>
+					<%if(cardHasLink){%><span class="read-more font-size-75 mt-3" (click)="onDetailLinkClicked(detail['_id'])">Detail <i class="fas fa-arrow-right" ></i></span><%}%>
+	            </td><%}%>
+			</tr><%_ if (includeSubDetail) {
+			let colspan = briefView.length + 1; %>
+			<tr *ngIf="detail.mddsShowDetail" >
+				<td colspan="<%-colspan%>"><app-<%-schemaName%>-detail-sub [inputData]="detail['_id']"></app-<%-schemaName%>-detail-sub></td>
+			</tr><%}%>
+			</ng-template>
+	    </tbody>
+	</table>

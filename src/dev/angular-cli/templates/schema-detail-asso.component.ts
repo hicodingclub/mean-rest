@@ -8,9 +8,6 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
 <%if (schemaHasRef) {%>
 import { ComponentFactoryResolver } from '@angular/core';<%}%>
-<%if (schemaHasEditor) {%>
-import { QueryList, ViewChildren } from '@angular/core';
-import { MddsRichTextShowDirective } from '@hicoder/angular-core';<%}%>
 
 @Component({
   selector: 'app-<%-schemaName%>-detail-asso',
@@ -23,9 +20,6 @@ export class <%-SchemaName%>AssoComponent extends <%-SchemaName%>Component imple
 
   public associationSchema: string;
   public associationField: string;
-
-<%if (schemaHasEditor) {%>
-  @ViewChildren(MddsRichTextShowDirective) textEditors: QueryList<MddsRichTextShowDirective>;<%}%>
 
   constructor(
       <%if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>

@@ -53,9 +53,6 @@ export class <%-ModuleName%><%-SchemaName%>Directive<%-field.FieldName%> impleme
 
 <%if (schemaHasRef) {%>
 import { ComponentFactoryResolver } from '@angular/core';<%}%>
-<%if (schemaHasEditor) {%>
-import { QueryList, ViewChildren } from '@angular/core';
-import { MddsRichTextSelectDirective } from '@hicoder/angular-core';<%}%>
 
 @Component({
   selector: 'app-<%-schemaName%>-edit',
@@ -81,13 +78,6 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>EditCustCompone
     public action: string;
     public minDate = {year: (new Date()).getFullYear() - 100, month: 1, day: 1};
 
-<%if (schemaHasEditor) {%>
-    @ViewChildren(MddsRichTextSelectDirective) textEditors: QueryList<MddsRichTextSelectDirective>;
-  <% for (let field of compositeEditView) { let fn=field.fieldName, Fn=field.FieldName; 
-    if (field.type === 'SchemaString' && field.editor) { %>
-    public Edit<%-Fn%>: any = {valid: true};
-<% }}%><%}%>
-
     constructor(<%if (schemaHasRef) {%>
       public componentFactoryResolver: ComponentFactoryResolver,<%}%>
       public <%-schemaName%>Service: <%-SchemaName%>Service,
@@ -99,17 +89,7 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>EditCustCompone
                 <%-schemaName%>Service, injector, router, route, location);
           this.view = ViewType.EDIT;
 <% let theView = compositeEditView; let isEditView = true;%><%_ include schema-construct.component.ts %>
-<% for (let field of compositeEditView) { let fn=field.fieldName, Fn=field.FieldName; 
-    if (field.type === 'SchemaString' && field.editor) { %>
-          this.textEditorMap['Edit<%-Fn%>'] = {
-            required: <%if (field.required) {%>true <%}else{%> false <%}%>,
-            <%if (typeof field.maxlength === 'number') {%>maxlength: <%-field.maxlength%>,<%}%>
-            <%if (typeof field.minlength === 'number') {%>minlength: <%-field.minlength%>,<%}%>
-            <%if (field.validators) {%>validators: new <%-SchemaName%>Directive<%-field.FieldName%>(), <%}%>
-            fieldState: this.Edit<%-Fn%>,
-            fieldName: '<%-fn%>'
-          };<% }}%>
-          
+
           const detail = {};
           this.detail = this.formatDetail(detail);
     }

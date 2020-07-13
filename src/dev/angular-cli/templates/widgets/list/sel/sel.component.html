@@ -23,13 +23,23 @@
 	let embeddedEdit = true;
 	let includeSubDetail = false;
 
-	let isActSel = true;
+	let listviewObj = {
+		clickToDetail, cardHasLink, clickToCheck,
+		canUpdate, canDelete, canArchive, canCheck,
+		includeSubDetail, embeddedEdit,
+	};
+
 	let view='list';
 
-	if (selectActionViewType === 'list') {%>
-<% include ../../../schema-list.view.list.html %><%}%><% if (selectActionViewType === 'grid') {%>
-<% include ../../../schema-list.view.grid.html %><%}%><% if (selectActionViewType === 'table') {%>
-<% include ../../../schema-list.view.table.html %><%}%>
+	if (selectActionViewType === 'list') {%><%-
+		include(`/ui/${uiFramework}/${uiDesign}/schema-list.view.list.html`, listviewObj); %><%
+	}
+	if (selectActionViewType === 'grid') {%><%-
+		include(`/ui/${uiFramework}/${uiDesign}/schema-list.view.grid.html`, listviewObj); %><%
+	}
+	if (selectActionViewType === 'table') {%><%-
+		include(`/ui/${uiFramework}/${uiDesign}/schema-list.view.table.html`, listviewObj); %><%
+	}%>
 <div class="add-area">
 	<a class="read-more" (click)="onAdd()"><i class="fas fa-plus-square" title="Add"></i> Add a new <%-schemaCamelName%></a>
 	<div *ngIf="isAdding">

@@ -4,24 +4,27 @@
 	  <div class="grid-fields">
 		<div class="card-header grid-head" [ngStyle]="style['card-header']"><%_{
 				let view='detail'; let largePicture=true;
-				let field = detailView[0]; let fn = field.fieldName; let ft = field.type;;%>
-		  <div *ngIf="fieldHasValue(detail['<%-fn%>'])" class="grid-head-picture"><% include ../../../schema-display.field.html %>
+				let field = detailView[0]; let fn = field.fieldName; let ft = field.type;
+				let fieldObj = {field, fn, ft, ref_link: true,};%>
+		  <div *ngIf="fieldHasValue(detail['<%-fn%>'])" class="grid-head-picture"><%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 		  </div><%_}%>
 		  <div class="ml-1">
 			<h2><%_{
 				let view='detail'; let largePicture=true;
-				let field = detailView[1]; let fn = field.fieldName; let ft = field.type;;%>
+				let field = detailView[1]; let fn = field.fieldName; let ft = field.type;
+				let fieldObj = {field, fn, ft, ref_link: true,};%>
 			  <div class="mr-1 ml-2 mt-3 d-inline-block" [ngStyle]="style['header-field']">
-				<% include ../../../schema-display.field.html %>
+				<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 			  </div><%_}%>
 			</h2>
 		  </div>
 		</div>
 		<div class="card-body" [ngStyle]="style['card-body']"><%_{
 			let view='detail'; let largePicture=true;
-			let field = detailView[2]; let fn = field.fieldName; let ft = field.type;;%>
+			let field = detailView[2]; let fn = field.fieldName; let ft = field.type;
+			let fieldObj = {field, fn, ft, ref_link: true,};%>
 			<div>
-			  <h4 class="info-description-text" [ngStyle]="style['body-field']"><% include ../../../schema-display.field.html %>
+			  <h4 class="info-description-text" [ngStyle]="style['body-field']"><%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 			  </h4>
 			</div><%_ }%>
 		</div>

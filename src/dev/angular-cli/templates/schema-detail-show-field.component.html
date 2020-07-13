@@ -5,6 +5,8 @@
 		if (ft === 'AngularSelector') {
 			continue;
 		}
+		let fieldObj = {field, fn, ft, ref_link: true,};
 		%>
-		<div *ngIf="detail && showFields.includes('<%-fn%>')"><% include schema-display.field.html %>
+		<div *ngIf="detail && showFields.includes('<%-fn%>')"><%-
+			include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 		</div><%}%>

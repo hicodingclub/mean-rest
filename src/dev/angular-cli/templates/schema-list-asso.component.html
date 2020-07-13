@@ -31,9 +31,10 @@
 	            <td scope="row">{{(page-1)*perPage+i+1+idx}}</td>
 <%_ let view = 'list'; for (let field of briefView){
 			if (field.hidden) continue;
-			let fn = field.fieldName, ft = field.type; let ref_link = false; %>
+			let fn = field.fieldName, ft = field.type; let ref_link = false;
+			let fieldObj = {field, fn, ft, ref_link,};%>
 	            <td *ngIf=" '<%-field.fieldName%>' !== associationField<%_if (field.ref) {%> && referenceFieldsMap['<%-field.fieldName%>'] != parentItem <%}%>" >
-	            	<% include schema-display.field.html %>
+	            	<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 				</td><%_ } %>
 				<td *ngFor = "let af of assoCompFields;" scope="col">
 					{{assoObj[af[0]]}}

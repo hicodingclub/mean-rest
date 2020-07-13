@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --trace-warnings
 /*
  * Script to create angular UI and service code based on Mongoose schema. This is the command line
  * interface for mean-rest-angular package
@@ -14,6 +14,8 @@ const fs = require('fs');
 const path = require('path');
 const relative = require('relative');
 const program = require('commander');
+
+const glob = require('glob');
 
 const minimatch = require('minimatch');
 const mkdirp = require('mkdirp');
@@ -53,7 +55,12 @@ const basedirFile = function (relativePath) {
 const generatedFile = function (outputDir, prefix, outputFile) {
   if (!prefix) prefix = '';
   if (prefix !== '' && !outputFile.startsWith('.')) prefix += '-';
-  return path.join(outputDir, prefix + outputFile);
+  let file = prefix + outputFile;
+  if (outputFile.toLowerCase().startsWith('mdds')) {
+    // no change if name starts with 'mdds'
+    file = outputFile;
+  }
+  return path.join(outputDir, file);
 };
 const capitalizeFirst = function (str) {
   return str.charAt(0).toUpperCase() + str.substr(1);
@@ -100,6 +107,8 @@ const camelToDisplay = function (str) {
 const templates = {
   //key:[template_file, output_file_suffix, description, write_options]
   //write_options: W: write, A: append
+  angular: ['../templates/ui/angular/mdds.angular.json', 'mdds.angular.json', 'angular configuration file', 'W'],
+
   conf: ['../templates/conf.ts', '.conf.ts', 'module conf file', 'A'],
   tokensValue: [
     '../templates/tokens.value.ts',
@@ -535,11 +544,7 @@ const generateSourceFile = function (keyname, template, renderObj, outputDir) {
         beautified_str = css_beautify(str, beautify_option);
         break;
       default:
-        console.error(
-          'ERROR! Cannot beautify. Unrecognized file extention: %s',
-          output,
-        );
-        increaseError();
+        beautified_str = str;
     }
 
     if (options == 'W') {
@@ -1225,6 +1230,7 @@ before(program, 'unknownOption', function () {
   }
 });
 
+let givenProgramName = process.argv[1];
 let programName = path.basename(process.argv[1]);
 if (programName === 'hg-angular-cli') {
   // called inside hg cli
@@ -1256,6 +1262,10 @@ program
   .option(
     '-d, --design <ui design>',
     'For Angular - Bootstrap, AngularMeterial, ngBootstrap. Default is Bootstrap'
+  )
+  .option(
+    '-c, --conf',
+    'Configuration for the given framework. -f (--framework) must be provided.'
   )
   .parse(process.argv);
 
@@ -1397,11 +1407,104 @@ function loadTemplate(name) {
   };
 }
 
+function getUiArch() {
+  let uiFramework = program.framework || 'angular';
+  uiFramework = uiFramework.toLowerCase();
+  let uiDesign;
+  switch (uiFramework) {
+    case 'angular':
+      uiDesign = program.design || 'bootstrap';
+      break;
+    case 'react':
+      uiDesign = program.design || 'bootstrap';
+      break;
+    default:
+      ;
+  }
+  uiDesign = uiDesign.toLowerCase();
+
+  return [uiFramework, uiDesign];
+}
+
+function getConfiguration(uiFramework, files) {
+  let conf = {styles: [], scripts: []};
+  for (let file of files) {
+    file = path.resolve(file);
+    let json = require(file);
+    conf.styles = conf.styles.concat(json.styles);
+    conf.scripts = conf.scripts.concat(json.scripts);
+  }
+
+  conf.styles = conf.styles.filter((x, i) => {
+    return conf.styles.indexOf(x) === i;
+  });
+  conf.scripts = conf.scripts.filter((x, i) => {
+    return conf.scripts.indexOf(x) === i;
+  });
+
+  console.log('');
+  console.log('*** Please include the following configuration to your project angular.json file:');
+  console.log('   -- architect.build.options.styles');
+  console.log(JSON.stringify(conf.styles, null, 4));
+  console.log('   -- architect.build.options.scripts');
+  console.log(JSON.stringify(conf.scripts, null, 4));
+}
+
+/**
+ * Generate sample configuration for given framework
+ */
+function configurationGen() {
+  let [uiFramework, uiDesign] = getUiArch();
+  let configFile;
+  switch(uiFramework) {
+    case 'angular':
+      configFile = 'mdds.angular.json';
+      break;
+    default:
+      console.error(`Configuration for framework ${uiFramework} is not supported.`);
+      _exit(1);
+  }
+  // output directory
+  let outputDir;
+  if (!program.output) {
+    if (fs.existsSync('src/app')) {
+      outputDir = 'src/app';
+      console.info(
+        'NOTE: Output directory is not provided. Use "src/app" directory to check configuration...'
+      );
+    } else {
+      outputDir = './';
+      console.info(
+        'NOTE: Output directory is not provided. Use the current to check configuration...'
+      );
+    }
+  } else {
+    outputDir = program.output;
+    if (!fs.existsSync(outputDir)) {
+      console.info(`Target project output directory ${outputDir} does not exist.`);
+    }
+  }
+
+  console.log(`Checking mdds.angular.json under ${outputDir}...`);
+  glob(outputDir + `/**/${configFile}`, {}, (err, files)=>{
+    if (err) {
+      console.log(`Error when checking configuration: ${err.stack}`);
+      _exit(1);
+    }
+    console.log(`-- The following configuration files are found: `, files);
+    getConfiguration(uiFramework, files);
+  });
+}
+
 /**
  * Main program.
  */
 
 function main() {
+  if (program.conf) {
+    return configurationGen();
+  }
+
   let inputFile = program.args.shift();
   if (!inputFile) {
     console.error('Argument error.');
@@ -1420,20 +1523,7 @@ function main() {
   }
 
   // ui framework
-  let uiFramework = program.framework || 'angular';
-  uiFramework = uiFramework.toLowerCase();
-  let uiDesign;
-  switch (uiFramework) {
-    case 'angular':
-      uiDesign = program.design || 'bootstrap';
-      break;
-    case 'react':
-      uiDesign = program.design || 'bootstrap';
-      break;
-    default:
-      ;
-  }
-  uiDesign = uiDesign.toLowerCase();
+  let [uiFramework, uiDesign] = getUiArch();
   
   let uiTemplateDir = path.join(ROOTDIR, 'ui', uiFramework, uiDesign);
   if (!fs.existsSync(uiTemplateDir)) {
@@ -1526,10 +1616,12 @@ function main() {
   let hasDate = false;
   let hasRef = false;
   let hasEditor = false;
+  let hasEditorU = false;
   let hasRequiredMultiSelection = false;
   let hasRequiredArray = false;
   let hasRequiredMap = false;
   let hasFileUpload = false;
+  let hasFileUploadU = false;
   let hasEmailing = false;
   let dateFormat = 'MM/DD/YYYY';
   if (config && config.dateFormat) dateFormat = config.dateFormat;
@@ -1954,10 +2046,12 @@ function main() {
     let schemaHasDate = hasDate5 || hasDate6;
     let schemaHasRef = false;
     let schemaHasEditor = false;
+    let schemaHasEditorU = false; // editor update view
     let schemaHasRequiredMultiSelection = false;
     let schemaHasRequiredArray = false;
     let schemaHasRequiredMap = false;
     let schemaHasFileUpload = false;
+    let schemaHasFileUploadU = false;
     let schemaHasEmailing = false;
     if (api.includes('L')) {
       selectors.used('L');
@@ -1983,11 +2077,13 @@ function main() {
       schemaHasDate = schemaHasDate || hasDate3;
       schemaHasRef = schemaHasRef || hasRef3;
       schemaHasEditor = schemaHasEditor || hasEditor3;
+      schemaHasEditorU = schemaHasEditorU || hasEditor3;
       schemaHasRequiredMultiSelection =
         schemaHasRequiredMultiSelection || hasReqGrp3;
       schemaHasRequiredArray = schemaHasRequiredArray || hasReqArr3;
       schemaHasRequiredMap = schemaHasRequiredMap || hasReqMap3;
       schemaHasFileUpload = schemaHasFileUpload || hasFileUpload3;
+      schemaHasFileUploadU = schemaHasFileUploadU || hasFileUpload3;
     }
     if (api.includes('U')) {
       selectors.used('U');
@@ -1995,19 +2091,23 @@ function main() {
       schemaHasDate = schemaHasDate || hasDate4;
       schemaHasRef = schemaHasRef || hasRef4;
       schemaHasEditor = schemaHasEditor || hasEditor4;
+      schemaHasEditorU = schemaHasEditorU || hasEditor4;
       schemaHasRequiredMultiSelection =
         schemaHasRequiredMultiSelection || hasReqGrp4;
       schemaHasRequiredArray = schemaHasRequiredArray || hasReqArr4;
       schemaHasRequiredMap = schemaHasRequiredMap || hasReqMap4;
       schemaHasFileUpload = schemaHasFileUpload || hasFileUpload4;
+      schemaHasFileUploadU = schemaHasFileUploadU || hasFileUpload4;
     }
     if (schemaHasDate) hasDate = true;
     if (schemaHasRef) hasRef = true;
     if (schemaHasEditor) hasEditor = true;
+    if (schemaHasEditorU) hasEditorU = true;
     if (schemaHasRequiredMultiSelection) hasRequiredMultiSelection = true;
     if (schemaHasRequiredArray) hasRequiredArray = true;
     if (schemaHasRequiredMap) hasRequiredMap = true;
     if (schemaHasFileUpload) hasFileUpload = true;
+    if (schemaHasFileUploadU) hasFileUploadU = true;
     if (schemaHasEmailing) hasEmailing = true;
 
     let [stripFieldMetaDetail, viewStrMetaHandledDetail] = stripFieldMeta(
@@ -2241,10 +2341,12 @@ function main() {
       schemaHasDate,
       schemaHasRef,
       schemaHasEditor,
+      schemaHasEditorU,
       schemaHasRequiredMultiSelection,
       schemaHasRequiredArray,
       schemaHasRequiredMap,
       schemaHasFileUpload,
+      schemaHasFileUploadU,
       schemaHasEmailing,
       schemaHasValidator,
       permission: schemaAnyonePermission,
@@ -2437,6 +2539,8 @@ function main() {
     return false;
   });
 
+  console.log('uiFramework: ', uiFramework, ' uiDesign: ', uiDesign);
+
   let renderObj = {
     moduleName,
     ModuleName,
@@ -2448,10 +2552,12 @@ function main() {
     hasDate,
     hasRef,
     hasEditor,
+    hasEditorU,
     hasRequiredMultiSelection,
     hasRequiredArray,
     hasRequiredMap,
     hasFileUpload,
+    hasFileUploadU,
     hasEmailing,
     dateFormat,
     timeFormat,
@@ -2463,10 +2569,11 @@ function main() {
 
     uiFramework,
     uiDesign,
+    VERSION,
   };
   //console.log('***renderObj', renderObj);
   //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
-
+  generateSourceFile(moduleName, templates.angular, renderObj, outputDir);
   generateSourceFile(moduleName, templates.conf, renderObj, outputDirCust);
   generateSourceFile(
     moduleName,
@@ -2888,6 +2995,9 @@ function main() {
   } else {
     console.log('+++ Done!');
   }
+  console.log();
+  console.log(`+++ Configure your ${uiFramework} application for the generated UI? Please run:`);
+  console.log(` ${programName} -c -f ${uiFramework} -o ${parentOutputDir}`);
   console.log();
   return;
 

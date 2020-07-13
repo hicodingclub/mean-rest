@@ -1,10 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-<%
-if (hasDate) {%>
-import { NgbModule, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
-import { MraNgbDateFormatterService } from './<%-moduleName%>.directive'; <%_ }%><%_
+<%- 
+include(`/ui/${uiFramework}/${uiDesign}/main.core.module.include.ts`, {part: 'file_import'});
+%><%_
 if (hasRequiredMultiSelection) {%>
 import { Directive<%-ModuleName%>MultiSelectionRequired } from './<%-moduleName%>.directive';<%_ } %><%_
 if (hasRequiredArray) {%>
@@ -14,7 +13,9 @@ import { Directive<%-ModuleName%>MapRequired } from './<%-moduleName%>.directive
 if (hasFileUpload) {%>
 import { FileUploadModule } from '@hicoder/angular-file';<%}%><%
 if (hasEmailing) {%>
-import { ActionEmailModule } from '@hicoder/angular-action-email';<%}%>
+import { ActionEmailModule } from '@hicoder/angular-action-email';<%}%><%
+if (hasEditor) {%>
+import { MddsRichtextEditorModule } from '@hicoder/angular-richtext';<%}%>
 
 import { MddsCoreModule } from '@hicoder/angular-core';
 
@@ -22,10 +23,13 @@ import { <%-ModuleName%>RoutingCoreModule } from './<%-moduleName%>-routing.core
 import { <%-ModuleName%>Component } from './<%-moduleName%>.component';<%
 if (hasRef) {%>
 import { <%-ModuleName%>RefSelectDirective } from './<%-moduleName%>.component';<%}%>
-<%for (let sel of uniqeSelectors) { if (sel.usedFlag) {%>
+<%for (let sel of uniqeSelectors) {
+  if (sel.usedFlag) {%>
 import { <%-sel.module%> } from '<%-sel.package%>';<%
-}}%>
-// Import components for each schema<%_
+  }
+}%>
+// Import components for each schema
+<%_
 for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api;%>
 import { <%-schm.SchemaName%>Component } from './<%-schm.schemaName%>/<%-schm.schemaName%>.component';<%_
   if (api.includes("L")) {%>
@@ -71,14 +75,16 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
 @NgModule({
   imports: [
     CommonModule,
-    FormsModule,<%_
-  if (hasDate) {%>
-    NgbModule,<%}%>
+    FormsModule,<%- 
+    include(`/ui/${uiFramework}/${uiDesign}/main.core.module.include.ts`, {part: 'module_import'});
+    %>
     MddsCoreModule,<%
   if (hasFileUpload) {%>
     FileUploadModule,<%}%><%
   if (hasEmailing) {%>
-    ActionEmailModule,<%}%><%_
+    ActionEmailModule,<%}%><%
+  if (hasEditor) {%>
+    MddsRichtextEditorModule,<%}%><%_
   for (let sel of uniqeSelectors) { if (sel.usedFlag) {%>
     <%-sel.module%>,<%}}%>
     <%-ModuleName%>RoutingCoreModule,
@@ -170,9 +176,9 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     if (hasRequiredMap) {%>
     Directive<%-ModuleName%>MapRequired,<%_ } %>
   ],
-  providers: [<%_
-  if (hasDate) {%>
-    { provide: NgbDateParserFormatter, useClass: MraNgbDateFormatterService },<%}%>
+  providers: [<%- 
+    include(`/ui/${uiFramework}/${uiDesign}/main.core.module.include.ts`, {part: 'module_provider'});
+    %>
   ],
   entryComponents: [<%_
   if (hasRef) {%><%_ referenceSchemas.forEach(function(reference){ let Ref = reference.Ref; let api = reference.api; %><% 

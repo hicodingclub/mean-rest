@@ -1,12 +1,11 @@
-﻿import { Component, OnInit, AfterViewInit, Input, ViewEncapsulation, Output, EventEmitter } from '@angular/core';
+﻿import { Component, OnInit, AfterViewInit, Input, Output, EventEmitter } from '@angular/core';
 
 import Cropper from 'cropperjs';
 
 @Component({
   selector: 'lib-mdds-cropper',
   templateUrl: 'mdds-cropper.component.html',
-  styleUrls: ['../../node_modules/cropperjs/dist/cropper.css', './mdds-cropper.component.css'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./mdds-cropper.component.css'],
 })
 export class MddsCropperComponent implements OnInit, AfterViewInit {
   @Input() downloadUrl: string;

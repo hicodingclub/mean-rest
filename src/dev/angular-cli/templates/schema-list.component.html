@@ -89,12 +89,23 @@ if (listCategoryRef && listCategoryShowMore) {%>
 		let includeSubDetail = false;
 		let embeddedEdit = false;
 
-	    let view='list'; 
-	for (const lt of listTypes) { let viewType = lt[0];%><%_if (viewType === 'list') {%>
-<% include schema-list.view.list.html %><%} else if (viewType === 'grid') {%>
-<% include schema-list.view.grid.html %><%} else if (viewType === 'table') {%>
-<% include schema-list.view.table.html %><%}%>
-	<%_ } %>
+		let listviewObj = {
+			clickToDetail, cardHasLink, clickToCheck,
+			canUpdate, canDelete, canArchive, canCheck,
+			includeSubDetail, embeddedEdit,
+		};
+
+	    let view='list';
+	for (const lt of listTypes) {
+		let viewType = lt[0];
+		if (viewType === 'list') {%><%-
+			include(`/ui/${uiFramework}/${uiDesign}/schema-list.view.list.html`, listviewObj); %><%
+		} else if (viewType === 'grid') {%><%-
+			include(`/ui/${uiFramework}/${uiDesign}/schema-list.view.grid.html`, listviewObj); %><%
+		} else if (viewType === 'table') {%><%-
+			include(`/ui/${uiFramework}/${uiDesign}/schema-list.view.table.html`, listviewObj); %><%
+		}
+	} %>
 	</div>
 	<div class="container">
 		<div *ngIf="!options['disablePagination']">

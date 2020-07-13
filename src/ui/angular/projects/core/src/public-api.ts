@@ -9,7 +9,6 @@ export { MddsCommonService } from './lib/mdds-common.service';
 
 export { MddsCoreModule } from './lib/mdds-core.module';
 export { MddsMaxNumberDirective, MddsMinNumberDirective } from './lib/mdds-common.directives';
-export { MddsRichTextSelectDirective, MddsRichTextShowDirective } from './lib/summernote.directive';
 
 export { ErrorToastConfig, ErrorToast, onServiceError } from './lib/util.errortoast';
 export { ModalConfig, Modal } from './lib/util.modal';

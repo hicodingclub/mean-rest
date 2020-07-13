@@ -40,11 +40,19 @@
 		let includeSubDetail = detailSubView.length != 0 && api.includes('R');
 
 		let embeddedEdit = false;
-
-	for (const lt of listTypes) { let viewType = lt[0];%><%_if (viewType === 'list') {%>
-<% include schema-list.view.list.html %><%} else if (viewType === 'table') {%>
-<% include schema-list.view.table.html %><%}%>
-	<%_ } %>
+		let listviewObj = {
+			clickToDetail, cardHasLink, clickToCheck,
+			canUpdate, canDelete, canArchive, canCheck,
+			includeSubDetail, embeddedEdit,
+		};
+	for (const lt of listTypes) {
+		let viewType = lt[0];
+		if (viewType === 'list') {%><%-
+			include(`/ui/${uiFramework}/${uiDesign}/schema-list.view.list.html`, listviewObj); %><%
+		} else if (viewType === 'table') {%><%-
+			include(`/ui/${uiFramework}/${uiDesign}/schema-list.view.table.html`, listviewObj); %><%
+		}
+	} %>
 	</div>
 	<div class="container">
 		<%_ disableRefreshIcon = true; disableSortSelection = true; disableViewSwitch = true;%><% include schema-list.pagination.html %>

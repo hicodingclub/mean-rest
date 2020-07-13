@@ -9,9 +9,6 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
 <%if (schemaHasRef) {%>
 import { ComponentFactoryResolver } from '@angular/core';<%}%>
-<%if (schemaHasEditor) {%>
-import { QueryList, ViewChildren } from '@angular/core';
-import { MddsRichTextShowDirective } from '@hicoder/angular-core';<%}%>
   
 @Component({
   selector: 'app-<%-schemaName%>-list',
@@ -33,8 +30,6 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustCompone
   // public queryParams: any;  // {listSortField: 'a', listSortOrder: 'asc' / 'desc', perPage: 6}
   // @Input()
   // public categoryBy:string; //field name whose value is used as category
-  <%if (schemaHasEditor) {%>
-  @ViewChildren(MddsRichTextShowDirective) textEditors: QueryList<MddsRichTextShowDirective>;<%}%>
 
   constructor(
       <% if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
@@ -57,6 +52,10 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustCompone
 
           <%let clickToDetail = api.includes('R') && listToDetail === 'click'; if (clickToDetail) {%>this.clickItemAction = 'detail';<%}%>
           this.itemMultiSelect = true;
+
+          // initialize detail structure for search
+          let detail = {};
+          this.detail = this.formatDetail(detail);
   }
 
   ngOnInit() {

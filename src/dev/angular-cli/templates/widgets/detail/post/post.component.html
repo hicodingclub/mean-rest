@@ -2,27 +2,32 @@
 	<div *ngIf="!options['disableActionButtions']"><%_ include ../../../schema-detail.d.actions.html %></div>
 	<div class="card transparent-border"><%
 		{ let view = 'detail'; let largePicture = true;
-		field = detailView[0]; let fn = field.fieldName; let ft = field.type;;%>
+		field = detailView[0]; let fn = field.fieldName; let ft = field.type;
+		let fieldObj = {field, fn, ft, ref_link: true,};%>
 		<div class="post-head-picture" *ngIf="fieldHasValue(detail['<%-fn%>'])">
-			<% include ../../../schema-display.field.html %>
+			<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 		</div><%
 		}%>
 		<div class="card-body"><%
-			{ let view = 'detail'; field = detailView[1]; let fn = field.fieldName; let ft = field.type;;%>
-			<h3 class="card-title"><% include ../../../schema-display.field.html %></h3><%
+			{ let view = 'detail'; field = detailView[1]; let fn = field.fieldName; let ft = field.type;
+			let fieldObj = {field, fn, ft, ref_link: true,};%>
+			<h3 class="card-title"><%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %></h3><%
 			}%>
 			<h6 class="card-subtitle mb-2 text-muted"><%
-				{ let view = 'detail'; field = detailView[2]; let fn = field.fieldName; let ft = field.type;;%>
-				<% include ../../../schema-display.field.html %> &nbsp;&nbsp;<%
+				{ let view = 'detail'; field = detailView[2]; let fn = field.fieldName; let ft = field.type;
+				let fieldObj = {field, fn, ft, ref_link: true,};%>
+				<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %> &nbsp;&nbsp;<%
 				}%><%
-				{ let view = 'detail'; field = detailView[3]; let fn = field.fieldName; let ft = field.type;;%>
-				<% include ../../../schema-display.field.html %><%
+				{ let view = 'detail'; field = detailView[3]; let fn = field.fieldName; let ft = field.type;
+				let fieldObj = {field, fn, ft, ref_link: true,};%>
+				<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %><%
 				}%>
 			</h6>
 
 			<div class="card-text"><%
-				{ let view = 'detail'; field = detailView[4]; let fn = field.fieldName; let ft = field.type;;%>
-					<% include ../../../schema-display.field.html %><%
+				{ let view = 'detail'; field = detailView[4]; let fn = field.fieldName; let ft = field.type;
+				let fieldObj = {field, fn, ft, ref_link: true,};%>
+					<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %><%
 				}%>
 			</div>
 		</div>
