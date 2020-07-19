@@ -6,6 +6,8 @@ const commandLineUsage = require('command-line-usage')
 const zipFolder = require('zip-folder');
 const { promisify } = require("util");
 const moment = require('moment');
+const winston = require('winston');
+
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
@@ -22,17 +24,11 @@ const optionDefinitions = [
   },
 ];
 
-function logger(str) {
-  let now = moment();
-  const s = now.format() + ' ' + str;
-  console.log(s);
-}
-
 function help(code) {
   const sections = [
     {
       header: 'A @hicoder tool',
-      content: 'Backup application data.'
+      content: 'Backup application and system data.'
     },
     {
       header: 'Options',
@@ -61,16 +57,31 @@ if (!valid) {
   help(1);
 }
 
+const logFile = path.join(options.appdir, 'hc-op-webbackup.log');
+const myFormat = winston.format.printf(({ level, message, timestamp }) => {
+  return `${timestamp} ${level}: ${message}`;
+});
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    myFormat,
+  ),
+  transports: [
+    new winston.transports.File({ filename: logFile }),
+  ],
+});
+
 const envFile = path.join(options.appdir, '.env');
 if (fs.existsSync(envFile)) {
   require('dotenv').config({ path: envFile });
 } else {
-  logger(`Warning: .env file doesn't exist: ${envFile}.`);
+  logger.warn(`Warning: .env file doesn't exist: ${envFile}.`);
 }
 
 const awsConfFile = path.join(options.appdir, process.env.AWS_CONFIG_FILE_NAME||'.aws.conf.json');
 if (!fs.existsSync(awsConfFile)) {
-  logger(`Error: aws conf file doesn't exist: ${awsConfFile}.`);
+  logger.error(`Error: aws conf file doesn't exist: ${awsConfFile}.`);
   process.exit(3);
 }
 
@@ -85,13 +96,13 @@ async function main() {
   const mongoUrl = process.env.MONGODB_URL || 'mongodb://127.0.0.1:27017/';
   const dumpDir = path.join(options.appdir, 'dump');
   try {
-    logger(`Mongodb dumping...`);
+    logger.debug(`Mongodb dumping...`);
 
     const { stdout, stderr } = await execit(`mongodump --uri="${mongoUrl}" --out="${dumpDir}"`);
     folders.push(dumpDir);
-    logger(`Success: mongodb dumped...`);
+    logger.debug(`Success: mongodb dumped...`);
   } catch(err) {
-    logger(`Error: failed to dump mongodb: ${err.message}`);
+    logger.error(`Error: failed to dump mongodb: ${err.message}`);
   }
 
   const uploads = [];
@@ -99,12 +110,12 @@ async function main() {
   const zipit = promisify(zipFolder);
   for (const f of folders) {
     try {
-      logger(`zipping folder ${f} to ${f}.zip`);
+      logger.debug(`zipping folder ${f} to ${f}.zip`);
 
       await zipit(f, f + '.zip');
       uploads.push(f + '.zip');
     } catch (err) {
-      logger(`Error to zip ${f}: ${err.message}`);
+      logger.error(`Error to zip ${f}: ${err.message}`);
     }
   }
 
@@ -118,7 +129,7 @@ async function main() {
     const fileStream = fs.createReadStream(f);
     fileStream.on('error', function(err) {
       console.log('File Error', err);
-      logger(`ERROR reading file stream from ${f}: ${err.message}`);
+      logger.error(`ERROR reading file stream from ${f}: ${err.message}`);
     });
 
     const uploadParams = {Bucket: options.bucket, Key: path.basename(f), Body: fileStream};
@@ -126,9 +137,9 @@ async function main() {
     // call S3 to retrieve upload file to specified bucket
     s3.upload (uploadParams, function (err, data) {
       if (err) {
-        logger(`ERROR to upload ${f} to S3 ${options.bucket}: ${err.message}`);
+        logger.error(`ERROR to upload ${f} to S3 ${options.bucket}: ${err.message}`);
       } if (data) {
-        logger(`Success to upload ${f} to S3 ${options.bucket}.`);
+        logger.info(`Success to upload ${f} to S3 ${options.bucket}.`);
       }
     });
   }
@@ -137,7 +148,7 @@ async function main() {
 try {
   main();
 } catch(err) {
-  logger(`ERROR to execute main function: ${err.message}`);
+  logger.error(`ERROR to execute main function: ${err.message}`);
 }
 
 /*
