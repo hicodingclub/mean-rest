@@ -1,0 +1,21 @@
+{
+  "name": "@hicoder/op-ng-compile",
+  "version": "0.5.1",
+  "description": "Angular project compile",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "command-exists": "^1.2.9",
+    "command-line-args": "^5.1.1",
+    "command-line-usage": "^6.1.0",
+    "moment": "^2.24.0",
+    "winston": "^3.3.3"
+  },
+  "bin": {
+    "hc-op-ngcompile": "index.js"
+  }
+}
