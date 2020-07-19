@@ -54,7 +54,7 @@
 				</ng-template>
 				<div class="action-buttons-center">
 					<button type="submit" class="btn btn-success" [disabled]="!editForm.form.valid">Submit</button>
-					<button class="btn btn-outline-success" type="button" (click)="editCancel()">Cancel</button>
+					<button *ngIf="!options['disableCancel']" class="btn btn-outline-success" type="button" (click)="editCancel()">Cancel</button>
 				</div>
 			</form>
 		</div>
