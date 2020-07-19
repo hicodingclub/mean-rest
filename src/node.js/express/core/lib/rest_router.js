@@ -87,6 +87,7 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
       api = "LCRUDA";
     }
 
+    const tags = schemaDef.tags;
     const schm = schemaDef.schema;
     const mraBE = schemaDef.mraBE || {};
     let collectionName = mraBE.collection;
@@ -139,7 +140,7 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
 
       // tell controller to use save so mongoose logic of plugin can be triggered
       schm.options.useSaveInsteadOfUpdate = true; //this is a special indicator to controller use save.
-      restController.register(schemaName, schm, views, model, moduleName, ownerConfig, mraBE);
+      restController.register(schemaName, schm, views, model, moduleName, ownerConfig, mraBE, tags);
     }
     if (permissionStore && api) {
       permissionStore.registerResource(schemaName, moduleName);

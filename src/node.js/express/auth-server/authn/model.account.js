@@ -32,15 +32,20 @@ const accountSchema = new Schema({
   },
   status:    {type: String, enum: ['Enabled', 'Disabled', 'Pending'], default: 'Enabled'},
   since: { type: Date, default: Date.now },
+  regtype: { type: String},
+
   password: { type: String, required: true },
   firstname: {type: String, maxlength: 100},
   lastname: {type: String, maxlength: 100},
+  photo: {type: String,
+    mraType: 'picture', mraSharable: false},
+  description: {type: String, textarea: true},
 });
 
-const accountBrief = "username email phone firstname lastname since status";
-const accountDetail = "username email phone firstname lastname since status";
-const accountCreat = "username email phone firstname lastname status password";
-const accountEdit = "username email phone firstname lastname status";
+const accountBrief = "username email phone firstname lastname since regtype status";
+const accountDetail = "username email phone firstname lastname since regtype status";
+const accountCreat = "username email phone firstname lastname regtype status password";
+const accountEdit = "username email phone firstname lastname regtype status";
 const accountTextSearch = "username email phone";
 const accountIndex = "username";
 
@@ -48,6 +53,7 @@ const schemas = {
   "maccount": {
     schema: accountSchema,
     views: [accountBrief, accountDetail, accountCreat, accountEdit, accountTextSearch, accountIndex],
+    tags: ['auth-user'], // used as authentication 'user' model
     name: 'Account',
     api: 'LRCUDM', // M - email
     mraUI: {

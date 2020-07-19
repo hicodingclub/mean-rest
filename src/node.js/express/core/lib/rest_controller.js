@@ -356,6 +356,7 @@ class RestController {
     this.populate_collection = {};
     this.owner_config = {}; // {enable: true, type: 'user | module'
     this.mraBE_collection = {};
+    this.tags_collection = {};
     this.mddsProperties = options || {};
   }
 
@@ -389,13 +390,14 @@ class RestController {
     return [views[5], views[0]]; //indexView and birefView. Brief view is for association population
   }
 
-  register(schemaName, schema, views, model, moduleName, ownerConfig, mraBE) {
+  register(schemaName, schema, views, model, moduleName, ownerConfig, mraBE, tags) {
     let name = schemaName.toLowerCase();
     this.schema_collection[name] = schema;
     this.views_collection[name] = views;
     this.model_collection[name] = model;
     this.owner_config[name] = ownerConfig;
     this.mraBE_collection[name] = mraBE;
+    this.tags_collection[name] = tags; // schema tags for special logic handling
     //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
     this.populate_collection[name] = {
       //populates in a array, each populate is an array, too, with [field, ref]
@@ -416,6 +418,16 @@ class RestController {
         });
       }
     }
+  }
+
+  getModelNameByTag(tag) {
+    for (let schemaName in this.tags_collection) {
+      let tags = this.tags_collection[schemaName];
+      if (tags && tags.includes(tag)) {
+        return schemaName;
+      }
+    }
+    return undefined;
   }
 
   getAll(req, res, next) {

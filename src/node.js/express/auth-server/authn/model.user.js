@@ -32,6 +32,8 @@ const userSchema = new Schema({
     validate: [validatePhone, 'Please fill a valid phone number']
   },
   status:    {type: String, enum: ['Enabled', 'Disabled', 'Pending'], default: 'Enabled'},
+  regtype: { type: String},
+
   since: { type: Date, default: Date.now },
   password: { type: String, required: true },
 
@@ -42,10 +44,10 @@ const userSchema = new Schema({
   description: {type: String, textarea: true},
 });
 
-const userBrief = "username email phone firstname lastname since status";
-const userDetail = "username email phone firstname lastname photo since status";
-const userCreat = "username email phone status firstname lastname password";
-const userEdit = "username email phone firstname lastname status";
+const userBrief = "username email phone firstname lastname since regtype status";
+const userDetail = "username email phone firstname lastname photo since regtype status";
+const userCreat = "username email phone firstname lastname regtype status password";
+const userEdit = "username email phone firstname lastname regtype status";
 const userTextSearch = "username email phone";
 const userIndex = "username";
 
@@ -53,6 +55,7 @@ const schemas = {
   "muser": {
     schema: userSchema,
     views: [userBrief, userDetail, userCreat, userEdit, userTextSearch, userIndex],
+    tags: ['auth-user'], // used as authentication 'user' model
     name: 'User',
     api: 'LRCUM', // M - email
     mraUI: {

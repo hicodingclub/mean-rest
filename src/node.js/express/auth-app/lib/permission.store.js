@@ -1,45 +1,45 @@
 const getPermissionFromAuthz = require('./authz_util');
 
-const permission_collection = {}; 
-const access_collection = {}; 
-
-const system_modules = {}; //{'moduleName': [resource1, resource2...]}
-
 class PermissionStore {
+  permission_collection = {}; 
+  access_collection = {}; 
+
+  system_modules = {}; //{'moduleName': [resource1, resource2...]}
+
   constructor() { }
-  static registerAuthz(moduleName, authz) {
-    access_collection[moduleName] = getPermissionFromAuthz(authz);
+  registerAuthz(moduleName, authz) {
+    this.access_collection[moduleName] = getPermissionFromAuthz(authz);
   }
-  static getPermission(moduleName) {
-    return permission_collection[moduleName];
+  getPermission(moduleName) {
+    return this.permission_collection[moduleName];
   }
-  static setPermissions(modulePermissions) {
+  setPermissions(modulePermissions) {
     for (let moduleName in modulePermissions) {
-      permission_collection[moduleName] = modulePermissions[moduleName];
+      this.permission_collection[moduleName] = modulePermissions[moduleName];
     }
   }
-  static getAccess(moduleName) {
-    return access_collection[moduleName];
+  getAccess(moduleName) {
+    return this.access_collection[moduleName];
   }
-  static setAccesses(modulePermissions) {
+  setAccesses(modulePermissions) {
     for (let moduleName in modulePermissions) {
-      access_collection[moduleName] = modulePermissions[moduleName];
+      this.access_collection[moduleName] = modulePermissions[moduleName];
     }
   }
-  static registerResource(schemaName, moduleName) {
+  registerResource(schemaName, moduleName) {
     if (moduleName) {
-      if (moduleName in system_modules) {
-        if (!system_modules[moduleName].includes(schemaName)) {
-          system_modules[moduleName].push(schemaName);
+      if (moduleName in this.system_modules) {
+        if (!this.system_modules[moduleName].includes(schemaName)) {
+          this.system_modules[moduleName].push(schemaName);
         }
       }
       else {
-        system_modules[moduleName] = [schemaName];
+        this.system_modules[moduleName] = [schemaName];
       }
     }
   }
-  static getAllModules() {
-    return system_modules;
+  getAllModules() {
+    return this.system_modules;
   }
 }
 

@@ -51,6 +51,7 @@ const schemas = {
   "musergroup": {
     schema: roleSchema,
     views: [roleBrief, roleDetail, roleCreat, roleEdit, roleTextSearch, roleIndex],
+    tags: ['auth-group'], // used as authentication 'group' model
     name: 'User Group',
     mraUI: {
       listType: 'table',
@@ -59,6 +60,7 @@ const schemas = {
   "mpubmodule": {
     schema: moduleSchema,
     views: [moduleBrief, moduleDetail, moduleCreat, moduleEdit, moduleTextSearch, moduleIndex],
+    tags: ['auth-module'], // used as authentication 'module' model
     name: 'Public Module',
     mraUI: {
       listType: 'table',
@@ -67,6 +69,7 @@ const schemas = {
   "mpubaccess": {
     schema: permissionSchema,
     views: [permBrief, permDetail, permCreat, permEdit, permTextSearch, permIndex],
+    tags: ['auth-access'], // used as authentication 'access' model
     name: 'Access Control',
     mraUI: {
       listType: 'table',

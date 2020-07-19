@@ -329,19 +329,22 @@ const verifyPermission = function(req, res, next) {
   return next();  //have to be resolved in controller based on the owner of record
 }
 
-const permissionStore = require('./permission.store');
-const setModulePermission = function(req, res, next) {
-  const moduleName = req.mddsModuleName;
-  req.mddsModulePermissions = permissionStore.getPermission(moduleName);
-  req.mddsAllModulePermissions = permissionStore.getPermission("All Modules");
-  req.mddsModuleAccesses = permissionStore.getAccess(moduleName);
-  req.mddsAllModuleAccesses = permissionStore.getAccess("All Modules");
-  next();
-}
 
-module.exports = {
-  verifyPermission,
-  verifyRolePermission,
-  setModulePermission,
-};
+
+function getAuthz(permissionStore) {
+  const setModulePermission = function(req, res, next) {
+    const moduleName = req.mddsModuleName;
+    req.mddsModulePermissions = permissionStore.getPermission(moduleName);
+    req.mddsAllModulePermissions = permissionStore.getPermission("All Modules");
+    req.mddsModuleAccesses = permissionStore.getAccess(moduleName);
+    req.mddsAllModuleAccesses = permissionStore.getAccess("All Modules");
+    next();
+  };
+  return {
+    verifyPermission,
+    verifyRolePermission,
+    setModulePermission,
+  };
+}
+module.exports = getAuthz;
 

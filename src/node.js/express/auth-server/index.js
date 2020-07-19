@@ -23,27 +23,36 @@ module.exports.authUserDef = authUserDef;
 module.exports.authAccountDef = authAccountDef;
 
 //authorization  - Admin Roles based authorization
-const GetAuthzModuleDef = require('./authz/model.role');
+const GetAuthzModuleDefAdmin = require('./authz/model.role');
 let accScmName = authAccountDef.authn.authUserSchema;
-const authzDef = GetAuthzModuleDef(accScmName, authAccountDef.schemas[accScmName]);
-
-// need a restController instance that the role table can be accessed.
-const internalRoleRouter =  meanRestExpress.RestRouter(authzDef, 'internal-role-manager');
-const restController = internalRoleRouter.restController;
-//getAccountRoles - the function to get account roles that can be used as middleware in Authn router.
-const AuthzController = require('./authz/controller');
-let getAccountRoles = AuthzController.getAccountRoles(restController); // function that appends user roles in user info
+const authzAdminDef = GetAuthzModuleDefAdmin(accScmName, authAccountDef.schemas[accScmName]);
+//authorization  - User Roles based authorization
+const GetAuthzModuleDefUser = require('./models/model.user-role');
+let userScmName = authUserDef.authn.authUserSchema;
+const authzUserDef = GetAuthzModuleDefUser(userScmName, authUserDef.schemas[userScmName]);
 
 //authorization  - Public Access based authorization, used to manage the public access
 const accessDef = require('./authz/model.access');
-
-module.exports.authzDef = authzDef;
+const AuthzController = require('./authz/controller');
 
 //authentication router
 module.exports.GetDefaultAuthnRouter = function(authDef, options) {
   let getRoleFunc;
-  // TODO: get role for accout or for user role.
-  if (options && options.authz === 'role') getRoleFunc = getAccountRoles;
+
+  if (options && options.authz === 'role') {
+    let authzSchemaDef;
+    if (options.authzModel === 'user') {
+      authzSchemaDef = authzUserDef;
+    } else {
+      authzSchemaDef = authzAdminDef;
+    }
+    // need a restController instance that the role table can be accessed.
+    const internalRoleRouter =  meanRestExpress.RestRouter(authzSchemaDef, 'internal-role-manager');
+    const restController = internalRoleRouter.restController;
+    // the function to get account roles that can be used as middleware in Authn router.
+    getRoleFunc = AuthzController.getAccountRoles(restController); // function that appends user roles in user info
+  }
+
   return GetAuthnRouter(authDef, options, getRoleFunc,);
 }
 
@@ -51,9 +60,17 @@ const dbOperations = require('./defaultDbOperations');
 
 //used to manage the admin user authorizations
 module.exports.GetDefaultRolesManageRouter =  function(moduleName, authAppFuncs) {
-  const authzRouter =  meanRestExpress.RestRouter(authzDef, moduleName, authAppFuncs);
+  const authzRouter =  meanRestExpress.RestRouter(authzAdminDef, moduleName, authAppFuncs);
   const restController = authzRouter.restController;
-  dbOperations.populateAdminRoles(restController);
+  dbOperations.populateRoles(restController, 'admin');
+  return authzRouter;
+}
+
+//used to manage the user role authorizations
+module.exports.GetDefaultUserRolesManageRouter =  function(moduleName, authAppFuncs) {
+  const authzRouter =  meanRestExpress.RestRouter(authzUserDef, moduleName, authAppFuncs);
+  const restController = authzRouter.restController;
+  dbOperations.populateRoles(restController, 'user');
   return authzRouter;
 }
 

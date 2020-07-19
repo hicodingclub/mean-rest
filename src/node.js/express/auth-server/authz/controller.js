@@ -13,8 +13,9 @@ AuthzController.getAccountRoles = function(restController) {
     let userId = req.muser['_id'];
     if (!userId) return next(); //without setting roles. User becomes normal login user.
     
+    const muserrole = restController.getModelNameByTag('auth-user-role');
     restController.ModelExecute(
-      "maccountrole",
+      muserrole,
       'findOne',
       {account: userId} //search criteria
     ).then(

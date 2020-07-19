@@ -30,8 +30,8 @@ const moduleIndex = "module";
 
 //Permission
 const permissionSchema = new Schema({
-  role: { type: Schema.Types.ObjectId, ref: 'mrole', required: true },
-  module: { type: Schema.Types.ObjectId, ref: 'mmodule', required: true }, 
+  role: { type: Schema.Types.ObjectId, ref: 'mpubrole', required: true },
+  module: { type: Schema.Types.ObjectId, ref: 'mpubmodule', required: true }, 
   modulePermission: { type: String }, //"CRUD" 
   resourcePermission: {type: Map, of: String},  //{resource: "CRUD"}
 });
@@ -48,7 +48,7 @@ const permIndex = "role"; //let's temporarily put any field here since this sche
 
 //Put all schemas together
 const schemas = {
-  "mrole": {
+  "mpubrole": {
     schema: roleSchema,
     views: [roleBrief, roleDetail, roleCreat, roleEdit, roleTextSearch, roleIndex],
     tags: ['auth-role'], // used as authentication 'role' model
@@ -57,7 +57,7 @@ const schemas = {
       listType: 'table',
     },
   },
-  "mmodule": {
+  "mpubmodule": {
     schema: moduleSchema,
     views: [moduleBrief, moduleDetail, moduleCreat, moduleEdit, moduleTextSearch, moduleIndex],
     tags: ['auth-module'], // used as authentication 'module' model
@@ -66,7 +66,7 @@ const schemas = {
       listType: 'table',
     },
   },
-  "mpermission": {
+  "mpubpermission": {
     schema: permissionSchema,
     views: [permBrief, permDetail, permCreat, permEdit, permTextSearch, permIndex],
     tags: ['auth-permission'], // used as authentication 'permission' model
@@ -100,7 +100,7 @@ const GetAuthzModuleDef = function(userSchemaName, userSchema) {
   //define account<->role schema
   const accountRoleSchema = new Schema({
     account: { type: Schema.Types.ObjectId, ref: userSchemaName, required: true, index: { unique: true } },
-    role: { type: [{type: Schema.Types.ObjectId, ref: 'mrole'}] }, 
+    role: { type: [{type: Schema.Types.ObjectId, ref: 'mpubrole'}] }, 
   });
 
   const accountRoleBrief = "account role";
@@ -110,12 +110,12 @@ const GetAuthzModuleDef = function(userSchemaName, userSchema) {
   const accountRoleTextSearch = "account role";
   const accountRoleIndex = "account"; //let's temporarily put any field here since this schema is not referred.
   
-  schemas['maccountRole'] = {
+  schemas['muserRole'] = {
     schema: accountRoleSchema,
     views: [accountRoleBrief, accountRoleDetail, accountRoleCreat, 
       accountRoleEdit, accountRoleTextSearch, accountRoleIndex],
     tags: ['auth-user-role'],
-    name: 'Account Role',
+    name: 'User Role',
     mraUI: {
       listType: 'table',
     },
