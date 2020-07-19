@@ -20,6 +20,8 @@ import { AuthGuard } from './auth.guard';
 import { AuthIconComponent } from './auth-icon/auth-icon.component';
 import { ClickElsewhereDirective } from './auth-icon/click-elsewhere.directive';
 
+import { MddsUiRoleCheckDirective } from './ui-role.directives';
+
 @NgModule({
     imports: [
         CommonModule,
@@ -41,10 +43,12 @@ import { ClickElsewhereDirective } from './auth-icon/click-elsewhere.directive';
         CheckEmailComponent,
         AuthIconComponent,
 
-        ClickElsewhereDirective
+        ClickElsewhereDirective,
+        MddsUiRoleCheckDirective,
     ],
     exports: [
-        AuthIconComponent
+        AuthIconComponent,
+        MddsUiRoleCheckDirective,
     ],
     providers: [
         AuthGuard,

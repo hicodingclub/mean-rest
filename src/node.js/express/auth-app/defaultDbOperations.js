@@ -1,13 +1,3 @@
-const groupModuleIds = {};
-let groupAllModuleId;
-
-const roleModuleIds = {};
-let roleAllModuleId;
-
-const userGroupIds = {};
-const groupModuleAccess = {};
-const roleModulePermissions = {};
-
 function modelExecuteSuccess1(taskStr) {
   function doSomething(result) {
     console.log(" --- auth app (group access): model excecute succeeded: ", taskStr);
@@ -24,6 +14,14 @@ function modelExecuteError1(taskStr) {
 }
 
 const uploadGroupsModulesAndAccessLocal = async function(publicModules, restController, permissionStore) {
+  restController.authAppCache = restController.authAppCache || {};
+
+  const authAppCache = restController.authAppCache;
+  authAppCache.groupModuleIds = {};
+  authAppCache.groupAllModuleId = undefined;
+
+  const userGroupIds = {};
+
   const mgroup = restController.getModelNameByTag('auth-group');
   const mmodule = restController.getModelNameByTag('auth-module');
   const maccess = restController.getModelNameByTag('auth-access');
@@ -40,7 +38,8 @@ const uploadGroupsModulesAndAccessLocal = async function(publicModules, restCont
         ).then(function(result) {
             if (result) rId = result['_id'];
           }, 
-          modelExecuteError1(takInfo));
+          modelExecuteError1(takInfo)
+        );
     userGroupIds[ar] = rId;
   }
   let modules = permissionStore.getAllModules();
@@ -64,9 +63,9 @@ const uploadGroupsModulesAndAccessLocal = async function(publicModules, restCont
         ).then(function(result) {
             if (result) mModuleId = result['_id'];
           }, 
-          modelExecuteError1(takInfo));
-    
-    groupModuleIds[m] = mModuleId;//cached id for later use
+          modelExecuteError1(takInfo)
+        );
+    authAppCache.groupModuleIds[m] = mModuleId;//cached id for later use
     
     let authz = permissionStore.getAccess(m);
     // authz: permission array [{'group': {...}, 'modulePermission':xxx, 'resourcePermission':{...}}, ...]
@@ -113,13 +112,17 @@ const uploadGroupsModulesAndAccessLocal = async function(publicModules, restCont
           "findOne",
           {module: 'All Modules'}//search criteria
       ).then(function(result) {
-          if (result) groupAllModuleId = result['_id'];
+          if (result) authAppCache.groupAllModuleId = result['_id'];
         }, 
-        modelExecuteError1(takInfo));
+        modelExecuteError1(takInfo)
+      );
 }
 
 const downloadGroupsAndAccessLocal = async function(publicModules, restController, permissionStore) {
   const maccess = restController.getModelNameByTag('auth-access');
+  const authAppCache = restController.authAppCache;
+
+  const groupModuleAccess = {};
 
   let modules = permissionStore.getAllModules();
   
@@ -127,7 +130,7 @@ const downloadGroupsAndAccessLocal = async function(publicModules, restControlle
   for (let m in modules) { //{'moduleName': [resource1, resource2...]}
     if (publicModules && !publicModules.includes(m)) continue; //modules not managed by this app
 
-    let mModuleId = groupModuleIds[m];
+    let mModuleId = authAppCache.groupModuleIds[m];
     if (mModuleId) {
       takInfo = `get "${m}" public module permisions...`;
       await restController.ModelExecute2(
@@ -154,12 +157,12 @@ const downloadGroupsAndAccessLocal = async function(publicModules, restControlle
     return;
   }
 
-  if (groupAllModuleId) {
+  if (authAppCache.groupAllModuleId) {
     takInfo = `get "All Modules" public module permisions...`;
     await restController.ModelExecute2(
             maccess,
             [
-              ['find', [{module: groupAllModuleId}]], //search criteria
+              ['find', [{module: authAppCache.groupAllModuleId}]], //search criteria
               ['populate', ['group', 'group']], //return role name for the role reference.
               ['populate', ['module', 'module']] //return module name for the role reference.
             ]
@@ -189,6 +192,12 @@ function modelExecuteError2(taskStr) {
 }
 
 const uploadRoleModulesLocal = async function(adminModules, restController, permissionStore) {
+  restController.authAppCache = restController.authAppCache || {};
+
+  const authAppCache = restController.authAppCache;
+  authAppCache.roleModuleIds = {};
+  authAppCache.roleAllModuleId = undefined;
+
   const mmodule = restController.getModelNameByTag('auth-module');
 
   let takInfo;
@@ -212,9 +221,10 @@ const uploadRoleModulesLocal = async function(adminModules, restController, perm
         ).then(function(result) {
             if (result) mModuleId = result['_id'];
           }, 
-          modelExecuteError2(takInfo));
+          modelExecuteError2(takInfo)
+        );
 
-    roleModuleIds[m] = mModuleId;//cached id for later use
+    authAppCache.roleModuleIds[m] = mModuleId;//cached id for later use
   }
 
   //get module ID for "All Modules"
@@ -223,19 +233,22 @@ const uploadRoleModulesLocal = async function(adminModules, restController, perm
           "findOne",
           {module: 'All Modules'}//search criteria
       ).then(function(result) {
-          if (result) roleAllModuleId = result['_id'];
+          if (result) authAppCache.roleAllModuleId = result['_id'];
         }, 
         modelExecuteError2(takInfo));
 }
 
 const downloadRoleAndPermissionsLocal = async function(adminModules, restController, permissionStore) {
   const mpermission = restController.getModelNameByTag('auth-permission');
+  const authAppCache = restController.authAppCache;
+
+  const roleModulePermissions = {};
 
   let modules = permissionStore.getAllModules();
   for (let m in modules) { //{'moduleName': [resource1, resource2...]}
     if (adminModules && !adminModules.includes(m)) continue; //modules not managed by this app
     
-    let mModuleId = roleModuleIds[m];
+    let mModuleId = authAppCache.roleModuleIds[m];
     if (mModuleId) {
       takInfo = `get "${m}" admin module permisions...`;
       await restController.ModelExecute2(
@@ -256,12 +269,12 @@ const downloadRoleAndPermissionsLocal = async function(adminModules, restControl
     }
   }
   
-  if (roleAllModuleId) {
+  if (authAppCache.roleAllModuleId) {
     takInfo = `get "All Modules" admin module permisions...`;
     await restController.ModelExecute2(
             mpermission,
             [
-              ['find', [{module: roleAllModuleId}]], //search criteria
+              ['find', [{module: authAppCache.roleAllModuleId}]], //search criteria
               ['populate', ['role', 'role']], //return role name for the role reference.
               ['populate', ['module', 'module']] //return module name for the role reference.
             ]

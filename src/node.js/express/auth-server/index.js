@@ -33,8 +33,8 @@ const authzUserDef = GetAuthzModuleDefUser(userScmName, authUserDef.schemas[user
 
 //authorization  - Public Access based authorization, used to manage the public access
 const accessDef = require('./authz/model.access');
-const AuthzController = require('./authz/controller');
 
+const AuthzController = require('./authz/controller');
 //authentication router
 module.exports.GetDefaultAuthnRouter = function(authDef, options) {
   let getRoleFunc;
@@ -52,7 +52,6 @@ module.exports.GetDefaultAuthnRouter = function(authDef, options) {
     // the function to get account roles that can be used as middleware in Authn router.
     getRoleFunc = AuthzController.getAccountRoles(restController); // function that appends user roles in user info
   }
-
   return GetAuthnRouter(authDef, options, getRoleFunc,);
 }
 

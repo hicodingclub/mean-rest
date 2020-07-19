@@ -25,12 +25,13 @@ const validatePasswords = (form) => {
     })
 export class RegisterComponent implements OnInit {
     registerForm: FormGroup;
-    loading = false;
-    submitted = false;
-    servererror = false;
-    serverText = '';
+    loading: boolean = false;
+    submitted: boolean = false;
+    servererror: boolean = false;
+    serverText: string = '';
+    regtype: string;
 
-    registrationSucc = false;
+    registrationSucc: boolean = false;
     email: string;
 
     constructor(
@@ -44,6 +45,8 @@ export class RegisterComponent implements OnInit {
 
 
     ngOnInit() {
+        this.regtype = this.route.snapshot.queryParamMap.get('rt');
+
         const phoneNumber = /^(\d+-?)+\d+$/;
         const userName = /^[A-Za-z]((?!(@)).)*$/;
 
@@ -86,11 +89,14 @@ export class RegisterComponent implements OnInit {
 
         this.loading = true;
         const values = this.registerForm.value;
-        const o = {};
+        const o: any = {};
         for (let p in values) { // remove empty string
             if (!!values[p]) {
                 o[p] = values[p];
             }
+        }
+        if (this.regtype) {
+            o.regtype = this.regtype;
         }
         this.authenticationService.register(o)
             .pipe(first())

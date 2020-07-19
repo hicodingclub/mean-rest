@@ -114,6 +114,10 @@ class AuthnController {
     const accessExpires = 60*60;
     const refreshExpires = 60*60*12;
     
+    // role permission
+    let rolep = req.muser.rolep || {};
+    delete req.muser.rolep;
+  
     let accessToken = jwt.sign(
       req.muser, 
       ACCESS_SECRETE, 
@@ -131,6 +135,7 @@ class AuthnController {
       refreshToken,
       userName: req.muser.userName,
       fieldName: req.muser.fieldName,
+      rolep,
       expiresIn: refreshExpires,
     }
     return res.send(r);

@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, filter, retry } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { Router, NavigationEnd  } from '@angular/router';
 
 import { AUTHENTICATION_SERVER_ROOT_URI } from './tokens';
@@ -27,6 +27,10 @@ export class AuthenticationService {
   private temporayToken: temporayTokenIntf;
   private temporayTokenAllowed: boolean = false;
 
+  private authRecord: any = undefined;
+
+  private authChangeSub: Subject<boolean> = new Subject<boolean>();
+
   constructor(
             @Inject(AUTHENTICATION_SERVER_ROOT_URI) private authServerRootUri: string,
             private router: Router,
@@ -48,35 +52,47 @@ export class AuthenticationService {
     this.adminInterface = JSON.parse(localStorage.getItem('adminInterface'));
   }
 
+  emptyAuthRecord() {
+    return {
+      userName: '',
+      accessToken: '',
+      refreshToken: '',
+      displayName: '',
+      rolep: {},
+      expiresIn: 0,
+    };
+  }
+
   isAuthorized(): boolean {
-    const authRecord = JSON.parse(localStorage.getItem('mdds-auth-record'));
+    const authRecord = this.getAuthRecord();
     if (authRecord && authRecord.accessToken && Date.now() < authRecord.expiresIn) {
       return true;
     }
     return false;
   }
 
+  authChange(): Subject<boolean> {
+    return this.authChangeSub;
+  }
+
   private getLogoutTime(): number {
-    const authRecord = JSON.parse(localStorage.getItem('mdds-auth-record'));
-    if (authRecord && 'logoutTs' in authRecord) {
+    const authRecord = this.getAuthRecord();
+    if ('logoutTs' in authRecord) {
         return authRecord.logoutTs;
     }
     return 0;
   }
 
   public getAccessToken(): string {
-    const authRecord = JSON.parse(localStorage.getItem('mdds-auth-record'));
-    if (authRecord) {
+    const authRecord = this.getAuthRecord();
+    if (authRecord.accessToken) {
       return authRecord.accessToken;
     }
     return null;
   }
 
   public refreshToken(): Observable<any> {
-    let authRecord: any = JSON.parse(localStorage.getItem('mdds-auth-record'));
-    if (!authRecord) {
-      authRecord = {refreshToken: '', userName: ''};
-    }
+    let authRecord: any = this.getAuthRecord();
     const refreshToken: string = authRecord.refreshToken;
     const userName: string = authRecord.userName;
 
@@ -84,7 +100,7 @@ export class AuthenticationService {
         this.authServerRootUri + '/refresh',
         {refreshToken, userName}
       ).pipe(
-        map(this.loggedIn),
+        map(this.loggedIn.bind(this)),
         catchError(error => {
           this.logout();
           return error;
@@ -126,23 +142,35 @@ export class AuthenticationService {
     }
   }
 
-  public getUserName(): string {
+  private getAuthRecord(): any {
+    if (typeof this.authRecord !== 'undefined') {
+      return this.authRecord;
+    }
     let authRecord: any = JSON.parse(localStorage.getItem('mdds-auth-record'));
     if (!authRecord) {
-      authRecord = {userName: ''};
+      this.authRecord  = this.emptyAuthRecord();
+    } else {
+      this.authRecord = authRecord;
     }
-    return authRecord.userName;
+    return this.authRecord;
+  }
+  private setAuthRecord(authRecord: any): void {
+    this.authRecord = authRecord;
+    localStorage.setItem('mdds-auth-record', JSON.stringify(authRecord));
+    this.authChangeSub.next(true);
+  }
+
+  public getUserName(): string {
+    return this.getAuthRecord().userName;
+  }
+
+  public getRolePermissions(): any {
+    return this.getAuthRecord().rolep;
   }
 
   login(userId: any, password: string) {
-    const authRecord: any = {
-      userName: userId.value,
-      accessToken: '',
-      refreshToken: '',
-      displayName: ''
-    };
-
-    localStorage.setItem('mdds-auth-record', JSON.stringify(authRecord));
+    const authRecord: any = this.emptyAuthRecord();
+    this.setAuthRecord(authRecord);
 
     const options = this.adminInterface ?
        { params: new HttpParams().set('type', 'admin') } : {};
@@ -156,18 +184,13 @@ export class AuthenticationService {
 
     return this.http.post<any>(this.authServerRootUri + '/login',
       requestObj, options
-    ).pipe(map(this.loggedIn));
+    ).pipe(map(this.loggedIn.bind(this)));
   }
 
   register(userInfo: any) {
-    localStorage.removeItem('mdds-auth-record');
-    const authRecord: any = {
-      userName: userInfo.userName,
-      accessToken: '',
-      refreshToken: '',
-      displayName: userInfo.displayName
-    };
-    localStorage.setItem('mdds-auth-record', JSON.stringify(authRecord));
+    const authRecord: any = this.emptyAuthRecord();
+    authRecord.displayName = userInfo.displayName;
+    this.setAuthRecord(authRecord);
 
     const options = this.adminInterface ?
        { params: new HttpParams().set('type', 'admin') } : {};
@@ -176,10 +199,7 @@ export class AuthenticationService {
   }
 
   public getProfile(): Observable<any> {
-    let authRecord: any = JSON.parse(localStorage.getItem('mdds-auth-record'));
-    if (!authRecord) {
-      authRecord = {refreshToken: '', userName: ''};
-    }
+    let authRecord: any = this.getAuthRecord();
     const refreshToken: string = authRecord.refreshToken;
     const userName: string = authRecord.userName;
 
@@ -191,10 +211,7 @@ export class AuthenticationService {
   }
 
   public updateProfile(userInfo: any) {
-    let authRecord: any = JSON.parse(localStorage.getItem('mdds-auth-record'));
-    if (!authRecord) {
-      authRecord = {refreshToken: '', userName: ''};
-    }
+    let authRecord: any = this.getAuthRecord();
     userInfo.refreshToken = authRecord.refreshToken;
 
     // use post with refresh token
@@ -223,13 +240,7 @@ export class AuthenticationService {
     return this.http.post<any>(this.authServerRootUri + '/findpass', emailInfo, options);
   }
   loggedIn(user) {
-    const authRecord: any = {
-      userName: '',
-      accessToken: '',
-      refreshToken: '',
-      displayName: '',
-      expiresIn: 0,
-    };
+    const authRecord: any = this.emptyAuthRecord();
     if (user && user.accessToken) {
       authRecord.accessToken = user.accessToken;
     }
@@ -245,20 +256,37 @@ export class AuthenticationService {
     if (user && user.expiresIn) {
       authRecord.expiresIn = user.expiresIn * 1000 + Date.now();
     }
-    localStorage.setItem('mdds-auth-record', JSON.stringify(authRecord));
+    if (user && user.rolep) {
+      // change module and resources to lower case
+      let rolep = {};
+      for (let p in user.rolep) {
+        let lp = p.toLowerCase();
+        let v = user.rolep[p];
+
+        let mr = {};
+        for (let mrp in v.mr) {
+          let lmrp = mrp.toLowerCase();
+          mr[lmrp] = v.mr[mrp];
+        }
+
+        v.mr = mr;
+
+        rolep[lp] = v;
+      }
+      authRecord.rolep = rolep;
+    }
+    this.setAuthRecord(authRecord);
     return user;
   }
 
   logout() {
     // remove user from local storage to log user out
-    let authRecord = JSON.parse(localStorage.getItem('mdds-auth-record'));
-    if (!authRecord) {
-        authRecord = {};
-    }
+    let authRecord = this.getAuthRecord();
     authRecord.logoutTs = Date.now();
     authRecord.accessToken = '';
     authRecord.refreshToken = '';
-    localStorage.setItem('mdds-auth-record', JSON.stringify(authRecord));
+    authRecord.rolep = {};
+    this.setAuthRecord(authRecord);
   }
 
 

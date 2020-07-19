@@ -43,7 +43,14 @@ const populateRoles = function(restController, interface) {
             "create",
             {module: "All Modules", resources: "All resources in the system."} //document
         ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
-    
+  
+    takInfo = 'insert system modules "ui-pages" ...';
+    await restController.ModelExecute(
+          mmodule,
+          "create",
+          {module: "ui-pages", resources: "Control Role Based UI permissions"} //document
+      ).then(modelExecuteSuccess(takInfo), modelExecuteError(takInfo));
+  
     takInfo = 'get "Administrator" role infomation...';
     let adminRoleId;
     await restController.ModelExecute(
