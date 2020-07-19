@@ -41,7 +41,7 @@ export class MddsUiRoleCheckDirective implements OnChanges {
     }
     const givenPermission = resourcepermission || rolep[module].mp || '';
     if (givenPermission.toUpperCase().includes(expectedPermission)) {
-      delete this.elementRef.nativeElement.style.display;
+      this.elementRef.nativeElement.style.display = '';
       return;
     }
     this.elementRef.nativeElement.style.display = 'none';
