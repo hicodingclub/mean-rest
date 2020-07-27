@@ -2532,6 +2532,9 @@ function main() {
   const usedSelectors = [];
 
   const uniqeSelectors = allSelectors.filter((x) => {
+    if (!x.module || !x.package) {
+      return false;
+    }
     if (x.isUsed() && !usedSelectors.includes(x.module + x.package)) {
       usedSelectors.push(x.module + x.package);
       return true;

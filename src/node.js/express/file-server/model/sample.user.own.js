@@ -51,8 +51,8 @@ const schemas = {
 const config = {
   dateFormat,
   timeFormat,
-  // patch: ['mmodule_name'], //extra fields to patch to schema
-  owner: {enable: true, type: 'module'},
+  // patch: ['muser_id'], //extra fields to patch to schema
+  owner: { enable: true, type: 'user', field: 'muser_id' },
 };
 
 const authz = {

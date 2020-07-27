@@ -69,6 +69,18 @@ export class MddsBaseService {
     return list;
   }
 
+  getListSimple(
+    page: number,
+    perPage: number,
+    searchContext: any,
+  ) {
+    return this.getList(page, perPage, searchContext,
+        undefined, undefined,
+        undefined, undefined, undefined, undefined,
+        undefined, undefined, undefined, undefined,
+        undefined, undefined, undefined, undefined,
+      );
+  }
   getList(
     page: number,
     perPage: number,
@@ -260,6 +272,15 @@ export class MddsBaseService {
     let serviceUrl = this.serviceUrl + 'mddsaction/getfieldvalues';
     return this.http
       .post<any>(serviceUrl, {}, httpOptions)
+      .pipe(catchError(this.errorResponseHandler));
+  }
+
+  callZInterface(action: string, interfaceName: string, content: any) {
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    };
+    return this.http
+      .post<any>(this.serviceUrl + `mddsaction/${action}-z/${interfaceName}`, content, httpOptions)
       .pipe(catchError(this.errorResponseHandler));
   }
 }

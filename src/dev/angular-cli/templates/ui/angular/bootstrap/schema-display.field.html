@@ -1,7 +1,23 @@
                 <%_let fieldValue = `detail['${fn}']`;
                     if (field.meta.pipe) {
                         let pipeSelector = selectors[field.meta.pipe].selector;
-                        fieldValue = fieldValue + ` | ${pipeSelector}`;
+                        fieldValue += ` | ${pipeSelector}`;
+
+                        let pipeInputs = selectors[field.meta.pipe].inputs || [];
+                        for (let inputObj of pipeInputs) {
+                            const value = inputObj.value;
+                            switch (typeof value) {
+                                case 'string':
+                                    fieldValue += `:'${value}'`;
+                                    break;
+                                case 'number':
+                                case 'boolean':
+                                    fieldValue += `:${value}`;
+                                    break;
+                                default:
+                                    console.error(`Pipe input type ${typeof value} is not supported.`);
+                            }
+                        }
                     }
                 %><%_if(ft == 'ObjectId') {
                     if (typeof ref_link === 'undefined') ref_link = true;

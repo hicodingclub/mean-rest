@@ -17,3 +17,5 @@ export { stringToDateStructure, dateStructureToString } from './lib/ngb-date-for
 
 export { MddsRouteReuseStrategy } from './lib/route-reuse-strategy';
 export { MDDS_ROUTE_REUSE_RUIs } from './lib/route-reuse.tokens';
+
+export * from './lib/anchor-pipe';

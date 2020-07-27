@@ -7,6 +7,9 @@
     max-width: 12rem;
     background-color: #a39f9f;
 }
+.file {
+    background-color: transparent;
+}
 
 .thumbnail-local {
     overflow: hidden;
@@ -27,17 +30,10 @@
 .thumbnail i {
     font-size: 6rem;
     left: 50%;
+    top: 50%;
     position: relative;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
 }
-
-.display-file {
-    display: inline-block;
-    width: 50%;
-}
-
-.select-file {
-    display: inline-block;
-    max-width: 50%;
-    padding-left: 0.75rem;
+.file i {
+    font-size: 4rem;
 }

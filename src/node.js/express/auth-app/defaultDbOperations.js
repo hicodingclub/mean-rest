@@ -263,7 +263,8 @@ const downloadRoleAndPermissionsLocal = async function(adminModules, restControl
                 roleModulePermissions[m] = result;
               }
             }, 
-            modelExecuteError2(takInfo));
+            modelExecuteError2(takInfo)
+          );
     } else {
       console.warn(` --- Warning: auth app: admin module "${m}" not found in system.`);
     }

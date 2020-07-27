@@ -95,12 +95,10 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent implemen
       this.uploadingFiles = []; // clear
     }
 
-    const files: { [key: string]: File } = this.file.nativeElement.files;
-    for (const key in files) {
-      if (!isNaN(parseInt(key, 10))) {
-        this.files.add(files[key]);
-        this.uploadingFiles.push(files[key].name);
-      }
+    const files = this.file.nativeElement.files; //array
+    for (const fl of files) {
+      this.files.add(fl);
+      this.uploadingFiles.push(fl.name);
     }
 
     // this.localImage = URL.createObjectURL(files['0']);

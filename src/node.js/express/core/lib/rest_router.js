@@ -158,12 +158,13 @@ const meanRestExpressRouter = function(sysDef, moduleName, authConfig) {
     }
     const mraBE = schemaDef.mraBE || {};
     const filters = mraBE.filters || {};
+    const zInterfaces = mraBE.zInterfaces || {};
 
     if (!api) continue;
     sub_routes.push("/" + name);
     
     if (!schemaDef.schema) continue;
-    restRouter = RestRouter(restController, schemaName, authzFunc, api, filters);
+    restRouter = RestRouter(restController, schemaName, authzFunc, api, filters, zInterfaces,);
     expressRouter.use("/" + name, restRouter)
   }
   

@@ -12,5 +12,5 @@ export class <%-SchemaName%>Service extends <%-SchemaName%>BaseService implement
         @Inject(<%-ModuleName%>_SERVER_ROOT_URI) private <%-moduleName%>ServerRootUri: string) {
         super(http, <%-moduleName%>ServerRootUri);
     }
-    ngOnDestroy() { }
+    ngOnDestroy() {}
 }

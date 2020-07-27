@@ -1,24 +1,6 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+const schema = require('./schema');
 
-const fileSchema = new Schema({
-  name: { type: String, maxlength: 128},
-  type: { type: String},
-  labels: {type: [String]},
-  md5: { type: String},
-  size: { type: Number},
-  link: { type: String, mraType: 'picture'}, //download link
-  uploaded: { type: Date, default: Date.now },
-  data: { type: Buffer},
-  location: { type: String}, //off-DB store location
-  hasThumbnail: {type: Boolean},
-  thumbnail: { type: Buffer}
-});
-
-const fileLabelsSchema = new Schema({
-  label: { type: String},
-  created: { type: Date, default: Date.now },
-});
+const { fileSchema, fileGroupSchema } = schema;
 
 const fB = 'link name labels size uploaded (hasThumbnail)';
 const fD = 'link name labels type size md5 uploaded hasThumbnail';
@@ -55,7 +37,7 @@ const schemas = {
 const config = {
   dateFormat,
   timeFormat,
-  patch: ['mmodule_name'], //extra fields to patch to schema
+  // patch: ['mmodule_name'], //extra fields to patch to schema
   owner: {enable: true, type: 'module'},
 };
 

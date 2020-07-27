@@ -8,7 +8,7 @@ const _setSchemaName = function(name) {
   }
 }
 
-const RestRouter = function(restController, schemaName, authzFunc, api, filters) {  
+const RestRouter = function(restController, schemaName, authzFunc, api, filters, zInterfaces) {  
   let router = express.Router();
   if (!api) return router;
 
@@ -33,6 +33,20 @@ const RestRouter = function(restController, schemaName, authzFunc, api, filters)
     }
     middlewares.push(restController.Create.bind(restController));
     router.put('/', middlewares);
+
+    if (zInterfaces.create) {
+      for (let itf of zInterfaces.create) {
+        const setZInterfacename = function(req, res, next) {
+          req.zInterface = {
+            name: itf.name,
+            action: 'create',
+          };
+          next();
+        }
+        let middlewares = [setZInterfacename, restController.zInterfaceCall.bind(restController)];
+        router.post(`/mddsaction/put-z/${itf.name}`, middlewares);
+      }
+    }
   }
   if (api.includes('U')) {
     let middlewares = [];

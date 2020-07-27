@@ -55,10 +55,10 @@
 
                     <lib-richtext-editor formControlName="content"  class="mdds-richtext-editor-content" 
                         [ngClass]="{ 'is-invalid': submitted && f.content.errors }"></lib-richtext-editor>
-
                     <div *ngIf="submitted && f.content.errors" class="invalid-feedback">
                         <div *ngIf="f.content.errors.required">Please enter the email content</div>
                     </div>
+
                 </div>
             </div>
             <div *ngIf="stringFields.length > 0">

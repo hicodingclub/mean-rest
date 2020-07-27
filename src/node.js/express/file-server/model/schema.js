@@ -12,7 +12,9 @@ const fileSchema = new Schema({
   data: { type: Buffer},
   location: { type: String}, //off-DB store location
   hasThumbnail: {type: Boolean},
-  thumbnail: { type: Buffer}
+  thumbnail: { type: Buffer},
+  muser_id: { type: String, },
+  mmodule_name: { type: String, },
 }, {timestamps: true});
 
 const fileGroupSchema = new Schema({

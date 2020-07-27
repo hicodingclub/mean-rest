@@ -6,6 +6,7 @@ const sizeOf = require('image-size')
 const fs = require('fs');
 
 const schemas = require('../model/schema');
+const { type } = require('os');
 const { fileSchema, fileGroupSchema, DB_CONFIG} = schemas;
 
 let db_app_name, db_module_name;
@@ -23,11 +24,6 @@ const File = mongoose.model('mfile', fileSchema, `${db_app_name}_${db_module_nam
 const FileGroup = mongoose.model('mfilegroup', fileGroupSchema, `${db_app_name}_${db_module_name}_mfilegroup`);
 
 const MddsFileCrop= "mdds-file-crop";
-
-const sOptions = {
-};
-const configs = {
-};
 
 defaultSOption = {
   storage: 'db',
@@ -56,45 +52,74 @@ const create_random = function(){
   });
   return result;
 }
-const getOptionByName = function(moduleName) {
-  return sOptions[moduleName] || defaultSOption;
-};
-const getConfigByName = function(moduleName) {
-  return configs[moduleName] || {  owner: {enable: true, type: 'module'} };
-};
 
 const ownerPatch = function (query, owner, req) {
   if (owner && owner.enable) {
     if (owner.type === 'module') {
       query.mmodule_name = req.mddsModuleName;
     } else if (owner.type === 'user') {
-      query.muser_id = req.muser._id;
+      if (req.muser) {
+        // user logged in
+        if (!!owner.field) {
+          query[owner.field] = req.muser._id;
+        } else {
+          query.muser_id = req.muser._id;
+        }
+      }
     }
   }
   return query;
 };
 
-const StoreToFileSystem = function(file, fileId, directory, cb) {
+const getUserId = function (req) {
+  if (req.muser) {
+    return req.muser._id;
+  }
+  return 'unknown'; //unknown users
+}
+
+const StoreToFileSystem = function(file, fileId, directory) {
   // Use the mv() method to place the file somewhere on your server
   let fileName = path.join(directory, fileId);
-  file.mv(fileName, function(err) {
-    if (err) {
-      return cb(err, null)
+  return new Promise((resolve, reject) => {
+    try {
+      if (!fs.existsSync(directory)) {
+        fs.mkdirSync(directory, { recursive: true });
+      }
+    } catch (err) {
+      reject(err);
     }
-    return cb(null, fileName)
+
+
+    file.mv(fileName, function(err) {
+      if (err) {
+        return reject(err)
+      }
+      return resolve(fileName)
+    });
   });
 };
 
-const StoreThumbnailToFileSystem = function(buffer, file, directory, cb) {
-  if (!buffer) {
-    return cb(null, 0);
-  }
-  let fileName = path.join(directory, file);
-  
-  fs.writeFile(fileName, buffer, (err, bytes) => {
-    if (err) { return cb(err); }
-    return cb(null, bytes);
-  });
+const StoreThumbnailToFileSystem = function(buffer, file, directory) {
+  return new Promise((resolve, reject) => {
+    try {
+      if (!fs.existsSync(directory)) {
+        fs.mkdirSync(directory, { recursive: true });
+      }
+    } catch (err) {
+      return reject(err);
+    }
+
+    if (!buffer) {
+      return reject(new Error('No thing to write to file'));
+    }
+    let fileName = path.join(directory, file);
+    
+    fs.writeFile(fileName, buffer, (err, bytes) => {
+      if (err) { return reject(err); }
+      return resolve(bytes);
+    });
+  })
 };
 
 const LoadFromFileSystem = function(fileId, directory, cb) {
@@ -116,13 +141,21 @@ const DeleteFromFileSystem = function(fileId, directory, hasFile, cb) {
 };
 
 class FileController {
+  sOptions = {}; // storage options
+  configs = {};
+  
   constructor() { }
 
-  static setConfig(moduleName, config) {
-    configs[moduleName] = config;
+  getOptionByName = function(moduleName) {
+    return this.sOptions[moduleName] || defaultSOption;
+  };
+  getConfigByName = function(moduleName) {
+    return this.configs[moduleName] || {  owner: {enable: true, type: 'module'} };
+  };
+  setConfig(moduleName, config) {
+    this.configs[moduleName] = config;
   }
-
-  static setOption(moduleName, option) {
+  setOption(moduleName, option) {
     switch (option.storage) {
       case 'fs':
         if (!option.directory) {
@@ -143,13 +176,13 @@ class FileController {
       default:
         console.error("File Server: storage type is not supported:", option.storage);
     }
-    sOptions[moduleName] = option;
+    this.sOptions[moduleName] = option;
   }
 
-  static async Create(req, res, next) {
+  async Create(req, res, next) {
     let moduleName = req.mddsModuleName;
-    let sOption = getOptionByName(moduleName);
-    let owner = getConfigByName(moduleName).owner;
+    let sOption = this.getOptionByName(moduleName);
+    let owner = this.getConfigByName(moduleName).owner;
     const files = Object.values(req.files); //[mfile1, mfile2, ... ]
 
     let fileID = req.params["fileID"];
@@ -188,12 +221,16 @@ class FileController {
       _id: "doesn't exist"
     };
     let thumbnail;
-    try {
-      const dimensions = sizeOf(file.data);
-      let options = { height: 160, width: Math.floor(160 * dimensions.width / dimensions.height), responseType: 'buffer' };
-      thumbnail = await imageThumbnail(file.data.toString('base64'), options);
-    } catch (err) {
-      console.log("thumbnail create error: ", err);
+  
+    if (fo.type.startsWith('image/')) {
+      // generate thumbnail for image files
+      try {
+        const dimensions = sizeOf(file.data);
+        let options = { height: 160, width: Math.floor(160 * dimensions.width / dimensions.height), responseType: 'buffer' };
+        thumbnail = await imageThumbnail(file.data.toString('base64'), options);
+      } catch (err) {
+        console.log("thumbnail create error: ", err);
+      }
     }
     fo.hasThumbnail = !!thumbnail;
     if (owner && owner.enable) {
@@ -202,7 +239,8 @@ class FileController {
     if (fileID) {
       fo._id = fileID;
       filter._id = fileID;
-    } 
+    }
+    let savedDocId;
     try {
       let savedDoc;
       if (skipDb) {
@@ -219,6 +257,7 @@ class FileController {
         }
       }
 
+      savedDocId = savedDoc._id;
       const doc = {
         _id: savedDoc._id,
         name: savedDoc.name,
@@ -226,39 +265,47 @@ class FileController {
         size: savedDoc.size,
         md5: savedDoc.md5
       };
+      let fsFileName = doc._id.toString();
+      let fsFileNameThumbnail = doc._id.toString() + '_thumbnail';
+
+      let fsDirecotry = sOption.directory;
+      let downloadLink = sOption.linkRoot + '/download/' + fsFileName;
+
+      if (owner && owner.type === 'user') {
+        // user specific files will store under 'users/<user_id>/original_file.name'
+        fsFileName = doc.name;
+        fsFileNameThumbnail = doc.name + '_thumbnail';
+        fsDirecotry = path.join(sOption.directory, 'users', getUserId(req));
+
+        downloadLink = sOption.linkRoot + '/download/' + 'users/' + getUserId(req) + '/' + fsFileName;
+      }
+
       if (sOption && sOption.storage == 'fs') {
-        StoreToFileSystem(file, doc._id.toString(), sOption.directory, (err, result) => {
-          if (err) {
-            if (!skipDb) {
-              File.findByIdAndDelete(doc._id).exec();
-            }
-            return next(err);
-          }
-          StoreThumbnailToFileSystem(thumbnail, doc._id.toString() + '_thumbnail', sOption.directory, (err, result) => {
-            if (err) {
-              if (!skipDb) {
-                File.findByIdAndDelete(doc._id).exec();
-              }
-              return next(err);
-            }
-            savedDoc.link = sOption.linkRoot + '/download/' + doc._id.toString();
-            if (!skipDb) {
-              savedDoc.save();
-            }
-            doc.link = savedDoc.link;
-            return res.send(doc);
-          });
-        });
+        await StoreToFileSystem(file, fsFileName, fsDirecotry);
+
+        savedDoc.link = downloadLink;
+        doc.link = savedDoc.link;
+        if (!skipDb) {
+          savedDoc.save();
+        }
+        if (!!thumbnail) {
+          await StoreThumbnailToFileSystem(thumbnail, fsFileNameThumbnail, fsDirecotry);
+        }
+        return res.send(doc);
       }
     } catch (err) {
+      if (!skipDb && savedDocId) {
+        File.findByIdAndDelete(savedDocId).exec();
+      }
       return next(err);
     }
   }
   
-  static Download(req, res, next) {
+  Download(req, res, next) {
     let moduleName = req.mddsModuleName;
-    let sOption = getOptionByName(moduleName);
+    let sOption = this.getOptionByName(moduleName);
     let fileName = req.params["fileID"];
+    console.log('fileName====', fileName);
     let id = fileName;
     let thumbnail = false;
     if (fileName.endsWith('_thumbnail')) {
@@ -299,11 +346,36 @@ class FileController {
         loadAll(fileName, sOption.directory);
       }
     }
-
   }
-  static Delete(req, res, next) {
+
+  DownloadUsers(req, res, next) {
     let moduleName = req.mddsModuleName;
-    let sOption = getOptionByName(moduleName);
+    let sOption = this.getOptionByName(moduleName);    
+    let filePath = req.originalUrl.split('/download/users/')[1];
+    
+    let [userId, fileName] = filePath.split('/');
+    fileName = decodeURI(fileName);
+    let directory = path.join(sOption.directory, 'users', userId);
+    
+    res.setHeader("Cache-Control", "public, max-age=2592000");
+    res.setHeader("Expires", new Date(Date.now() + 2592000000).toUTCString());
+
+    function loadAll(filename, directory) {
+      LoadFromFileSystem(filename, directory, (err, data) => {
+        if (err) {
+          return next(err);
+        }
+
+        return res.send(data);
+      });
+    }
+
+    loadAll(fileName, directory);
+  }
+
+  Delete(req, res, next) {
+    let moduleName = req.mddsModuleName;
+    let sOption = this.getOptionByName(moduleName);
     let id = req.params["fileID"];
 
     let skipDb = false;

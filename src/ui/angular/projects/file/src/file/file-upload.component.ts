@@ -1,4 +1,4 @@
-﻿import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+﻿import { Component, EventEmitter, Input, Output, ViewChild, OnChanges } from '@angular/core';
 
 import { forkJoin } from 'rxjs';
 
@@ -9,9 +9,18 @@ import { MddsFileUploadService, UploadStatus} from './file-upload.service';
     templateUrl: 'file-upload.component.html',
     styleUrls: ['file-upload.component.css']
 })
-export class FileUploadComponent {
+export class FileUploadComponent implements OnChanges {
+    @Input() accept: string[] = [];
+      // [] - emptry array means any type.
+      // ['image/*'] - any image file
+      // ['video/*'] - any video file
+      // ['audio/*'] - any audio file
+      // ['application/zip', '.zip']  - zip file
+
+    @Input() isImage: boolean = false;
+
     @Input() downloadUrl: string;
-    @Output() downloadUrlChange = new EventEmitter<string>();
+    @Output() downloadUrlChange: EventEmitter<string[]> = new EventEmitter<string[]>();
     @ViewChild('file', {static: true}) file;
     public files: Set<File> = new Set();
 
@@ -21,10 +30,21 @@ export class FileUploadComponent {
     uploading = false;
     uploadSuccessful = true; // no pending files for upload
     selectNew = false; // select or add
-    localImage: string;
+    localUrl: string;
+    acceptStr: string = '';
+    downloadName: string = '';
+    localName: string = '';
+
 
     constructor(private uploadService: MddsFileUploadService) {}
 
+    ngOnChanges() {
+      this.acceptStr = this.accept.join(',');
+      if (this.downloadUrl) {
+        this.downloadName = this.downloadUrl.substr(this.downloadUrl.lastIndexOf('/')+1);
+      }
+    }
+  
     addFiles() {
       this.file.nativeElement.click();
     }
@@ -41,14 +61,14 @@ export class FileUploadComponent {
         this.progress = undefined;
       }
 
-      const files: { [key: string]: File } = this.file.nativeElement.files;
-      for (const key in files) {
-        if (!isNaN(parseInt(key, 10))) {
-          this.files.add(files[key]);
-        }
+      const files = this.file.nativeElement.files;
+      for (const fl of files) {
+        console.log('type: ', fl.type);
+        this.files.add(fl);
       }
-      if (files['0']) {
-        this.localImage = URL.createObjectURL(files['0']);
+      if (files[0]) {
+        this.localUrl = URL.createObjectURL(files[0]);
+        this.localName = files[0].name;
       }
     }
 
@@ -85,14 +105,16 @@ export class FileUploadComponent {
 
         // ... the upload was successful...
         this.uploadSuccessful = true;
-        this.localImage = null;
+        this.localUrl = null;
 
         // ... and the component is no longer uploading
         this.uploading = false;
 
         for (const key of Object.keys(this.progress)) {
           this.downloadUrl = this.progress[key].result.value.link;
-          this.downloadUrlChange.emit(this.downloadUrl);
+          this.downloadName = this.downloadUrl.substr(this.downloadUrl.lastIndexOf('/')+1);
+
+          this.downloadUrlChange.emit([this.downloadUrl, this.localName]);
           break; // only emit one url
         }
       });

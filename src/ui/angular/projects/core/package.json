@@ -1,9 +1,10 @@
 {
   "name": "@hicoder/angular-core",
-  "version": "0.9.40",
+  "version": "0.9.45",
   "peerDependencies": {
     "@angular/common": "^10.0.2",
-    "@angular/core": "^10.0.2"
+    "@angular/core": "^10.0.2",
+    "@angular/router": "^10.0.2"
   },
   "dependencies": {
     "tslib": "^2.0.0"

@@ -105,6 +105,7 @@ export class MddsRichtextEditorComponent
         },
       },
     };
+    this.validateFn = createValidator(this.required, this.maxlength, this.minlength);
   }
 
   onChange: any = () => {};
@@ -158,8 +159,10 @@ export class MddsRichtextEditorComponent
       "innerHTML",
       this.content
     );
-    $(`#${this.richtextId}`).summernote(this.summerNoteConfig);
-    this.summernoteInit = true;
+    setTimeout(() => {
+      $(`#${this.richtextId}`).summernote(this.summerNoteConfig);
+      this.summernoteInit = true;
+    }, 10);    
   }
 
   getContent(): string[] {

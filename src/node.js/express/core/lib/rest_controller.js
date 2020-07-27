@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const MddsUncategorized = 'MddsUncategorized';
 const MddsAll = 'MddsAll';
 
+const { exportAllExternal } = require('./rest_ctrl_export');
+const { emailAllErrorExternal, emailAllCheckExternal, emailAllExternal } = require('./rest_ctrl_email')
+
 const createRegex = function (obj) {
   const fieldRegex = function (field) {
     return new RegExp(
@@ -29,43 +32,6 @@ var capitalizeFirst = function (str) {
 
 var lowerFirst = function (str) {
   return str.charAt(0).toLowerCase() + str.substr(1);
-};
-
-var camelToDisplay = function (str) {
-  // insert a space before all caps
-  words = [
-    'At',
-    'Around',
-    'By',
-    'After',
-    'Along',
-    'For',
-    'From',
-    'Of',
-    'On',
-    'To',
-    'With',
-    'Without',
-    'And',
-    'Nor',
-    'But',
-    'Or',
-    'Yet',
-    'So',
-    'A',
-    'An',
-    'The',
-  ];
-  let arr = str
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/_/g, ' ')
-    .match(/\S+/g);
-  arr = arr.map((x) => {
-    let y = capitalizeFirst(x);
-    if (words.includes(y)) y = lowerFirst(y);
-    return y;
-  });
-  return capitalizeFirst(arr.join(' '));
 };
 
 function getFieldValue(field) {
@@ -497,6 +463,9 @@ class RestController {
     return [populateArray, populateMap];
   }
 
+  // Handling other MddsActins post request
+  // 1. /mddsaction/emailing
+  // 2. /mddsaction/export
   async PostActionsAll(req, res, next, actionType) {
     let body = req.body;
     if (typeof body === 'string') {
@@ -509,7 +478,7 @@ class RestController {
 
     if (actionType === '/mddsaction/emailing') {
       try {
-        this.emailAllCheck(req);
+        emailAllCheckExternal(req, this);
       } catch (err) {
         return next(err);
       }
@@ -530,17 +499,15 @@ class RestController {
       req.query['__per_page'] = String(PER_PAGE);
       let output;
       try {
-        output = await this.searchAll(req, res, next, searchContext, true); // set furtherAction parameter to true
-        if (!output.page) {
-          // not expected result. must be next() called by searchAll. Just return it.
-          return output;
-        }
+        const [o, items] = await this.searchAllExec(req, searchContext);
+        output = o;
+        output.items = items; // un-reduced items
       } catch (err) {
         //handle DB query error
         if (actionType === '/mddsaction/export') {
           return next(err);
         } else if (actionType === '/mddsaction/emailing') {
-          return this.emailAllError(req, res, next, emailAllResult, err);
+          return emailAllErrorExternal(req, res, next, emailAllResult, err);
         }
       }
 
@@ -555,7 +522,7 @@ class RestController {
           emailAllResult.queuing += result.queuing;
           emailAllResult.error = result.error;
         } catch (err) {
-          return this.emailAllError(req, res, next, emailAllResult, err);
+          return emailAllErrorExternal(req, res, next, emailAllResult, err);
         }
       }
       let { page, total_pages, total_count } = output;
@@ -574,274 +541,15 @@ class RestController {
     return next(createError(400, `Action ${actionType} not supported.`));
   }
 
-  emailAllError(req, res, next, emailAllResult, err) {
-    if (emailAllResult.success + emailAllResult.fail + emailAllResult.queuing > 0) {
-      emailAllResult.error = err;
-      return res.send(emailAllResult);
-    }
-    return next(err);
-  }
-  // throw error, return actionData
-  emailAllCheck(req) {
-    let body = req.body;
-    if (typeof body === 'string') {
-      try {
-        body = JSON.parse(body);
-      } catch (e) {
-        throw createError(400, 'Bad document in body.');
-      }
-    }
-    const actionData = body ? body.actionData : {};
-
-    const {
-      emailInput,
-      emailTemplate,
-      subject,
-      content,
-      emailFields,
-    } = actionData;
-
-    let badRequest = false;
-    if (emailInput === 'template') {
-      if (!emailTemplate) {
-        badRequest = true;
-      }
-    } else if (emailInput === 'compose') {
-      if (!subject || !content) {
-        badRequest = true;
-      }
-    } else {
-      badRequest = true;
-    }
-
-    if (badRequest) {
-      throw createError(400, 'Bad action data for emailing');
-    }
-
-    const { emailer, emailerObj } = this.mddsProperties || {};
-    if (!emailer) {
-      throw createError(503, 'Emailing service is not available');
-    }
-    return actionData;
-  }
-
   async emailAll(req, rows) {
-    const {
-      emailInput,
-      emailTemplate,
-      subject,
-      content,
-      emailFields,
-    } = this.emailAllCheck(req);
-
-    const { emailer, emailerObj, replacement } = this.mddsProperties || {};
-
-    const recipients = [];
-    const substitutions = [];
-    for (let i = 0; i < rows.length; i++) {
-      for (let j = 0; j < emailFields.length; j++) {
-        const emailField = emailFields[j];
-        const eml = rows[i][emailField];
-        if (eml) {
-          recipients.push(eml);
-          substitutions.push(rows[i]);
-        }
-      }
-    }
-
-    // filter emails and send
-    try {
-      let result;
-      if (emailInput === 'template') {
-        result = await emailer.sendEmailTemplate(
-          recipients,
-          emailTemplate,
-          replacement || emailerObj || {},
-          substitutions,
-        );
-      } else {
-        result = await emailer.sendEmail(
-          undefined,
-          recipients,
-          subject,
-          content,
-          replacement || emailerObj || {},
-          substitutions,
-        );
-      }
-      // result: {success: 1, fail: 0, queuing: 1, errors: []}
-      let err = new Error(`Email send failed: unknown error.`);
-      if (result.errors.length > 0 ) {
-        err = result.errors[0];
-      }
-      if (result.success + result.fail + result.queuing > 0) {
-        return {
-          success: result.success,
-          queuing: result.queuing,
-          fail: result.fail,
-          error: err,
-        };
-      } else {
-        throw err;
-      }
-    } catch (err2) {
-      throw (err2);
-    }
+    return await emailAllExternal(req, rows, this);
   }
 
   exportAll(req, res, next, rows) {
-    const {
-      name,
-      schema,
-      model,
-      views,
-      populates,
-      owner,
-      mraBE,
-    } = this.loadContextVars(req);
-
-    let __asso = req.query['__asso'] || undefined;
-    let __ignore = req.query['__ignore'] || undefined;
-
-    const briefView = views[0];
-
-    //header field name for exported
-    let headers = briefView.split(' ');
-    let assoHeaders;
-    if (__asso) {
-      for (let p of populates.briefView) {
-        //an array, with [field, ref]
-        if (p[0] === __asso) {
-          let assoSchema = p[1];
-          const refViews = this.getPopulatesRefFields(assoSchema);
-
-          assoHeaders = refViews[1].split(' ');
-
-          headers = headers.filter((x) => x !== __asso);
-          break;
-        }
-      }
-    }
-    if (__ignore) {
-      headers = headers.filter((x) => x !== __ignore);
-    }
-    let combinedHeaders = headers.concat(assoHeaders);
-
-    let combinedRows = [];
-    for (let r of rows) {
-      const ro = [];
-
-      for (let hf of headers) {
-        ro.push(getFieldValue(r[hf]));
-      }
-
-      let asf = r[__asso];
-      if (!Array.isArray(asf)) {
-        asf = [asf];
-      }
-      for (let as of asf) {
-        let asr = [];
-        for (let af of assoHeaders) {
-          asr.push(getFieldValue(as[af]));
-        }
-        combinedRows.push(ro.concat(asr));
-      }
-    }
-
-    // console.log('combinedHeaders, ', combinedHeaders);
-    // console.log('combinedRows, ', combinedRows);
-    // return res.send(headers);
-
-    const excel = require('node-excel-export');
-
-    const styles = {
-      headerGray: {
-        fill: {
-          fgColor: {
-            rgb: 'D3D3D3FF',
-          },
-        },
-        font: {
-          color: {
-            rgb: '000000FF', // Blue fount
-          },
-          sz: 14,
-          bold: true,
-          underline: true,
-        },
-      },
-      headerDark: {
-        fill: {
-          fgColor: {
-            rgb: 'FF000000',
-          },
-        },
-        font: {
-          color: {
-            rgb: 'FFFFFFFF',
-          },
-          sz: 14,
-          bold: true,
-          underline: true,
-        },
-      },
-      cellPink: {
-        fill: {
-          fgColor: {
-            rgb: 'FFFFCCFF',
-          },
-        },
-      },
-      cellGreen: {
-        fill: {
-          fgColor: {
-            rgb: 'FF00FF00',
-          },
-        },
-      },
-    };
-
-    const heading = [[{ value: `${name}`, style: styles.headerGray }]];
-
-    const specifications = {};
-    for (let f of combinedHeaders) {
-      specifications[f] = {
-        displayName: f,
-        headerStyle: styles.headerGray,
-        width: '25', // width in chars (passed as string)
-      };
-    }
-
-    const dataset = combinedRows.map((x) => {
-      const obj = {};
-      for (let [i, f] of combinedHeaders.entries()) {
-        obj[f] = x[i];
-      }
-      return obj;
-    });
-
-    // Create the excel report.
-    // This function will return Buffer
-    const report = excel.buildExport([
-      // <- Notice that this is an array. Pass multiple sheets to create multi sheet report
-      {
-        name: 'Report', // <- Specify sheet name (optional)
-        heading: heading, // <- Raw heading array (optional)
-        // merges: merges, // <- Merge cell ranges
-        specification: specifications, // <- Report specification
-        data: dataset, // <-- Report data
-      },
-    ]);
-
-    const fileName =
-      `${name}-` + Date.now() + (Math.random() * 100).toFixed(2) + '.xlsx';
-
-    // You can then return this straight
-    res.attachment(`${fileName}`); // This is sails.js specific (in general you need to set headers)
-    return res.send(report);
+    return exportAllExternal(req, res, next, rows, this);
   }
 
-  async searchAll(req, res, next, searchContext, furtherAction) {
+  async searchAllExec(req, searchContext) {
     const {
       name,
       schema,
@@ -1094,7 +802,7 @@ class RestController {
 
           // db.someCollection.aggregate([{ $match: { age: { $gte: 21 }}}, {"$group" : {_id:"$source", count:{$sum:1}}} ])
         } catch (err) {
-          return next(err);
+          throw (err);
         }
       }
 
@@ -1122,7 +830,7 @@ class RestController {
     try {
       count = await model.countDocuments(query).exec();
     } catch (err) {
-      return next(err);
+      throw (err);
     }
 
     const [perPage, pageNum, maxPageNum, skipCount] = processPages(
@@ -1167,14 +875,20 @@ class RestController {
         categoriesBrief2: categoryObjectsBriefAll[1],
       };
       output = JSON.parse(JSON.stringify(output));
-      if (furtherAction) {
-        //return un-reduced items
-        return output; // export, return data to caller;
-      }
 
+      const items = output.items;
       output.items = resultReducerForRef(output.items, populateMap);
       output.items = resultReducerForView(output.items, briefView);
 
+      return [output, items];
+    } catch (err) {
+      throw (err);
+    }
+  }
+
+  async searchAll(req, res, next, searchContext) {
+    try {
+      const [output, items] = await this.searchAllExec(req, searchContext);
       return res.send(output);
     } catch (err) {
       return next(err);
@@ -1344,7 +1058,8 @@ class RestController {
       });
     });
   }
-  getDetailsById(req, res, next) {
+
+  async getDetailsByIdExec(req) {
     const {
       name,
       schema,
@@ -1384,16 +1099,23 @@ class RestController {
       //dbExec = dbExec.populate(p);
       dbExec = dbExec.populate(p.path); //only give the reference path. return everything for reference
     }
-    dbExec.exec(function (err, result) {
-      if (err) {
-        return next(err);
-      }
-      result = JSON.parse(JSON.stringify(result));
-      result = resultReducerForRef(result, populateMap);
-      result = resultReducerForView(result, detailView);
-      return res.send(result);
-    });
+    let result = await dbExec.exec();
+  
+    result = JSON.parse(JSON.stringify(result));
+    let reducedResult = resultReducerForRef(result, populateMap);
+    reducedResult = resultReducerForView(reducedResult, detailView);
+    return [reducedResult, result];
   }
+
+  async getDetailsById(req, res, next) {
+    try {
+      let [reducedResult, result] = await this.getDetailsByIdExec(req);
+      return res.send(reducedResult);
+    } catch (err) {
+      return next(err);
+    }
+  }
+
   HardDeleteById(req, res, next) {
     const {
       name,
@@ -1413,51 +1135,7 @@ class RestController {
       return res.send();
     });
   }
-  PostActions(req, res, next) {
-    /*
-    if (req.query) {
-        action = req.query['action'];
-    }
-    */
-    let body = req.body;
-    if (typeof body === 'string') {
-      try {
-        body = JSON.parse(body);
-      } catch (e) {
-        return next(createError(400, 'Bad document in body.'));
-      }
-    }
-    let action = req.path;
-    let ids;
-    switch (action) {
-      case '/mddsaction/delete':
-        ids = body;
-        this.deleteManyByIds(req, res, next, ids);
-        break;
-      case '/mddsaction/archive':
-        ids = body;
-        this.archiveManyByIds(req, res, next, ids);
-        break;
-      case '/mddsaction/unarchive':
-        ids = body;
-        this.unarchiveManyByIds(req, res, next, ids);
-        break;
-      case '/mddsaction/getfieldvalues':
-        let fieldValueSearch = body ? body.fieldValueSearch : {};
-        this.searchFieldValues(req, res, next, fieldValueSearch);
-        break;
-      case '/mddsaction/get':
-        let searchContext = body ? body.search : {};
-        this.searchAll(req, res, next, searchContext);
-        break;
-      default:
-        if (action.startsWith('/mddsaction/')) {
-          this.PostActionsAll(req, res, next, action);
-        } else {
-          return next(createError(404, 'Bad Action: ' + action));
-        }
-    }
-  }
+
   deleteManyByIds(req, res, next, ids) {
     const {
       name,
@@ -1509,7 +1187,7 @@ class RestController {
       return res.send();
     });
   }
-  Create(req, res, next) {
+  async CreateExec(req) {
     const {
       name,
       schema,
@@ -1524,18 +1202,25 @@ class RestController {
       try {
         body = JSON.parse(body);
       } catch (e) {
-        return next(createError(400, 'Bad ' + name + ' document.'));
+        throw createError(400, 'Bad ' + name + ' document.');
       }
     }
     body = ownerPatch(body, owner, req);
-    model.create(body, (err, result) => {
-      if (err) {
-        return next(err);
-      }
-      this.handleInsertHooks(result, mraBE);
-      return res.send(result);
-    });
+    let result = await model.create(body); 
+    this.handleInsertHooks(result, mraBE);
+    return result;
   }
+
+  async Create(req, res, next) {
+    let result;
+    try {
+      result = await this.CreateExec(req);
+      res.send(result);
+    } catch (err) {
+      return next(err);
+    }
+  }
+
   Update(req, res, next) {
     const {
       name,
@@ -1612,6 +1297,84 @@ class RestController {
       });
     }
   }
+
+  PostActions(req, res, next) {
+    /*
+    if (req.query) {
+        action = req.query['action'];
+    }
+    */
+    let body = req.body;
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        return next(createError(400, 'Bad document in body.'));
+      }
+    }
+    let action = req.path;
+    let ids;
+    switch (action) {
+      case '/mddsaction/delete':
+        ids = body;
+        this.deleteManyByIds(req, res, next, ids);
+        break;
+      case '/mddsaction/archive':
+        ids = body;
+        this.archiveManyByIds(req, res, next, ids);
+        break;
+      case '/mddsaction/unarchive':
+        ids = body;
+        this.unarchiveManyByIds(req, res, next, ids);
+        break;
+      case '/mddsaction/getfieldvalues':
+        let fieldValueSearch = body ? body.fieldValueSearch : {};
+        this.searchFieldValues(req, res, next, fieldValueSearch);
+        break;
+      case '/mddsaction/get':
+        let searchContext = body ? body.search : {};
+        this.searchAll(req, res, next, searchContext);
+        break;
+      default:
+        if (action.startsWith('/mddsaction/')) {
+          this.PostActionsAll(req, res, next, action);
+        } else {
+          return next(createError(404, 'Bad Action: ' + action));
+        }
+    }
+  }
+
+  zInterfaceCall(req, res, next) {
+    if (!req.zInterface) {
+      return next(createError(400, 'Bad Request: interface not defined'));
+    }
+    let ifname = req.zInterface.name;
+    let action = req.zInterface.action;
+    const {
+      name,
+      schema,
+      model,
+      views,
+      populates,
+      owner,
+      mraBE,
+    } = this.loadContextVars(req);
+
+    if (!mraBE || !mraBE.zInterfaces
+      || !mraBE.zInterfaces[action]) {
+      return next(createError(400, `Bad Request: ${action} interface not defined: ${ifname}`));
+    }
+    const targetInterfaces = mraBE.zInterfaces[action].filter(x => {
+      if (x.name === ifname) return true;
+      return false;
+    });
+    if (targetInterfaces.length === 0) {
+      return next(createError(400, `Bad Request: ${action} interface not defined: ${ifname}`));
+    }
+    const fn =  targetInterfaces[0].fn;
+    return fn(req, res, next, this);
+  }
+
   //Return a promise.
   ModelExecute(modelName, apiName, ...params) {
     const modelname = modelName.toLowerCase();
