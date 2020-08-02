@@ -24,7 +24,7 @@ export class <%-SchemaName%>ListSelectComponent extends <%-SchemaName%>ListCompo
         public route: ActivatedRoute,
         public location: Location
         ) {
-            super(<%if (schemaHasRef) {%>null,<%}%><%-schemaName%>Service, injector, router, route, location);
+            super(<%if (sFeatures.hasRef) {%>null,<%}%><%-schemaName%>Service, injector, router, route, location);
             this.majorUi = false;
             this.itemMultiSelect = false;
     }

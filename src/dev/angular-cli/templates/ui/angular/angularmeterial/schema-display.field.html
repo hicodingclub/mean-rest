@@ -32,7 +32,7 @@
                     let fmraT = field.mraType;
                     %>  {{detail['<%-fn%>']? (detail['<%-fn%>']['originalValue'] | date:'<%-fmraT%>') : ''}}<%_
                 } else if (ft === 'SchemaArray') {
-                        if (field.enumValues && field.elementUnique) {%>
+                        if (field.elementMultiSelect) {%>
                     <mat-chip-list aria-label="<%-field.displayName%>" *ngIf="detail['<%-fn%>']">
                         <ng-template ngFor let-element [ngForOf]="enums['<%-fn%>']" let-idx="index">
                             <mat-chip *ngIf="detail['<%-fn%>']['selection'][element]">{{element}}</mat-chip>
@@ -109,34 +109,3 @@
                         [<%-input.key%>]="<%-input.value%>"<%}%>>
                     </<%-sel.selector%>><%
                 } else {%>{{<%-fieldValue%>}} <%}%>
-
-
-
-
-{
-    "body":{
-        "took":12,
-        "timed_out":false,
-        "_shards":{"total":1,"successful":1,"skipped":0,"failed":0},
-        "hits":{
-            "total":{"value":10000,"relation":"gte"},
-            "max_score":0.869974,
-            "hits":[
-                {"_index":"las20200710","_type":"_doc","_id":"vCKkOXMBVP9aYKuLh74K","_score":0.869974,"_source":{"case_node":"node-1289e9bac09d","@version":"1","log":{"offset":1917655,"file":{"path":"/home/ubuntu/data/debug-logs_20200604-215630/var/log/messages.1"}},"case_id":"debug-ef0897d012f","tags":["las_messages","beats_input_codec_plain_applied"],"message":"2020-06-03T11:15:55.337177+08:00 INFO tast[14473]: video.MTBF016PlaybackDailymotionHTML5: Creating virtual mouse device \"Tast virtual mouse 14473.6\"","@timestamp":"2020-06-03T03:15:55.337Z","program":"tast","level":"INFO","input":{"type":"log"},"case_date":"las20200710"}},
-                {"_index":"las20200710","_type":"_doc","_id":"oiKkOXMBVP9aYKuLjsaP","_score":0.869974,"_source":{"case_node":"node-1289e9bac09d","@version":"1","case_id":"debug-ef0897d012f","tags":["las_messages","beats_input_codec_plain_applied"],"log":{"offset":1785558,"file":{"path":"/home/ubuntu/data/debug-logs_20200604-215630/var/log/messages"}},"message":"2020-06-04T11:24:00.642237+08:00 INFO tast[3908]: video.MTBF016PlaybackDailymotionHTML5: Creating virtual mouse device \"Tast virtual mouse 3908.3\"","@timestamp":"2020-06-04T03:24:00.642Z","program":"tast","level":"INFO","input":{"type":"log"},"case_date":"las20200710"}},
-                {"_index":"las20200710","_type":"_doc","_id":"tyKkOXMBVP9aYKuLjsaP","_score":0.869974,"_source":{"case_node":"node-1289e9bac09d","@version":"1","case_id":"debug-ef0897d012f","tags":["las_messages","beats_input_codec_plain_applied"],"log":{"offset":1788160,"file":{"path":"/home/ubuntu/data/debug-logs_20200604-215630/var/log/messages"}},"message":"2020-06-04T11:24:31.079085+08:00 INFO tast[3908]: video.MTBF016PlaybackDailymotionHTML5: Creating virtual mouse device \"Tast virtual mouse 3908.6\"","@timestamp":"2020-06-04T03:24:31.079Z","program":"tast","level":"INFO","input":{"type":"log"},"case_date":"las20200710"}},
-                {"_index":"las20200710","_type":"_doc","_id":"yiKkOXMBVP9aYKuLrurC","_score":0.869974,"_source":{"case_node":"node-1289e9bac09d","@version":"1","case_id":"debug-ef0897d012f","log":{"offset":2670508,"file":{"path":"/home/ubuntu/data/debug-logs_20200604-215630/var/log/messages"}},"tags":["las_messages","beats_input_codec_plain_applied"],"message":"2020-06-04T12:12:19.422691+08:00 INFO tast[25332]: video.MTBF016PlaybackDailymotionHTML5: Creating virtual mouse device \"Tast virtual mouse 25332.1\"","@timestamp":"2020-06-04T04:12:19.422Z","program":"tast","level":"INFO","input":{"type":"log"},"case_date":"las20200710"}},
-                {"_index":"las20200710","_type":"_doc","_id":"0SKkOXMBVP9aYKuLrurC","_score":0.869974,"_source":{"case_node":"node-1289e9bac09d","@version":"1","log":{"offset":2671285,"file":{"path":"/home/ubuntu/data/debug-logs_20200604-215630/var/log/messages"}},"tags":["las_messages","beats_input_codec_plain_applied"],"case_id":"debug-ef0897d012f","message":"2020-06-04T12:12:29.969316+08:00 INFO tast[25332]: video.MTBF016PlaybackDailymotionHTML5: Creating virtual mouse device \"Tast virtual mouse 25332.2\"","@timestamp":"2020-06-04T04:12:29.969Z","program":"tast","level":"INFO","input":{"type":"log"},"case_date":"las20200710"}},
-                {"_index":"las20200710","_type":"_doc","_id":"2CKkOXMBVP9aYKuLrurC","_score":0.869974,"_source":{"case_node":"node-1289e9bac09d","@version":"1","log":{"offset":2672227,"file":{"path":"/home/ubuntu/data/debug-logs_20200604-215630/var/log/messages"}},"tags":["las_messages","beats_input_codec_plain_applied"],"case_id":"debug-ef0897d012f","message":"2020-06-04T12:12:40.187405+08:00 INFO tast[25332]: video.MTBF016PlaybackDailymotionHTML5: Creating virtual mouse device \"Tast virtual mouse 25332.3\"","@timestamp":"2020-06-04T04:12:40.187Z","program":"tast","level":"INFO","input":{"type":"log"},"case_date":"las20200710"}},
-                {"_index":"las20200710","_type":"_doc","_id":"3iKkOXMBVP9aYKuLrurC","_score":0.869974,"_source":{"case_node":"node-1289e9bac09d","@version":"1","case_id":"debug-ef0897d012f","tags":["las_messages","beats_input_codec_plain_applied"],"log":{"offset":2673003,"file":{"path":"/home/ubuntu/data/debug-logs_20200604-215630/var/log/messages"}},"message":"2020-06-04T12:12:50.428832+08:00 INFO tast[25332]: video.MTBF016PlaybackDailymotionHTML5: Creating virtual mouse device \"Tast virtual mouse 25332.4\"","@timestamp":"2020-06-04T04:12:50.428Z","program":"tast","level":"INFO","input":{"type":"log"},"case_date":"las20200710"}},
-                {"_index":"las20200710","_type":"_doc","_id":"5CKkOXMBVP9aYKuLrurC","_score":0.869974,"_source":{"case_node":"node-1289e9bac09d","@version":"1","log":{"offset":2673779,"file":{"path":"/home/ubuntu/data/debug-logs_20200604-215630/var/log/messages"}},"tags":["las_messages","beats_input_codec_plain_applied"],"case_id":"debug-ef0897d012f","message":"2020-06-04T12:13:00.615665+08:00 INFO tast[25332]: video.MTBF016PlaybackDailymotionHTML5: Creating virtual mouse device \"Tast virtual mouse 25332.5\"","@timestamp":"2020-06-04T04:13:00.615Z","program":"tast","level":"INFO","input":{"type":"log"},"case_date":"las20200710"}},
-                {"_index":"las20200710","_type":"_doc","_id":"6yKkOXMBVP9aYKuLrurC","_score":0.869974,"_source":{"case_node":"node-1289e9bac09d","@version":"1","log":{"offset":2674721,"file":{"path":"/home/ubuntu/data/debug-logs_20200604-215630/var/log/messages"}},"tags":["las_messages","beats_input_codec_plain_applied"],"case_id":"debug-ef0897d012f","message":"2020-06-04T12:13:10.729068+08:00 INFO tast[25332]: video.MTBF016PlaybackDailymotionHTML5: Creating virtual mouse device \"Tast virtual mouse 25332.6\"","@timestamp":"2020-06-04T04:13:10.729Z","program":"tast","level":"INFO","input":{"type":"log"},"case_date":"las20200710"}},
-                {"_index":"las20200710","_type":"_doc","_id":"3yKkOXMBVP9aYKuLvv6T","_score":0.869974,"_source":{"case_node":"node-1289e9bac09d","@version":"1","case_id":"debug-ef0897d012f","log":{"offset":3582335,"file":{"path":"/home/ubuntu/data/debug-logs_20200604-215630/var/log/messages.1"}},"tags":["las_messages","beats_input_codec_plain_applied"],"message":"2020-06-03T12:42:21.058812+08:00 INFO tast[30575]: video.MTBF016PlaybackDailymotionHTML5: Creating virtual mouse device \"Tast virtual mouse 30575.1\"","@timestamp":"2020-06-03T04:42:21.058Z","program":"tast","level":"INFO","input":{"type":"log"},"case_date":"las20200710"}}
-            ]
-        }
-    },
-    "statusCode":200,
-    "headers":{"content-type":"application/json; charset=UTF-8","content-length":"6399"},
-    "warnings":null,
-    "meta":{"context":null,"request":{"params":{"method":"POST","path":"/las20200710/_search","body":"{\"query\":{\"match\":{\"message\":\"tast\"}}}","querystring":"","headers":{"user-agent":"elasticsearch-js/7.8.0 (linux 4.15.0-1065-aws-x64; Node.js v13.14.0)","content-type":"application/json","content-length":"38"},"timeout":30000},"options":{"warnings":null},"id":1},"name":"elasticsearch-js","connection":{"url":"http://localhost:9200/","id":"http://localhost:9200/","headers":{},"deadCount":0,"resurrectTimeout":0,"_openRequests":0,"status":"alive","roles":{"master":true,"data":true,"ingest":true,"ml":false}},"attempts":0,"aborted":false}
-}

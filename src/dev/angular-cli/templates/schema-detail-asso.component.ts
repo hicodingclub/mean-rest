@@ -6,7 +6,7 @@ import { Injector } from '@angular/core';
 import { <%-SchemaName%>Component, ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
-<%if (schemaHasRef) {%>
+<%if (sFeatures.hasRef) {%>
 import { ComponentFactoryResolver } from '@angular/core';<%}%>
 
 @Component({
@@ -22,13 +22,13 @@ export class <%-SchemaName%>AssoComponent extends <%-SchemaName%>Component imple
   public associationField: string;
 
   constructor(
-      <%if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
+      <%if (sFeatures.hasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
       public <%-schemaName%>Service: <%-SchemaName%>Service,
       public injector: Injector,
       public router: Router,
       public route: ActivatedRoute,
       public location: Location) {
-          super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
+          super(<%if (sFeatures.hasRef) {%>componentFactoryResolver,<%}%>
                 <%-schemaName%>Service, injector, router, route, location);
           this.view = ViewType.DETAIL;
 <% let theView = detailView; let isEditView = false;%><%_ include schema-construct.component.ts %>

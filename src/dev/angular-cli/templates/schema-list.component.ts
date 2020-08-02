@@ -7,7 +7,7 @@ import { <%-SchemaName%>ListCustComponent } from '../../../<%-moduleName%>-cust/
 import { ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
-<%if (schemaHasRef) {%>
+<%if (sFeatures.hasRef) {%>
 import { ComponentFactoryResolver } from '@angular/core';<%}%>
   
 @Component({
@@ -16,7 +16,7 @@ import { ComponentFactoryResolver } from '@angular/core';<%}%>
   styleUrls: ['./<%-schemaName%>-list.component.css']
 })
 export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustComponent implements OnInit {
-  <%_ if (schemaHasDate) { %>
+  <%_ if (sFeatures.hasDate) { %>
   public minDate = {year: (new Date()).getFullYear() - 100, month: 1, day: 1};<%}%>
 
   // @Input() options: any; {disableCatetory: false, disablePagination: false, disbleActionButtons: false
@@ -32,13 +32,13 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustCompone
   // public categoryBy:string; //field name whose value is used as category
 
   constructor(
-      <% if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
+      <% if (sFeatures.hasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
       public <%-schemaName%>Service: <%-SchemaName%>Service,
       public injector: Injector,
       public router: Router,
       public route: ActivatedRoute,
       public location: Location) {
-          super(<%if (schemaHasRef) {%>componentFactoryResolver,<%}%>
+          super(<%if (sFeatures.hasRef) {%>componentFactoryResolver,<%}%>
                 <%-schemaName%>Service, injector, router, route, location);
           this.view = ViewType.LIST;
 <% let theView = briefView; %><%_ include schema-construct.component.ts %>
@@ -97,7 +97,7 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustCompone
 
   static getInstance() {
     //used by others to call some common functions
-    return new <%-SchemaName%>ListComponent(<%_ if (schemaHasRef) {%>null, <%}%>null, null, null, null, null);
+    return new <%-SchemaName%>ListComponent(<%_ if (sFeatures.hasRef) {%>null, <%}%>null, null, null, null, null);
   }
 }
 

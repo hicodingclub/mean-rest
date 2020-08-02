@@ -35,11 +35,11 @@ const TEMPLATE_DIR = path.join(__dirname, '..', 'templates');
 const VERSION = require('../package').version;
 
 const { Selectors } = require('./selectors');
+const { getNewFeatures } = require('./features');
+
+const logger = require('./log');
 
 const ROOTDIR = __dirname.replace(/bin$/, 'templates');
-
-let warningNumber = 0;
-let errorNumber = 0;
 
 const _exit = process.exit;
 
@@ -107,7 +107,12 @@ const camelToDisplay = function (str) {
 const templates = {
   //key:[template_file, output_file_suffix, description, write_options]
   //write_options: W: write, A: append
-  angular: ['../templates/ui/angular/mdds.angular.json', 'mdds.angular.json', 'angular configuration file', 'W'],
+  angular: [
+    '../templates/ui/angular/mdds.angular.json',
+    'mdds.angular.json',
+    'angular configuration file',
+    'W',
+  ],
 
   conf: ['../templates/conf.ts', '.conf.ts', 'module conf file', 'A'],
   tokensValue: [
@@ -515,13 +520,9 @@ const generateSourceFile = function (keyname, template, renderObj, outputDir) {
   //console.info('Generating %s for '%s'...', description, keyname);
   ejs.renderFile(templateFile, renderObj, renderOptions, (err, str) => {
     if (err) {
-      console.error(
-        'ERROR! Error happens when generating %s for %s: %s',
-        description,
-        keyname,
-        err
+      logger.error(
+        `ERROR! Error happens when generating ${description} for ${keyname}: ${err}`
       );
-      increaseError();
       return;
     }
 
@@ -556,91 +557,90 @@ const generateSourceFile = function (keyname, template, renderObj, outputDir) {
 };
 
 const getPrimitiveField = function (fieldSchema) {
-  let type;
-  let jstype;
-  let defaultValue;
-  let numberMin, numberMax;
-  let maxlength, minlength;
-  let enumValues;
-  let ref, Ref, RefCamel;
-  let editor = false;
-  let mraType = ''; // if this is URL link
-  let textarea = false;
-  let currency = false;
-  let requiredField = false;
-  let mraEmailRecipient = false; // if this email can be used by sendEmail Action
+  let primitiveField = {
+    type: fieldSchema.constructor.name,
+    defaultValue: fieldSchema.options.default,
 
-  let flagDate = false;
-  let flagRef = false;
-  let flagPicture = false;
-  let aspectRatio;
-  let flagFile = false;
-  let flagSharable = false;
+    jstype: undefined,
+    numberMin: undefined,
+    numberMax: undefined,
+    maxlength: undefined,
+    minlength: undefined,
+    enumValues: undefined,
+    ref: undefined,
+    Ref: undefined,
+    RefCamel: undefined,
+    editor: false,
+    mraType: '',
+    textarea: false,
+    mraEmailRecipient: false,
+    flagDate: false,
+    flagRef: false,
+    flagPicture: false,
+    aspectRatio: undefined,
+    flagFile: false,
+    flagSharable: false,
+  };
 
-  type = fieldSchema.constructor.name;
-
-  switch (type) {
+  switch (primitiveField.type) {
     case 'SchemaString':
-      jstype = 'string';
-      if (typeof defaultValue !== 'undefined') {
-        defaultValue = "'" + defaultValue + "'";
-      }
+      primitiveField.jstype = 'string';
       //console.log('fieldSchema.validators', fieldSchema.validators)
       if (fieldSchema.validators)
         fieldSchema.validators.forEach((val) => {
           if (val.type == 'maxlength' && typeof val.maxlength === 'number')
-            maxlength = val.maxlength;
+            primitiveField.maxlength = val.maxlength;
           if (val.type == 'minlength' && typeof val.minlength === 'number')
-            minlength = val.minlength;
+            primitiveField.minlength = val.minlength;
           if (
             val.type == 'enum' &&
             Array.isArray(val.enumValues) &&
             val.enumValues.length > 0
           )
-            enumValues = val.enumValues;
+            primitiveField.enumValues = val.enumValues;
         });
       if (fieldSchema.options.editor == true) {
-        editor = true;
+        primitiveField.editor = true;
       } else if (fieldSchema.options.textarea == true) {
-        textarea = true;
+        primitiveField.textarea = true;
       } else if (fieldSchema.options.mraEmailRecipient == true) {
-        mraEmailRecipient = true;
+        primitiveField.mraEmailRecipient = true;
       } else if (fieldSchema.options.mraType) {
-        mraType = fieldSchema.options.mraType.toLowerCase();
-        switch (mraType) {
+        primitiveField.mraType = fieldSchema.options.mraType.toLowerCase();
+        switch (primitiveField.mraType) {
           case 'picture':
-            flagPicture = true;
-            flagSharable = !!fieldSchema.options.mraSharable;
-            aspectRatio = fieldSchema.options.aspectRatio;
+            primitiveField.flagPicture = true;
+            primitiveField.flagSharable = !!fieldSchema.options.mraSharable;
+            primitiveField.aspectRatio = fieldSchema.options.aspectRatio;
 
             break;
           case 'file':
-            flagFile = true;
-            flagSharable = !!fieldSchema.options.mraSharable;
+            primitiveField.flagFile = true;
+            primitiveField.flagSharable = !!fieldSchema.options.mraSharable;
 
             break;
           case 'httpurl':
             break;
           default:
-            warning(
+            logger.warning(
               `Unrecoganized mraType for SchemaString: ${fieldSchema.options.mraType}. Ignore...`
             );
         }
       }
       break;
     case 'SchemaBoolean':
-      jstype = 'boolean';
+      primitiveField.jstype = 'boolean';
       break;
     case 'SchemaNumber':
-      jstype = 'number';
+      primitiveField.jstype = 'number';
 
       if (fieldSchema.options.mraType) {
-        mraType = fieldSchema.options.mraType.toLowerCase();
-        switch (mraType) {
+        primitiveField.mraType = fieldSchema.options.mraType.toLowerCase();
+        switch (primitiveField.mraType) {
           case 'currency':
             break;
           default:
-            warning(
+            logger.warning(
               `Unrecoganized mraType for SchemaNumber: ${fieldSchema.options.mraType}. Ignore...`
             );
         }
@@ -648,55 +648,34 @@ const getPrimitiveField = function (fieldSchema) {
       if (fieldSchema.validators)
         fieldSchema.validators.forEach((val) => {
           if (val.type == 'min' && typeof val.min === 'number')
-            numberMin = val.min;
+            primitiveField.numberMin = val.min;
           if (val.type == 'max' && typeof val.max === 'number')
-            numberMax = val.max;
+            primitiveField.numberMax = val.max;
         });
       break;
     case 'ObjectId':
-      jstype = 'string';
+      primitiveField.jstype = 'string';
       if (fieldSchema.options.ref) {
-        RefCamel = capitalizeFirst(fieldSchema.options.ref);
-        ref = fieldSchema.options.ref.toLowerCase();
-        Ref = capitalizeFirst(ref);
-        flagRef = true;
+        primitiveField.RefCamel = capitalizeFirst(fieldSchema.options.ref);
+        primitiveField.ref = fieldSchema.options.ref.toLowerCase();
+        primitiveField.Ref = capitalizeFirst(primitiveField.ref);
+        primitiveField.flagRef = true;
       }
       break;
     case 'SchemaDate':
-      jstype = 'string';
-      flagDate = true;
+      primitiveField.jstype = 'string';
+      primitiveField.flagDate = true;
       if (fieldSchema.options.mraType) {
-        mraType = fieldSchema.options.mraType; //https://angular.io/api/common/DatePipe
+        primitiveField.mraType = fieldSchema.options.mraType; //https://angular.io/api/common/DatePipe
       } else {
-        mraType = 'medium'; // 'medium': equivalent to 'MMM d, y, h:mm:ss a' (Jun 15, 2015, 9:03:01 AM).
+        primitiveField.mraType = 'medium'; // 'medium': equivalent to 'MMM d, y, h:mm:ss a' (Jun 15, 2015, 9:03:01 AM).
       }
       break;
     default:
-      warning(`Field type ${type} is not recoganized...`);
+      logger.warning(`Field type ${primitiveField.type} is not recoganized...`);
   }
 
-  return [
-    type,
-    jstype,
-    numberMin,
-    numberMax,
-    maxlength,
-    minlength,
-    enumValues,
-    ref,
-    Ref,
-    RefCamel,
-    editor,
-    mraType,
-    textarea,
-    mraEmailRecipient,
-    flagDate,
-    flagRef,
-    flagPicture,
-    aspectRatio,
-    flagFile,
-    flagSharable,
-  ];
+  return primitiveField;
 };
 
 const generateViewPicture = function (
@@ -707,7 +686,8 @@ const generateViewPicture = function (
   validators,
   indexViewNames,
   selectors,
-  fieldMeta
+  fieldMeta,
+  features
 ) {
   const [field2Meta, viewStrMetaHandled] = stripFieldMeta(viewStr);
   const [displayNames, viewStrDisplayNameHandled] = stripDisplayNames(
@@ -748,14 +728,19 @@ const generateViewPicture = function (
 
   let view = [];
   let viewMap = {};
-  let hasDate = false;
-  let hasRef = false;
-  let hasEditor = false;
-  let hasRequiredMultiSelection = false;
-  let hasRequiredArray = false;
-  let hasRequiredMap = false;
-  let hasFileUpload = false;
-  let hasEmailing = false;
+
+  let schFeatures = {
+    hasDate: false,
+    hasRef: false,
+    hasEditor: false,
+    hasRequiredMultiSelection: false,
+    hasRequiredArray: false,
+    hasRequiredMap: false,
+    hasFileUpload: false,
+    hasEmailing: false,
+
+    hasMultiSelect: false,
+  };
 
   for (let item of viewDef) {
     let hidden = !!fieldHidden[item];
@@ -769,39 +754,34 @@ const generateViewPicture = function (
     let isIndexField = false;
     if (indexViewNames.includes(item)) isIndexField = true;
 
-    let type;
-    let jstype;
-    let defaultValue;
-    let numberMin, numberMax;
-    let maxlength, minlength;
-    let enumValues;
-    let ref, Ref, RefCamel;
-    let editor = false;
-    let mraType = '';
-    let textarea = false;
     let requiredField = false;
-    let mraEmailRecipient = false;
+
     let fieldDescription = '';
     let keyDescription = '';
     let valueDescription = '';
     let importantInfo = false;
 
-    let flagDate = false;
-    let flagRef = false;
-    let flagPicture = false;
-    let aspectRatio;
-    let flagFile = false;
-    let flagSharable = false;
-
     //for array
-    let elementUnique = false;
-    let elementType;
+    let elementMultiSelect = false;
+    let parentType;
     let mapKey;
 
     let sortable = false;
 
     let selector;
     let meta = {};
+
+    let primitiveField = {
+      mraType: '',
+      editor: false,
+      textarea: false,
+      mraEmailRecipient: false,
+      flagDate: false,
+      flagRef: false,
+      flagPicture: false,
+      flagFile: false,
+      flagSharable: false,
+    };
 
     if (item in schema.paths) {
       if (usedMeta && fieldMeta && fieldMeta[usedMeta]) {
@@ -812,21 +792,23 @@ const generateViewPicture = function (
             selector = selectors.getSelector(sel);
             selector.usedCandidate(API);
           } else {
-            warning(
+            logger.warning(
               `Selector ${sel} for Field ${item} is not defined. Skipped...`
             );
             continue;
           }
         }
       } else if (usedMeta) {
-        warning(`Field meta ${usedMeta} is not defined for field ${item}...`);
+        logger.warning(
+          `Field meta ${usedMeta} is not defined for field ${item}...`
+        );
       }
 
       let fieldSchema = schema.paths[item];
-      type = fieldSchema.constructor.name;
+      parentType = fieldSchema.constructor.name;
       requiredField = fieldSchema.originalRequiredValue === true ? true : false;
       //TODO: required could be a function
-      defaultValue = fieldSchema.defaultValue;
+      defaultValue = fieldSchema.defaultValue || fieldSchema.options.default;
       if (fieldSchema.options.description) {
         //scope of map key defined
         fieldDescription = fieldSchema.options.description;
@@ -844,66 +826,31 @@ const generateViewPicture = function (
         importantInfo = fieldSchema.options.important;
       }
 
-      switch (type) {
+      switch (parentType) {
         case 'SchemaString':
         case 'SchemaBoolean':
         case 'SchemaNumber':
         case 'ObjectId':
         case 'SchemaDate':
-          [
-            type,
-            jstype,
-            numberMin,
-            numberMax,
-            maxlength,
-            minlength,
-            enumValues,
-            ref,
-            Ref,
-            RefCamel,
-            editor,
-            mraType,
-            textarea,
-            mraEmailRecipient,
-            flagDate,
-            flagRef,
-            flagPicture,
-            aspectRatio,
-            flagFile,
-            flagSharable,
-          ] = getPrimitiveField(fieldSchema);
-          if (flagDate) hasDate = true;
-          if (flagRef) hasRef = true;
-          if (editor) hasEditor = true;
-          if (flagPicture || flagFile) hasFileUpload = true;
-          if (mraEmailRecipient) hasEmailing = true;
+          primitiveField = getPrimitiveField(fieldSchema);
+          if (primitiveField.flagDate) schFeatures.hasDate = true;
+          if (primitiveField.flagRef) schFeatures.hasRef = true;
+          if (primitiveField.editor) schFeatures.hasEditor = true;
+          if (primitiveField.flagPicture || primitiveField.flagFile)
+            schFeatures.hasFileUpload = true;
+          if (primitiveField.mraEmailRecipient)
+            schFeatures.hasEmailing = true;
 
           sortable = true;
-          if (editor || flagPicture || flagFile) sortable = false;
+          if (
+            primitiveField.editor ||
+            primitiveField.flagPicture ||
+            primitiveField.flagFile
+          )
+            sortable = false;
           break;
         case 'SchemaArray':
-          [
-            elementType,
-            jstype,
-            numberMin,
-            numberMax,
-            maxlength,
-            minlength,
-            enumValues,
-            ref,
-            Ref,
-            RefCamel,
-            editor,
-            mraType,
-            textarea,
-            mraEmailRecipient,
-            flagDate,
-            flagRef,
-            flagPicture,
-            aspectRatio,
-            flagFile,
-            flagSharable,
-          ] = getPrimitiveField(fieldSchema.caster);
+          primitiveField = getPrimitiveField(fieldSchema.caster);
           //rewrite the default value for array
           let defaultInput = fieldSchema.options.default;
           if (Array.isArray(defaultInput)) {
@@ -911,49 +858,21 @@ const generateViewPicture = function (
           } else {
             defaultValue = undefined;
           }
-          if (fieldSchema.options.elementunique) {
-            elementUnique = true;
+          if (fieldSchema.options.elementunique && primitiveField.enumValues) {
+            elementMultiSelect = true;
+            schFeatures.hasMultiSelect = true;
             if (requiredField) {
-              hasRequiredMultiSelection = true;
+              schFeatures.hasRequiredMultiSelection = true;
             }
           } else {
             if (requiredField) {
-              hasRequiredArray = true;
+              schFeatures.hasRequiredArray = true;
             }
           }
-
-          //let fs = fieldSchema;
-          //console.log(fs);
-          //console.log('===fieldSchema.options.default:', fieldSchema.options.default);
-          // console.log('===caster.validators:', fs.caster.validators);
-          // console.log('===casterConstructor:', fs.casterConstructor);
-          // console.log('===validators:', fs.validators);
           break;
         case 'SchemaMap':
         case 'Map':
-          [
-            elementType,
-            jstype,
-            numberMin,
-            numberMax,
-            maxlength,
-            minlength,
-            enumValues,
-            ref,
-            Ref,
-            RefCamel,
-            editor,
-            mraType,
-            textarea,
-            mraEmailRecipient,
-            flagDate,
-            flagRef,
-            flagPicture,
-            aspectRatio,
-            flagFile,
-            flagSharable,
-          ] = getPrimitiveField(fieldSchema['$__schemaType']);
-          //console.log('getPrimitiveField', getPrimitiveField(fieldSchema['$__schemaType']));
+          primitiveField = getPrimitiveField(fieldSchema['$__schemaType']);
           //rewrite the default value for array
           let defaultMap = fieldSchema.options.default;
           if (typeof defaultMap == 'object') {
@@ -963,50 +882,43 @@ const generateViewPicture = function (
           }
 
           if (requiredField) {
-            hasRequiredMap = true;
+            schFeatures.hasRequiredMap = true;
           }
 
           if (fieldSchema.options.key) {
             //scope of map key defined
             mapKey = fieldSchema.options.key;
           }
-          //let fs = fieldSchema;
-          //console.log(fieldSchema);
-          //console.log('===fieldSchema['$__schemaType']:', fieldSchema['$__schemaType']);
-          // console.log('===caster.validators:', fs.caster.validators);
-          // console.log('===casterConstructor:', fs.casterConstructor);
-          // console.log('===validators:', fs.validators);
-          //console.log('***schema map: ', fieldSchema)
           break;
         default:
-          warning(`Field type ${type} is not recoganized for field ${item}...`);
+          logger.warning(
+            `Field type ${primitiveField.type} is not recoganized for field ${item}...`
+          );
       }
     } else if (item in schema.virtuals) {
       //Handle as a string
-      type = 'SchemaString';
-      jstype = 'string';
+      primitiveField.type = 'SchemaString';
+      primitiveField.jstype = 'string';
     } else if (usedMeta && selectors && selectors.hasSelector(usedMeta)) {
       // selector type:
-      type = 'AngularSelector';
+      primitiveField.type = 'AngularSelector';
 
       selector = selectors.getSelector(usedMeta);
       selector.usedCandidate(API);
     } else if (usedMeta) {
-      warning(
+      logger.warning(
         `Selector ${usedMeta} for Field ${item} is not defined. Skipped...`
       );
       continue;
     } else {
-      warning(
+      logger.warning(
         `Field ${item} is not defined in schema ${schemaName}. Skipped...`
       );
       continue;
     }
 
-    if (type == 'SchemaMap') {
-      type = 'Map';
-      //console.log('***schema', schema);
-      //console.log('***Map', fieldPicture);
+    if (parentType == 'SchemaMap') {
+      parentType = 'Map';
     }
 
     const DN = displayNames[item] || camelToDisplay(item);
@@ -1017,19 +929,26 @@ const generateViewPicture = function (
       displayName: DN,
       displayname: dn,
       hidden,
-      type,
-      jstype,
-      ref,
-      Ref,
-      RefCamel,
-      editor, //rich format text
-      mraType,
-      textarea, // big text input
-      mraEmailRecipient, // an email field an can receive email
-      picture: flagPicture, // a picture field
-      aspectRatio: aspectRatio,
-      file: flagFile, // a file field
-      sharable: flagSharable, // picture or file is sharable
+
+      type: parentType,
+      jstype: primitiveField.jstype,
+      numberMin: primitiveField.numberMin,
+      numberMax: primitiveField.numberMax,
+      maxlength: primitiveField.maxlength,
+      minlength: primitiveField.minlength,
+      enumValues: primitiveField.enumValues,
+      ref: primitiveField.ref,
+      Ref: primitiveField.Ref,
+      RefCamel: primitiveField.RefCamel,
+      editor: primitiveField.editor, //rich format text
+      mraType: primitiveField.mraType,
+      textarea: primitiveField.textarea, // big text input
+      mraEmailRecipient: primitiveField.mraEmailRecipient, // an email field an can receive email
+      picture: primitiveField.flagPicture, // a picture field
+      aspectRatio: primitiveField.aspectRatio,
+      file: primitiveField.flagFile, // a file field
+      sharable: primitiveField.flagSharable, // picture or file is sharable
+
       //TODO: required could be a function
       required: requiredField,
       defaultValue: defaultValue,
@@ -1037,19 +956,14 @@ const generateViewPicture = function (
       keyDescription,
       valueDescription,
       important: importantInfo,
-      numberMin,
-      numberMax,
-      maxlength,
-      minlength,
-      enumValues,
       validators: validatorArray,
 
       isIndexField: isIndexField,
       sortable,
 
       //for array and map
-      elementType,
-      elementUnique,
+      elementType: primitiveField.type,
+      elementMultiSelect,
       //for map
       mapKey,
 
@@ -1058,9 +972,6 @@ const generateViewPicture = function (
       meta,
     };
 
-    if (fieldPicture.fieldName === 'student') {
-      //console.log(fieldPicture.fieldName, fieldPicture);
-    }
     view.push(fieldPicture);
     viewMap[item] = fieldPicture;
   }
@@ -1117,18 +1028,15 @@ const generateViewPicture = function (
     let arr = grp.filter((x) => x in viewMap).map((x) => viewMap[x]);
     if (arr.length > 0) viewGroups.push(arr);
   }
-  return [
-    viewGroups,
-    view,
-    hasDate,
-    hasRef,
-    hasEditor,
-    hasRequiredMultiSelection,
-    hasRequiredArray,
-    hasRequiredMap,
-    hasFileUpload,
-    hasEmailing,
-  ];
+
+  for (let feature in schFeatures) {
+    if (schFeatures[feature]) {
+      // if true
+      features.usedCandidate(feature, API);
+    }
+  }
+
+  return [viewGroups, view];
 };
 
 const setFieldProperty = function (view, fieldArr, include, property, value) {
@@ -1419,7 +1327,6 @@ function getUiArch() {
       uiDesign = program.design || 'bootstrap';
       break;
     default:
-      ;
   }
   uiDesign = uiDesign.toLowerCase();
 
@@ -1427,7 +1334,7 @@ function getUiArch() {
 }
 
 function getConfiguration(uiFramework, files) {
-  let conf = {styles: [], scripts: []};
+  let conf = { styles: [], scripts: [] };
   for (let file of files) {
     file = path.resolve(file);
     let json = require(file);
@@ -1443,7 +1350,9 @@ function getConfiguration(uiFramework, files) {
   });
 
   console.log('');
-  console.log('*** Please include the following configuration to your project angular.json file:');
+  console.log(
+    '*** Please include the following configuration to your project angular.json file:'
+  );
   console.log('   -- architect.build.options.styles');
   console.log(JSON.stringify(conf.styles, null, 4));
   console.log('   -- architect.build.options.scripts');
@@ -1456,12 +1365,14 @@ function getConfiguration(uiFramework, files) {
 function configurationGen() {
   let [uiFramework, uiDesign] = getUiArch();
   let configFile;
-  switch(uiFramework) {
+  switch (uiFramework) {
     case 'angular':
       configFile = 'mdds.angular.json';
       break;
     default:
-      console.error(`Configuration for framework ${uiFramework} is not supported.`);
+      console.error(
+        `Configuration for framework ${uiFramework} is not supported.`
+      );
       _exit(1);
   }
   // output directory
@@ -1481,12 +1392,14 @@ function configurationGen() {
   } else {
     outputDir = program.output;
     if (!fs.existsSync(outputDir)) {
-      console.info(`Target project output directory ${outputDir} does not exist.`);
+      console.info(
+        `Target project output directory ${outputDir} does not exist.`
+      );
     }
   }
 
   console.log(`Checking mdds.angular.json under ${outputDir}...`);
-  glob(outputDir + `/**/${configFile}`, {}, (err, files)=>{
+  glob(outputDir + `/**/${configFile}`, {}, (err, files) => {
     if (err) {
       console.log(`Error when checking configuration: ${err.stack}`);
       _exit(1);
@@ -1524,10 +1437,13 @@ function main() {
 
   // ui framework
   let [uiFramework, uiDesign] = getUiArch();
-  
+  const moduleFeatures = getNewFeatures(uiFramework, uiDesign);
+
   let uiTemplateDir = path.join(ROOTDIR, 'ui', uiFramework, uiDesign);
   if (!fs.existsSync(uiTemplateDir)) {
-    console.error(`Combination of UI Framework "${program.framework}" and UI Design "${program.design}" is not supported.`);
+    console.error(
+      `Combination of UI Framework "${program.framework}" and UI Design "${program.design}" is not supported.`
+    );
     _exit(1);
   }
 
@@ -1613,16 +1529,7 @@ function main() {
   let referenceSchemas = []; ////schemas that are referred
   let referenceMap = [];
   let defaultSchema;
-  let hasDate = false;
-  let hasRef = false;
-  let hasEditor = false;
-  let hasEditorU = false;
-  let hasRequiredMultiSelection = false;
-  let hasRequiredArray = false;
-  let hasRequiredMap = false;
-  let hasFileUpload = false;
-  let hasFileUploadU = false;
-  let hasEmailing = false;
+
   let dateFormat = 'MM/DD/YYYY';
   if (config && config.dateFormat) dateFormat = config.dateFormat;
   let timeFormat = 'hh:mm:ss';
@@ -1631,20 +1538,22 @@ function main() {
   if (config && config.fileServer) fileServer = config.fileServer;
   let authRequired = false;
 
-  let allSelectors = [];
+  let allSelectors = new Selectors();
 
   for (let name in schemas) {
+    const schemaFeatures = getNewFeatures(uiFramework, uiDesign);
+
     let schemaDef = schemas[name];
 
-    let schemaAnyonePermission = 'CRUDA'; // A - archive
+    let schemaAnyonePermission = 'CRU'; // only check the three permissions which impact UI AuthGuard
+    //D - delete, A - archive, E - Export, M - eMail: not considered here
+
     if (authz) {
       schemaAnyonePermission = getSchemaPermission(name, authz);
     }
-    if (
-      ['C', 'R', 'U', 'D', 'A'].some((e) => !schemaAnyonePermission.includes(e))
-    ) {
-      //not crud
-      authRequired = true;
+    if (['C', 'R', 'U'].some((e) => !schemaAnyonePermission.includes(e))) {
+      //anyone permission not include all of C, R, U
+      authRequired = true; // need to include AuthGuard for certain pages.
     }
 
     if (typeof schemaDef !== 'object') {
@@ -1675,7 +1584,7 @@ function main() {
           f[p] = PredefinedPatchFields[p];
           mongooseSchema.add(f);
         } else {
-          warning(
+          logger.warning(
             `ignore patching. Field is not a predefined patch fields: ${p}`
           );
         }
@@ -1730,7 +1639,7 @@ function main() {
       }
       if (mraUI.listType) {
         if (listTypeOnly) {
-          warning(
+          logger.warning(
             `Schema ${name} "listTypeOnly" is already set. Ignore listType ${mraUI.listType}...`
           );
         } else {
@@ -1898,18 +1807,7 @@ function main() {
     let indexViewNames = [];
     //briefView, detailView, CreateView, EditView, SearchView, indexView]
     /* 1. handle fields in indexView */
-    let [
-      indexViewGrp,
-      indexView,
-      hasDate6,
-      hasRef6,
-      hasEditor6,
-      hasReqGrp6,
-      hasReqArr6,
-      hasReqMap6,
-      hasFileUpload6,
-      hasEmailing6,
-    ] = generateViewPicture(
+    let [indexViewGrp, indexView] = generateViewPicture(
       'I',
       name,
       views[5],
@@ -1917,24 +1815,14 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta
+      fieldMeta,
+      schemaFeatures
     );
     for (let s of indexView) {
       indexViewNames.push(s.fieldName);
     }
     /* 2. handle fields in briefView */
-    let [
-      briefViewGrp,
-      briefView,
-      hasDate1,
-      hasRef1,
-      hasEditor1,
-      hasReqGrp1,
-      hasReqArr1,
-      hasReqMap1,
-      hasFileUpload1,
-      hasEmailing1,
-    ] = generateViewPicture(
+    let [briefViewGrp, briefView] = generateViewPicture(
       'L',
       name,
       views[0],
@@ -1942,26 +1830,14 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta
+      fieldMeta,
+      schemaFeatures
     );
-    //console.log('***briefView', briefView);
-    //console.log('***hasRef1', hasRef1);
     setFieldProperty(briefView, listSortFields, false, 'sortable', false); // if include is "false", set to "false"
     setFieldProperty(briefView, editHintFields, true, 'hint', true); // if include is "true", set to "true"
 
     /* 3. handle fields in detailView */
-    let [
-      detailViewGrp,
-      detailView,
-      hasDate2,
-      hasRef2,
-      hasEditor2,
-      hasReqGrp2,
-      hasReqArr2,
-      hasReqMap2,
-      hasFileUpload2,
-      hasEmailing2,
-    ] = generateViewPicture(
+    let [detailViewGrp, detailView] = generateViewPicture(
       'R',
       name,
       views[1],
@@ -1969,22 +1845,12 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta
+      fieldMeta,
+      schemaFeatures
     );
 
     /* 4. handle fields in createView */
-    let [
-      createViewGrp,
-      createView,
-      hasDate3,
-      hasRef3,
-      hasEditor3,
-      hasReqGrp3,
-      hasReqArr3,
-      hasReqMap3,
-      hasFileUpload3,
-      hasEmailing3,
-    ] = generateViewPicture(
+    let [createViewGrp, createView] = generateViewPicture(
       'C',
       name,
       views[2],
@@ -1992,23 +1858,13 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta
+      fieldMeta,
+      schemaFeatures
     );
     setFieldProperty(createView, editHintFields, true, 'hint', true); // if include is "true", set to "true"
 
     /* 5. handle fields in editView */
-    let [
-      editViewGrp,
-      editView,
-      hasDate4,
-      hasRef4,
-      hasEditor4,
-      hasReqGrp4,
-      hasReqArr4,
-      hasReqMap4,
-      hasFileUpload4,
-      hasEmailing4,
-    ] = generateViewPicture(
+    let [editViewGrp, editView] = generateViewPicture(
       'U',
       name,
       views[3],
@@ -2016,23 +1872,13 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta
+      fieldMeta,
+      schemaFeatures
     );
     setFieldProperty(editView, editHintFields, true, 'hint', true); // if include is "true", set to "true"
 
     /* 6. handle fields in searchView */
-    let [
-      searchViewGrp,
-      searchView,
-      hasDate5,
-      hasRef5,
-      hasEditor5,
-      hasReqGrp5,
-      hasReqArr5,
-      hasReqMap5,
-      hasFileUpload5,
-      hasEmailing5,
-    ] = generateViewPicture(
+    let [searchViewGrp, searchView] = generateViewPicture(
       'S',
       name,
       views[4],
@@ -2040,75 +1886,25 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta
+      fieldMeta,
+      schemaFeatures
     );
 
-    let schemaHasDate = hasDate5 || hasDate6;
-    let schemaHasRef = false;
-    let schemaHasEditor = false;
     let schemaHasEditorU = false; // editor update view
-    let schemaHasRequiredMultiSelection = false;
-    let schemaHasRequiredArray = false;
-    let schemaHasRequiredMap = false;
-    let schemaHasFileUpload = false;
     let schemaHasFileUploadU = false;
-    let schemaHasEmailing = false;
-    if (api.includes('L')) {
-      selectors.used('L');
-      // includes list view
-      schemaHasDate = schemaHasDate || hasDate1;
-      schemaHasRef = schemaHasRef || hasRef1;
-      schemaHasFileUpload = schemaHasFileUpload || hasFileUpload1;
-      schemaHasEditor = schemaHasEditor || hasEditor1;
-      schemaHasEmailing = schemaHasEmailing || hasEmailing1;
+    for (let sAPI of ['L', 'R', 'C', 'U']) {
+      if (api.includes(sAPI)) {
+        selectors.used(sAPI);
+        schemaFeatures.used(sAPI);
+      }
     }
-    if (api.includes('R')) {
-      selectors.used('R');
-      // includes detail view
-      schemaHasDate = schemaHasDate || hasDate2;
-      schemaHasRef = schemaHasRef || hasRef2;
-      schemaHasFileUpload = schemaHasFileUpload || hasFileUpload2;
-      schemaHasEditor = schemaHasEditor || hasEditor2;
-      schemaHasEmailing = schemaHasEmailing || hasEmailing2;
+
+    let sFeatures = schemaFeatures.getUsedFeatures();
+    for (let f in sFeatures) {
+      if (sFeatures[f]) {
+        moduleFeatures.usedConfirmed(f);
+      }
     }
-    if (api.includes('C')) {
-      selectors.used('C');
-      // includes CreateView
-      schemaHasDate = schemaHasDate || hasDate3;
-      schemaHasRef = schemaHasRef || hasRef3;
-      schemaHasEditor = schemaHasEditor || hasEditor3;
-      schemaHasEditorU = schemaHasEditorU || hasEditor3;
-      schemaHasRequiredMultiSelection =
-        schemaHasRequiredMultiSelection || hasReqGrp3;
-      schemaHasRequiredArray = schemaHasRequiredArray || hasReqArr3;
-      schemaHasRequiredMap = schemaHasRequiredMap || hasReqMap3;
-      schemaHasFileUpload = schemaHasFileUpload || hasFileUpload3;
-      schemaHasFileUploadU = schemaHasFileUploadU || hasFileUpload3;
-    }
-    if (api.includes('U')) {
-      selectors.used('U');
-      // includes editView
-      schemaHasDate = schemaHasDate || hasDate4;
-      schemaHasRef = schemaHasRef || hasRef4;
-      schemaHasEditor = schemaHasEditor || hasEditor4;
-      schemaHasEditorU = schemaHasEditorU || hasEditor4;
-      schemaHasRequiredMultiSelection =
-        schemaHasRequiredMultiSelection || hasReqGrp4;
-      schemaHasRequiredArray = schemaHasRequiredArray || hasReqArr4;
-      schemaHasRequiredMap = schemaHasRequiredMap || hasReqMap4;
-      schemaHasFileUpload = schemaHasFileUpload || hasFileUpload4;
-      schemaHasFileUploadU = schemaHasFileUploadU || hasFileUpload4;
-    }
-    if (schemaHasDate) hasDate = true;
-    if (schemaHasRef) hasRef = true;
-    if (schemaHasEditor) hasEditor = true;
-    if (schemaHasEditorU) hasEditorU = true;
-    if (schemaHasRequiredMultiSelection) hasRequiredMultiSelection = true;
-    if (schemaHasRequiredArray) hasRequiredArray = true;
-    if (schemaHasRequiredMap) hasRequiredMap = true;
-    if (schemaHasFileUpload) hasFileUpload = true;
-    if (schemaHasFileUploadU) hasFileUploadU = true;
-    if (schemaHasEmailing) hasEmailing = true;
 
     let [stripFieldMetaDetail, viewStrMetaHandledDetail] = stripFieldMeta(
       views[1]
@@ -2155,17 +1951,7 @@ function main() {
     let detailSubViewStr = detailViewGroups.join('|');
 
     /* 6. handle fields in detailSubView */
-    let [
-      detailSubViewGrp,
-      detailSubView,
-      hasDate7,
-      hasRef7,
-      hasEditor7,
-      hasReqGrp7,
-      hasReqMap7,
-      hasFileUpload7,
-      hasEmailing7,
-    ] = generateViewPicture(
+    let [detailSubViewGrp, detailSubView] = generateViewPicture(
       'R',
       name,
       detailSubViewStr,
@@ -2173,7 +1959,8 @@ function main() {
       validators,
       indexViewNames,
       selectors,
-      fieldMeta
+      fieldMeta,
+      schemaFeatures
     );
 
     let compositeEditView = [];
@@ -2290,20 +2077,21 @@ function main() {
       .filter((x) => !x.showFieldInList)
       .map((x) => x.listCategoryField);
 
-    allSelectors = allSelectors.concat(selectors.selectors);
+    allSelectors.combineSelectors(selectors);
 
     const selectorsObj = {};
     selectors.selectors.forEach((x) => {
       selectorsObj[x.name] = x;
     });
 
-    const searchBarObj = analizeSearch( 
+    const searchBarObj = analizeSearch(
       briefView,
       listCategoryFieldsNotShown,
       listSearchFieldsBlackList,
       ownSearchStringFields,
       api,
-      listActionButtons);
+      listActionButtons
+    );
 
     let schemaObj = {
       name: name,
@@ -2334,20 +2122,12 @@ function main() {
       compositeEditBriefView,
       mapFieldsRef,
 
+      sFeatures,
+
       componentDir,
       componentDirCust,
       dateFormat,
       timeFormat,
-      schemaHasDate,
-      schemaHasRef,
-      schemaHasEditor,
-      schemaHasEditorU,
-      schemaHasRequiredMultiSelection,
-      schemaHasRequiredArray,
-      schemaHasRequiredMap,
-      schemaHasFileUpload,
-      schemaHasFileUploadU,
-      schemaHasEmailing,
       schemaHasValidator,
       permission: schemaAnyonePermission,
       embeddedViewOnly,
@@ -2513,7 +2293,7 @@ function main() {
         }
       }
       if (!fieldFound) {
-        warning(
+        logger.warning(
           `Association schema ${ref[0]} doesn't have ref field ${assoField}...`
         );
         assoRecord.push(null);
@@ -2529,18 +2309,28 @@ function main() {
     schemaObj.assoRoutes = assoRoutes;
   }
 
-  const usedSelectors = [];
+  const mFeatures = moduleFeatures.getUsedFeatures();
+  const fImports = moduleFeatures.getImports();
+  const sImports = allSelectors.getImports();
 
-  const uniqeSelectors = allSelectors.filter((x) => {
-    if (!x.module || !x.package) {
-      return false;
+  // merge imports from features and selectors
+  let mergedModules = fImports.modules.concat(sImports.modules);
+  mergedModules = mergedModules.filter((x, idx) => mergedModules.indexOf(x) === idx);
+  let mergedImports = fImports.imports;
+  for (let p in sImports.imports) {
+    if (mergedImports[p]) {
+      mergedImports[p] = mergedImports[p].concat(sImports.imports[p]);
+    } else {
+      mergedImports[p] = sImports.imports[p];
     }
-    if (x.isUsed() && !usedSelectors.includes(x.module + x.package)) {
-      usedSelectors.push(x.module + x.package);
-      return true;
-    }
-    return false;
-  });
+  }
+  for (let p in mergedImports) {
+    mergedImports[p] = mergedImports[p].filter((x, idx) => mergedImports[p].indexOf(x) === idx);
+  }
+  const mImports = {
+    imports: mergedImports,
+    modules: mergedModules,
+  };
 
   console.log('uiFramework: ', uiFramework, ' uiDesign: ', uiDesign);
 
@@ -2552,21 +2342,14 @@ function main() {
     defaultSchema,
     validatorFields,
     referenceSchemas: referenceObjSchemas, //schemas that are referred
-    hasDate,
-    hasRef,
-    hasEditor,
-    hasEditorU,
-    hasRequiredMultiSelection,
-    hasRequiredArray,
-    hasRequiredMap,
-    hasFileUpload,
-    hasFileUploadU,
-    hasEmailing,
+
+    mFeatures,
+    mImports,
+
     dateFormat,
     timeFormat,
     authRequired,
     fileServer,
-    uniqeSelectors,
 
     generateView,
 
@@ -2640,10 +2423,10 @@ function main() {
   );
 
   if (
-    hasDate ||
-    hasRequiredMultiSelection ||
-    hasRequiredArray ||
-    hasRequiredMap
+    mFeatures.hasDate ||
+    mFeatures.hasRequiredMultiSelection ||
+    mFeatures.hasRequiredArray ||
+    mFeatures.hasRequiredMap
   ) {
     generateSourceFile(
       moduleName,
@@ -2751,7 +2534,7 @@ function main() {
         // restore noMoreSearchArea
         schemaObj.searchBarObj.noMoreSearchArea = noMoreSearchArea;
       }
-      if (schemaObj.schemaHasRef) {
+      if (schemaObj.sFeatures.hasRef) {
         generateSourceFile(
           schemaName,
           templates.schemaListSubComponent,
@@ -2903,7 +2686,7 @@ function main() {
           subComponentDir
         );
       }
-      if (schemaObj.schemaHasRef) {
+      if (schemaObj.sFeatures.hasRef) {
         schemaName,
           templates.schemaListSubComponent,
           schemaObj,
@@ -2991,7 +2774,7 @@ function main() {
   } /*End of generate source for each schema*/
 
   console.log();
-  const [wNum, eNum] = warningNum();
+  const [wNum, eNum] = logger.statistics();
   if (wNum + eNum > 0) {
     console.log('+++ total warnings:', wNum);
     console.log('+++ total errors:', eNum);
@@ -2999,7 +2782,9 @@ function main() {
     console.log('+++ Done!');
   }
   console.log();
-  console.log(`+++ Configure your ${uiFramework} application for the generated UI? Please run:`);
+  console.log(
+    `+++ Configure your ${uiFramework} application for the generated UI? Please run:`
+  );
   console.log(` ${programName} -c -f ${uiFramework} -o ${parentOutputDir}`);
   console.log();
   return;
@@ -3045,32 +2830,13 @@ function mkdir(base, dir) {
 
 function renamedOption(originalName, newName) {
   return function (val) {
-    warning(
+    logger.warning(
       util.format('option "%s" has been renamed to "%s"', originalName, newName)
     );
     return val;
   };
 }
 
-/**
- * Display a warning similar to how errors are displayed by commander.
- *
- * @param {String} message
- */
-function warning(message) {
-  message.split('\n').forEach(function (line) {
-    console.error('  warning: %s', line);
-  });
-  console.error();
-  warningNumber += 1;
-}
-function increaseError() {
-  errorNumber += 1;
-}
-
-function warningNum() {
-  return [warningNumber, errorNumber];
-}
 /**
  * echo str > file.
  *

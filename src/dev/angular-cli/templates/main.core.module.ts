@@ -1,33 +1,15 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-<%- 
-include(`/ui/${uiFramework}/${uiDesign}/main.core.module.include.ts`, {part: 'file_import'});
-%><%_
-if (hasRequiredMultiSelection) {%>
-import { Directive<%-ModuleName%>MultiSelectionRequired } from './<%-moduleName%>.directive';<%_ } %><%_
-if (hasRequiredArray) {%>
-import { Directive<%-ModuleName%>ArrayRequired } from './<%-moduleName%>.directive';<%_ } %><%_
-if (hasRequiredMap) {%>
-import { Directive<%-ModuleName%>MapRequired } from './<%-moduleName%>.directive';<%_ } %><%
-if (hasFileUpload) {%>
-import { FileUploadModule } from '@hicoder/angular-file';<%}%><%
-if (hasEmailing) {%>
-import { ActionEmailModule } from '@hicoder/angular-action-email';<%}%><%
-if (hasEditor) {%>
-import { MddsRichtextEditorModule } from '@hicoder/angular-richtext';<%}%>
-
-import { MddsCoreModule } from '@hicoder/angular-core';
-
+<%for (let imp in mImports.imports) {
+  let components = mImports.imports[imp];%>
+import { <% for (let c of components) {%><%-c%>,<%}%> } from '<%-imp%>';
+<%}%>
 import { <%-ModuleName%>RoutingCoreModule } from './<%-moduleName%>-routing.core.module';
 import { <%-ModuleName%>Component } from './<%-moduleName%>.component';<%
-if (hasRef) {%>
+if (mFeatures.hasRef) {%>
 import { <%-ModuleName%>RefSelectDirective } from './<%-moduleName%>.component';<%}%>
-<%for (let sel of uniqeSelectors) {
-  if (sel.usedFlag) {%>
-import { <%-sel.module%> } from '<%-sel.package%>';<%
-  }
-}%>
+
 // Import components for each schema
 <%_
 for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api;%>
@@ -60,7 +42,7 @@ import { <%-Ref%>DetailPopComponent } from './<%-ref%>/<%-ref%>-detail/<%-ref%>-
   if (api.includes("R")) {%>
 import { <%-Ref%>DetailSelComponent } from './<%-ref%>/<%-ref%>-detail/<%-ref%>-detail-sel.component';<%_ } %><%_ }); %><%_
 for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let sn = schm.schemaName, api = schm.api; 
-  if (schm.schemaHasRef) {%><%_
+  if (schm.sFeatures.hasRef) {%><%_
     if (api.includes("L")) {%>
 import { <%-schm.SchemaName%>ListSubComponent } from './<%-sn%>/<%-sn%>-list/<%-sn%>-list-sub.component';<%
     if (schm.associationFor.length > 0) {%>
@@ -75,23 +57,15 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
 @NgModule({
   imports: [
     CommonModule,
-    FormsModule,<%- 
-    include(`/ui/${uiFramework}/${uiDesign}/main.core.module.include.ts`, {part: 'module_import'});
-    %>
-    MddsCoreModule,<%
-  if (hasFileUpload) {%>
-    FileUploadModule,<%}%><%
-  if (hasEmailing) {%>
-    ActionEmailModule,<%}%><%
-  if (hasEditor) {%>
-    MddsRichtextEditorModule,<%}%><%_
-  for (let sel of uniqeSelectors) { if (sel.usedFlag) {%>
-    <%-sel.module%>,<%}}%>
+    FormsModule,
+  <%for (let mod of mImports.modules) {%>
+    <%-mod%>,
+  <%}%>
     <%-ModuleName%>RoutingCoreModule,
   ],
   declarations: [
     <%-ModuleName%>Component,<%
-    if (hasRef) {%>
+    if (mFeatures.hasRef) {%>
     <%-ModuleName%>RefSelectDirective,<%}%><%_
   for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; %>
     <%-schm.SchemaName%>Component,<%
@@ -121,18 +95,12 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     <%-Ref%>DetailPopComponent,<%}%><%
     if (api.includes("R")) {%>
     <%-Ref%>DetailSelComponent,<%}%><%_ }); %><%_
-  for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; if (schm.schemaHasRef) { %>
+  for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; if (schm.sFeatures.hasRef) { %>
     <% if (api.includes("L")) {%><%-schm.SchemaName%>ListSubComponent,<%if (schm.associationFor.length > 0) {%>
     <%-schm.SchemaName%>ListAssoComponent,<%}%><%}%>
     <% if (api.includes("R")) {%><%-schm.SchemaName%>DetailSubComponent,<%}%><%_ }}%><%_
   validatorFields.forEach(function(element){ %>
-    <%-element.Directive%>,<%_ }); %><%_
-  if (hasRequiredMultiSelection) {%>
-    Directive<%-ModuleName%>MultiSelectionRequired,<%_ } %><%_
-  if (hasRequiredArray) {%>
-    Directive<%-ModuleName%>ArrayRequired,<%_ } %><%_
-  if (hasRequiredMap) {%>
-    Directive<%-ModuleName%>MapRequired,<%_ } %>
+    <%-element.Directive%>,<%_ }); %>
   ],
   exports: [
     <%-ModuleName%>Component,<%_
@@ -160,7 +128,7 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     <%-Ref%>DetailPopComponent,<%}%><%
     if (api.includes("R")) {%>
     <%-Ref%>DetailSelComponent,<%}%><%_ }); %><%_
-  for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; if (schm.schemaHasRef) { %><%
+  for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; if (schm.sFeatures.hasRef) { %><%
     if (api.includes("L")) {%>
     <%-schm.SchemaName%>ListSubComponent,<%
     if (schm.associationFor.length > 0) {%>
@@ -168,20 +136,14 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     if (api.includes("R")) {%>
     <%-schm.SchemaName%>DetailSubComponent,<%}%><%_ }}%><%_
     validatorFields.forEach(function(element){ %>
-    <%-element.Directive%>,<%_ }); %><%_
-    if (hasRequiredMultiSelection) {%>
-    Directive<%-ModuleName%>MultiSelectionRequired,<%_ } %><%_
-    if (hasRequiredArray) {%>
-    Directive<%-ModuleName%>ArrayRequired,<%_ } %><%_
-    if (hasRequiredMap) {%>
-    Directive<%-ModuleName%>MapRequired,<%_ } %>
+    <%-element.Directive%>,<%_ }); %>
   ],
   providers: [<%- 
     include(`/ui/${uiFramework}/${uiDesign}/main.core.module.include.ts`, {part: 'module_provider'});
     %>
   ],
   entryComponents: [<%_
-  if (hasRef) {%><%_ referenceSchemas.forEach(function(reference){ let Ref = reference.Ref; let api = reference.api; %><% 
+  if (mFeatures.hasRef) {%><%_ referenceSchemas.forEach(function(reference){ let Ref = reference.Ref; let api = reference.api; %><% 
     if (api.includes("L")) {%>
     <%-Ref%>ListSelectComponent,<%}%><%
     if (api.includes("L")) { for (const widget of reference.listSelectWidgets) {%>

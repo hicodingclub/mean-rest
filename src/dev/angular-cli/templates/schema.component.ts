@@ -7,11 +7,11 @@ import { <%-SchemaName%>Service } from './<%-schemaName%>.service';
 const itemCamelName = '<%-schemaCamelName%>';
 
 export { ViewType };
-<%if (schemaHasRef || referred) {%>
+<%if (sFeatures.hasRef || referred) {%>
 import { ViewChild } from '@angular/core';<%}%>
 <%if (referred) {%>
 import { ElementRef } from '@angular/core';<%}%>
-<%if (schemaHasRef) {%>
+<%if (sFeatures.hasRef) {%>
 import { ComponentFactoryResolver } from '@angular/core';
 import { <%-ModuleName%>RefSelectDirective } from '../<%-moduleName%>.component';
     <%_ for (let field of compositeEditBriefView) { 
@@ -89,7 +89,7 @@ export class <%-SchemaName%>Component extends MddsBaseComponent implements OnIni
     // @Input() inputData;
     // @Output() outputData;
 
-<%if (schemaHasRef) {%>
+<%if (sFeatures.hasRef) {%>
     public selectComponents = {
   <%_ for (let field of compositeEditBriefView) { 
       if (field.Ref) {const listSelTypeRef = refListSelectType[field.ref][0]; const ListSelTypeRef = refListSelectType[field.ref][1];%>
@@ -105,7 +105,7 @@ export class <%-SchemaName%>Component extends MddsBaseComponent implements OnIni
     @ViewChild('<%-ModuleName%>Modal', {static: true}) public focusEl: ElementRef;<%}%>
 
     constructor(
-      <% if (schemaHasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
+      <% if (sFeatures.hasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
       public <%-schemaName%>Service: <%-SchemaName%>Service,
       public injector: Injector,
       public router: Router,
@@ -118,7 +118,7 @@ export class <%-SchemaName%>Component extends MddsBaseComponent implements OnIni
         <% include schema-base-construct.component.ts%>
 
         this.schemaName = '<%-schemaName%>';
-        <% if (schemaHasDate)  {%>this.dateFormat = '<%-dateFormat%>';
+        <% if (sFeatures.hasDate)  {%>this.dateFormat = '<%-dateFormat%>';
         this.timeFormat = '<%-timeFormat%>';<%}%>
         this.modulePath = '<%-moduleName%>';
         this.indexFields = [<%for (let field of indexView) {%>'<%-field.fieldName%>',<%}%> ];

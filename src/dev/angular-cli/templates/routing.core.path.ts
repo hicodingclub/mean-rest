@@ -5,7 +5,7 @@
   <%_ if (api.includes("R") && detailType === 'normal') {%>import { <%-schm.SchemaName%>DetailComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail.component';<%}%>
   <%_ if (api.includes("R") && detailType !== 'normal') {%>import { <%-schm.SchemaName%>DetailWidget<%-schm.DetailType%>Component } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail-widget-<%-detailType%>.component';<%}%>
   <%_ if (api.includes("U") || api.includes("C")) {%>import { <%-schm.SchemaName%>EditComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-edit/<%-schm.schemaName%>-edit.component';<%}%>
-  <%_ if (schm.schemaHasRef) {
+  <%_ if (schm.sFeatures.hasRef) {
     if (api.includes("L")) {%>import { <%-schm.SchemaName%>ListSubComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-sub.component';<%}
   }%><%_if (api.includes("R")) {
     if (schm.assoRoutes.length > 0 ) {%>
@@ -14,7 +14,7 @@ import { <%-schm.SchemaName%>AssoComponent } from './<%-schm.schemaName%>/<%-sch
 <%_ if (authRequired) {%>
 import { AuthGuard } from '@hicoder/angular-auth';
 <%}%>
-<%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; if (schm.schemaHasRef) {%>
+<%_ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; if (schm.sFeatures.hasRef) {%>
   <%_ if (api.includes("L")) {%>const <%-schm.schemaName%>SubPath = [
     {path: 'list', component: <%-schm.SchemaName%>ListSubComponent}
 ];<%}%>

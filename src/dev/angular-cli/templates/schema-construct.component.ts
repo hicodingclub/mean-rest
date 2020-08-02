@@ -55,7 +55,7 @@ let mapFields = [];
           ];<%}%><%_
 let multiSelectionFields = [];
     for (let field of theView) { 
-        if (field.type === "SchemaArray" && field.enumValues && field.elementUnique) multiSelectionFields.push(field.fieldName);
+        if (field.type === "SchemaArray" && field.elementMultiSelect) multiSelectionFields.push(field.fieldName);
     }
     if (multiSelectionFields.length > 0) {%>
           this.multiSelectionFields = [<%for (let fnm of multiSelectionFields) {%>
@@ -63,7 +63,7 @@ let multiSelectionFields = [];
           ];<%}%><%_
 let arrayFields = []; let arrayRefFields = [];
     for (let field of theView) {
-        if (field.type === "SchemaArray" && !(field.enumValues && field.elementUnique)) {
+        if (field.type === "SchemaArray" && !field.elementMultiSelect) {
           arrayFields.push([field.fieldName, field.elementType]);
           if (field.elementType == 'ObjectId') {
             arrayRefFields.push([field.fieldName, field.ref]);

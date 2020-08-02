@@ -117,7 +117,7 @@
 									<!-- (focus)="detail['<%-fn%>']['_id']?onRefShow('<%-field.fieldName%>', 'select', detail['<%-fn%>']['_id']):onRefSelect('<%-fn%>')" --><%_
 								} else if (field.type === "SchemaArray") {
 									if (field.elementType === "SchemaString") {
-										if (field.enumValues && field.elementUnique) {
+										if (field.elementMultiSelect) {
 											field.enumValues.forEach( (f, index) => {
 												const fd = f.trim().replace(/\s+/g, '');%>
 									<div class="form-check-inline">

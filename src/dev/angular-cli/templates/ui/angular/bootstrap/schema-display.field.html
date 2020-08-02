@@ -31,7 +31,7 @@
                     let fmraT = field.mraType;
                     %>  {{detail['<%-fn%>']? (detail['<%-fn%>']['originalValue'] | date:'<%-fmraT%>') : ''}}<%_
                 } else if (ft === 'SchemaArray') {
-                        if (field.enumValues && field.elementUnique) {%>
+                        if (field.elementMultiSelect) {%>
                     <div class="badge badge-pill badge-secondary" *ngFor="let element of enums['<%-fn%>']">
                          <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection'][element]">{{element}}</div>
                     </div><%

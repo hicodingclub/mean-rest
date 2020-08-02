@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-<% if (hasRef) { %>
+<% if (mFeatures.hasRef) { %>
 import { ViewContainerRef,  Directive} from '@angular/core';
 @Directive({
   selector: '[<%-moduleName%>-ref-select]',

@@ -21,7 +21,7 @@ export class <%-SchemaName%>ListSubComponent extends <%-SchemaName%>ListComponen
       public router: Router,
       public route: ActivatedRoute,
       public location: Location) {
-        super(<%if (schemaHasRef) {%>null,<%}%> <%-schemaName%>Service, injector, router, route, location);
+        super(<%if (sFeatures.hasRef) {%>null,<%}%> <%-schemaName%>Service, injector, router, route, location);
 
         this.listCategory1 = {}; // no do query based on category for sub view;
         this.listCategory2 = {}; // no do query based on category for sub view;

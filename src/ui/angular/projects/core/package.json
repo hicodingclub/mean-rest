@@ -4,9 +4,17 @@
   "peerDependencies": {
     "@angular/common": "^10.0.2",
     "@angular/core": "^10.0.2",
-    "@angular/router": "^10.0.2"
+    "@angular/router": "^10.0.2",
+    "@ng-bootstrap/ng-bootstrap": "^6.1.0"
+  },
+  "devDependencies": {
+    "@ng-bootstrap/ng-bootstrap": "^6.1.0"
   },
   "dependencies": {
-    "tslib": "^2.0.0"
+    "tslib": "^2.0.0",
+    "bootstrap": "^4.5.0",
+    "popper.js": "^1.16.0",
+    "jquery": "^3.5.0",
+    "@fortawesome/fontawesome-free": "^5.14.0"
   }
 }

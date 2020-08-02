@@ -1,16 +1,11 @@
-function warning(message) {
-  message.split('\n').forEach(function (line) {
-    console.error('  Selector warning: %s', line);
-  });
-}
-
+const logger = require('./log');
 class SelectorInput {
   valid = false;
   key;
   value;
   constructor(input) {
     if (typeof input !== 'object') {
-      warning(`selector not given as object： ${input}`);
+      logger.warning(`selector not given as object： ${input}`);
       return;
     }
     this.key = input.key;
@@ -31,7 +26,7 @@ class Selector {
   inputs = [];
   constructor(name, selector) {
     if (typeof selector !== 'object') {
-      warning(`selector ${name} not given as object.`);
+      logger.warning(`selector ${name} not given as object.`);
       return;
     }
     this.name = name;
@@ -64,8 +59,11 @@ class Selector {
 class Selectors {
   selectors = [];
   constructor(sels) {
+    if (!sels) {
+      return;
+    }
     if (typeof sels !== 'object') {
-      // warning(`selectors not given as object. ${JSON.stringify(sels)}`);
+      logger.warning(`selectors not given as object.`);
       return;
     }
     for (const s in sels) {
@@ -92,6 +90,41 @@ class Selectors {
     for (let x of this.selectors) {
       x.used(API);
     }
+  }
+  combineSelectors(selectors) {
+    if (!(selectors instanceof Selectors)) {
+      logger.warning(`selectors not given as instanceof Selectors`);
+      return;
+    }
+    this.selectors = this.selectors.concat(selectors.selectors);
+  }
+  getImports() {
+    let imports = {};
+    let modules = [];
+
+    for (let x of this.selectors) {
+      if (!x.module || !x.package) {
+        continue;
+      }
+      if (!x.isUsed()) {
+        continue;
+      }
+      if (!imports[x.package]) {
+        imports[x.package] = [];
+      }
+      imports[x.package].push(x.module);
+      modules.push(x.module);
+    }
+    modules = modules.filter((item, index) => modules.indexOf(item) === index);
+    for (let p in imports) {
+      imports[p] = imports[p].filter(
+        (item, index) => imports[p].indexOf(item) === index
+      );
+    }
+    return {
+      imports,
+      modules,
+    };
   }
 }
 

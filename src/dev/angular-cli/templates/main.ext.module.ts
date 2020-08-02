@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-<% if (hasDate) {%>
+<% if (mFeatures.hasDate) {%>
 import { NgbModule, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
-import { MraNgbDateFormatterService } from '../<%-moduleName%>/<%-moduleName%>.directive'; <%_ }%>
+import { MDDS_NGB_DATE_FORMAT, MraNgbDateFormatterService } from '@hicoder/angular-core'; <%_ }%>
 
 @NgModule({
   imports: [
@@ -13,7 +13,7 @@ import { MraNgbDateFormatterService } from '../<%-moduleName%>/<%-moduleName%>.d
     FormsModule,
     RouterModule,
     
-    <%_ if (hasDate) {%>
+    <%_ if (mFeatures.hasDate) {%>
     NgbModule,<%}%>
   ],
   declarations: [
@@ -21,7 +21,8 @@ import { MraNgbDateFormatterService } from '../<%-moduleName%>/<%-moduleName%>.d
   exports: [
   ],
   providers: [
-    <%_ if (hasDate) {%>
+    <%_ if (mFeatures.hasDate) {%>
+    { provide: MDDS_NGB_DATE_FORMAT, useValue: '<%-dateFormat%>'},
     { provide: NgbDateParserFormatter, useClass: MraNgbDateFormatterService },<%}%>
   ],
   entryComponents: [

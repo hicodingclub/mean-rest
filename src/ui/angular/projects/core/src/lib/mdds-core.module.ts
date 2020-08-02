@@ -1,23 +1,32 @@
-import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { NgModule } from "@angular/core";
+import { RouterModule } from "@angular/router";
 
-import { MddsMinNumberDirective, MddsMaxNumberDirective } from './mdds-common.directives';
-import { MddsAnchorPipe } from './anchor-pipe';
+import {
+  MddsMinNumberDirective,
+  MddsMaxNumberDirective,
+  MddsDirectiveArrayRequired,
+  MddsDirectiveMapRequired,
+  MddsDirectiveMultiSelectionRequired,
+} from "./mdds-common.directives";
+import { MddsAnchorPipe } from "./anchor.pipe";
 @NgModule({
-  imports: [
-    RouterModule,
-  ],
+  imports: [RouterModule],
   declarations: [
     MddsMinNumberDirective,
     MddsMaxNumberDirective,
     MddsAnchorPipe,
+    MddsDirectiveArrayRequired,
+    MddsDirectiveMapRequired,
+    MddsDirectiveMultiSelectionRequired,
   ],
   exports: [
     MddsMinNumberDirective,
     MddsMaxNumberDirective,
     MddsAnchorPipe,
- ],
-  providers: [
+    MddsDirectiveArrayRequired,
+    MddsDirectiveMapRequired,
+    MddsDirectiveMultiSelectionRequired,
   ],
+  providers: [],
 })
-export class MddsCoreModule { }
+export class MddsCoreModule {}

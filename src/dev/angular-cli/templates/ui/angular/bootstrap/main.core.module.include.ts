@@ -1,14 +1,4 @@
-<% if (part === 'file_import') {%><%
-    if (hasDate) {%>
-import { NgbModule, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
-import { MraNgbDateFormatterService } from './<%-moduleName%>.directive';<%
-    }%><%
-} else if (part === 'module_import') {%><%
-    if (hasDate) {%>
-NgbModule,<%
-    }%><%
-} else if (part === 'module_provider') {%><%
-    if (hasDate) {%>
+<% if (mFeatures.hasDate) {%>
+{ provide: MDDS_NGB_DATE_FORMAT, useValue: '<%-dateFormat%>'},
 { provide: NgbDateParserFormatter, useClass: MraNgbDateFormatterService },<%
-    }%><%
 }%>

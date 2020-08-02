@@ -18,7 +18,7 @@ export class <%-SchemaName%>ListWidgetCleanComponent extends <%-SchemaName%>List
       public router: Router,
       public route: ActivatedRoute,
       public location: Location) {
-        super(<%if (schemaHasRef) {%>null,<%}%> <%-schemaName%>Service, injector, router, route, location);
+        super(<%if (sFeatures.hasRef) {%>null,<%}%> <%-schemaName%>Service, injector, router, route, location);
         this.perPage = <%-homeListNumber%>;
         this.listCategory1 = {}; // no do query based on category for home view;
         this.listCategory2 = {}; // no do query based on category for home view;

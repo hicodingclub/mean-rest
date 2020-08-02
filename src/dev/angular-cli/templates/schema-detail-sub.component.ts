@@ -21,7 +21,7 @@ export class <%-SchemaName%>DetailSubComponent extends <%-SchemaName%>DetailComp
         public router: Router,
         public route: ActivatedRoute,
         public location: Location) {
-            super(<%if (schemaHasRef) {%>null,<%}%><%-schemaName%>Service, injector, router, route, location);
+            super(<%if (sFeatures.hasRef) {%>null,<%}%><%-schemaName%>Service, injector, router, route, location);
     }
 
     ngOnInit() {
