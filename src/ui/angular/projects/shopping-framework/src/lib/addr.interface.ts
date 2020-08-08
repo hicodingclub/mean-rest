@@ -9,6 +9,11 @@ export interface Address {
   zipCode: string;
 
   phone?: string,
+  email?: string,
+
+  // for store address
+  contactPerson?: string,
+  id?: string,
 }
 
 export const AddressToString = function (addr: Address): string {
@@ -38,5 +43,6 @@ export const AddressToString = function (addr: Address): string {
   if (addr.phone) {
     str += ` Phone: ${addr.phone}`
   }
+  // At this time, not show email and contactPerson
   return str;
 }

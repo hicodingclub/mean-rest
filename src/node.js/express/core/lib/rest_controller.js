@@ -1207,7 +1207,7 @@ class RestController {
     }
     body = ownerPatch(body, owner, req);
     let result = await model.create(body); 
-    this.handleInsertHooks(result, mraBE);
+    this.handleHooks('insert', result, mraBE);
     return result;
   }
 
@@ -1245,17 +1245,20 @@ class RestController {
     let editViewStr = views[3];
     let viewFields = editViewStr.match(/\S+/g) || [];
     if (schema.options.useSaveInsteadOfUpdate) {
-      model.findOne({ _id: id }, function (err, result) {
+      model.findOne({ _id: id }, (err, result) => {
         if (err) {
           return next(err);
         }
 
+        let mapFields = {};
         let hasMap = false;
         for (let field in body) {
           let income = body[field];
+
           let existing = result[field];
           if (existing instanceof Map) {
-            // first remove the map filed, and will update the second time.
+            // first remove the map filed, and save it for later update.
+            mapFields[field] = income;
             income = undefined;
             hasMap = true;
           }
@@ -1271,28 +1274,36 @@ class RestController {
           }
         }
         result = ownerPatch(result, owner, req);
-        result.save(function (err) {
+        result.save((err) => {
           if (err) {
             return next(err);
           }
+          // put map fields to the result
+          for (let field in mapFields) {
+            result[field] = mapFields[field];
+          }
           if (!hasMap) {
+            this.handleHooks('update', result, mraBE);
             return res.send();
           }
-          // update second time for the map field
-          model.updateOne({ _id: id }, body, function (err) {
+          // update second time for the map field.
+          // Use update for performance (assume map fields don't need save hooks)
+          model.updateOne({ _id: id }, mapFields, (err) => {
             if (err) {
               return next(err);
             }
+            this.handleHooks('update', result, mraBE);
             return res.send();
           });
         });
       });
     } else {
       //all top-level update keys that are not $atomic operation names are treated as $set operations
-      model.updateOne({ _id: id }, body, function (err, result) {
+      model.updateOne({ _id: id }, body, (err, result) => {
         if (err) {
           return next(err);
         }
+        this.handleHooks('update', result, mraBE);
         return res.send();
       });
     }
@@ -1425,20 +1436,23 @@ class RestController {
     return dbExe.exec();
   }
 
-  handleInsertHooks(data, mraBE) {
+  handleHooks(action, data, mraBE) {
+    //action: insert, update
+  
     // 1. check emailer hooks
     const { emailer, emailerObj } = this.mddsProperties || {};
-    if (!emailer) return;
-    const emailerConf = mraBE.emailer || {};
-    const replacement = emailerConf.replacement || {};
-    const hooks = emailerConf.hooks || {};
-    if (hooks.insert) {
-      hooks.insert(emailer, data, replacement, emailerObj);
+    if (emailer) {
+      const emailerConf = mraBE.emailer || {};
+      const replacement = emailerConf.replacement || {};
+      const hooks = emailerConf.hooks || {};
+      const restController = this;
+      if (hooks[action]) {
+        hooks[action](emailer, data, replacement, emailerObj, restController);
+      }
     }
 
     // 2. check .... hooks
   }
-
 }
 
 module.exports = RestController;

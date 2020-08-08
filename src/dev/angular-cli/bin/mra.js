@@ -1644,7 +1644,9 @@ function main() {
           );
         } else {
           if (!listTypes.includes(mraUI.listType)) {
-            `Schema ${name} "listType" value ${mraUI.listType} incorrect. Ignore...`;
+            logger.warning(
+              `Schema ${name} "listType" value ${mraUI.listType} incorrect. Ignore...`
+            )
           } else {
             listType = mraUI.listType;
             const tindex = listTypes.indexOf(listType);

@@ -4,6 +4,7 @@ export interface OrderInfo {
   shipping: string;
   price: string;
   priceTotal: number;
+  orderType?: string;
   contact?: string;
   notes?: string;
 }
