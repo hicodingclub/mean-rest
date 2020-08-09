@@ -838,8 +838,7 @@ const generateViewPicture = function (
           if (primitiveField.editor) schFeatures.hasEditor = true;
           if (primitiveField.flagPicture || primitiveField.flagFile)
             schFeatures.hasFileUpload = true;
-          if (primitiveField.mraEmailRecipient)
-            schFeatures.hasEmailing = true;
+          if (primitiveField.mraEmailRecipient) schFeatures.hasEmailing = true;
 
           sortable = true;
           if (
@@ -895,13 +894,17 @@ const generateViewPicture = function (
             `Field type ${primitiveField.type} is not recoganized for field ${item}...`
           );
       }
+
+      if (parentType == 'SchemaMap') {
+        parentType = 'Map';
+      }
     } else if (item in schema.virtuals) {
       //Handle as a string
-      primitiveField.type = 'SchemaString';
+      parentType = 'SchemaString';
       primitiveField.jstype = 'string';
     } else if (usedMeta && selectors && selectors.hasSelector(usedMeta)) {
       // selector type:
-      primitiveField.type = 'AngularSelector';
+      parentType = 'AngularSelector';
 
       selector = selectors.getSelector(usedMeta);
       selector.usedCandidate(API);
@@ -915,10 +918,6 @@ const generateViewPicture = function (
         `Field ${item} is not defined in schema ${schemaName}. Skipped...`
       );
       continue;
-    }
-
-    if (parentType == 'SchemaMap') {
-      parentType = 'Map';
     }
 
     const DN = displayNames[item] || camelToDisplay(item);
@@ -1646,7 +1645,7 @@ function main() {
           if (!listTypes.includes(mraUI.listType)) {
             logger.warning(
               `Schema ${name} "listType" value ${mraUI.listType} incorrect. Ignore...`
-            )
+            );
           } else {
             listType = mraUI.listType;
             const tindex = listTypes.indexOf(listType);
@@ -2317,7 +2316,9 @@ function main() {
 
   // merge imports from features and selectors
   let mergedModules = fImports.modules.concat(sImports.modules);
-  mergedModules = mergedModules.filter((x, idx) => mergedModules.indexOf(x) === idx);
+  mergedModules = mergedModules.filter(
+    (x, idx) => mergedModules.indexOf(x) === idx
+  );
   let mergedImports = fImports.imports;
   for (let p in sImports.imports) {
     if (mergedImports[p]) {
@@ -2327,7 +2328,9 @@ function main() {
     }
   }
   for (let p in mergedImports) {
-    mergedImports[p] = mergedImports[p].filter((x, idx) => mergedImports[p].indexOf(x) === idx);
+    mergedImports[p] = mergedImports[p].filter(
+      (x, idx) => mergedImports[p].indexOf(x) === idx
+    );
   }
   const mImports = {
     imports: mergedImports,

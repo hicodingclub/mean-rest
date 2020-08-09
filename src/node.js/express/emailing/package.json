@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/express-emailing",
-  "version": "0.9.45",
+  "version": "0.9.46",
   "description": "Send emails",
   "main": "index.js",
   "scripts": {
@@ -16,9 +16,9 @@
     "jsonwebtoken": "^8.4.0"
   },
   "devDependencies": {
-    "@hicoder/express-core": "0.9.45"
+    "@hicoder/express-core": "0.9.46"
   },
   "peerDependencies": {
-    "@hicoder/express-core": "0.9.45"
+    "@hicoder/express-core": "0.9.46"
   }
 }
