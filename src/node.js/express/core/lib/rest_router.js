@@ -292,6 +292,12 @@ const meanRestExpressRouter = function (sysDef, moduleName, authConfig) {
       restController.mddsProperties.emailerObj = info;
     }
   };
+  expressRouter.setMddsProperty = function (key, value) {
+    if (!restController.mddsProperties) {
+      restController.mddsProperties = {};
+    }
+    restController.mddsProperties[key] = value;
+  };
 
   return expressRouter;
 };

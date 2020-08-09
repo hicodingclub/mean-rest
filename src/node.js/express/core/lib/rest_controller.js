@@ -5,14 +5,18 @@ const MddsUncategorized = 'MddsUncategorized';
 const MddsAll = 'MddsAll';
 
 const { exportAllExternal } = require('./rest_ctrl_export');
-const { emailAllErrorExternal, emailAllCheckExternal, emailAllExternal } = require('./rest_ctrl_email')
+const {
+  emailAllErrorExternal,
+  emailAllCheckExternal,
+  emailAllExternal,
+} = require('./rest_ctrl_email');
 
 const createRegex = function (obj) {
   const fieldRegex = function (field) {
     return new RegExp(
       // Escape all special characters except *
       // Allow the use of * as a wildcard like % in SQL.
-      field.replace(/([.+?^=!:${}()|\[\]\/\\])/g, '\\$1').replace(/\*/g, '.*'), 
+      field.replace(/([.+?^=!:${}()|\[\]\/\\])/g, '\\$1').replace(/\*/g, '.*'),
       'i'
     );
   };
@@ -311,8 +315,8 @@ const processPages = function (
 
 const fieldValueSearchAllowed = function (field, mraBE) {
   const fields = mraBE.valueSearchFields || [];
-  return fields.includes(field)
-}
+  return fields.includes(field);
+};
 
 class RestController {
   constructor(options) {
@@ -356,7 +360,16 @@ class RestController {
     return [views[5], views[0]]; //indexView and birefView. Brief view is for association population
   }
 
-  register(schemaName, schema, views, model, moduleName, ownerConfig, mraBE, tags) {
+  register(
+    schemaName,
+    schema,
+    views,
+    model,
+    moduleName,
+    ownerConfig,
+    mraBE,
+    tags
+  ) {
     let name = schemaName.toLowerCase();
     this.schema_collection[name] = schema;
     this.views_collection[name] = views;
@@ -377,10 +390,16 @@ class RestController {
       for (let obj of mraBE.createObjects) {
         model.create(obj, function (err, result) {
           if (err) {
-            console.error(` ～～ mraBE Initialization: failed to create object for schema ${schemaName}: `, err.message);
+            console.error(
+              ` ～～ mraBE Initialization: failed to create object for schema ${schemaName}: `,
+              err.message
+            );
             return;
           }
-          console.log(` ～～ mraBE Initialization: create object for schema ${schemaName}: `, ++cnt);
+          console.log(
+            ` ～～ mraBE Initialization: create object for schema ${schemaName}: `,
+            ++cnt
+          );
         });
       }
     }
@@ -483,7 +502,6 @@ class RestController {
         return next(err);
       }
     } else if (actionType === '/mddsaction/export') {
-      ;
     } else {
       return next(createError(400, `Action ${actionType} not supported.`));
     }
@@ -491,7 +509,7 @@ class RestController {
     const searchContext = body ? body.search : {};
 
     let rows = [];
-    let emailAllResult = {success: 0, fail: 0, queuing: 0, error: null}
+    let emailAllResult = { success: 0, fail: 0, queuing: 0, error: null };
 
     const PER_PAGE = 400; //query 400 each time. SES limit is 500;
     for (let p = 1; ; p++) {
@@ -776,16 +794,12 @@ class RestController {
             // put total cnt in front.
             categoriesCounts[i].splice(0, 0, totalCnt);
             */
-            let totalCnt = await model
-              .countDocuments(catQuery)
-              .exec(); // returns array of distinct field values. Value is unwinded for array type.
+            let totalCnt = await model.countDocuments(catQuery).exec(); // returns array of distinct field values. Value is unwinded for array type.
             categoriesCounts[i].splice(0, 0, totalCnt);
           }
 
-          catQuery[cate.categoryBy] = {$in: [null, []]};
-          let uncategorizedCnt = await model
-            .countDocuments(catQuery)
-            .exec(); // returns array of distinct field values. Value is unwinded for array type.
+          catQuery[cate.categoryBy] = { $in: [null, []] };
+          let uncategorizedCnt = await model.countDocuments(catQuery).exec(); // returns array of distinct field values. Value is unwinded for array type.
           categoriesCounts[i].push(uncategorizedCnt);
 
           // get the biref population of the category fields
@@ -802,7 +816,7 @@ class RestController {
 
           // db.someCollection.aggregate([{ $match: { age: { $gte: 21 }}}, {"$group" : {_id:"$source", count:{$sum:1}}} ])
         } catch (err) {
-          throw (err);
+          throw err;
         }
       }
 
@@ -814,7 +828,7 @@ class RestController {
         } else if (cate.categoryCand === MddsUncategorized) {
           // uncategorized request from front end. use null.
           // query[cate.categoryBy] = null;
-          query[cate.categoryBy] = {$in: [null, []]};
+          query[cate.categoryBy] = { $in: [null, []] };
         } else {
           if (i === 0) {
             // Search all. don't put to query
@@ -830,7 +844,7 @@ class RestController {
     try {
       count = await model.countDocuments(query).exec();
     } catch (err) {
-      throw (err);
+      throw err;
     }
 
     const [perPage, pageNum, maxPageNum, skipCount] = processPages(
@@ -882,7 +896,7 @@ class RestController {
 
       return [output, items];
     } catch (err) {
-      throw (err);
+      throw err;
     }
   }
 
@@ -933,7 +947,9 @@ class RestController {
       return next(createError(400, 'Field is not provided'));
     }
     if (!fieldValueSearchAllowed(__field, mraBE)) {
-      return next(createError(400, `Field value search for '${__field}' is now allowed`));
+      return next(
+        createError(400, `Field value search for '${__field}' is now allowed`)
+      );
     }
 
     let catQuery = {};
@@ -955,7 +971,7 @@ class RestController {
       { $match: catQuery },
       { $unwind: `$${__field}` }, // unwind will unpack the array, if field is of type array.
       { $group: { _id: `$${__field}`, count: { $sum: 1 } } }, // group and sum
-      { $match: fieldQuery}, // pick fields matching the given field value;
+      { $match: fieldQuery }, // pick fields matching the given field value;
       { $sort: sortO },
       { $limit: __limit },
     ];
@@ -1100,7 +1116,7 @@ class RestController {
       dbExec = dbExec.populate(p.path); //only give the reference path. return everything for reference
     }
     let result = await dbExec.exec();
-  
+
     result = JSON.parse(JSON.stringify(result));
     let reducedResult = resultReducerForRef(result, populateMap);
     reducedResult = resultReducerForView(reducedResult, detailView);
@@ -1128,15 +1144,16 @@ class RestController {
     } = this.loadContextVars(req);
     let idParam = name + 'Id';
     let id = req.params[idParam];
-    model.findByIdAndDelete(id).exec(function (err, result) {
+    model.findByIdAndDelete(id).exec((err, result) => {
       if (err) {
         return next(err);
       }
+      this.handleHooks('delete', result, mraBE);
       return res.send();
     });
   }
 
-  deleteManyByIds(req, res, next, ids) {
+  async deleteManyByIds(req, res, next, ids) {
     const {
       name,
       schema,
@@ -1146,9 +1163,21 @@ class RestController {
       owner,
       mraBE,
     } = this.loadContextVars(req);
-    model.deleteMany({ _id: { $in: ids } }).exec(function (err, result) {
+    let query = { _id: { $in: ids } };
+    let docs = [];
+    if (this.hasHooks('delete', mraBE)) {
+      try {
+        docs = await model.find(query).exec();
+      } catch (err) {
+        console.error('query docs faied ', err);
+      }
+    }
+    model.deleteMany(query).exec((err, results) => {
       if (err) {
         return next(err);
+      }
+      for (let doc of docs) {
+        this.handleHooks('delete', doc, mraBE);
       }
       return res.send();
     });
@@ -1206,7 +1235,7 @@ class RestController {
       }
     }
     body = ownerPatch(body, owner, req);
-    let result = await model.create(body); 
+    let result = await model.create(body);
     this.handleHooks('insert', result, mraBE);
     return result;
   }
@@ -1371,18 +1400,27 @@ class RestController {
       mraBE,
     } = this.loadContextVars(req);
 
-    if (!mraBE || !mraBE.zInterfaces
-      || !mraBE.zInterfaces[action]) {
-      return next(createError(400, `Bad Request: ${action} interface not defined: ${ifname}`));
+    if (!mraBE || !mraBE.zInterfaces || !mraBE.zInterfaces[action]) {
+      return next(
+        createError(
+          400,
+          `Bad Request: ${action} interface not defined: ${ifname}`
+        )
+      );
     }
-    const targetInterfaces = mraBE.zInterfaces[action].filter(x => {
+    const targetInterfaces = mraBE.zInterfaces[action].filter((x) => {
       if (x.name === ifname) return true;
       return false;
     });
     if (targetInterfaces.length === 0) {
-      return next(createError(400, `Bad Request: ${action} interface not defined: ${ifname}`));
+      return next(
+        createError(
+          400,
+          `Bad Request: ${action} interface not defined: ${ifname}`
+        )
+      );
     }
-    const fn =  targetInterfaces[0].fn;
+    const fn = targetInterfaces[0].fn;
     return fn(req, res, next, this);
   }
 
@@ -1436,22 +1474,56 @@ class RestController {
     return dbExe.exec();
   }
 
-  handleHooks(action, data, mraBE) {
+  async handleHooks(action, data, mraBE) {
     //action: insert, update
-  
+
+    const restController = this;
+
     // 1. check emailer hooks
     const { emailer, emailerObj } = this.mddsProperties || {};
     if (emailer) {
       const emailerConf = mraBE.emailer || {};
       const replacement = emailerConf.replacement || {};
-      const hooks = emailerConf.hooks || {};
-      const restController = this;
-      if (hooks[action]) {
-        hooks[action](emailer, data, replacement, emailerObj, restController);
+      const emailHooks = emailerConf.hooks || {};
+      if (emailHooks[action]) {
+        emailHooks[action](
+          emailer,
+          data,
+          replacement,
+          emailerObj,
+          restController
+        );
       }
     }
 
     // 2. check .... hooks
+    const hooks = mraBE.hooks || {};
+    if (hooks[action]) {
+      let hooksArr = hooks[action];
+      if (!Array.isArray(hooksArr)) {
+        hooksArr = [hooks[action]];
+      }
+      for (let func of hooksArr) {
+        func(data, restController);
+      }
+    }
+  }
+  hasHooks(action, mraBE) {
+    // 1. check emailer hooks
+    const { emailer, emailerObj } = this.mddsProperties || {};
+    if (emailer) {
+      const emailerConf = mraBE.emailer || {};
+      const emailHooks = emailerConf.hooks || {};
+      if (emailHooks[action]) {
+        return true;
+      }
+    }
+    // 2. check .... hooks
+    const hooks = mraBE.hooks || {};
+    if (hooks[action]) {
+      return true;
+    }
+    return false;
   }
 }
 

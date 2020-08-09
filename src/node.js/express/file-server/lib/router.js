@@ -3,7 +3,7 @@ const fileUpload = require('express-fileupload');
 
 const meanRestExpress = require('@hicoder/express-core');
 
-const FileController = require('./controller')
+const FileController = require('./controller');
 
 const FileExpressRouter = function(sysDef, moduleName, authConfig, options) {
   const fileController = new FileController();
@@ -24,9 +24,9 @@ const FileExpressRouter = function(sysDef, moduleName, authConfig, options) {
   router = express.Router();
   router.get('/users*', fileController.DownloadUsers.bind(fileController)); // download user specific files
   router.get('/:fileID', fileController.Download.bind(fileController));
-  restRouter = meanRestExpress.RestRouter.Hook(restRouter, 'download', router);  
-  //3. load "delete" router for file delete
+  restRouter = meanRestExpress.RestRouter.Hook(restRouter, 'download', router);
 
+  restRouter.setMddsProperty('fileController', fileController);
   return restRouter;
 }
 

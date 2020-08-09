@@ -1,34 +1,39 @@
-import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
-import { Location } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
-import { Injector } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef } from "@angular/core";
+import { Location } from "@angular/common";
+import { Router, ActivatedRoute } from "@angular/router";
+import { Injector } from "@angular/core";
 
-import { forkJoin } from 'rxjs';
+import { forkJoin } from "rxjs";
 
-import Cropper from 'cropperjs';
+import Cropper from "cropperjs";
 
-import { MddsUncategorized } from '@hicoder/angular-core';
+import { MddsUncategorized } from "@hicoder/angular-core";
 
-import { MfileListComponent } from './mfile-list.component';
-import { MfileService } from '../mfile.service';
+import { MfileListComponent } from "./mfile-list.component";
+import { MfileService } from "../mfile.service";
 
-import { MddsFileUploadService, UploadStatus} from '../../file-upload.service';
-import { _appIdRandomProviderFactory } from '@angular/core/src/application_tokens';
+import { MddsFileUploadService, UploadStatus } from "../../file-upload.service";
+import { _appIdRandomProviderFactory } from "@angular/core/src/application_tokens";
 
-const MddsFileCrop = 'mdds-file-crop';
+const MddsFileCrop = "mdds-file-crop";
 @Component({
-  selector: 'lib-mfile-list-widget-gallery',
-  templateUrl: './mfile-list-widget-gallery.component.html',
-  styleUrls: ['./mfile-list.component.css', './mfile-list-widget-gallery.component.css'],
+  selector: "lib-mfile-list-widget-gallery",
+  templateUrl: "./mfile-list-widget-gallery.component.html",
+  styleUrls: [
+    "./mfile-list.component.css",
+    "./mfile-list-widget-galleryBottomTitle.component.css",
+    "./mfile-list-widget-gallery.component.css",
+  ],
 })
-export class MfileListWidgetGalleryComponent extends MfileListComponent implements OnInit {
+export class MfileListWidgetGalleryComponent extends MfileListComponent
+  implements OnInit {
   public titleFn: string;
   public picturelinkFn: string;
   @Input() options: any = {}; // {canSelect: true, largePicture: true, showTitle: true, aspectRaio};
   public selectedIdx;
 
-  @ViewChild('FilesModal', {static: true}) public focusEl: ElementRef;
-  @ViewChild('file', {static: true}) public file;
+  @ViewChild("FilesModal", { static: true }) public focusEl: ElementRef;
+  @ViewChild("file", { static: true }) public file;
 
   public files: Set<File> = new Set();
 
@@ -49,21 +54,23 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent implemen
   cropper: Cropper;
 
   constructor(
-      public mfileService: MfileService,
-      public injector: Injector,
-      public router: Router,
-      public route: ActivatedRoute,
-      public location: Location,
-      private uploadService: MddsFileUploadService) {
-        super(null, mfileService, injector, router, route, location);
-        this.majorUi = false;
+    public mfileService: MfileService,
+    public injector: Injector,
+    public router: Router,
+    public route: ActivatedRoute,
+    public location: Location,
+    private uploadService: MddsFileUploadService
+  ) {
+    super(null, mfileService, injector, router, route, location);
+    this.majorUi = false;
   }
-
 
   ngOnInit() {
     // this.inputData == this.inputData|| [] // expect field name in array: ['subtitle', 'description', 'picture']
-    if ( !Array.isArray(this.inputData) || this.inputData.length < 2) {
-      console.error('inputData of array is expected for gallery view: titleFn, picturelinkFn');
+    if (!Array.isArray(this.inputData) || this.inputData.length < 2) {
+      console.error(
+        "inputData of array is expected for gallery view: titleFn, picturelinkFn"
+      );
       return;
     }
 
@@ -130,7 +137,8 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent implemen
     if (groupName === MddsUncategorized) {
       groupName = null;
     }
-    if (grpName) { // use given group name
+    if (grpName) {
+      // use given group name
       groupName = grpName;
     }
     // start the upload and save the progress map
@@ -150,7 +158,7 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent implemen
     this.showCancelButton = false;
 
     // When all progress-observables are completed...
-    forkJoin(allProgressObservables).subscribe(end => {
+    forkJoin(allProgressObservables).subscribe((end) => {
       // ... the dialog can be closed again...
       this.canBeClosed = true;
       // this.dialogRef.disableClose = false;
@@ -171,14 +179,15 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent implemen
   }
 
   public onGroupAdded(result: any) {
-    if (result) { // add successful. Re-populate the current list
+    if (result) {
+      // add successful. Re-populate the current list
       this.categoryDisplays.push(result.name);
       this.categories.push({
-        group: result
+        group: result,
       });
       this.categoriesCounts.push(0);
     } else {
-        ; // do nothing
+      // do nothing
     }
   }
   // rewite. Just close the pop up
@@ -201,37 +210,42 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent implemen
   }
   // overload the base one
   selectItemConfirmed() {
-    this.cropper.getCroppedCanvas().toBlob((blob) => {
-      // convert to a file
-      const b: any = blob;
-      b.lastModifiedDate = new Date();
-      b.name = this.selectedFileName;
+    this.cropper.getCroppedCanvas().toBlob(
+      (blob) => {
+        // convert to a file
+        const b: any = blob;
+        b.lastModifiedDate = new Date();
+        b.name = this.selectedFileName;
 
-      const f = blob as File;
+        const f = blob as File;
 
-      this.uploadSuccessful = false;
-      this.selectNew = false;
-      this.progress = undefined;
+        this.uploadSuccessful = false;
+        this.selectNew = false;
+        this.progress = undefined;
 
-      this.files = new Set();
-      this.uploadingFiles = []; // clear
+        this.files = new Set();
+        this.uploadingFiles = []; // clear
 
-      this.files.add(f);
-      this.uploadingFiles.push(f.name);
-      this.uploadFiles(MddsFileCrop, () => {
-        const success = this.progress[f.name].result.success;
-        if (success) {
-          const fileObj = this.progress[f.name].result.value;
-          this.outputData = {action: 'selected',
-            detail: fileObj,
-            value: undefined
-          };
-          this.done.emit(true);
-        } else {
-          this.uploadingFiles.push(f.name);
-        }
-      });
-    }, 'image/jpeg', 0.9);
+        this.files.add(f);
+        this.uploadingFiles.push(f.name);
+        this.uploadFiles(MddsFileCrop, () => {
+          const success = this.progress[f.name].result.success;
+          if (success) {
+            const fileObj = this.progress[f.name].result.value;
+            this.outputData = {
+              action: "selected",
+              detail: fileObj,
+              value: undefined,
+            };
+            this.done.emit(true);
+          } else {
+            this.uploadingFiles.push(f.name);
+          }
+        });
+      },
+      "image/jpeg",
+      0.9
+    );
   }
 
   backSelect() {

@@ -1,6 +1,5 @@
-const schema = require('./schema');
-
-const { fileSchema, fileGroupSchema } = schema;
+const { fileSchema, fileGroupSchema } = require('./schema');
+const { hooks } = require('./hooks');
 
 const fB = 'name type group labels size link createdAt hasThumbnail';
 const fD = 'name type group labels size link createdAt hasThumbnail';
@@ -23,7 +22,7 @@ const schemas = {
   'mfile': {
      schema: fileSchema,
      views: [fB, fD, fC, fE, fTS, fI],
-     api: 'LU',  // api exposed by rest controller
+     api: 'LUD',  // api exposed by rest controller
      name: 'File',
      mraUI: {
       listCategories: [
@@ -33,6 +32,9 @@ const schemas = {
           showEmptyCategory: false,
         },
       ],
+     },
+     mraBE: {
+      hooks,
      },
   },
   'mfilegroup': {
@@ -46,12 +48,11 @@ const schemas = {
   },
   'upload': {},
   'download': {},
-  'delete': {},
 };
 const config = {
   dateFormat,
   timeFormat,
-  // patch: ['mmodule_name'], //extra fields to patch to schema
+  patch: ['mmodule_name'], //extra fields to patch to schema
   owner: {enable: true, type: 'module'},
 };
 

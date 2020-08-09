@@ -1,15 +1,17 @@
 .page-link {
-	padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.5rem;
+  text-align: center;
+  font-size: 0.8rem;
 }
 
 .pagination li {
-    min-width: 2rem;
+  min-width: 2rem;
 }
 
 .list-items {
-	min-height: 120px;
+  min-height: 120px;
 }
 
 .total_counts {
-    padding-top: 0rem;
+  padding-top: 0rem;
 }

@@ -1,15 +1,6 @@
 ﻿import { Component, EventEmitter, OnInit, Input, Output, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
-import { ViewContainerRef,  Directive, ComponentFactoryResolver } from '@angular/core';
-
-import { MddsBaseComponentInterface } from '@hicoder/angular-core';
 
 import { MfileListWidgetGalleryComponent } from './mfile/mfile-list/mfile-list-widget-gallery.component'
-@Directive({
-  selector: '[libMddsFileSelect]',
-})
-export class MddsFileSelectDirective {
-  constructor(public viewContainerRef: ViewContainerRef) { }
-}
 
 @Component({
     selector: 'lib-mdds-file-select',
@@ -23,13 +14,12 @@ export class FileSelectComponent implements OnInit, OnChanges {
     @Input() askForSelect: boolean = false;
     @Output() downloadUrlChange = new EventEmitter<string>();
 
-    @ViewChild(MddsFileSelectDirective, {static: true}) refSelectDirective: MddsFileSelectDirective;
+    public showListWidget: boolean = false;
+    @ViewChild(MfileListWidgetGalleryComponent) listWidget: MfileListWidgetGalleryComponent;
 
     public componentSubscription;
 
-    constructor(
-      private componentFactoryResolver: ComponentFactoryResolver,
-    ) {}
+    constructor() {}
 
     ngOnInit() {}
 
@@ -50,34 +40,23 @@ export class FileSelectComponent implements OnInit, OnChanges {
     }
 
     selectFileList() {
-      const viewContainerRef = this.refSelectDirective.viewContainerRef;
-      viewContainerRef.clear();
-
-      const componentFactory = this.componentFactoryResolver.resolveComponentFactory(MfileListWidgetGalleryComponent);
-      const componentRef = viewContainerRef.createComponent(componentFactory); // create and insert in one call
-
-      const componentInstance = componentRef.instance as MddsBaseComponentInterface;
-      componentInstance.setFocus();
-      componentInstance.inputData = ['name', 'link'];
-      componentInstance.options = {canSelect: true, largePicture: false, showTitle: true, aspectRatio: this.aspectRatio};
-
-      this.componentSubscription = componentInstance.done.subscribe( (val) => {
-        const outputData = componentInstance.outputData;
-        if (outputData) {
-          switch (outputData.action){
-            case 'selected':
-              this.downloadUrl = outputData.detail.link;
-              this.downloadUrlChange.emit(this.downloadUrl); // emit the new url to parent.
-              break;
-            default:
-              break;
-          }
+      this.showListWidget = true;
+    }
+    listWidgetDone(val: boolean) {
+      const outputData = this.listWidget.outputData;
+      if (outputData) {
+        switch (outputData.action){
+          case 'selected':
+            this.downloadUrl = outputData.detail.link;
+            this.downloadUrlChange.emit(this.downloadUrl); // emit the new url to parent.
+            break;
+          default:
+            break;
         }
-        if (val) {
-          this.componentSubscription.unsubscribe();
-          viewContainerRef.clear(); // only detach. not destroy
-        }
-      });
+      }
 
+      if (val) {
+        this.showListWidget = false;
+      }
     }
 }

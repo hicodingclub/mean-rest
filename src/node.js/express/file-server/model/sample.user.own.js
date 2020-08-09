@@ -46,7 +46,6 @@ const schemas = {
   },
   'upload': {},
   'download': {},
-  'delete': {},
 };
 const config = {
   dateFormat,

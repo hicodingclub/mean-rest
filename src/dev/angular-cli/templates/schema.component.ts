@@ -72,9 +72,11 @@ export class <%-SchemaName%>Component extends MddsBaseComponent implements OnIni
     // @Input() 
     // public id:string;
     @Input()
-    public disableActionButtions:boolean;
+    public disableActionButtons:boolean;
     @Output()
     public eventEmitter: EventEmitter<any> = new EventEmitter();
+    @Input()
+    public listRouterLink: string = '<%-listRouterLink%>'; // router link from detail to list
 
     // detail sub component
     // @Input() inputData;
@@ -97,9 +99,9 @@ export class <%-SchemaName%>Component extends MddsBaseComponent implements OnIni
   <%_ for (let field of compositeEditBriefView) { 
       if (field.Ref) {const listSelTypeRef = refListSelectType[field.ref][0]; const ListSelTypeRef = refListSelectType[field.ref][1];%>
       '<%-field.fieldName%>': {
-          <% if (refApi[field.ref].includes("R")) {%>'select-type': <%if (listSelTypeRef === 'normal') {%><%-field.Ref%>ListSelectComponent<%} else {%><%-field.Ref%>ListSelect<%-ListSelTypeRef%>Component<%}%>,<%}%>
+          <% if (refApi[field.ref].includes("L")) {%>'select-type': <%if (listSelTypeRef === 'normal') {%><%-field.Ref%>ListSelectComponent<%} else {%><%-field.Ref%>ListSelect<%-ListSelTypeRef%>Component<%}%>,<%}%>
           <% if (refApi[field.ref].includes("R")) {%>'select-detail-type': <%-field.Ref%>DetailSelComponent,<%}%>
-          <% if (refApi[field.ref].includes("L")) {%>'pop-detail-type': <%-field.Ref%>DetailPopComponent,<%}%>
+          <% if (refApi[field.ref].includes("R")) {%>'pop-detail-type': <%-field.Ref%>DetailPopComponent,<%}%>
           'componentRef': null},<%}}%>
     }
     @ViewChild(<%-ModuleName%>RefSelectDirective, {static: true}) refSelectDirective: <%-ModuleName%>RefSelectDirective;

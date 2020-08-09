@@ -3,7 +3,7 @@
 	<h3><%-detailTitle%></h3>
 </div><%}%>
 <div class="detail" *ngIf="detail">
-	<div *ngIf="!options['disableActionButtions']"><%_ include schema-detail.d.actions.html %></div>
+	<div *ngIf="!options['disableActionButtons']"><%_ include schema-detail.d.actions.html %></div>
 	<div class="card text-left transparent-border ">
 		<div class="grid-fields">
 	<%_ viewFields = detailView; let viewGrp = detailViewGrp; let view='detail'; let largePicture=false;%><%_ include schema-display.detail.html %>

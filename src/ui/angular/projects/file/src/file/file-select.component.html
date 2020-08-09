@@ -11,4 +11,8 @@
   </div>
 </div>
 
-<ng-template libMddsFileSelect></ng-template>
+<lib-mfile-list-widget-gallery *ngIf="showListWidget"
+  [inputData]="['name', 'link']"
+  [options]="{canSelect: true, largePicture: false, showTitle: true, aspectRatio: this.aspectRatio}"
+  (done)="listWidgetDone($event)"
+></lib-mfile-list-widget-gallery>

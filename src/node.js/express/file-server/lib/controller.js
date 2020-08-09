@@ -133,7 +133,7 @@ const LoadFromFileSystem = function(fileId, directory, cb) {
 const DeleteFromFileSystem = function(fileId, directory, hasFile, cb) {
   if (!hasFile) {return cb(null);}
   
-  // Use the mv() method to place the file somewhere on your server
+  // Use the mv() method to remove the file
   let fileName = path.join(directory, fileId)
   fs.unlink(fileName, function (err) {
     return cb(err);
@@ -141,19 +141,18 @@ const DeleteFromFileSystem = function(fileId, directory, hasFile, cb) {
 };
 
 class FileController {
-  sOptions = {}; // storage options
-  configs = {};
+  sOption = defaultSOption;
+  config = {  owner: {enable: true, type: 'module'} };
   
   constructor() { }
-
-  getOptionByName = function(moduleName) {
-    return this.sOptions[moduleName] || defaultSOption;
+  getOption = function() {
+    return this.sOption ;
   };
-  getConfigByName = function(moduleName) {
-    return this.configs[moduleName] || {  owner: {enable: true, type: 'module'} };
+  getConfig = function() {
+    return this.config;
   };
   setConfig(moduleName, config) {
-    this.configs[moduleName] = config;
+    this.config = config;
   }
   setOption(moduleName, option) {
     switch (option.storage) {
@@ -176,13 +175,13 @@ class FileController {
       default:
         console.error("File Server: storage type is not supported:", option.storage);
     }
-    this.sOptions[moduleName] = option;
+    this.sOption = option;
   }
 
   async Create(req, res, next) {
     let moduleName = req.mddsModuleName;
-    let sOption = this.getOptionByName(moduleName);
-    let owner = this.getConfigByName(moduleName).owner;
+    let sOption = this.getOption();
+    let owner = this.getConfig().owner;
     const files = Object.values(req.files); //[mfile1, mfile2, ... ]
 
     let fileID = req.params["fileID"];
@@ -303,7 +302,7 @@ class FileController {
   
   Download(req, res, next) {
     let moduleName = req.mddsModuleName;
-    let sOption = this.getOptionByName(moduleName);
+    let sOption = this.getOption();
     let fileName = req.params["fileID"];
     console.log('fileName====', fileName);
     let id = fileName;
@@ -350,7 +349,7 @@ class FileController {
 
   DownloadUsers(req, res, next) {
     let moduleName = req.mddsModuleName;
-    let sOption = this.getOptionByName(moduleName);    
+    let sOption = this.getOption();
     let filePath = req.originalUrl.split('/download/users/')[1];
     
     let [userId, fileName] = filePath.split('/');
@@ -375,7 +374,7 @@ class FileController {
 
   Delete(req, res, next) {
     let moduleName = req.mddsModuleName;
-    let sOption = this.getOptionByName(moduleName);
+    let sOption = this.getOption();
     let id = req.params["fileID"];
 
     let skipDb = false;
@@ -408,6 +407,26 @@ class FileController {
       });
     } else {
       deleteAll(id, sOption.directory, true);
+    }
+  }
+
+  DeleteById(id, hasThumbnail) {
+    let sOption = this.getOption();
+    if (sOption && sOption.storage === 'fs') {
+      let directory = sOption.directory;
+      DeleteFromFileSystem(id.toString(), directory, true, (err) => {
+        if (err) {
+          console.error(`Failed to delete ${id}`, err);
+        }
+      });
+      if (!hasThumbnail) {
+        return;
+      }
+      DeleteFromFileSystem(id.toString() + '_thumbnail', directory, true, (err) => {
+        if (err) {
+          console.error(`Failed to delete ${id}__thumbnail`, err);
+        }
+      });
     }
   }
 }

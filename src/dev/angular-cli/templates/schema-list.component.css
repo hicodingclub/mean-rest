@@ -246,6 +246,8 @@ tr:hover td i.fa-trash-alt:hover,
   position: relative;
   background-color: #fefefe;
   /*margin: auto;*/
+  margin-left: auto;
+  margin-right: auto;
   padding: 0;
   border: 1px solid #888;
   width: 90%;

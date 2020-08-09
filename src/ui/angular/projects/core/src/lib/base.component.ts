@@ -80,6 +80,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
   public briefFieldsInfo = []; // from base contructor. All breifFields
 
+  public listRouterLink: string = '../../list'; //router link from detail to list; overridden by component
   public listViewFilter = 'table'; // list, or grid
   public listSortField: string;
   public listSortFieldDisplay: string;
@@ -1957,7 +1958,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
             snackBar.show();
 
             if (this.view !== ViewType.LIST) {
-              this.router.navigate(['../../list'], { relativeTo: this.route });
+              this.router.navigate([this.listRouterLink], { relativeTo: this.route });
             } else {
               const len = this.checkedItem.length;
               for (let i = 0; i < len; i++) {
@@ -2000,7 +2001,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
             snackBar.show();
 
             if (this.view !== ViewType.LIST) {
-              this.router.navigate(['../../list'], { relativeTo: this.route });
+              this.router.navigate([this.listRouterLink], { relativeTo: this.route });
             } else if (idx !== null && this.list) {
               this.list.splice(idx, 1);
               this.checkedItem.splice(idx, 1);
@@ -2088,7 +2089,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
               snackBar.show();
 
               if (this.view !== ViewType.LIST) {
-                this.router.navigate(['../../list'], {
+                this.router.navigate([this.listRouterLink], {
                   relativeTo: this.route,
                 });
               } else {

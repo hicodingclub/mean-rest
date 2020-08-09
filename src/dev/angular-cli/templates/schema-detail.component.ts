@@ -21,7 +21,7 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>DetailCustCom
   // @Input()
   // public searchObj:any;
   // @Input()
-  // public disableActionButtions:boolean;
+  // public disableActionButtons:boolean;
   // @Output()
   // public eventEmitter: EventEmitter<any> = new EventEmitter();
 

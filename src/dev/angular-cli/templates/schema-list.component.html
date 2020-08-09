@@ -43,7 +43,7 @@ if (listCategoryRef && listCategoryShowMore) {%>
 <div>
 	<div *ngIf="!options['disableListHead']" class="container search"><%-
 		include('/schema-search.include.html'); %>
-		<div class="row" *ngIf="!options['disableActionButtions']">
+		<div class="row" *ngIf="!options['disableActionButtons']">
 			<div class="col">
 		        <div class="action-buttons"><%
 					if (api.includes('M') && listActionButtons[2] && sFeatures.hasEmailing){%>

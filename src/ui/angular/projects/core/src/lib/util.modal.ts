@@ -22,7 +22,7 @@ const modalCss = `
 .meanExpressAngularModal {
     display: none;
     position: fixed;
-    z-index: 100;
+    z-index: 2000;
     padding-top: 100px;
     left: 0;
     top: 0;

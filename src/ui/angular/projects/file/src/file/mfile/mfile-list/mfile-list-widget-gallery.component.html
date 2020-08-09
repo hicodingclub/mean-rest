@@ -12,8 +12,10 @@
       <div class="modal-body">
 
 <!--  modal body starts -->
-  <div [hidden]="croppingPictureLink" class="select-picture"><!-- start of selection -->
+  <!-- 1. start of selection -->
+  <div [hidden]="croppingPictureLink" class="select-picture">
 
+    <!-- 1.1. Left panel (groups)-->
     <ul *ngIf="listCategory1.listCategoryField" class="nav nav-pills category-nav">
       <li *ngFor="let ele of categoryDisplays; let idx = index;" class="nav-item" >
         <!-- not show idx 0 "All"-->
@@ -26,212 +28,265 @@
       <li class="li-add">
           <a class="pointer" routerLink="." (click)="onAdd()"><i class="fas fa-plus-square" title="Add"></i> New Group</a>
           <div class="add-group-pop" *ngIf="isAdding">
-              <lib-mfilegroup-edit [initData]="parentData" [embeddedView]="true" [embedMode]="'create'" (done)="onActionDone($event)" (doneData)="onGroupAdded($event)"></lib-mfilegroup-edit>
+              <app-mfilegroup-edit [initData]="parentData" [embeddedView]="true" [embedMode]="'create'" (done)="onActionDone($event)" (doneData)="onGroupAdded($event)"></app-mfilegroup-edit>
           </div>
       </li>
     </ul>
-    
-    
+    <!-- Endo of left panel (groups)-->
+
+    <!-- 1.2. start of right panel-->
     <div class="main-area">
-      <div class="container search">
-        <div class="row">
-          <div class="col-9">
-    
-    
+      <!-- 1.2.1 Start of select/upload buttons-->
+      <div class="action-buttons">
+        <button type="button" class="btn btn-success" (click)="selectConfirmed()"
+        [disabled]="!isItemSelected()">Confirm Selection</button>
+        <button type="button" class="btn btn-outline-success" (click)="selectFiles()">Upload New</button>            
+      </div>
+      <!-- End of select/upload buttons-->
+      <!-- 1.2.2 Start of gallery widget-->
+      <div>
+        <div *ngIf="!options['disableListHead']" class="container search">
+          <div class="row" *ngIf="!options['disableListSearch']">
+            <div class="col">
               <div class="input-group">
-                    <input type="search" class="form-control border border-secondary" id="mfileTextSearch" 
-                #mfileTextSearch [(ngModel)]="searchText"
-                (keydown.enter)="$event.target.blur();searchList();false"
-                  placeholder="Search for name"> 
-              <div *ngIf="searchText" class="input-group-append icon-clear-inside">
-              <span >
-                  <i class="fas fa-times-circle" (click)="onSearchTextClear()" title="Clear"></i>
+                <input type="search" class="form-control border border-secondary" id="mfileTextSearch" #mfileTextSearch [(ngModel)]="searchText" (search)="$event.target.blur();searchList();" placeholder="Search for name">
+                <div *ngIf="searchText" class="input-group-append icon-search-clear">
+                  <span>
+                    <i class="fas fa-times-circle" (click)="onSearchTextClear()" title="Clear"></i>
+                  </span>
+                </div>
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-outline-secondary" (click)="searchList()"><i class="fas fa-search"></i></button>
+                </div>
+              </div>
+              <div class="text-center">
+                <span class="pointer" (click)="toggleMoreSearch()">
+                  <span class="refine-search-text">Refine Search &nbsp;</span>
+                  <span>
+                    <i *ngIf="!moreSearchOpened" class="fas fa-plus-circle" title="More"></i>
+                    <i *ngIf="moreSearchOpened" class="fas fa-minus-circle" title="Less"></i>
+                  </span>
                 </span>
               </div>
-              <div class="input-group-append">
-                <button type="button" class="btn btn-outline-secondary" (click)="searchList()"><i class="fas fa-search"></i></button>
+              <div class="shadow" *ngIf="moreSearchOpened">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="d-flex flex-wrap align-items-center">
+                      <div class="container one-column-search small">
+                        <div class="row col-gutter align-items-center">
+                          <div class="col-12 col-lg-3">
+                            <label for="mfileEditCreatedAt"> Upload time </label>
+                          </div>
+                          <div class="col-11 col-lg-8">
+                            <div class="row">
+                              <div class="input-group input-group-sm col-12 col-md-6 align-items-center">
+                                <span class="small mx-1" style="width:2rem">From</span>
+                                <input class="form-control form-control-sm" id="mfileEditCreatedAtFrom" placeholder="{{dateFormat}}" [(ngModel)]="detail['createdAt']['from']" name="mfileEditCreatedAt" ngbDatepicker [minDate]="minDate" #mfileEditCreatedAt="ngModel">
+                                <div class="input-group-append">
+                                  <button class="btn btn-outline-secondary" (click)="onDateSelectionToggle('createdAt')" type="button">
+                                    <i class="fas fa-calendar-alt"></i>
+                                  </button>
+                                </div>
+                              </div>
+                              <div class="input-group input-group-sm col-12 col-md-6 align-items-center">
+                                <span class="small mx-1" style="width:2rem">to</span>
+                                <input class="form-control form-control-sm" id="mfileEditCreatedAtTo" placeholder="{{dateFormat}}" [(ngModel)]="detail['createdAt']['to']" name="mfileEditCreatedAt" ngbDatepicker [minDate]="minDate" #mfileEditCreatedAt="ngModel">
+                                <div class="input-group-append">
+                                  <button class="btn btn-outline-secondary" (click)="onDateSelectionToggle('createdAt')" type="button">
+                                    <i class="fas fa-calendar-alt"></i>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="date-selection-pop" *ngIf="detail['createdAt']['pop']">
+                              <ngb-datepicker #dp [minDate]="minDate" (select)="onDateSelection('createdAt', $event)" [displayMonths]="datePickerDisplayMonths" [dayTemplate]="mfileEditCreatedAtT">
+                              </ngb-datepicker>
+                              <ng-template #mfileEditCreatedAtT let-mfileEditCreatedAtDate="date" let-mfileEditCreatedAtFocused="focused">
+                                <span class="custom-day" [class.focused]="mfileEditCreatedAtFocused" [class.range]="isRange('createdAt', mfileEditCreatedAtDate)" [class.faded]="isHovered('createdAt', mfileEditCreatedAtDate) || isInside('createdAt', mfileEditCreatedAtDate)" (mouseenter)="hoveredDate = mfileEditCreatedAtDate" (mouseleave)="hoveredDate = null">
+                                  {{ mfileEditCreatedAtDate.day }}
+                                </span>
+                              </ng-template>
+                            </div>
+                          </div>
+                          <div class="col-1">
+                            <div class="pointer" (click)="clearValueFromDetail('createdAt')" *ngIf="checkValueDefinedFromDetail('createdAt')"><i class="fas fa-times-circle" title="Clear"></i></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="action-buttons">
+                      <button type="button" class="btn btn-outline-success" (click)="onSearchClear()">Reset</button>
+                      <button type="button" class="btn btn-success" (click)="searchList()">Search</button>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>        
+              <div *ngIf="!moreSearchOpened" style="text-align: left;">
+                <span class="badge badge-pill badge-info" *ngFor="let value of searchMoreDetail">
+                  <a (click)="toggleMoreSearch()" class="pointer"> {{value[0]}}: {{value[1]}}</a>
+                  <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromDetailAndSearchList(value[2])" title="Clear"></i>
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-
-        <hr/>
-        <div class="action-buttons">
-
-            <button type="button" class="btn btn-success" (click)="selectConfirmed()"
-            [disabled]="!isItemSelected()">Confirm Selection</button>
-            <button type="button" class="btn btn-outline-success" (click)="selectFiles()">Upload New</button>            
-        </div>
-        <div class="row justify-content-end mt-3">
-        
-          <div *ngIf="list.length > 2" class="sort-selection mr-5">
-              <div class="dropdown" style="width: 100%;">
-                <button class="sort-dropdown btn btn-light btn-sm dropdown-toggle"
-                  type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Sort: <span *ngIf="listSortField && !viewHiddenFields.includes(listSortField)">{{listSortFieldDisplay}}
+          <div class="row" *ngIf="!options['disableActionButtons']">
+            <div class="col">
+              <div class="action-buttons">
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div *ngIf="!options['disablePagination']">
+            <div class="row justify-content-end mt-3">
+              <div *ngIf="list.length > 2" class="sort-selection mr-5">
+                <div class="dropdown" style="width: 100%;">
+                  <button class="sort-dropdown btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Sort: <span *ngIf="listSortField && !viewHiddenFields.includes(listSortField)">{{listSortFieldDisplay}}
                       <i *ngIf="listSortOrder === 'asc'" class="fas fa-arrow-up"></i>
                       <i *ngIf="listSortOrder === 'desc'" class="fas fa-arrow-down"></i>
-                  </span>
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  <a class="dropdown-item pointer" (click)="setListSortAndRefresh('name', 'Name', 'asc')">Name<i class="fas fa-arrow-up"></i></a>
-                  <a class="dropdown-item pointer" (click)="setListSortAndRefresh('name', 'Name', 'desc')">Name<i class="fas fa-arrow-down"></i></a>
-                </div>
-              </div>
-          </div>
-          
-        </div>
-        <div class="d-flex justify-content-between">
-          <div></div>
-          <div>
-            <div class="total_counts">
-              <span *ngIf="list.length > 2">Total: <b>{{totalCount}}</b></span>
-              <a class="ml-3" (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a>
-            </div>
-          </div>
-        </div>
-    
-        <div class="d-flex justify-content-center mt-2">
-            <div *ngIf="totalPages > 1">
-              <ul class="pagination justify-content-center">
-                <li class="page-item"
-                    [ngClass]="{'disabled': page<=1}">
-                <a class="page-link" routerLink="." (click)="onPreviousPage()"
-                  aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                  <span class="sr-only">Previous</span>
-                </a>
-                </li>
-    
-                <li *ngIf="leftMore" class="page-item"><a class="page-link">...</a></li>
-    
-                <li *ngFor="let p of pages;  let i = index" class="page-item"
-                    [ngClass]="{'active': p==page}">
-                  <a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
-                </li>
-    
-                <li *ngIf="rightMore" class="page-item"><a class="page-link">...</a></li>
-                <li class="page-item"
-                    [ngClass]="{'disabled': page>=totalPages}">
-                <a class="page-link" routerLink="." (click)="onNextPage()"
-                  aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
-                  <span class="sr-only">Next</span>
-                </a>
-                </li>
-              </ul>
-            </div>
-        </div>
-    
-      </div>
-      <div class="no-records" *ngIf="list.length === 0">
-        <span *ngIf="loaded">No records found.</span>
-        <span *ngIf="!loaded">Loading...</span>
-      </div>
-      <div *ngIf="list.length > 0">
-    
-    
-    
-        <!-- start of gallery-->
-
-        <div class="galleryView">
-          <div class="grid-block"  [ngClass]="{'grid-block-large': options['largePicture']}" *ngFor="let detail of list;  let i = index; let list_index = index;">
-            <div class="text-left h-100"
-              [ngClass]="{'clickable-card pointer': clickItemAction, 'clicked-row': checkedItem[i]}" >
-              <div class="grid-fields" (click)="clickOneItem(i)" >
-
-                <div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}">                
-                      <lib-mdds-file-display [downloadUrl]="detail[picturelinkFn]" [isLarge]="options['largePicture']"></lib-mdds-file-display>
-                </div>
-                <div *ngIf="options['showTitle']" class="grid-picture-name">		
-                    {{detail[titleFn]}}
+                    </span>
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item pointer" (click)="setListSortAndRefresh('name', 'Name', 'asc')">Name<i class="fas fa-arrow-up"></i></a>
+                    <a class="dropdown-item pointer" (click)="setListSortAndRefresh('name', 'Name', 'desc')">Name<i class="fas fa-arrow-down"></i></a>
+                    <a class="dropdown-item pointer" (click)="setListSortAndRefresh('createdAt', 'Upload time', 'asc')">Upload time<i class="fas fa-arrow-up"></i></a>
+                    <a class="dropdown-item pointer" (click)="setListSortAndRefresh('createdAt', 'Upload time', 'desc')">Upload time<i class="fas fa-arrow-down"></i></a>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="grid-block" *ngFor="let file of uploadingFiles">
-            <small *ngIf="progress" >{{file}}
-                <span>{{progress[file].progress | async}} </span>
-                <span *ngIf="uploadSuccessful">
-                    <span *ngIf="progress[file].result.success">SUCC</span>
-                    <span *ngIf="!progress[file].result.success">FAIL</span>
-                </span>
-            </small>
-          </div>
-
-        </div>
-
-
-
-
-        <!-- end of gallery-->
-    
-      </div>
-      <div class="container">
-        <div class="row justify-content-end mt-3">
-        
-          
-        </div>
-        <div class="d-flex justify-content-between">
-          <div></div>
-          <div>
-            <div class="total_counts">
-              <span *ngIf="list.length > 2">Total: <b>{{totalCount}}</b></span>
+            <div class="d-flex justify-content-between">
+              <div>
+                <div *ngIf="list.length > 0">
+                </div>
+              </div>
+              <div>
+                <div class="total_counts">
+                  <span *ngIf="totalCount > 2">Total: <b>{{totalCount}}</b></span>
+                  <a class="ml-3" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-center flex-wrap mt-2">
+              <div *ngIf="totalPages > 1">
+                <ul class="pagination justify-content-center">
+                  <li class="page-item" [ngClass]="{'disabled': page<=1}">
+                    <a class="page-link" routerLink="." (click)="onPreviousPage()" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                      <span class="sr-only">Previous</span>
+                    </a>
+                  </li>
+                  <li *ngIf="leftMore" class="page-item"><a class="page-link">...</a></li>
+                  <li *ngFor="let p of pages;  let i = index" class="page-item" [ngClass]="{'active': p==page}">
+                    <a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
+                  </li>
+                  <li *ngIf="rightMore" class="page-item"><a class="page-link">...</a></li>
+                  <li class="page-item" [ngClass]="{'disabled': page>=totalPages}">
+                    <a class="page-link" routerLink="." (click)="onNextPage()" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                      <span class="sr-only">Next</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div class="ml-3" *ngIf="totalPages > 1">
+                <small>Page</small>&nbsp;<input type="number" class="page-control form-control" [value]="page" (input)="onGotoPage($event.target.value)" />&nbsp;/&nbsp;{{totalPages}}
+              </div>
             </div>
           </div>
         </div>
-    
-        <div class="d-flex justify-content-center mt-2">
-            <div *ngIf="totalPages > 1">
-              <ul class="pagination justify-content-center">
-                <li class="page-item"
-                    [ngClass]="{'disabled': page<=1}">
-                <a class="page-link" routerLink="." (click)="onPreviousPage()"
-                  aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                  <span class="sr-only">Previous</span>
-                </a>
-                </li>
-    
-                <li *ngIf="leftMore" class="page-item"><a class="page-link">...</a></li>
-    
-                <li *ngFor="let p of pages;  let i = index" class="page-item"
-                    [ngClass]="{'active': p==page}">
-                  <a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
-                </li>
-    
-                <li *ngIf="rightMore" class="page-item"><a class="page-link">...</a></li>
-                <li class="page-item"
-                    [ngClass]="{'disabled': page>=totalPages}">
-                <a class="page-link" routerLink="." (click)="onNextPage()"
-                  aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
-                  <span class="sr-only">Next</span>
-                </a>
-                </li>
-              </ul>
+        <div class="no-records" *ngIf="list.length === 0">
+          <span *ngIf="loaded">No records found.</span>
+          <span *ngIf="!loaded">Loading...</span>
+        </div>
+        <div *ngIf="list.length > 0">
+          <div class="galleryView">
+            <div class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}" *ngFor="let detail of list;  let i = index; let list_index = index;">
+              <div class="text-left h-100" [ngClass]="{
+              'clicked-row': clickedId==detail['_id'],
+              'selected-row': clickItemAction === 'select' && checkedItem[i]
+            }">
+                <div class="grid-fields">
+                  <div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture'], 'clickable-card pointer': clickItemAction}" [ngStyle]="style['picture']" (click)="clickOneItem(i)">
+                    <lib-mdds-file-display [downloadUrl]="detail['link']" [isLarge]="options['largePicture']">
+                    </lib-mdds-file-display>
+                  </div>
+                  <div class="text-center">
+                    <div *ngIf="!options['notShowTitle']" class="grid-picture-title" [ngClass]="{'grid-picture-title-large': options['largePicture'], 'read-more': clickItemAction === 'detail'}" [ngStyle]="style['title']" (click)="clickOneItem(i)">
+                      {{detail['name']}}
+                    </div>
+                    <div *ngIf="!options['notShowSubTitle']" class="grid-picture-subtitle" [ngClass]="{'grid-picture-subtitle-large': options['largePicture'], 'read-more': clickItemAction === 'detail'}" [ngStyle]="style['subtitle']" (click)="clickOneItem(i)">
+                      {{detail['createdAt']? (detail['createdAt']['originalValue'] | date:'medium') : ''}}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+            <i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+            <i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+            <i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+            <i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+            <i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+          </div>
         </div>
-    
-        <!--
-        <div class="action-buttons">
-
-            <button type="button" class="btn btn-success" (click)="selectConfirmed()"
-            [disabled]="!isItemSelected()">Confirm Selection</button>
-            <button type="button" class="btn btn-outline-success" (click)="selectFiles()">Upload New</button>            
+        <div class="container">
+          <div *ngIf="!options['disablePagination']">
+            <div class="row justify-content-end mt-3">
+            </div>
+            <div class="d-flex justify-content-between">
+              <div>
+              </div>
+              <div>
+                <div class="total_counts">
+                  <span *ngIf="totalCount > 2">Total: <b>{{totalCount}}</b></span>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-center flex-wrap mt-2">
+              <div *ngIf="totalPages > 1">
+                <ul class="pagination justify-content-center">
+                  <li class="page-item" [ngClass]="{'disabled': page<=1}">
+                    <a class="page-link" routerLink="." (click)="onPreviousPage()" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                      <span class="sr-only">Previous</span>
+                    </a>
+                  </li>
+                  <li *ngIf="leftMore" class="page-item"><a class="page-link">...</a></li>
+                  <li *ngFor="let p of pages;  let i = index" class="page-item" [ngClass]="{'active': p==page}">
+                    <a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
+                  </li>
+                  <li *ngIf="rightMore" class="page-item"><a class="page-link">...</a></li>
+                  <li class="page-item" [ngClass]="{'disabled': page>=totalPages}">
+                    <a class="page-link" routerLink="." (click)="onNextPage()" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                      <span class="sr-only">Next</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div class="ml-3" *ngIf="totalPages > 1">
+                <small>Page</small>&nbsp;<input type="number" class="page-control form-control" [value]="page" (input)="onGotoPage($event.target.value)" />&nbsp;/&nbsp;{{totalPages}}
+              </div>
+            </div>
+          </div>
         </div>
-        -->
       </div>
-      
+      <!-- End of gallery widget-->
+      <!-- 1.2.3 Start of select/upload buttons-->
+      <div *ngIf="list && list.length > 10" class="action-buttons">
+        <button type="button" class="btn btn-success" (click)="selectConfirmed()"
+        [disabled]="!isItemSelected()">Confirm Selection</button>
+        <button type="button" class="btn btn-outline-success" (click)="selectFiles()">Upload New</button>            
+      </div>
+      <!-- End of select/upload buttons-->
     </div>
-    
-    <input type="file" #file style="display: none" (change)="onFilesSelected()"  multiple/><!-- add 'multiple' to allow multiple file selection -->
+    <!-- end of right panel-->
 
+    <input type="file" #file style="display: none" (change)="onFilesSelected()"  accept="image/*" multiple/><!-- add 'multiple' to allow multiple file selection -->
     <ng-template files-ref-select></ng-template>
-  </div>  <!-- end of selection -->
+  </div>
+  <!-- end of selection -->
 
-  <!-- start of crop-->
+  <!-- 2. start of crop-->
   <div *ngIf="croppingPictureLink" class="crop-area">
     <div class="crop-area-ratio"></div>
       <lib-mdds-cropper  class="crop-area-box"
@@ -259,7 +314,6 @@
       </div>
     </div>
   </div>
-
   <!-- end of crop-->
 <!--  model body ends -->
 

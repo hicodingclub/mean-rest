@@ -5,5 +5,5 @@ import { <%-SchemaName%>Component } from '../../../<%-moduleName%>/<%-schemaName
 @Component({
     template: '',
 })
-export class <%-SchemaName%>EditCustComponent extends <%-SchemaName%>Component {        
+export class <%-SchemaName%>EditCustComponent extends <%-SchemaName%>Component {
 }

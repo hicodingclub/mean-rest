@@ -1,10 +1,7 @@
-const schema = require('./schema');
+const { fileSchema, fileGroupSchema } = require('./schema');
 
-const { fileSchema, fileGroupSchema } = schema;
-
-//const fB = 'name type group labels size link createdAt hasThumbnail';
-const fB = 'name (group) link (hasThumbnail)';
-const fD = 'name type group labels size link createdAt hasThumbnail';
+const fB = 'link name createdAt[Upload time] (size) (group)';
+const fD = 'link name type group labels size createdAt hasThumbnail';
 const fC = 'name group labels';
 const fE = 'name group labels';
 const fTS = 'name labels';  // fields that can make text search on.
@@ -17,7 +14,6 @@ const lE = 'name';
 const lTS = '';  // fields that can make text search on.
 const lI = 'name';
 
-
 const dateFormat = 'MM/DD/YYYY';
 const timeFormat = 'hh:mm:ss';
 
@@ -25,10 +21,10 @@ const schemas = {
   'mfile': {
      schema: fileSchema,
      views: [fB, fD, fC, fE, fTS, fI],
-     api: 'LU',  // api exposed by rest controller
+     api: 'L',  // api exposed by rest controller
      name: 'Picture',
-     listWidgets: ['galleryBottomTitle'],
      mraUI: {
+      listTypeOnly: 'galleryBottomTitle', 
       listCategories: [
         {
           listCategoryField: 'group',
@@ -41,7 +37,7 @@ const schemas = {
   'mfilegroup': {
      schema: fileGroupSchema,
      views: [lB, lD, lC, lE, lTS, lI],
-     api: 'LRCU', // api exposed by rest controller
+     api: 'LCU', // api exposed by rest controller
      name: 'Picture Group',
      mraUI: {
       listSelectType: 'index',
@@ -49,7 +45,6 @@ const schemas = {
   },
   'upload': {},
   'download': {},
-  'delete': {},
 };
 const config = {
   dateFormat,
@@ -63,4 +58,8 @@ const authz = {
   'download': {'LoginUser': {'others': '', 'own': ''}, 'Anyone': 'R'},
 };
 
-module.exports = {schemas, config, authz};
+const DB_CONFIG = {
+  APP_NAME: process.env.APP_NAME,
+  MODULE_NAME: 'FILE',
+};
+module.exports = {schemas, config, authz, DB_CONFIG};

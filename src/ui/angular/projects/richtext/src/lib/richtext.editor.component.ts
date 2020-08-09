@@ -38,6 +38,10 @@ export function createValidator(required: boolean, maxlength: number, minlength:
   }
 }
 
+const EMPTY_EDITOR_STRINGS = [
+  '<br>', '<p><br></p>', '<br/>', '<p></p>',
+];
+
 @Component({
   selector: "lib-richtext-editor",
   templateUrl: "richtext.editor.component.html",
@@ -94,6 +98,9 @@ export class MddsRichtextEditorComponent
       ],
       callbacks: {
         onChange: (content: string) => {
+          if (EMPTY_EDITOR_STRINGS.includes(content)) { // empty
+            content = '';
+          }
           this.content = content;
           this.onChange(content);
         },
@@ -145,6 +152,9 @@ export class MddsRichtextEditorComponent
   }
 
   setContent(content: string) {
+    if (EMPTY_EDITOR_STRINGS.includes(content)) { // empty
+      content = '';
+    }
     let newContent = content || "";
     if (this.summernoteInit) {
       if (newContent === this.content) {
