@@ -35,6 +35,9 @@ export class <%-SchemaName%>Component extends MddsBaseComponent implements OnIni
     @Input()
     public searchObj: any;
 
+    @Input()
+    public snackbarMessages: any = {}; // keys: edit, create, list, detail, delete, deleteMany TODO: archive, unarchive
+
     // *** list component
     @Input()
     public inputData: any;

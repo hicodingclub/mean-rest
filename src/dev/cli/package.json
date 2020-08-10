@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/cli",
-  "version": "0.9.46",
+  "version": "0.9.47",
   "description": "HiCoder templates and UI generation tool",
   "main": "index.js",
   "scripts": {

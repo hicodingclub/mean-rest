@@ -1622,8 +1622,11 @@ function main() {
     let detailRefName = {};
 
     let ownSearchStringFields = []; //list of strings that should have own search field in the search area
-
     let selectActionViewType = 'dropdown'; // used by list select widget
+
+    // name of the submit buttons
+    let editActionButtons = ['Submit', 'Cancel'];
+    let createActionButtons = ['Submit', 'Cancel']; 
 
     // internal used
     let listTypes = ['list', 'grid', 'table'];
@@ -1699,6 +1702,9 @@ function main() {
       if (!!mraUI.ownSearchStringFields) {
         ownSearchStringFields = mraUI.ownSearchStringFields;
       }
+
+      editActionButtons = mraUI.editActionButtons || editActionButtons;
+      createActionButtons = mraUI.createActionButtons || createActionButtons;
     }
 
     let embeddedViewOnly = schemaDef.embeddedViewOnly ? true : false;
@@ -2166,8 +2172,10 @@ function main() {
       detailWidgets,
 
       editHintFields,
-
       ownSearchStringFields,
+
+      editActionButtons,
+      createActionButtons,
 
       homeListNumber,
 

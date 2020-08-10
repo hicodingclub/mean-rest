@@ -174,12 +174,14 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   /*** Any View - add new component in the current view*/
   public parentData: any;
   public parentId: any;
-  public isAdding = false;
+  public isAdding: boolean = false;
 
-  public isEditing = false;
+  public isEditing: boolean = false;
 
   // archived search
-  public archivedSearch = false;
+  public archivedSearch: boolean = false;
+
+  public snackbarMessages: any = {}; // keys: edit, create, list, detail, delete, deleteMany TODO: archive, unarchive
 
   public view: ViewType;
 
@@ -1016,8 +1018,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     }
     if (this.refreshing) {
       this.refreshing = false;
+      let content = this.snackbarMessages.detail || 'Detail refreshed';
       const snackBarConfig: SnackBarConfig = {
-        content: 'Detail refreshed',
+        content,
       };
       const snackBar = new SnackBar(snackBarConfig);
       snackBar.show();
@@ -1675,8 +1678,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
 
           if (this.refreshing) {
             this.refreshing = false;
+            let content = this.snackbarMessages.list || 'List refreshed';
             const snackBarConfig: SnackBarConfig = {
-              content: 'List refreshed',
+              content,
             };
             const snackBar = new SnackBar(snackBarConfig);
             snackBar.show();
@@ -1945,8 +1949,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       callBack: (result: any) => {
         if (result) {
           this.service.deleteManyByIds(deletedItem).subscribe((_: any) => {
+            let content = this.snackbarMessages.deleteMany || this.ItemCamelName + ' deleted';
             const snackBarConfig: SnackBarConfig = {
-              content: this.ItemCamelName + ' deleted',
+              content,
             };
             const snackBar = new SnackBar(snackBarConfig);
             snackBar.show();
@@ -1987,8 +1992,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       callBack: (result: any) => {
         if (result) {
           this.service.deleteOne(id).subscribe((_: any) => {
+            let content = this.snackbarMessages.delete || this.ItemCamelName + ' deleted';
             const snackBarConfig: SnackBarConfig = {
-              content: this.ItemCamelName + ' deleted',
+              content,
             };
             const snackBar = new SnackBar(snackBarConfig);
             snackBar.show();
@@ -2111,8 +2117,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       this.service
         .updateOne(this.id, this.cloneDetail)
         .subscribe((result: any) => {
+          let content = this.snackbarMessages.edit || this.ItemCamelName + ' updated.';
           const snackBarConfig: SnackBarConfig = {
-            content: this.ItemCamelName + ' updated.',
+            content,
           };
           const snackBar = new SnackBar(snackBarConfig);
           snackBar.show();
@@ -2131,9 +2138,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         .createOne(this.cloneDetail)
         .subscribe((result: { [x: string]: string }) => {
           const action = this.embeddedView ? ' added' : ' created.';
-
+          let content = this.snackbarMessages.create || this.ItemCamelName + action;
           const snackBarConfig: SnackBarConfig = {
-            content: this.ItemCamelName + action,
+            content,
           };
           const snackBar = new SnackBar(snackBarConfig);
           snackBar.show();
