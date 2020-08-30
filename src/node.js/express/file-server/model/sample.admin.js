@@ -25,6 +25,24 @@ const schemas = {
      api: 'LUD',  // api exposed by rest controller
      name: 'File',
      mraUI: {
+      mraUI: {
+        listWidgets: {
+          general: {
+            views: ['list', 'table', 'grid',],
+          },
+          select: {
+            views: ['list', 'table',],
+          },
+          sub: {
+            views: ['list', 'table',],
+          }
+        },
+        listWidgetTypes: {
+          general: 'general',
+          select: 'select',
+          sub: 'sub',
+        },
+      },
       listCategories: [
         {
           listCategoryField: 'group',
@@ -43,8 +61,23 @@ const schemas = {
      api: 'LRCU', // api exposed by rest controller
      name: 'File Group',
      mraUI: {
-      listSelectType: 'index',
-     },
+      listWidgets: {
+        general: {
+          views: ['table', 'list', 'grid',],
+        },
+        select: {
+          views: ['index', 'table', 'list',],
+        },
+        sub: {
+          views: ['table', 'list',],
+        }
+      },
+      listWidgetTypes: {
+        general: 'general',
+        select: 'select',
+        sub: 'sub',
+      },
+    },
   },
   'upload': {},
   'download': {},

@@ -54,7 +54,22 @@ const schemas = {
     tags: ['auth-group'], // used as authentication 'group' model
     name: 'User Group',
     mraUI: {
-      listType: 'table',
+      listWidgets: {
+        general: {
+          views: ['table', 'list', 'grid',],
+        },
+        select: {
+          views: ['table', 'list',],
+        },
+        sub: {
+          views: ['table', 'list',],
+        }
+      },
+      listWidgetTypes: {
+        general: 'general',
+        select: 'select',
+        sub: 'sub',
+      },
     },
   },
   "mpubmodule": {
@@ -63,7 +78,22 @@ const schemas = {
     tags: ['auth-module'], // used as authentication 'module' model
     name: 'Public Module',
     mraUI: {
-      listType: 'table',
+      listWidgets: {
+        general: {
+          views: ['table', 'list', 'grid',],
+        },
+        select: {
+          views: ['table', 'list',],
+        },
+        sub: {
+          views: ['table', 'list',],
+        }
+      },
+      listWidgetTypes: {
+        general: 'general',
+        select: 'select',
+        sub: 'sub',
+      },
     },
   },
   "mpubaccess": {
@@ -72,7 +102,22 @@ const schemas = {
     tags: ['auth-access'], // used as authentication 'access' model
     name: 'Access Control',
     mraUI: {
-      listType: 'table',
+      listWidgets: {
+        general: {
+          views: ['table', 'list', 'grid',],
+        },
+        select: {
+          views: ['table', 'list',],
+        },
+        sub: {
+          views: ['table', 'list',],
+        }
+      },
+      listWidgetTypes: {
+        general: 'general',
+        select: 'select',
+        sub: 'sub',
+      },
     },
   }
 };

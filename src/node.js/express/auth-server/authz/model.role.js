@@ -54,7 +54,22 @@ const schemas = {
     tags: ['auth-role'], // used as authentication 'role' model
     name: 'Role',
     mraUI: {
-      listType: 'table',
+      listWidgets: {
+        general: {
+          views: ['table', 'list', 'grid',],
+        },
+        select: {
+          views: ['table', 'list',],
+        },
+        sub: {
+          views: ['table', 'list',],
+        }
+      },
+      listWidgetTypes: {
+        general: 'general',
+        select: 'select',
+        sub: 'sub',
+      },
     },
   },
   "mmodule": {
@@ -63,7 +78,22 @@ const schemas = {
     tags: ['auth-module'], // used as authentication 'module' model
     name: 'System Module',
     mraUI: {
-      listType: 'table',
+      listWidgets: {
+        general: {
+          views: ['table', 'list', 'grid',],
+        },
+        select: {
+          views: ['table', 'list',],
+        },
+        sub: {
+          views: ['table', 'list',],
+        }
+      },
+      listWidgetTypes: {
+        general: 'general',
+        select: 'select',
+        sub: 'sub',
+      },
     },
   },
   "mpermission": {
@@ -72,7 +102,22 @@ const schemas = {
     tags: ['auth-permission'], // used as authentication 'permission' model
     name: 'Permission',
     mraUI: {
-      listType: 'table',
+      listWidgets: {
+        general: {
+          views: ['table', 'list', 'grid',],
+        },
+        select: {
+          views: ['table', 'list',],
+        },
+        sub: {
+          views: ['table', 'list',],
+        }
+      },
+      listWidgetTypes: {
+        general: 'general',
+        select: 'select',
+        sub: 'sub',
+      },
     },
   }
 };
@@ -117,7 +162,22 @@ const GetAuthzModuleDef = function(userSchemaName, userSchema) {
     tags: ['auth-user-role'],
     name: 'Account Role',
     mraUI: {
-      listType: 'table',
+      listWidgets: {
+        general: {
+          views: ['table', 'list', 'grid',],
+        },
+        select: {
+          views: ['table', 'list',],
+        },
+        sub: {
+          views: ['table', 'list',],
+        }
+      },
+      listWidgetTypes: {
+        general: 'general',
+        select: 'select',
+        sub: 'sub',
+      },
     },
   }
   

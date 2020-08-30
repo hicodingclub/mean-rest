@@ -1,3 +1,30 @@
+function getFieldValue(field) {
+  let t = typeof field;
+  switch (t) {
+    case 'string':
+    case 'boolean':
+    case 'number':
+      return String(field);
+      break;
+    case 'object':
+      if (Array.isArray(field)) {
+        let v = '';
+        for (let f of field) {
+          v += getFieldObject(f) + ' ';
+        }
+        return v;
+      }
+      let v = '';
+      for (let f in field) {
+        v += getFieldObject(field[f]);
+      }
+      return v;
+      break;
+    default:
+      return '';
+  }
+}
+
 function exportAllExternal(req, res, next, rows, restController) {
   const {
     name,
@@ -46,7 +73,11 @@ function exportAllExternal(req, res, next, rows, restController) {
 
     let asf = r[__asso];
     if (!Array.isArray(asf)) {
-      asf = [asf];
+      if (typeof asf === 'object') {
+        asf = [asf];
+      } else {
+        asf = [{}]; // put an empty object
+      }
     }
     for (let as of asf) {
       let asr = [];

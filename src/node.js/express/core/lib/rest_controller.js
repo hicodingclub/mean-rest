@@ -38,33 +38,6 @@ var lowerFirst = function (str) {
   return str.charAt(0).toLowerCase() + str.substr(1);
 };
 
-function getFieldValue(field) {
-  let t = typeof field;
-  switch (t) {
-    case 'string':
-    case 'boolean':
-    case 'number':
-      return String(field);
-      break;
-    case 'object':
-      if (Array.isArray(field)) {
-        let v = '';
-        for (let f of field) {
-          v += getFieldObject(f) + ' ';
-        }
-        return v;
-      }
-      let v = '';
-      for (let f in field) {
-        v += getFieldObject(field[f]);
-      }
-      return v;
-      break;
-    default:
-      return '';
-  }
-}
-
 const checkAndSetValue = function (obj, schema) {
   //obj in {item: value} format
   for (let item in obj) {
