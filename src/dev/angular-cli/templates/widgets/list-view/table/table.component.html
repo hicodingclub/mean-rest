@@ -1,0 +1,97 @@
+<%
+//Set up local variables used by this view
+		let {
+			cardHasLink,
+            canUpdate, canDelete, canArchive, canCheck,
+            includeSubDetail,
+        } = listViewObj;
+%>
+<div class="table-wrapper">
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+    <%_ for (let field of briefView){
+                if (field.hidden) continue;
+                if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
+                if (field.sortable) { %>
+                <th class="pointer" scope="col"
+                    (click)="toggleListSort('<%-field.fieldName%>')"<%_
+                    if (field.ref) {%>
+                    *ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem" <%}%> >
+                    <%-field.displayName%>
+                    <span *ngIf="listSortField === '<%-field.fieldName%>'">
+                        <i *ngIf="listSortOrder === 'asc'" class="fas fa-arrow-up th-sort-arrow"></i>
+                        <i *ngIf="listSortOrder === 'desc'" class="fas fa-arrow-down th-sort-arrow"></i>
+                    </span>
+                </th><%} else {%>
+                <th scope="col"<%_
+                    if (field.ref) {%>
+                    *ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem"<%}%> >
+                    <%-field.displayName%>
+                </th><%_
+                }
+    }%><%
+    if (includeSubDetail) {%>
+                <th *ngIf="includeSubDetail"></th><%}%>
+                <th  *ngIf="canDelete || canArchive || canUpdate || canCheck || cardHasLink || cardHasSelect" scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-template ngFor let-detail [ngForOf]="list" let-i="index">
+            <tr [ngClass]="{'clicked-row': clickedId==detail['_id'],
+                            'selected-row': clickItemAction === 'select' && checkedItem[i]}">
+                <td scope="row"
+                    (click)="<%if(cardHasLink) {%>onDetailLinkClicked(detail['_id'])<%} else {%>clickOneItem(i)<%}%>"
+                    class="mt-3"
+                    [ngClass]="{'pointer read-more link': clickItemAction === 'detail' || <%-cardHasLink%>,
+                                'pointer': clickItemAction === 'select'}"
+                    >
+                    {{(page-1)*perPage+i+1}}
+                </td><%_
+    let view = 'list'; for (let field of briefView){
+                if (field.hidden) continue;
+                if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
+                let fn = field.fieldName, ft = field.type;
+                let fieldObj = {field, fn, ft, ref_link: true,};%>
+                <td (click)="clickOneItem(i)"
+                    [ngClass]="{'pointer': clickItemAction}"<%_
+                    if (field.ref) {%>
+                    *ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem"<%}%>
+                    >
+                    <div class="<%if (field.picture) {%>table-picture-cell<%}%>">
+                        <%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
+                    </div>
+                </td><%}%>
+                <td *ngIf="includeSubDetail || cardHasLink || cardHasSelect">
+                    <%if(cardHasLink){%><div *ngIf="cardHasLink" class="pointer read-more font-size-75 my-1" (click)="onDetailLinkClicked(detail['_id'])">Detail <i class="far fa-arrow-alt-circle-right"></i></div><%}%>
+                    <div *ngIf="cardHasSelect" class="read-more font-size-75 my-1" (click)="selectItemSelected(i)">Select <i class="far fa-hand-pointer" ></i></div>
+                    <% if (includeSubDetail) {%>
+                    <div *ngIf="includeSubDetail" class="pointer read-more mt-2" (click)="toggleShowDetailItem(i)">
+                        <span *ngIf="!detail.mddsShowDetail" >More <i class="fas fa-caret-down" title="More"></i></span>
+                        <span *ngIf="detail.mddsShowDetail" >Less <i class="fas fa-caret-up" title="Less"></i></span>
+                    </div><%}%>
+                </td>
+                <%if(canDelete || canArchive || canUpdate || canCheck){%>
+                <td *ngIf="canDelete || canArchive || canUpdate || canCheck">
+                    <div class="d-flex flex-wrap justify-content-start align-items-center">
+                        <%if(canUpdate){%>
+                            <a *ngIf="canUpdate" class="pointer" queryParamsHandling="preserve" (click)="onEdit(detail._id)"><i class="fas fa-edit" title="Edit"></i></a>
+                        <%}%>
+                        <%if(canDelete){%><a *ngIf="canDelete" class="pointer" (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
+                        <%if(canArchive){%><a *ngIf="canArchive" class="pointer" (click)="onArchive(detail['_id'], i, archivedSearch)">
+                            <i *ngIf="!archivedSearch" class="fa fa-archive" title="Archive"></i>
+                            <i *ngIf="archivedSearch" class="fas fa-trash-restore" title="Unarchive"></i>	
+                        </a><%}%>
+                        <%if(canCheck){%><input *ngIf="canCheck" class="list-check-box" type="checkbox"  [ngModel]="checkedItem[i]" (click)="selectOneItem(i)"/><%}%>
+                    </div>
+                </td><%}%>
+            </tr><%
+if (includeSubDetail) { let colspan = briefView.length + 3; %>
+            <tr *ngIf="includeSubDetail && detail.mddsShowDetail" >
+                <td colspan="<%-colspan%>"><app-<%-schemaName%>-detail-sub [inputData]="detail['_id']"></app-<%-schemaName%>-detail-sub></td>
+            </tr><%}%>
+            </ng-template>
+        </tbody>
+    </table>
+</div>

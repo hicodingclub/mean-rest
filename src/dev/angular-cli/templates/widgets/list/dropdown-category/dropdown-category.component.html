@@ -1,0 +1,96 @@
+<label *ngIf="inputData && inputData.stepTitle" [ngStyle]="style['stepTyle']">
+	{{ inputData.stepTitle }}
+</label>
+<%_ let cate = listCategories[0] || {};
+	let { listCategoryField, listCategoryRef, listCategoryShowMore } = cate;
+	let cate2 = listCategories[1] || {};
+	let { listCategoryField: listCategoryField2, listCategoryRef: listCategoryRef2, listCategoryShowMore: listCategoryShowMore2 } = cate2;
+%>
+<div [ngStyle]="style['form']" class="d-flex">
+	<%_ if (listCategoryField2) {%>
+	<div *ngIf="categoryDisplays2.length > 0" class="sort-selection mr-3" [ngStyle]="style['cate2']">
+		<div class="dropdown" style="width: 100%;">
+			<button class="category2-dropdown btn btn-light btn-sm dropdown-toggle" type="button"
+				id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				{{categoryDisplays2[selectedCategory2 || 0]}}
+			</button>
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+				<a *ngFor="let ele of categoryDisplays2; let idx = index;" class="dropdown-item pointer"
+					(click)="categorySelected2(idx)">{{ele}}</a>
+			</div>
+		</div>
+	</div><%}%>
+	<%_ if (listCategoryField) {%>
+	<div *ngIf="categoryDisplays.length > 0" class="sort-selection mr-3" [ngStyle]="style['cate1']">
+		<div class="dropdown" style="width: 100%;">
+			<button class="category2-dropdown btn btn-light btn-sm dropdown-toggle" type="button"
+				id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				{{categoryDisplays[selectedCategory || 0]}}
+			</button>
+			<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+				<a *ngFor="let ele of categoryDisplays; let idx = index;" class="dropdown-item pointer"
+					(click)="categorySelected(idx)">{{ele}}</a>
+			</div>
+		</div>
+	</div><%}%>
+</div>
+
+
+<div>
+	<div *ngIf="!options['disableListHead']" class="container search">
+		<div *ngIf="!options['disablePagination']">
+			<%_ let disableRefreshIcon = true; let disableSortSelection = true; let disableViewSwitch = true;
+				let pagiObj = {disableRefreshIcon, disableSortSelection, disableViewSwitch, };
+			%><%-include(`/schema-list.pagination.html`, pagiObj)%>
+		</div>
+	</div>
+	<div class="no-records" *ngIf="list.length === 0">
+		<span *ngIf="loaded">No records found.</span>
+		<span *ngIf="!loaded">Loading...</span>
+	</div>
+
+	<div *ngIf="list.length > 0"><% for (let view of widgetDef.views) {%>
+		<ng-template [ngIf]="isShowListView('<%-view%>')">
+			<app-<%-schemaName%>-list-view-widget-<%-view%>
+				[style]="style" [options]="options"
+				[inputData]="inputData"
+				[viewInputs]="viewInputs"
+
+				[list]="list"
+				[includeSubDetail]="includeSubDetail"
+
+				[clickItemAction]="clickItemAction"
+				[clickedId]="clickedId"
+				[checkedItem]="checkedItem"
+				[parentItem]="parentItem"
+				[referenceFieldsMap]="referenceFieldsMap"
+				[listSortOrder]="listSortOrder"
+				[listSortField]="listSortField"
+				[page]="page"
+				[perPage]="perPage"
+				[archivedSearch]="archivedSearch"
+				[enums]="enums"
+
+				[clickItemAction]="clickItemAction"
+				[cardHasLink]="cardHasLink"
+				[cardHasSelect]="cardHasSelect"
+				[canArchive]="canArchive"
+				[canCheck]="canCheck"
+				[canDelete]="canDelete"
+				[canUpdate]="canUpdate"
+				[includeSubDetail]="includeSubDetail"
+
+				(uiEvents)="viewUIEvent($event)"
+			>
+			</app-<%-schemaName%>-list-view-widget-<%-view%>>
+		</ng-template>
+		<%}%>
+	</div>
+	<div class="container">
+		<div *ngIf="!options['disablePagination']">
+		<%_ disableRefreshIcon = true; disableSortSelection = true; disableViewSwitch = true;
+			pagiObj = {disableRefreshIcon, disableSortSelection, disableViewSwitch};
+		%><%-include(`/schema-list.pagination.html`, pagiObj) %>
+		</div>
+	</div>
+</div>

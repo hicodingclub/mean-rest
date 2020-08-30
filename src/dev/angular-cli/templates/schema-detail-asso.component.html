@@ -11,7 +11,7 @@
 
 	<%for (let asso of assoRoutes) {%>
 	<div *ngIf=" '<%-asso[0]%>' === associationSchema && '<%-asso[2]%>' === associationField">
-		<app-<%-asso[0]%>-list-asso [asso]="'<%-asso[2]%>'" ></app-<%-asso[0]%>-list-asso>
+		<app-<%-asso[0]%>-list-association [asso]="'<%-asso[2]%>'" ></app-<%-asso[0]%>-list-association%>>
 	</div>
 	<%}%>
 

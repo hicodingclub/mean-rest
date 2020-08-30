@@ -51,14 +51,14 @@
         </div><%_  
     }%>
         <div class="d-flex flex-row mt-1"><% if (includeSubDetail) {%>
-          <div class="read-more mr-5">
+          <div class="read-more mr-5">More
             <span class="pointer" (click)="toggleShowDetailItem(i)">
               <i *ngIf="!detail.mddsShowDetail" class="fas fa-caret-down" title="More"></i>
               <i *ngIf="detail.mddsShowDetail" class="fas fa-caret-up" title="Less"></i>
             </span>
           </div><%}%><% if (cardHasLink) {%>
             <div class="read-more" (click)="onDetailLinkClicked(detail['_id'])">
-              Detail <i class="fas fa-arrow-right" ></i>
+              Detail <i class="far fa-arrow-alt-circle-right"></i>
             </div><%}%>
         </div><%_ if (includeSubDetail) {%>
         <div *ngIf="detail.mddsShowDetail" >

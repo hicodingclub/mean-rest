@@ -1,0 +1,10 @@
+
+<div class="d-flex justify-content-center my-5" [ngStyle]="style['select-container']">
+	<div class="form-group list-selection" [ngStyle]="style['select']">
+		<select class="form-control" id="select<%-schemaName%>"
+			(change)="dropdownChanged($event.target.selectedIndex)"
+			name="select<%-schemaName%>">
+			<option *ngFor="let detail of list; let i = index" [ngValue]="detail._id">{{detail.mddsDisplayName}}</option>
+		</select>
+	</div>
+</div>

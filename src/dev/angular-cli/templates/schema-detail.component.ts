@@ -7,9 +7,6 @@ import { <%-SchemaName%>DetailCustComponent } from '../../../<%-moduleName%>-cus
 import { ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
-<%if (sFeatures.hasRef) {%>
-import { ComponentFactoryResolver } from '@angular/core';<%}%>
-
 @Component({
   selector: 'app-<%-schemaName%>-detail',
   templateUrl: './<%-schemaName%>-detail.component.html',
@@ -26,14 +23,12 @@ export class <%-SchemaName%>DetailComponent extends <%-SchemaName%>DetailCustCom
   // public eventEmitter: EventEmitter<any> = new EventEmitter();
 
   constructor(
-      <%if (sFeatures.hasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
       public <%-schemaName%>Service: <%-SchemaName%>Service,
       public injector: Injector,
       public router: Router,
       public route: ActivatedRoute,
       public location: Location) {
-          super(<%if (sFeatures.hasRef) {%>componentFactoryResolver,<%}%>
-                <%-schemaName%>Service, injector, router, route, location);
+          super(<%-schemaName%>Service, injector, router, route, location);
           this.view = ViewType.DETAIL;
 <% let theView = detailView; let isEditView = false;%><%_ include schema-construct.component.ts %>
   }

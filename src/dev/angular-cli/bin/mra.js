@@ -27,8 +27,6 @@ const js_beautify = require('js-beautify').js;
 const html_beautify = require('js-beautify').html;
 const css_beautify = require('js-beautify').css;
 
-const humanize = require('string-humanize');
-
 const MODE_0666 = parseInt('0666', 8);
 const MODE_0755 = parseInt('0755', 8);
 const TEMPLATE_DIR = path.join(__dirname, '..', 'templates');
@@ -36,6 +34,9 @@ const VERSION = require('../package').version;
 
 const { Selectors } = require('./selectors');
 const { getNewFeatures } = require('./features');
+const Util = require('./util');
+const { defaultListWidgets, defaultListWidgetTypes,
+  setListViewProperties, } = require('./default-widgets');
 
 const logger = require('./log');
 
@@ -61,47 +62,6 @@ const generatedFile = function (outputDir, prefix, outputFile) {
     file = outputFile;
   }
   return path.join(outputDir, file);
-};
-const capitalizeFirst = function (str) {
-  return str.charAt(0).toUpperCase() + str.substr(1);
-};
-
-const lowerFirst = function (str) {
-  return str.charAt(0).toLowerCase() + str.substr(1);
-};
-
-const camelToDisplay = function (str) {
-  // insert a space before all caps
-  words = [
-    'At',
-    'Around',
-    'By',
-    'After',
-    'Along',
-    'For',
-    'From',
-    'Of',
-    'On',
-    'To',
-    'With',
-    'Without',
-    'And',
-    'Nor',
-    'But',
-    'Or',
-    'Yet',
-    'So',
-    'A',
-    'An',
-    'The',
-  ];
-  let arr = humanize(str).split(' ');
-  arr = arr.map((x) => {
-    let y = capitalizeFirst(x);
-    if (words.includes(y)) y = lowerFirst(y);
-    return y;
-  });
-  return capitalizeFirst(arr.join(' '));
 };
 
 const templates = {
@@ -238,40 +198,10 @@ const templates = {
     'list component css file',
     'W',
   ],
-  schemaSelectComponent: [
-    '../templates/schema-list-select.component.ts',
-    'list-select.component.ts',
-    'list select component file',
-    'W',
-  ],
-  schemaSelectComponentHtml: [
-    '../templates/schema-list-select.component.html',
-    'list-select.component.html',
-    'list select component html file',
-    'W',
-  ],
-  schemaListSubComponent: [
-    '../templates/schema-list-sub.component.ts',
-    'list-sub.component.ts',
-    'list-sub component file',
-    'W',
-  ],
-  schemaListSubComponentHtml: [
-    '../templates/schema-list-sub.component.html',
-    'list-sub.component.html',
-    'list-sub component html file',
-    'W',
-  ],
-  schemaListAssoComponent: [
-    '../templates/schema-list-asso.component.ts',
-    'list-asso.component.ts',
-    'list-asso component file',
-    'W',
-  ],
-  schemaListAssoComponentHtml: [
-    '../templates/schema-list-asso.component.html',
-    'list-asso.component.html',
-    'list-asso component html file',
+  schemaListViewComponent: [
+    '../templates/schema-list-view.component.ts',
+    'list-view.component.ts',
+    'list view component file',
     'W',
   ],
 
@@ -362,6 +292,12 @@ const templates = {
     '../templates/schema-detail-sub.component.html',
     'detail-sub.component.html',
     'detail sub component html file',
+    'W',
+  ],
+  schemaDetailSubComponentCss: [
+    '../templates/schema-detail-sub.component.css',
+    'detail-sub.component.css',
+    'detail sub component css file',
     'W',
   ],
 
@@ -556,6 +492,72 @@ const generateSourceFile = function (keyname, template, renderObj, outputDir) {
   });
 };
 
+
+const generateWidgetSource = function (widigetCategory, 
+  widgetname, widgets, schemaName, schemaObj, dirname,
+  componentType) {
+  let component_file_name = `${widigetCategory}-widget-${widgetname}`;
+  if (componentType && ['general', 'select', 'sub', 'association'].includes(componentType)) {
+    component_file_name = `${widigetCategory}-${componentType}`;
+  }
+  let ComponentClassName = component_file_name.split('-').map(x=>Util.capitalizeFirst(x)).join('');
+  schemaObj.ComponentClassName = ComponentClassName;
+  schemaObj.component_file_name = component_file_name;
+
+  let widgetDef;
+  if (widgets) {
+    widgetDef = widgets[widgetname];
+    if (!widgetDef) {
+      logger.error(
+        `ERROR! widget definition for ${widgetname} is not given in wigets definition for ${widigetCategory}.`
+      );
+      _exit(1);
+    }
+  }
+  schemaObj.widgetDef = widgetDef;
+
+  const tsTemplate = `../templates/widgets/${widigetCategory}/${widgetname}/${widgetname}.component.ts`;
+  const htmlTemplate = `../templates/widgets/${widigetCategory}/${widgetname}/${widgetname}.component.html`;
+  const cssTemplate = `../templates/widgets/${widigetCategory}/${widgetname}/${widgetname}.component.css`;
+  if (
+    !fs.existsSync(basedirFile(tsTemplate)) ||
+    !fs.existsSync(basedirFile(htmlTemplate)) ||
+    !fs.existsSync(basedirFile(cssTemplate))
+  ) {
+    console.log(
+      `Error! template files for ${widigetCategory} widget '${widgetname}' don't exist! Ignore...`
+    );
+    console.log(`    Expecting:${tsTemplate} and ${htmlTemplate}`);
+    console.log(`       -- ${tsTemplate}`);
+    console.log(`       -- ${htmlTemplate}`);
+    console.log(`       -- ${cssTemplate}`);
+    _exit(1);
+  }
+  const tsFile = [
+    tsTemplate,
+    `${component_file_name}.component.ts`,
+    `${component_file_name} component file`,
+    'W',
+  ];
+  const htmlFile = [
+    htmlTemplate,
+    `${component_file_name}.component.html`,
+    `${component_file_name} component html file`,
+    'W',
+  ];
+  const cssFile = [
+    cssTemplate,
+    `${component_file_name}.component.css`,
+    `${component_file_name} component css file`,
+    'W',
+  ];
+  generateSourceFile(schemaName, tsFile, schemaObj, dirname);
+  generateSourceFile(schemaName, htmlFile, schemaObj, dirname);
+  generateSourceFile(schemaName, cssFile, schemaObj, dirname);
+
+  return [component_file_name, ComponentClassName];
+}
+
 const getPrimitiveField = function (fieldSchema) {
   let primitiveField = {
     type: fieldSchema.constructor.name,
@@ -656,9 +658,9 @@ const getPrimitiveField = function (fieldSchema) {
     case 'ObjectId':
       primitiveField.jstype = 'string';
       if (fieldSchema.options.ref) {
-        primitiveField.RefCamel = capitalizeFirst(fieldSchema.options.ref);
+        primitiveField.RefCamel = Util.capitalizeFirst(fieldSchema.options.ref);
         primitiveField.ref = fieldSchema.options.ref.toLowerCase();
-        primitiveField.Ref = capitalizeFirst(primitiveField.ref);
+        primitiveField.Ref = Util.capitalizeFirst(primitiveField.ref);
         primitiveField.flagRef = true;
       }
       break;
@@ -920,11 +922,11 @@ const generateViewPicture = function (
       continue;
     }
 
-    const DN = displayNames[item] || camelToDisplay(item);
+    const DN = displayNames[item] || Util.camelToDisplay(item);
     const dn = DN.toLowerCase();
     let fieldPicture = {
       fieldName: item,
-      FieldName: capitalizeFirst(item),
+      FieldName: Util.capitalizeFirst(item),
       displayName: DN,
       displayname: dn,
       hidden,
@@ -1113,6 +1115,38 @@ const getSchemaPermission = function (schemaName, authz) {
     permission = anyonePermission;
   }
   return permission;
+};
+
+const setListViewObj = function (schemaObj) {
+  let clickItemAction = '';
+  if (schemaObj.api.includes('R') && schemaObj.listToDetail === 'click') {
+    clickItemAction = 'detail';
+  }
+  let cardHasLink = schemaObj.api.includes('R') && schemaObj.listToDetail === 'link';
+
+  let canUpdate = schemaObj.api.includes('U');
+  let canDelete = schemaObj.api.includes('D');
+  let canArchive = schemaObj.api.includes('A');
+  let canCheck = schemaObj.api.includes('D') || schemaObj.api.includes('A');
+
+  let includeSubDetail = schemaObj.detailSubView.length != 0 && schemaObj.api.includes('R');
+
+  let listViewObj = {
+    clickItemAction,
+    cardHasLink,
+    cardHasSelect: false,
+    includeSubDetail,
+
+    canUpdate,
+    canDelete,
+    canArchive,
+    canCheck,
+
+    itemMultiSelect: true,
+    majorUi: false,
+  };
+  schemaObj.listViewObj = listViewObj;
+  return schemaObj;
 };
 
 // CLI
@@ -1446,6 +1480,10 @@ function main() {
     _exit(1);
   }
 
+  const funcs = {
+    capitalizeFirst: Util.capitalizeFirst,
+  }
+
   let moduleName;
   if (!program.module) {
     let startPosition = inputFile.lastIndexOf(path.sep) + 1;
@@ -1458,7 +1496,7 @@ function main() {
     moduleName = program.module;
     console.info('Using "%s" as generated module name...', moduleName);
   }
-  let ModuleName = capitalizeFirst(moduleName);
+  let ModuleName = Util.capitalizeFirst(moduleName);
   let moduleNameCust = `${moduleName}-cust`;
 
   let apiBase;
@@ -1595,10 +1633,6 @@ function main() {
     let detailType = 'normal';
     let detailTitle = '';
 
-    let listType = 'list';
-    let listTypeOnly = undefined;
-
-    let listSelectType = 'normal';
     let listTitle = '';
     let listRouterLink = '../../list';
     let disableListSearch = false;
@@ -1613,6 +1647,7 @@ function main() {
     //          showFieldInList: false, showEmptyCategory: false}
     let listCategories = [];
     let listSortFields; // sortable fields name inside the array. 'undefined' will use default sort fields.
+    let listShowSubDetail = false;
 
     let detailActions = []; //extra buttons that trigger other pipelines
     let detailActionButtons = ['Edit', 'New', 'Delete', 'Archive'];
@@ -1626,39 +1661,28 @@ function main() {
 
     // name of the submit buttons
     let editActionButtons = ['Submit', 'Cancel'];
-    let createActionButtons = ['Submit', 'Cancel']; 
+    let createActionButtons = ['Submit', 'Cancel'];
 
-    // internal used
-    let listTypes = ['list', 'grid', 'table'];
+    let listWidgets = Util.clone(defaultListWidgets);
+    let listWidgetTypes = Util.clone(defaultListWidgetTypes);
+    let listExtraWidgets = [];
+
+    if (schemaDef.listWidgets) {
+      logger.warning(`Schema ${name}: listWidgets is deprecated. Please configure your list widgets with mraUI.listWidgets.`)
+    }
     if (schemaDef.mraUI) {
       const mraUI = schemaDef.mraUI;
       detailType = mraUI.detailType || 'normal'; //post, info, slide, term, ...
 
       if (mraUI.listTypeOnly) {
-        listTypeOnly = mraUI.listTypeOnly;
-        listTypes = [listTypeOnly];
-        listType = listTypeOnly;
+        logger.warning(`Schema ${name}: mraUI.listTypeOnly is deprecated. Please configure your list view widgets with listWidgets and listWidgetTypes.`)
       }
       if (mraUI.listType) {
-        if (listTypeOnly) {
-          logger.warning(
-            `Schema ${name} "listTypeOnly" is already set. Ignore listType ${mraUI.listType}...`
-          );
-        } else {
-          if (!listTypes.includes(mraUI.listType)) {
-            logger.warning(
-              `Schema ${name} "listType" value ${mraUI.listType} incorrect. Ignore...`
-            );
-          } else {
-            listType = mraUI.listType;
-            const tindex = listTypes.indexOf(listType);
-            if (tindex !== -1) listTypes.splice(tindex, 1);
-            listTypes = [listType].concat(listTypes);
-          }
-        }
+        logger.warning(`Schema ${name}: mraUI.listType is deprecated. Please configure your list view widgets with listWidgets and listWidgetTypes.`)
       }
-
-      listSelectType = mraUI.listSelectType || 'normal';
+      if (mraUI.listSelectType) {
+        logger.warning(`Schema ${name}: mraUI.listSelectType is deprecated. Please configure your list view widgets with listWidgets and listWidgetTypes.`)
+      }
 
       switch (mraUI.listToDetail) {
         case 'none':
@@ -1670,6 +1694,14 @@ function main() {
         default:
           listToDetail = 'click';
       }
+      if (mraUI.listWidgets) {
+        listWidgets = Util.replaceProperties(mraUI.listWidgets, listWidgets);
+      }
+      if (mraUI.listWidgetTypes) {
+        listWidgetTypes = Util.replaceProperties(mraUI.listWidgetTypes, listWidgetTypes);
+      }
+      listExtraWidgets = mraUI.listExtraWidgets || listExtraWidgets;
+
       listTitle = mraUI.listTitle;
       listRouterLink = mraUI.listRouterLink || listRouterLink;
       detailTitle = mraUI.detailTitle;
@@ -1685,6 +1717,9 @@ function main() {
       listSearchType = mraUI.listSearchType || listSearchType;
       listSearchFieldsBlackList =
         mraUI.listSearchFieldsBlackList || listSearchFieldsBlackList;
+      if (typeof mraUI.listShowSubDetail === 'boolean') {
+        listShowSubDetail = mraUI.listShowSubDetail;
+      }
 
       if (mraUI.defaultListSort) {
         const keys = Object.keys(mraUI.defaultListSort);
@@ -1719,45 +1754,24 @@ function main() {
       // api.replace('L', '').replace('D', ''); //not allow list and delete for single record
     }
 
-    listTypes = listTypes.map((x) => {
-      return [x, capitalizeFirst(x)];
-    });
+    if ( ['myprefer'].includes(name.toLowerCase())) {
+      listWidgets.general = {
+        views: ['list', 'grid', 'table', 'sld', 'index', 'gallerySideIntro', 'galleryBottomTitle'],
+      };
+    }
 
-    let listTypeNormal = true;
-    if (!['list', 'grid', 'table'].includes(listType)) {
-      listTypeNormal = false;
+    if (schemaDef.listSelectWidgets) {
+      logger.warning(`listSelectWidgets is deprecated. Please configure your list select view widgets in listWidgets.select.`)
     }
-    let listWidgets = schemaDef.listWidgets || []; //widgets: clean, sld, sel, ...
-    let ListType = capitalizeFirst(listType);
-    if (!listTypeNormal && !listWidgets.includes(listType)) {
-      listWidgets.push(listType);
-    }
-    listWidgets = listWidgets.map((x) => {
-      return [x, capitalizeFirst(x)];
-    });
-
-    let listSelectWidgets = schemaDef.listSelectWidgets || [];
-    listSelectWidgets = listSelectWidgets.map((x) => x);
-    listSelectType = listSelectType;
-    let ListSelectType = capitalizeFirst(listSelectType);
-    if (
-      listSelectType != 'normal' &&
-      !listSelectWidgets.includes(listSelectWidgets)
-    ) {
-      listSelectWidgets.push(listSelectType);
-    }
-    listSelectWidgets = listSelectWidgets.map((x) => {
-      return [x, capitalizeFirst(x)];
-    });
 
     let detailWidgets = schemaDef.detailWidgets || []; //widgets: clean, sld, sel, ...
     detailWidgets = detailWidgets.map((x) => x);
-    let DetailType = capitalizeFirst(detailType);
+    let DetailType = Util.capitalizeFirst(detailType);
     if (detailType !== 'normal' && !detailWidgets.includes(detailType)) {
       detailWidgets.push(detailType);
     }
     detailWidgets = detailWidgets.map((x) => {
-      return [x, capitalizeFirst(x)];
+      return [x, Util.capitalizeFirst(x)];
     });
 
     let editHintFields = [];
@@ -1999,9 +2013,9 @@ function main() {
       });
     }
 
-    let SchemaName = capitalizeFirst(schemaName);
-    let SchemaCamelName = viewName ? viewName : capitalizeFirst(name);
-    let schemaCamelName = lowerFirst(SchemaCamelName);
+    let SchemaName = Util.capitalizeFirst(schemaName);
+    let SchemaCamelName = viewName ? viewName : Util.capitalizeFirst(name);
+    let schemaCamelName = Util.lowerFirst(SchemaCamelName);
     let schemaHasValidator = false;
 
     compositeEditView.forEach(function (x) {
@@ -2139,13 +2153,7 @@ function main() {
       permission: schemaAnyonePermission,
       embeddedViewOnly,
 
-      listType,
-      ListType,
       listRouterLink,
-      listTypeNormal,
-      listTypes, // array of ordered list type
-      listSelectType,
-      ListSelectType,
       listTitle, //array of grid, table, list
       listToDetail, // link, click, none
       disableListSearch,
@@ -2157,10 +2165,16 @@ function main() {
       defaultSortFieldDisplay,
       defaultSortOrder,
       listWidgets,
-      listSelectWidgets,
+      listWidgetTypes,
+      listExtraWidgets,
       listSearchType,
       listSearchFieldsBlackList,
       searchBarObj,
+      listViewObj: {}, //listViewObj = {cardHasLink,canUpdate,canDelete,canArchive,canCheck,}
+      listShowSubDetail,
+      allListViewWidgets: [],
+      knownListWidgets: [],
+      listViewProperties: {}, // properties
 
       detailType, // normal, post, info, slide, term...
       DetailType,
@@ -2200,8 +2214,11 @@ function main() {
 
       uiFramework,
       uiDesign,
+
+      funcs,
     };
     //console.log('======schemaObj', schemaObj);
+    schemaObj = setListViewObj(schemaObj);
 
     if (!defaultSchema) defaultSchema = schemaName;
     schemaMap[schemaName] = schemaObj;
@@ -2211,7 +2228,7 @@ function main() {
     return self.indexOf(value) === index;
   }); //de-duplicate
   let referenceObjSchemas = referenceSchemas.map((value) => {
-    return { ref: value, Ref: capitalizeFirst(value) };
+    return { ref: value, Ref: Util.capitalizeFirst(value) };
   });
   referenceMap = referenceMap.filter((value, index, self) => {
     return self.indexOf(value) === index;
@@ -2228,10 +2245,7 @@ function main() {
     value.push(refObj.name); //its name
 
     refObj.refApi[value[3]] = schemaObj.api;
-    refObj.refListSelectType[value[3]] = [
-      schemaObj.listSelectType,
-      schemaObj.ListSelectType,
-    ];
+    refObj.refListSelectType[value[3]] = ['-list-select', 'ListSelect'];
     value[5] = refObj.SchemaCamelName;
     if (refObj.name in schemaObj.detailRefName) {
       value[5] = schemaObj.detailRefName[refObj.name];
@@ -2248,10 +2262,14 @@ function main() {
 
       for (let obj of referenceObjSchemas) {
         if (obj.ref == schemaName) {
-          obj.api = schemaObj.api; //assign api to the referenceSchema
-          obj.listSelectType = schemaObj.listSelectType;
-          obj.ListSelectType = schemaObj.ListSelectType;
-          obj.listSelectWidgets = schemaObj.listSelectWidgets;
+          const properties = [
+            'api',
+            'listWidgets', 'listWidgetTypes',
+          ];
+
+          for (let p of properties) {
+            obj[p] = schemaObj[p];
+          }
         }
       }
     } else {
@@ -2309,6 +2327,7 @@ function main() {
         assoRecord.push(null);
         continue;
       }
+      assoRecord.push(schemaObj.listWidgetTypes.association);
 
       assoRoutes.push(assoRecord);
       // Put to the association schema object
@@ -2369,85 +2388,9 @@ function main() {
     uiFramework,
     uiDesign,
     VERSION,
+
+    funcs,
   };
-  //console.log('***renderObj', renderObj);
-  //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
-  generateSourceFile(moduleName, templates.angular, renderObj, outputDir);
-  generateSourceFile(moduleName, templates.conf, renderObj, outputDirCust);
-  generateSourceFile(
-    moduleName,
-    templates.tokensValue,
-    renderObj,
-    outputDirCust
-  );
-
-  generateSourceFile(moduleName, templates.mainModule, renderObj, outputDir);
-  generateSourceFile(
-    moduleName,
-    templates.mainCoreModule,
-    renderObj,
-    outputDir
-  );
-  generateSourceFile(
-    moduleName,
-    templates.mainCustModule,
-    renderObj,
-    outputDirCust
-  );
-  generateSourceFile(
-    moduleName,
-    templates.mainExtModule,
-    renderObj,
-    outputDirCust
-  );
-  generateSourceFile(moduleName, templates.mainComponent, renderObj, outputDir);
-  generateSourceFile(
-    moduleName,
-    templates.mainComponentHtml,
-    renderObj,
-    outputDir
-  );
-  generateSourceFile(
-    moduleName,
-    templates.mainComponentCss,
-    renderObj,
-    outputDir
-  );
-  generateSourceFile(moduleName, templates.tokens, renderObj, outputDir);
-
-  generateSourceFile(moduleName, templates.routingModule, renderObj, outputDir);
-  generateSourceFile(
-    moduleName,
-    templates.routingCoreModule,
-    renderObj,
-    outputDir
-  );
-  generateSourceFile(
-    moduleName,
-    templates.routingCorePath,
-    renderObj,
-    outputDir
-  );
-  generateSourceFile(
-    moduleName,
-    templates.routingCustPath,
-    renderObj,
-    outputDirCust
-  );
-
-  if (
-    mFeatures.hasDate ||
-    mFeatures.hasRequiredMultiSelection ||
-    mFeatures.hasRequiredArray ||
-    mFeatures.hasRequiredMap
-  ) {
-    generateSourceFile(
-      moduleName,
-      templates.mainDirective,
-      renderObj,
-      outputDir
-    );
-  }
 
   for (let key in schemaMap) {
     let schemaObj = renderObj.schemaMap[key];
@@ -2475,7 +2418,98 @@ function main() {
     );
 
     if (schemaObj.api.includes('L')) {
+      let allListViewWidgets = [];
+      let knownListWidgets = [];
+      let knownListViewWidgets = [];
+
       let subComponentDir = path.join(componentDir, schemaName + '-list');
+
+      let listViewObjBk = Util.clone(schemaObj.listViewObj);
+      schemaObj.listViewObj = setListViewProperties('general', schemaObj.listViewObj);
+      let widget = schemaObj.listWidgetTypes.general;
+      let [component_file_name, ComponentClassName] =
+        generateWidgetSource('list', widget, schemaObj.listWidgets, schemaName, schemaObj, subComponentDir, 'general');
+      knownListWidgets.push([component_file_name, ComponentClassName]);
+      allListViewWidgets = allListViewWidgets.concat(schemaObj.listWidgets[widget].views);
+      schemaObj.listViewObj = listViewObjBk;
+
+      if (referenceSchemas.indexOf(schemaName) != -1) {
+        //Don't search ref any more on select view. Disable more search area
+        const noMoreSearchArea = schemaObj.searchBarObj.noMoreSearchArea;
+        schemaObj.searchBarObj.noMoreSearchArea = true;
+
+        listViewObjBk = Util.clone(schemaObj.listViewObj);
+        schemaObj.listViewObj = setListViewProperties('select', schemaObj.listViewObj);
+        widget = schemaObj.listWidgetTypes.select;
+        [component_file_name, ComponentClassName] =
+          generateWidgetSource('list', widget, schemaObj.listWidgets, schemaName, schemaObj, subComponentDir, 'select');
+        knownListWidgets.push([component_file_name, ComponentClassName]);
+        allListViewWidgets = allListViewWidgets.concat(schemaObj.listWidgets[widget].views);
+        schemaObj.listViewObj = listViewObjBk;
+
+        // restore noMoreSearchArea
+        schemaObj.searchBarObj.noMoreSearchArea = noMoreSearchArea;
+      }
+      if (schemaObj.sFeatures.hasRef) {
+        listViewObjBk = Util.clone(schemaObj.listViewObj);
+        schemaObj.listViewObj = setListViewProperties('sub', schemaObj.listViewObj);
+        widget = schemaObj.listWidgetTypes.sub;
+        [component_file_name, ComponentClassName] =
+          generateWidgetSource('list', widget, schemaObj.listWidgets, schemaName, schemaObj, subComponentDir, 'sub');
+        knownListWidgets.push([component_file_name, ComponentClassName]);
+        allListViewWidgets = allListViewWidgets.concat(schemaObj.listWidgets[widget].views);
+        schemaObj.listViewObj = listViewObjBk;
+
+        if (schemaObj.associationFor.length > 0) {
+          listViewObjBk = Util.clone(schemaObj.listViewObj);
+          schemaObj.listViewObj = setListViewProperties('association', schemaObj.listViewObj);
+          widget = schemaObj.listWidgetTypes.association;
+          [component_file_name, ComponentClassName] =
+            generateWidgetSource('list', widget, schemaObj.listWidgets, schemaName, schemaObj, subComponentDir, 'association');
+          knownListWidgets.push([component_file_name, ComponentClassName]);
+          allListViewWidgets = allListViewWidgets.concat(schemaObj.listWidgets[widget].views);
+          schemaObj.listViewObj = listViewObjBk;
+        }
+      }
+      for (let widget of schemaObj.listExtraWidgets) {
+        if (knownListWidgets.includes(widget)) {
+          continue;
+        }
+        [component_file_name, ComponentClassName] =
+          generateWidgetSource('list', widget, schemaObj.listWidgets, schemaName, schemaObj, subComponentDir);
+        knownListWidgets.push([component_file_name, ComponentClassName]);
+        allListViewWidgets = allListViewWidgets.concat(schemaObj.listWidgets[widget].views);
+      }
+
+      allListViewWidgets = allListViewWidgets.filter((x, idx) => allListViewWidgets.indexOf(x) === idx);
+      for (let widget of allListViewWidgets) {
+        [component_file_name, ComponentClassName] =
+          generateWidgetSource('list-view', widget, null, schemaName, schemaObj, subComponentDir);
+        knownListViewWidgets.push([component_file_name, ComponentClassName]);
+      }
+
+      let listViewProperties = {};
+      for (let w of allListViewWidgets) {
+        let property = {
+          mobile: false,
+        };
+        let jsonFile = basedirFile(`../templates/widgets/list-view/${w}/property.json`);
+        if (fs.existsSync(jsonFile)) {
+          let rawdata = fs.readFileSync(jsonFile);
+          let parsedData = JSON.parse(rawdata);
+
+          property.mobile = parsedData.mobile;
+        } else {
+          logger.warning(`${jsonFile} file does not exist for widget ${w}.`)
+        }
+
+        listViewProperties[w] = property;
+      }
+      knownListWidgets = knownListWidgets.filter((x, idx) => knownListWidgets.indexOf(x) === idx);
+      schemaObj.knownListViewWidgets = knownListViewWidgets;
+      schemaObj.knownListWidgets = knownListWidgets;
+      schemaObj.listViewProperties = listViewProperties;
+      
       generateSourceFile(
         schemaName,
         templates.schemaListComponent,
@@ -2490,133 +2524,16 @@ function main() {
       );
       generateSourceFile(
         schemaName,
-        templates.schemaListComponentHtml,
+        templates.schemaListComponentCss,
         schemaObj,
         subComponentDir
       );
       generateSourceFile(
         schemaName,
-        templates.schemaListComponentCss,
+        templates.schemaListViewComponent,
         schemaObj,
         subComponentDir
       );
-      if (referenceSchemas.indexOf(schemaName) != -1) {
-        //Don't search ref any more on select view. Disable more search area
-        const noMoreSearchArea = schemaObj.searchBarObj.noMoreSearchArea;
-        schemaObj.searchBarObj.noMoreSearchArea = true;
-
-        //referenced by others, provide select component
-        generateSourceFile(
-          schemaName,
-          templates.schemaSelectComponent,
-          schemaObj,
-          subComponentDir
-        );
-        generateSourceFile(
-          schemaName,
-          templates.schemaSelectComponentHtml,
-          schemaObj,
-          subComponentDir
-        );
-
-        for (const widget of schemaObj.listSelectWidgets) {
-          const widgetname = widget[0];
-          const ts = [
-            `../templates/widgets/list-select/${widgetname}/${widgetname}.component.ts`,
-            `list-select-${widgetname}.component.ts`,
-            `detail widget ${widgetname} component file`,
-            'W',
-          ];
-          const html = [
-            `../templates/widgets/list-select/${widgetname}/${widgetname}.component.html`,
-            `list-select-${widgetname}.component.html`,
-            `detail widget ${widgetname} component html file`,
-            'W',
-          ];
-          const css = [
-            `../templates/widgets/list-select/${widgetname}/${widgetname}.component.css`,
-            `list-select-${widgetname}.component.css`,
-            `detail widget ${widgetname} component css file`,
-            'W',
-          ];
-          generateSourceFile(schemaName, ts, schemaObj, subComponentDir);
-          generateSourceFile(schemaName, html, schemaObj, subComponentDir);
-          generateSourceFile(schemaName, css, schemaObj, subComponentDir);
-        }
-
-        // restore noMoreSearchArea
-        schemaObj.searchBarObj.noMoreSearchArea = noMoreSearchArea;
-      }
-      if (schemaObj.sFeatures.hasRef) {
-        generateSourceFile(
-          schemaName,
-          templates.schemaListSubComponent,
-          schemaObj,
-          subComponentDir
-        );
-        generateSourceFile(
-          schemaName,
-          templates.schemaListSubComponentHtml,
-          schemaObj,
-          subComponentDir
-        );
-
-        if (schemaObj.associationFor.length > 0) {
-          generateSourceFile(
-            schemaName,
-            templates.schemaListAssoComponent,
-            schemaObj,
-            subComponentDir
-          );
-          generateSourceFile(
-            schemaName,
-            templates.schemaListAssoComponentHtml,
-            schemaObj,
-            subComponentDir
-          );
-        }
-      }
-      for (const widget of schemaObj.listWidgets) {
-        const widgetname = widget[0];
-        const tsTemplate = `../templates/widgets/list/${widgetname}/${widgetname}.component.ts`;
-        const htmlTemplate = `../templates/widgets/list/${widgetname}/${widgetname}.component.html`;
-        const cssTemplate = `../templates/widgets/list/${widgetname}/${widgetname}.component.css`;
-        if (
-          !fs.existsSync(basedirFile(tsTemplate)) ||
-          !fs.existsSync(basedirFile(htmlTemplate)) ||
-          !fs.existsSync(basedirFile(cssTemplate))
-        ) {
-          console.log(
-            `Error! template files for list widget '${widgetname}' don't exist! Ignore...`
-          );
-          console.log(`    Expecting:${tsTemplate} and ${htmlTemplate}`);
-          console.log(`       -- ${tsTemplate}`);
-          console.log(`       -- ${htmlTemplate}`);
-          console.log(`       -- ${cssTemplate}`);
-          _exit(1);
-        }
-        const tsFile = [
-          tsTemplate,
-          `list-widget-${widgetname}.component.ts`,
-          `list-widget-${widgetname} component file`,
-          'W',
-        ];
-        const htmlFile = [
-          htmlTemplate,
-          `list-widget-${widgetname}.component.html`,
-          `list-widget-${widgetname} component html file`,
-          'W',
-        ];
-        const cssFile = [
-          cssTemplate,
-          `list-widget-${widgetname}.component.css`,
-          `list-widget-${widgetname} component css file`,
-          'W',
-        ];
-        generateSourceFile(schemaName, tsFile, schemaObj, subComponentDir);
-        generateSourceFile(schemaName, htmlFile, schemaObj, subComponentDir);
-        generateSourceFile(schemaName, cssFile, schemaObj, subComponentDir);
-      }
     }
 
     if (schemaObj.api.includes('R')) {
@@ -2699,11 +2616,7 @@ function main() {
           subComponentDir
         );
       }
-      if (schemaObj.sFeatures.hasRef) {
-        schemaName,
-          templates.schemaListSubComponent,
-          schemaObj,
-          subComponentDir;
+      if (schemaObj.api.includes('L') && schemaObj.listViewObj.includeSubDetail) {
         generateSourceFile(
           schemaName,
           templates.schemaDetailSubComponent,
@@ -2713,6 +2626,12 @@ function main() {
         generateSourceFile(
           schemaName,
           templates.schemaDetailSubComponentHtml,
+          schemaObj,
+          subComponentDir
+        );
+        generateSourceFile(
+          schemaName,
+          templates.schemaDetailSubComponentCss,
           schemaObj,
           subComponentDir
         );
@@ -2785,6 +2704,87 @@ function main() {
       );
     }
   } /*End of generate source for each schema*/
+
+  //console.log('***renderObj', renderObj);
+  //generateSourceFile(null, templates.mraCss, {}, parentOutputDir);
+  generateSourceFile(moduleName, templates.angular, renderObj, outputDir);
+  generateSourceFile(moduleName, templates.conf, renderObj, outputDirCust);
+  generateSourceFile(
+    moduleName,
+    templates.tokensValue,
+    renderObj,
+    outputDirCust
+  );
+
+  generateSourceFile(moduleName, templates.mainModule, renderObj, outputDir);
+  generateSourceFile(
+    moduleName,
+    templates.mainCoreModule,
+    renderObj,
+    outputDir
+  );
+  generateSourceFile(
+    moduleName,
+    templates.mainCustModule,
+    renderObj,
+    outputDirCust
+  );
+  generateSourceFile(
+    moduleName,
+    templates.mainExtModule,
+    renderObj,
+    outputDirCust
+  );
+  generateSourceFile(moduleName, templates.mainComponent, renderObj, outputDir);
+  generateSourceFile(
+    moduleName,
+    templates.mainComponentHtml,
+    renderObj,
+    outputDir
+  );
+  generateSourceFile(
+    moduleName,
+    templates.mainComponentCss,
+    renderObj,
+    outputDir
+  );
+  generateSourceFile(moduleName, templates.tokens, renderObj, outputDir);
+
+  generateSourceFile(moduleName, templates.routingModule, renderObj, outputDir);
+  generateSourceFile(
+    moduleName,
+    templates.routingCoreModule,
+    renderObj,
+    outputDir
+  );
+  generateSourceFile(
+    moduleName,
+    templates.routingCorePath,
+    renderObj,
+    outputDir
+  );
+  generateSourceFile(
+    moduleName,
+    templates.routingCustPath,
+    renderObj,
+    outputDirCust
+  );
+
+  if (
+    mFeatures.hasDate ||
+    mFeatures.hasRequiredMultiSelection ||
+    mFeatures.hasRequiredArray ||
+    mFeatures.hasRequiredMap
+  ) {
+    generateSourceFile(
+      moduleName,
+      templates.mainDirective,
+      renderObj,
+      outputDir
+    );
+  }
+
+
 
   console.log();
   const [wNum, eNum] = logger.statistics();

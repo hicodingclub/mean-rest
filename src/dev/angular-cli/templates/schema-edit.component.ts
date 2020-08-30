@@ -51,9 +51,6 @@ export class <%-ModuleName%><%-SchemaName%>Directive<%-field.FieldName%> impleme
 }<%_}}); %><%#comments: end of: forEach %>
 <%}%><%#comments: end of: if (schemaHasValidator%>
 
-<%if (sFeatures.hasRef) {%>
-import { ComponentFactoryResolver } from '@angular/core';<%}%>
-
 @Component({
   selector: 'app-<%-schemaName%>-edit',
   templateUrl: './<%-schemaName%>-edit.component.html',
@@ -78,15 +75,13 @@ export class <%-SchemaName%>EditComponent extends <%-SchemaName%>EditCustCompone
     public action: string;
     public minDate = {year: (new Date()).getFullYear() - 100, month: 1, day: 1};
 
-    constructor(<%if (sFeatures.hasRef) {%>
-      public componentFactoryResolver: ComponentFactoryResolver,<%}%>
+    constructor(
       public <%-schemaName%>Service: <%-SchemaName%>Service,
       public injector: Injector,
       public router: Router,
       public route: ActivatedRoute,
       public location: Location) {
-          super(<%if (sFeatures.hasRef) {%>componentFactoryResolver,<%}%>
-                <%-schemaName%>Service, injector, router, route, location);
+          super(<%-schemaName%>Service, injector, router, route, location);
           this.view = ViewType.EDIT;
 <% let theView = compositeEditView; let isEditView = true;%><%_ include schema-construct.component.ts %>
 

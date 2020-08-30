@@ -1,0 +1,55 @@
+<%-include('/schema-list-view.component.css') %>
+
+.grid-block {
+  flex: 1 1 10rem;
+  display: inline-block;
+  margin: 1rem;
+  align-self: stretch;
+
+
+  word-break: break-word;
+  overflow-wrap: break-word;
+  /*border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;*/
+}
+
+.grid-block-large {
+  flex: 1 1 20rem;
+}
+
+.grid-fields {
+  height: 100%;
+}
+
+.grid-head-picture {
+  width: 100%;
+  height: 6rem;
+  background-color: unset;
+}
+
+.grid-head-picture-large {
+  height: 12rem;
+}
+
+.intro-block {
+  flex: 1 1 30rem;
+}
+
+.grid-picture-title {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 2px;
+}
+
+.grid-picture-title-large {
+  font-size: 1.25rem;
+}
+
+.grid-picture-subtitle {
+  font-size: 1rem;
+  margin: 2px;
+}
+
+.grid-picture-subtitle-large {
+}
+

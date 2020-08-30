@@ -1,0 +1,86 @@
+<%
+//Set up local variables used by this view
+		let {
+			cardHasLink,
+            canUpdate, canDelete, canArchive, canCheck,
+            includeSubDetail,
+        } = listViewObj;
+%>
+<div class="galleryView">
+	<div class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"
+		*ngFor="let detail of list;  let i = index; let list_index = index;">
+		<%_
+		if (briefView.length < 3) {
+			throw new Error(`${schemaName} briefView doesn't have enought number of fields to generate GalleryBottomTitle view. Need at least 3.`);
+		}
+		let field0 = briefView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
+		let field1 = briefView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
+		let field2 = briefView[2]; let fn2 = field2.fieldName; let ft2 = field2.type;
+		let field, fn, ft, fieldObj;
+		%>
+		<div class="text-left h-100"
+			[ngClass]="{
+				'clicked-row': clickedId==detail['_id'],
+				'selected-row': clickItemAction === 'select' && checkedItem[i]
+			}">
+			<div class="grid-fields">
+				<div class="grid-head-picture"
+					[ngClass]="{'grid-head-picture-large': options['largePicture'], 'clickable-card pointer': clickItemAction}"
+					[ngStyle]="style['picture']"
+					(click)="clickOneItem(i)">
+					<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']">
+					</lib-mdds-file-display>
+				</div>
+				<div class="text-center">
+					<div *ngIf="!options['notShowTitle']" class="grid-picture-title"
+						[ngClass]="{'grid-picture-title-large': options['largePicture'], 'read-more link-primary': clickItemAction === 'detail'}"
+						[ngStyle]="style['title']"
+						(click)="clickOneItem(i)">
+						<%
+						field = field1; fn = fn1; ft = ft1;
+						fieldObj = {field, fn, ft, ref_link: true,};
+						%>
+						<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
+					</div>
+					<div *ngIf="!options['notShowSubTitle']" class="grid-picture-subtitle"
+						[ngClass]="{'grid-picture-subtitle-large': options['largePicture'], 'read-more link-primary': clickItemAction === 'detail'}"
+						[ngStyle]="style['subtitle']"
+						(click)="clickOneItem(i)">
+						<%
+						field = field2; fn = fn2; ft = ft2;
+						fieldObj = {field, fn, ft, ref_link: true,};
+						%>
+						<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
+					</div><%_
+					const otherFields = briefView.slice(3);
+					for (let [index, field] of otherFields.entries()){
+						if (field.hidden) continue;
+						if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
+				
+						let fn = field.fieldName; let ft = field.type;
+						let fieldObj = {field, fn, ft, ref_link: true,};
+						%>
+					<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%> class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (ft !== 'AngularSelector') {%>
+						<div class="field-label bottome-field-label" [ngStyle]="style['<%-fn%>-label']">
+							<%-field.displayName%>:
+						</div><%}%>
+						<div class="<%_ if (ft !== 'AngularSelector') {%>ml-1 <%}%>text-left" [ngStyle]="style['<%-fn%>-value']">
+							<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
+						</div>
+					</div><%_  
+					}%>
+				</div>
+			</div>
+		</div>
+		<div class="card-action-links ml-3">
+			<div *ngIf="cardHasSelect">
+				<span class="read-more color-success font-size-75 mt-3" (click)="selectItemSelected(i)">Select <i class="far fa-hand-pointer" ></i></span>
+			</div>
+		</div>
+	</div>
+	<i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+	<i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+	<i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+	<i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+	<i aria-hidden="true" class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}"></i>
+</div>

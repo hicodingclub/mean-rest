@@ -1,0 +1,66 @@
+<%
+//Set up local variables used by this view
+		let {
+			cardHasLink,
+            canUpdate, canDelete, canArchive, canCheck,
+            includeSubDetail,
+        } = listViewObj;
+%>
+
+<div class="listview">
+    <div class="list-block" *ngFor="let detail of list;  let i = index; let list_index = index;">
+        <hr *ngIf="i==0" class="list-devider">
+        <div class="list-card text-left clickable-card"
+            [ngClass]="{'clicked-row': clickedId==detail['_id'],
+                        'selected-row': clickItemAction === 'select' && checkedItem[i]}" >
+            <div class="list-info">
+                <div class="list-fields" [ngClass]="{pointer: clickItemAction}" (click)="clickOneItem(i)">
+                    <%_
+                    let viewFields = briefView;
+                    let viewGrp = briefViewGrp;
+                    let listDisplayObj = {
+                        viewFields, viewGrp, cardHasLink, includeSubDetail,
+                    };
+                    %><%-
+                    include(`schema-display.list.html`, listDisplayObj);
+                    %>
+                </div>
+                <div class="mt-3">
+                    <div class="card-action-links"><% if (includeSubDetail) {%>
+                        <div *ngIf="includeSubDetail" class="read-more mr-5">
+                            <span class="pointer" (click)="toggleShowDetailItem(i)">
+                                <span *ngIf="!detail.mddsShowDetail">More <i class="fas fa-caret-down" title="More"></i></span>
+                                <span *ngIf="detail.mddsShowDetail" >Less <i class="fas fa-caret-up" title="Less"></i></span>
+                            </span>
+                        </div><%}%><% if (cardHasLink) {%>
+                        <div *ngIf="cardHasLink" class="read-more  mr-5" (click)="onDetailLinkClicked(detail['_id'])">
+                            Detail <i class="far fa-arrow-alt-circle-right"></i>
+                        </div><%}%>
+                        <div *ngIf="cardHasSelect">
+                            <span class="read-more color-success font-size-75 mt-3" (click)="selectItemSelected(i)">Select <i class="far fa-hand-pointer" ></i></span>
+                        </div>
+                    </div>
+                    <% if (includeSubDetail) {%>
+                    <div *ngIf="includeSubDetail && detail.mddsShowDetail" [@inOutAnimation] class="show-detail">
+                        <app-<%-schemaName%>-detail-sub [inputData]="detail['_id']"></app-<%-schemaName%>-detail-sub>
+                    </div><%}%>
+                </div>
+            </div>
+            
+            <%if(canDelete || canUpdate || canArchive || canCheck) {%>
+            <div class="card-action-icons">
+                <%if(canUpdate){%>
+                    <a *ngIf="canUpdate" class="pointer" (click)="onEdit(detail._id)"><i class="fas fa-edit" title="Edit"></i></a>
+                <%}%>
+                <%if(canDelete){%><a *ngIf="canDelete" class="pointer" (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
+                <%if(canArchive){%><a *ngIf="canArchive" class="pointer" (click)="onArchive(detail['_id'], i, archivedSearch)">
+                    <i *ngIf="!archivedSearch" class="fa fa-archive" title="Archive"></i>
+                    <i *ngIf="archivedSearch" class="fas fa-trash-restore" title="Unarchive"></i>	
+                </a><%}%>
+                <%if(canCheck){%><input *ngIf="canCheck" class="list-check-box" type="checkbox" [ngModel]="checkedItem[i]" (click)="selectOneItem(i)"/><%}%>
+            </div>
+            <%}%>
+        </div>
+        <hr class="list-devider">
+    </div>
+</div>

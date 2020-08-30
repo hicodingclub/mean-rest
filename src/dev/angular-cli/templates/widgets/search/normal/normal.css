@@ -17,10 +17,10 @@ hr {
   color: #868181;
 }
 
-.vitrual-card {
+.search-criteria-card {
 }
 
-.virtual-card label {
+.search-criteria-card label {
   font-weight: bold;
 }
 
@@ -36,6 +36,12 @@ hr {
 .two-column-search > .row,
 .one-column-search > .row {
   padding-bottom: 4px;
+}
+
+.search-detail-badge {
+  max-width: 250px;
+  display: inline-block;
+  overflow: hidden;
 }
 
 @media (min-width: 992px) {

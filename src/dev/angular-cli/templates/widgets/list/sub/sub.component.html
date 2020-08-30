@@ -1,0 +1,72 @@
+<div>
+	<div class="add-area d-flex">
+		<%_ if (api.includes("C")) {%>
+		<% if (embeddedViewOnly) {%><div class=" mr-5">
+			<a class="pointer" routerLink="." (click)="onEmbeddedAdd()"><i class="fas fa-plus-square" title="Add"></i> Add</a>
+		</div><%}%><%}%>
+		<div class="d-flex ml-auto">
+			<%_ for (let assoRecord of associationFor) { %>
+			<div *ngIf="parentSchema === '<%-assoRecord[4]%>'" class="mr-3">
+				<a class="pointer asso-link" [routerLink]="['../../../../asso/' + parentItemId + '/<%-schemaName%>/<%-assoRecord[2]%>']"><%-assoRecord[3]%></a>
+			</div>
+			<%}%>
+		</div>
+	</div>
+	<%_ if (api.includes('C')) {%>
+		<% if (embeddedViewOnly) {%>
+	<div *ngIf="isAdding">
+		<app-<%-schemaName%>-edit [initData]="parentData" [embeddedView]="true" (done)="onEmbededEditDone($event)"></app-<%-schemaName%>-edit>
+	</div><%}%><%}%>
+	
+	<div *ngIf="list.length === 0" class="no-records">
+		<span *ngIf="loaded">No records found.</span>
+		<span *ngIf="!loaded">Loading...</span>
+	</div>
+	<div class="container search">
+		<%_ let disableRefreshIcon = true; let disableSortSelection = true; let disableViewSwitch = true;
+			let pagiObj = {disableRefreshIcon, disableSortSelection, disableViewSwitch};
+		%><%-include(`/schema-list.pagination.html`, pagiObj) %>
+	</div>
+	<div *ngIf="list.length > 0"><% for (let view of widgetDef.views) {%>
+		<ng-template [ngIf]="isShowListView('<%-view%>')">
+			<app-<%-schemaName%>-list-view-widget-<%-view%>
+				[style]="style" [options]="options"
+				[inputData]="inputData"
+				[viewInputs]="viewInputs"
+
+				[list]="list"
+
+				[clickedId]="clickedId"
+				[checkedItem]="checkedItem"
+				[parentItem]="parentItem"
+				[referenceFieldsMap]="referenceFieldsMap"
+				[listSortOrder]="listSortOrder"
+				[listSortField]="listSortField"
+				[page]="page"
+				[perPage]="perPage"
+				[archivedSearch]="archivedSearch"
+				[enums]="enums"
+				
+				[clickItemAction]="clickItemAction"
+				[cardHasLink]="cardHasLink"
+				[cardHasSelect]="cardHasSelect"
+				[canArchive]="canArchive"
+				[canCheck]="canCheck"
+				[canDelete]="canDelete"
+				[canUpdate]="canUpdate"
+				[includeSubDetail]="includeSubDetail"
+
+				(uiEvents)="viewUIEvent($event)"
+			>
+			</app-<%-schemaName%>-list-view-widget-<%-view%>>
+		</ng-template>
+		<%}%>
+	</div>
+
+	<div class="container">
+		<%_ disableRefreshIcon = true; disableSortSelection = true; disableViewSwitch = true;
+			pagiObj = {disableRefreshIcon, disableSortSelection, disableViewSwitch};
+		%><%-include(`/schema-list.pagination.html`, pagiObj) %>
+	</div>
+	
+</div>

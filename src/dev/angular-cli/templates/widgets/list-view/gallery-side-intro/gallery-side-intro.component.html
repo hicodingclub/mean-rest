@@ -1,0 +1,63 @@
+<ng-template ngFor let-detail [ngForOf]="list" let-idx="index">
+	<div class="d-flex flex-wrap align-items-center" [ngClass]="{'flex-row-reverse': idx%2 == 1}">
+		<%_
+		if (briefView.length < 3) {
+			throw new Error(`${schemaName} briefView doesn't have enought number of fields to generate GallerySideIntro view. Need at least 3.`);
+		}
+		let field0 = briefView[0]; let fn0 = field0.fieldName; let ft0 = field0.type;
+		let field1 = briefView[1]; let fn1 = field1.fieldName; let ft1 = field1.type;
+		let field2 = briefView[2]; let fn2 = field2.fieldName; let ft2 = field2.type;
+		let field, fn, ft, fieldObj;%>
+		<div class="grid-block" [ngClass]="{'grid-block-large': options['largePicture']}">
+			<div class="text-left h-100"
+				[ngClass]="{
+					'clicked-row': clickedId==detail['_id'],
+					'selected-row': clickItemAction === 'select' && checkedItem[idx],
+					'clickable-card pointer': clickItemAction}">
+				<div class="grid-fields" (click)="clickOneItem(idx)">
+					<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}"
+						[ngStyle]="style['picture']">
+						<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']">
+						</lib-mdds-file-display>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="intro-block">
+			<div *ngIf="!options['notShowTitle']" class="grid-picture-title"
+				[ngClass]="{'grid-picture-title-large': options['largePicture']}"
+				[ngStyle]="style['title']">
+				<%
+				field = field1; fn = fn1; ft = ft1;
+				fieldObj = {field, fn, ft, ref_link: true,};
+				%>
+				<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
+			</div>
+			<div *ngIf="!options['notShowSubTitle']" class="grid-picture-subtitle"
+				[ngClass]="{'grid-picture-subtitle-large': options['largePicture']}"
+				[ngStyle]="style['intro']">
+				<%
+				field = field2; fn = fn2; ft = ft2;
+				fieldObj = {field, fn, ft, ref_link: true,};
+				%>
+				<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
+			</div>
+			<%_
+			const otherFields = briefView.slice(3);
+			for (let [index, field] of otherFields.entries()){
+				if (field.hidden) continue;
+				if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
+
+				let fn = field.fieldName; let ft = field.type;
+				let fieldObj = {field, fn, ft, ref_link: true,};
+				%>
+			<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%> class="mr-3 d-inline-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (ft !== 'AngularSelector') {%>
+				<div class="field-label" [ngStyle]="style['<%-fn%>-label']"><%-field.displayName%>:</div><%}%>
+				<div class="<%_ if (ft !== 'AngularSelector') {%>ml-1<%}%>" [ngStyle]="style['<%-fn%>-value']">
+					<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
+				</div>
+			</div><%_  
+			}%>
+		</div>
+	</div>
+</ng-template>

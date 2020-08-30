@@ -12,15 +12,12 @@ import { ViewChild } from '@angular/core';<%}%>
 <%if (referred) {%>
 import { ElementRef } from '@angular/core';<%}%>
 <%if (sFeatures.hasRef) {%>
-import { ComponentFactoryResolver } from '@angular/core';
 import { <%-ModuleName%>RefSelectDirective } from '../<%-moduleName%>.component';
     <%_ for (let field of compositeEditBriefView) { 
-        if (field.Ref) { const listSelTypeRef = refListSelectType[field.ref][0]; const ListSelTypeRef = refListSelectType[field.ref][1];%>
-  <%_ if (refApi[field.ref].includes("R")) {%>import { <%-field.Ref%>DetailSelComponent } from '../<%-field.ref%>/<%-field.ref%>-detail/<%-field.ref%>-detail-sel.component';<%}%>
+        if (field.Ref) {%>
   <%_ if (refApi[field.ref].includes("R")) {%>import { <%-field.Ref%>DetailPopComponent } from '../<%-field.ref%>/<%-field.ref%>-detail/<%-field.ref%>-detail-pop.component';<%}%>
-  <%_ if (refApi[field.ref].includes("L")) {%><%if (listSelTypeRef === 'normal') {
-      %>import { <%-field.Ref%>ListSelectComponent } from '../<%-field.ref%>/<%-field.ref%>-list/<%-field.ref%>-list-select.component';<%} else {
-      %>import { <%-field.Ref%>ListSelect<%-ListSelTypeRef%>Component } from '../<%-field.ref%>/<%-field.ref%>-list/<%-field.ref%>-list-select-<%-listSelTypeRef%>.component';<%}%><%}%><%}}%>
+  <%_ if (refApi[field.ref].includes("L")) {%>
+      %>import { <%-field.Ref%>ListSelectComponent } from '../<%-field.ref%>/<%-field.ref%>-list/<%-field.ref%>-list-select.component';%><%}%><%}}%>
 <%}%>
 
 @Component({
@@ -45,6 +42,10 @@ export class <%-SchemaName%>Component extends MddsBaseComponent implements OnIni
     public queryParams: any;  // {listSortField: 'a', listSortOrder: 'asc' / 'desc', perPage: 6}
     @Input()
     public categoryBy:string; //field name whose value is used as category
+    @Input()
+    public listViews: string[] = [];
+    @Input()
+    public viewInputs: any = {};
 
     // list-asso component
     @Input('asso') public associationField: string;
@@ -97,10 +98,9 @@ export class <%-SchemaName%>Component extends MddsBaseComponent implements OnIni
 <%if (sFeatures.hasRef) {%>
     public selectComponents = {
   <%_ for (let field of compositeEditBriefView) { 
-      if (field.Ref) {const listSelTypeRef = refListSelectType[field.ref][0]; const ListSelTypeRef = refListSelectType[field.ref][1];%>
+      if (field.Ref) {%>
       '<%-field.fieldName%>': {
-          <% if (refApi[field.ref].includes("L")) {%>'select-type': <%if (listSelTypeRef === 'normal') {%><%-field.Ref%>ListSelectComponent<%} else {%><%-field.Ref%>ListSelect<%-ListSelTypeRef%>Component<%}%>,<%}%>
-          <% if (refApi[field.ref].includes("R")) {%>'select-detail-type': <%-field.Ref%>DetailSelComponent,<%}%>
+          <% if (refApi[field.ref].includes("L")) {%>'select-type': <%-field.Ref%>ListSelectComponent,<%}%>
           <% if (refApi[field.ref].includes("R")) {%>'pop-detail-type': <%-field.Ref%>DetailPopComponent,<%}%>
           'componentRef': null},<%}}%>
     }
@@ -110,7 +110,6 @@ export class <%-SchemaName%>Component extends MddsBaseComponent implements OnIni
     @ViewChild('<%-ModuleName%>Modal', {static: true}) public focusEl: ElementRef;<%}%>
 
     constructor(
-      <% if (sFeatures.hasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
       public <%-schemaName%>Service: <%-SchemaName%>Service,
       public injector: Injector,
       public router: Router,

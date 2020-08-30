@@ -1,0 +1,64 @@
+<%
+//Set up local variables used by this view
+		let {
+			cardHasLink,
+            canUpdate, canDelete, canArchive, canCheck,
+            includeSubDetail,
+        } = listViewObj;
+%>
+
+<div class="gridview">
+    <div class="grid-block" *ngFor="let detail of list;  let i = index; let list_index = index;">
+        <div class="card text-left clickable-card h-100"
+            [ngClass]="{'clicked-row': clickedId==detail['_id'],
+                        'selected-row': clickItemAction === 'select' && checkedItem[i]}" >
+            <div class="grid-fields" [ngClass]="{pointer: clickItemAction}" (click)="clickOneItem(i)" >
+        <%_
+        let viewFields = briefView;
+        let viewGrp = briefViewGrp;
+        let listDisplayObj = {
+            viewFields, viewGrp,
+            cardHasLink,
+        };
+        %><%-
+        include(`schema-display.grid.html`, listDisplayObj); %>
+            </div>
+
+            <div class="card-action-links ml-3"><% if (includeSubDetail) {%>
+                <div *ngIf="includeSubDetail" class="read-more mr-5">
+                    <span class="pointer" (click)="toggleShowDetailItem(i)">
+                    <span *ngIf="!detail.mddsShowDetail">More <i class="fas fa-caret-down" title="More"></i></span>
+                    <span *ngIf="detail.mddsShowDetail" >Less <i class="fas fa-caret-up" title="Less"></i></span>
+                    </span>
+                </div><%}%><% if (cardHasLink) {%>
+                <div *ngIf="cardHasLink" class="read-more  mr-5" (click)="onDetailLinkClicked(detail['_id'])">
+                    Detail <i class="far fa-arrow-alt-circle-right"></i>
+                </div><%}%>
+                <div *ngIf="cardHasSelect">
+                    <span class="read-more color-success font-size-75 mt-3" (click)="selectItemSelected(i)">Select <i class="far fa-hand-pointer" ></i></span>
+                </div>
+            </div>
+            <% if (includeSubDetail) {%>
+            <div *ngIf="includeSubDetail && detail.mddsShowDetail" class="show-detail mx-1">
+                <app-<%-schemaName%>-detail-sub [inputData]="detail['_id']"></app-<%-schemaName%>-detail-sub>
+            </div><%}%>
+
+            <%if(canUpdate || canDelete || canArchive || canCheck){%>
+            <div class="card-action-icons-container">
+                <div class="card-action-icons">
+                    <%if(canUpdate){%>
+                        <a *ngIf="canUpdate" [routerLink]="['.']" queryParamsHandling="preserve" (click)="onEdit(detail._id)"><i class="fas fa-edit" title="Edit"></i></a>
+                    <%}%>
+                    <%if(canDelete){%><a *ngIf="canDelete" routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
+                    <%if(canArchive){%><a *ngIf="canArchive" routerLink="." (click)="onArchive(detail['_id'], i, archivedSearch)">
+                        <i *ngIf="!archivedSearch" class="fa fa-archive" title="Archive"></i>
+                        <i *ngIf="archivedSearch" class="fas fa-trash-restore" title="Unarchive"></i>	
+                    </a><%}%>
+                    <%if(canCheck){%><input *ngIf="canCheck" class="list-check-box" type="checkbox" [ngModel]="checkedItem[i]" (click)="selectOneItem(i)"/><%}%>
+                </div>
+            </div><%}%>
+        </div>
+    </div>
+    <i aria-hidden="true" class="grid-block"></i>
+	<i aria-hidden="true" class="grid-block"></i>
+</div>

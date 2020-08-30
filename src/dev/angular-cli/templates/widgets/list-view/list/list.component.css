@@ -1,0 +1,71 @@
+<%-include('/schema-list-view.component.css') %>
+
+.list-head-picture {
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 6rem;
+  height: 6rem;
+
+  margin-right: 0.5rem;
+  overflow: hidden;
+}
+
+@media screen and (min-width: 500px) {
+  .list-head-picture {
+    flex-basis: 8rem;
+    height: 8rem;
+  }
+}
+
+.listview {
+  /*
+  border-top: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+  */
+}
+
+.list-block {
+  width: 100%;
+  padding: 0.5rem;
+
+  word-break: break-word;
+  overflow-wrap: break-word;
+  /*border: 1px solid rgba(0,0,0,.125);
+  border-radius: .25rem;*/
+}
+
+.list-card {
+  display: flex;
+  flex-flow: wrap;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.list-info {
+  flex-grow: 1;
+
+  min-width: 300px;
+  width: 85%;
+}
+.list-fields {
+  display: flex;
+}
+
+.list-body-fields {
+  flex-grow: 1;
+}
+.list-devider-gradient {
+  border: 0;
+  height: 2px;
+  background: #095484;
+  background-image: linear-gradient(to right, #ccc, #095484, #ccc);
+}
+.list-devider {
+  width: 80%;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.list-body-fields label {
+  font-weight: bold;
+}

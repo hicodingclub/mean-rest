@@ -23,7 +23,7 @@ export class <%-SchemaName%>DetailSelComponent extends <%-SchemaName%>DetailComp
         public router: Router,
         public route: ActivatedRoute,
         public location: Location) {
-            super(<%if (sFeatures.hasRef) {%>null, <%}%><%-schemaName%>Service, injector, router, route, location);
+            super(<%-schemaName%>Service, injector, router, route, location);
             this.majorUi = false;
     }
 

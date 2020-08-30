@@ -16,9 +16,13 @@ for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm
 import { <%-schm.SchemaName%>Component } from './<%-schm.schemaName%>/<%-schm.schemaName%>.component';<%_
   if (api.includes("L")) {%>
 import { <%-schm.SchemaName%>ListComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list.component';
+import { <%-schm.SchemaName%>ListViewComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-view.component';
 import { <%-schm.SchemaName%>ListCustComponent } from '../<%-moduleName%>-cust/base/<%-schm.schemaName%>/<%-schm.schemaName%>-list.cust.component';<%_ } %><%_
-  if (api.includes('L')) { for (const widget of schm.listWidgets) {%>
-import { <%-schm.SchemaName%>ListWidget<%-widget[1]%>Component } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-list-widget-<%-widget[0]%>.component';<%} }%><%_
+  if (api.includes('L')) { for (const [fileName, CompName] of schm.knownListWidgets) {%>
+import { <%-schm.SchemaName%><%-CompName%>Component } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-<%-fileName%>.component';<%}
+      for (const [fileName, CompName] of schm.knownListViewWidgets) {%>
+import { <%-schm.SchemaName%><%-CompName%>Component } from './<%-schm.schemaName%>/<%-schm.schemaName%>-list/<%-schm.schemaName%>-<%-fileName%>.component';<%}
+  }%><%_
   if (api.includes("R")) {%>
 import { <%-schm.SchemaName%>DetailComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail.component';
 import { <%-schm.SchemaName%>DetailCustComponent } from '../<%-moduleName%>-cust/base/<%-schm.schemaName%>/<%-schm.schemaName%>-detail.cust.component';<%_ } %><%_
@@ -33,23 +37,13 @@ import { <%-schm.SchemaName%>EditCustComponent } from '../<%-moduleName%>-cust/b
 import { <%-schm.SchemaName%>AssoComponent } from './<%-schm.schemaName%>/<%-schm.schemaName%>-detail/<%-schm.schemaName%>-detail-asso.component';<%}%><%_
 } %><%_
 referenceSchemas.forEach(function(schObj){ let ref = schObj.ref, Ref = schObj.Ref, api = schObj.api;%><%_
-  if (api.includes("L")) {%>
-import { <%-Ref%>ListSelectComponent } from './<%-ref%>/<%-ref%>-list/<%-ref%>-list-select.component';<%_ } %><%_
-  if (api.includes("L")) { for (const widget of schObj.listSelectWidgets) {%>
-import { <%-Ref%>ListSelect<%-widget[1]%>Component } from './<%-ref%>/<%-ref%>-list/<%-ref%>-list-select-<%-widget[0]%>.component';<%_ } }%><%_
   if (api.includes("R")) {%>
 import { <%-Ref%>DetailPopComponent } from './<%-ref%>/<%-ref%>-detail/<%-ref%>-detail-pop.component';<%_ } %><%_
   if (api.includes("R")) {%>
 import { <%-Ref%>DetailSelComponent } from './<%-ref%>/<%-ref%>-detail/<%-ref%>-detail-sel.component';<%_ } %><%_ }); %><%_
 for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let sn = schm.schemaName, api = schm.api; 
-  if (schm.sFeatures.hasRef) {%><%_
-    if (api.includes("L")) {%>
-import { <%-schm.SchemaName%>ListSubComponent } from './<%-sn%>/<%-sn%>-list/<%-sn%>-list-sub.component';<%
-    if (schm.associationFor.length > 0) {%>
-import { <%-schm.SchemaName%>ListAssoComponent } from './<%-sn%>/<%-sn%>-list/<%-sn%>-list-asso.component';<%}%><%_ } %><%_
-    if (api.includes("R")) {%>
+  if (schm.api.includes('L') && schm.listViewObj.includeSubDetail) {%>
 import { <%-schm.SchemaName%>DetailSubComponent } from './<%-sn%>/<%-sn%>-detail/<%-sn%>-detail-sub.component';<%_ } %><%_
-  }
 }%><%_
 validatorFields.forEach(function(element){ %>
 import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.schemaName%>-edit/<%-element.schemaName%>-edit.component';<%_ }); %>
@@ -71,9 +65,13 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     <%-schm.SchemaName%>Component,<%
     if (api.includes("L")) {%>
     <%-schm.SchemaName%>ListComponent,
+    <%-schm.SchemaName%>ListViewComponent,
     <%-schm.SchemaName%>ListCustComponent,<%}%><%_
-    if (api.includes('L')) { for (const widget of schm.listWidgets) {%>
-    <%-schm.SchemaName%>ListWidget<%-widget[1]%>Component,<%} }%><%
+    if (api.includes('L')) { for (const [fileName, CompName] of schm.knownListWidgets) {%>
+    <%-schm.SchemaName%><%-CompName%>Component,<%}
+      for (const [fileName, CompName] of schm.knownListViewWidgets) {%>
+    <%-schm.SchemaName%><%-CompName%>Component,<%}
+    }%><%
     if (api.includes("R")) {%>
     <%-schm.SchemaName%>DetailCustComponent,
     <%-schm.SchemaName%>DetailComponent,<%}%><%_
@@ -87,28 +85,21 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     if (api.includes("R") && schm.assoRoutes.length > 0 ) {%>
     <%-schm.SchemaName%>AssoComponent,<%}%><%}%><%_
   referenceSchemas.forEach(function(reference){ let Ref = reference.Ref, api = reference.api; %><%
-    if (api.includes("L")) {%>
-    <%-Ref%>ListSelectComponent,<%}%><%
-    if (api.includes("L")) { for (const widget of reference.listSelectWidgets) {%>
-    <%-Ref%>ListSelect<%-widget[1]%>Component,<%_ } }%><%
     if (api.includes("R")) {%>
     <%-Ref%>DetailPopComponent,<%}%><%
     if (api.includes("R")) {%>
     <%-Ref%>DetailSelComponent,<%}%><%_ }); %><%_
-  for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; if (schm.sFeatures.hasRef) { %>
-    <% if (api.includes("L")) {%><%-schm.SchemaName%>ListSubComponent,<%if (schm.associationFor.length > 0) {%>
-    <%-schm.SchemaName%>ListAssoComponent,<%}%><%}%>
-    <% if (api.includes("R")) {%><%-schm.SchemaName%>DetailSubComponent,<%}%><%_ }}%><%_
+  for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; 
+    if (schm.api.includes('L') && schm.listViewObj.includeSubDetail) {%>
+    <%-schm.SchemaName%>DetailSubComponent,<%}%><%_ }%><%_
   validatorFields.forEach(function(element){ %>
     <%-element.Directive%>,<%_ }); %>
   ],
   exports: [
     <%-ModuleName%>Component,<%_
-  for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; %><%
-    if (api.includes("L")) {%>
-    <%-schm.SchemaName%>ListComponent,<%}%><%_
-    if (api.includes('L')) { for (const widget of schm.listWidgets) {%>
-    <%-schm.SchemaName%>ListWidget<%-widget[1]%>Component,<%} }%><%
+  for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; %><%_
+    if (api.includes('L')) { for (const [fileName, CompName] of schm.knownListWidgets) {%>
+    <%-schm.SchemaName%><%-CompName%>Component,<%} }%><%
     if (api.includes("R")) {%>
     <%-schm.SchemaName%>DetailComponent,<%}%><%_
     if (api.includes('R')) { for (const widget of schm.detailWidgets) {%>
@@ -120,21 +111,13 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     if (api.includes("R") && schm.assoRoutes.length > 0 ) {%>
     <%-schm.SchemaName%>AssoComponent,<%}%><%_ }%><%_
   referenceSchemas.forEach(function(reference){ let Ref = reference.Ref, api = reference.api; %><%
-    if (api.includes("L")) {%>
-    <%-Ref%>ListSelectComponent,<%}%><%
-    if (api.includes("L")) { for (const widget of reference.listSelectWidgets) {%>
-    <%-Ref%>ListSelect<%-widget[1]%>Component,<%_ } }%><%
     if (api.includes("R")) {%>
     <%-Ref%>DetailPopComponent,<%}%><%
     if (api.includes("R")) {%>
     <%-Ref%>DetailSelComponent,<%}%><%_ }); %><%_
-  for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; if (schm.sFeatures.hasRef) { %><%
-    if (api.includes("L")) {%>
-    <%-schm.SchemaName%>ListSubComponent,<%
-    if (schm.associationFor.length > 0) {%>
-    <%-schm.SchemaName%>ListAssoComponent,<%}%><%}%><%
-    if (api.includes("R")) {%>
-    <%-schm.SchemaName%>DetailSubComponent,<%}%><%_ }}%><%_
+  for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api; 
+    if (schm.api.includes('L') && schm.listViewObj.includeSubDetail) {%>
+    <%-schm.SchemaName%>DetailSubComponent,<%}%><%_ }%><%_
     validatorFields.forEach(function(element){ %>
     <%-element.Directive%>,<%_ }); %>
   ],
@@ -143,18 +126,16 @@ import { <%-element.Directive%> } from './<%-element.schemaName%>/<%-element.sch
     %>
   ],
   entryComponents: [<%_
-  if (mFeatures.hasRef) {%><%_ referenceSchemas.forEach(function(reference){ let Ref = reference.Ref; let api = reference.api; %><% 
+  if (mFeatures.hasRef) {
+    referenceSchemas.forEach(function(reference){ let Ref = reference.Ref; let api = reference.api; 
+    %><% 
     if (api.includes("L")) {%>
     <%-Ref%>ListSelectComponent,<%}%><%
-    if (api.includes("L")) { for (const widget of reference.listSelectWidgets) {%>
-    <%-Ref%>ListSelect<%-widget[1]%>Component,<%_ } }%><%
     if (api.includes("R")) {%>
     <%-Ref%>DetailPopComponent,<%}%><% 
     if (api.includes("R")) {%>
     <%-Ref%>DetailSelComponent,<%}%><%_ }); %><%_}%><%
   for (let sch_name in schemaMap) { let schm = schemaMap[sch_name]; let api = schm.api;%><%
-    if (api.includes('L')) { for (const widget of schm.listWidgets) {%>
-    <%-schm.SchemaName%>ListWidget<%-widget[1]%>Component,<%} }%><%
     if (api.includes("R")) { for (const widget of schm.detailWidgets) {%>
     <%-schm.SchemaName%>DetailWidget<%-widget[1]%>Component,<%} }%><%
     if (api.includes("C") ) {%>

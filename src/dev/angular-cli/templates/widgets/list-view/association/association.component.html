@@ -1,0 +1,38 @@
+<div class="table-wrapper">
+    <table *ngIf="list.length > 0" class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+    <%_ for (let field of briefView){
+            if (field.hidden) continue;
+            %>
+                <th *ngIf=" '<%-field.fieldName%>' !== associationField<%_if (field.ref) {%> && referenceFieldsMap['<%-field.fieldName%>'] != parentItem <%}%>" scope="col">
+                    <%-field.displayName%>
+                </th><%_ } %>		        
+                <th *ngFor = "let af of assoCompFields" scope="col">
+                    {{af[1]}}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        <ng-template ngFor let-detail [ngForOf]="list" let-i="index" let-seq="0">
+            <ng-template ngFor let-assoObj [ngForOf]="assoCompObjects[i]" let-idx="index">
+            <tr [ngClass]="{'clicked-row': clickedId==detail['_id']}"> <!-- *ngFor="let detail of list;  let i = index" -->
+                <td scope="row">{{(page-1)*perPage+i+1+idx}}</td>
+    <%_ let view = 'list'; for (let field of briefView){
+            if (field.hidden) continue;
+            let fn = field.fieldName, ft = field.type; let ref_link = false;
+            let fieldObj = {field, fn, ft, ref_link,};%>
+                <td *ngIf=" '<%-field.fieldName%>' !== associationField<%_if (field.ref) {%> && referenceFieldsMap['<%-field.fieldName%>'] != parentItem <%}%>" >
+                    <%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
+                </td><%_ } %>
+                <td *ngFor = "let af of assoCompFields;" scope="col">
+                    {{assoObj[af[0]]}}
+                </td>				
+            </tr>
+
+            </ng-template>
+        </ng-template>
+        </tbody>
+    </table>
+</div>

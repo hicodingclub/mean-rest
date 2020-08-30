@@ -1,0 +1,68 @@
+<div>
+
+	<div *ngIf="list.length === 0" class="no-records">
+		<span *ngIf="loaded">No records found.</span>
+		<span *ngIf="!loaded">Loading...</span>
+	</div>
+	<div class="container search">
+		<% let showExport = true; %>
+		<%_ let disableRefreshIcon = true; let disableSortSelection = true; let disableViewSwitch = true;
+		let pagiObj = {disableRefreshIcon, disableSortSelection, disableViewSwitch, showExport};
+		%><%-include(`/schema-list.pagination.html`, pagiObj)%>
+	</div>
+
+	<%_
+	let {
+		cardHasLink,
+		canUpdate, canDelete, canArchive, canCheck,
+		includeSubDetail,
+		cardHasSelect,
+	} = listViewObj;
+	%>
+	<div *ngIf="list.length > 0"><% for (let view of widgetDef.views) {%>
+		<ng-template [ngIf]="isShowListView('<%-view%>')">
+			<app-<%-schemaName%>-list-view-widget-<%-view%>
+				[style]="style" [options]="options"
+				[inputData]="inputData"
+				[viewInputs]="viewInputs"
+
+				[list]="list"
+
+				[clickedId]="clickedId"
+				[checkedItem]="checkedItem"
+				[parentItem]="parentItem"
+				[referenceFieldsMap]="referenceFieldsMap"
+				[listSortOrder]="listSortOrder"
+				[listSortField]="listSortField"
+				[page]="page"
+				[perPage]="perPage"
+				[archivedSearch]="archivedSearch"
+				[enums]="enums"
+				[associationField]="associationField"
+				[assoCompFields]="assoCompFields"
+				[assoCompObjects]="assoCompObjects"
+
+				[clickItemAction]="clickItemAction"
+				[cardHasLink]="cardHasLink"
+				[cardHasSelect]="cardHasSelect"
+				[canArchive]="canArchive"
+				[canCheck]="canCheck"
+				[canDelete]="canDelete"
+				[canUpdate]="canUpdate"
+				[includeSubDetail]="includeSubDetail"
+
+				(uiEvents)="viewUIEvent($event)"
+			>
+			</app-<%-schemaName%>-list-view-widget-<%-view%>>
+		</ng-template>
+		<%}%>
+	</div>
+
+	<div class="container">
+		<% showExport = false; %>
+		<%_ disableRefreshIcon = true; disableSortSelection = true; disableViewSwitch = true;
+		pagiObj = {disableRefreshIcon, disableSortSelection, disableViewSwitch, showExport};
+		%><%-include(`/schema-list.pagination.html`, pagiObj)%>		
+	</div>
+	
+</div>

@@ -24,7 +24,7 @@
                     </span>
 				</div>
 			    <div class="shadow" *ngIf="moreSearchOpened">
-					<div class="card">
+					<div class="card search-criteria-card">
 						<div class="card-body">
 							<div class="d-flex flex-wrap align-items-center">
 								<%_ sbo.ownSearchFields.forEach( (field) => {
@@ -51,7 +51,7 @@
 		        </div>
 		        <div *ngIf="!moreSearchOpened" style="text-align: left;">
 					<span class="badge badge-pill badge-info" *ngFor="let value of searchMoreDetail">
-					    <a (click)="toggleMoreSearch()" class="pointer"> {{value[0]}}: {{value[1]}}</a>
+					    <div (click)="toggleMoreSearch()" class="pointer search-detail-badge"> {{value[0]}}: {{value[1]}}</div>
 					    <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromDetailAndSearchList(value[2])" title="Clear"></i>
 					</span>
 				</div>

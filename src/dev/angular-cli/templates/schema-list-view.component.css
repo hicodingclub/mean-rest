@@ -1,0 +1,129 @@
+.read-more {
+  /*font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;*/
+  /*color: #307bff;*/
+  color: #28a745;
+
+  font-style: italic;
+  font-size: 0.85rem;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+}
+
+.read-more:hover {
+  /*color: #0056b3;*/
+  color: #218838;
+  /*text-decoration: underline;*/
+}
+.read-more i {
+  position: relative;
+  transition: all 0.3s;
+  top: 0;
+  right: 0;
+}
+.read-more:hover i {
+  top: 0px;
+  right: -3px;
+}
+
+.link-primary {
+  color: #307bff;
+
+}
+.link-primary:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.link {}
+.link:hover {
+  text-decoration: underline;
+}
+
+.show-detail {
+  position: relative;
+  margin-top: 15px;
+  transition: all 0.5s;
+}
+.show-detail:before {
+  content: '';
+  border-style: solid;
+  border-width: 0 10px 15px 10px;
+  border-color: transparent transparent rgba(0,0,0,.125) transparent;
+  position: absolute;
+  top: -15px;
+  left: 10px;
+}
+
+.fa-edit {
+  width: 1rem;
+}
+
+.thin-devider {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+.clicked-row {
+}
+
+.selected-row {
+  /*background-color: rgba(167, 224, 169, 0.175);*/
+  box-shadow: 0 0 0 2px #44b549;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.clickable-card {}
+.clickable-card:hover {
+  background-color: rgba(0, 0, 0, 0.075);
+}
+
+.card-action-links {
+  display: flex;
+  
+  align-items: baseline;
+}
+.card-action-icons-container {
+  flex-grow: 1;
+
+  display: flex;
+  align-items: flex-end;
+}
+.card-action-icons {
+  flex-grow: 1;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.field-label {
+  font-weight: bold;
+}
+
+td input,
+.card-action-icons input {
+  margin: 0.5rem;
+}
+
+td a i,
+.card-action-icons a i {
+  color: rgb(196, 191, 191);
+  margin: 0.5rem;
+}
+/*change the icon color when card is hoverred*/
+tr:hover td a i,
+.clickable-card:hover .card-action-icons a i {
+  color: black;
+}
+tr:hover td i.fa-edit:hover,
+.clickable-card:hover .card-action-icons i.fa-edit:hover {
+  color: blue;
+}
+tr:hover td i.fa-trash-alt:hover,
+.clickable-card:hover .card-action-icons i.fa-trash-alt:hover {
+  color: red;
+}

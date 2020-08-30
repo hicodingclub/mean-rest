@@ -16,9 +16,8 @@
 			include(`/ui/${uiFramework}/${uiDesign}/schema-display.grid.html`, listDisplayObj); %>
 				</div><%if(canUpdate || canDelete || canArchive || canCheck){%>
 				<div class="card-action-icons">
-					<%if(canUpdate){%><% if (embeddedEdit) {%>
-						<a [routerLink]="['.']" queryParamsHandling="preserve" (click)="onEdit(detail._id)"><i class="fas fa-edit" title="Edit"></i></a><%} else {%>
-						<a [routerLink]="['../edit', detail['_id'] ]" [skipLocationChange]="false"><i class="fas fa-edit" title="Edit"></i></a><%}%>
+					<%if(canUpdate){%>
+						<a [routerLink]="['.']" queryParamsHandling="preserve" (click)="onEdit(detail._id)"><i class="fas fa-edit" title="Edit"></i></a>
 					<%}%>
 					<%if(canDelete){%><a routerLink="." (click)="onDelete(detail['_id'], i)"><i class="fas fa-trash-alt" title="Delete"></i></a><%}%>
 					<%if(canArchive){%><a routerLink="." (click)="onArchive(detail['_id'], i, archivedSearch)">

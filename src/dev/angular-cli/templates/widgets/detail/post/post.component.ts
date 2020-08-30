@@ -6,10 +6,6 @@ import { Injector } from '@angular/core';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 import { <%-SchemaName%>DetailComponent } from './<%-schemaName%>-detail.component';
 
-<%if (sFeatures.hasRef) {%>
-import { ComponentFactoryResolver } from '@angular/core';<%}%>
-
-
 @Component({
   selector: 'app-<%-schemaName%>-detail-widget-post',
   templateUrl: './<%-schemaName%>-detail-widget-post.component.html',
@@ -17,14 +13,12 @@ import { ComponentFactoryResolver } from '@angular/core';<%}%>
 })
 export class <%-SchemaName%>DetailWidgetPostComponent extends <%-SchemaName%>DetailComponent implements OnInit, AfterViewInit {
   constructor(
-      <%if (sFeatures.hasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
       public <%-schemaName%>Service: <%-SchemaName%>Service,
       public injector: Injector,
       public router: Router,
       public route: ActivatedRoute,
       public location: Location) {
-          super(<%if (sFeatures.hasRef) {%>componentFactoryResolver,<%}%>
-                <%-schemaName%>Service, injector, router, route, location);
+          super(<%-schemaName%>Service, injector, router, route, location);
   }
 
   ngOnInit() {

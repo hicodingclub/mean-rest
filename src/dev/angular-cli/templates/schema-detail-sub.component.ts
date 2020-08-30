@@ -9,7 +9,7 @@ import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 @Component({
   selector: 'app-<%-schemaName%>-detail-sub',
   templateUrl: './<%-schemaName%>-detail-sub.component.html',
-  styleUrls: ['./<%-schemaName%>-detail.component.css']
+  styleUrls: ['./<%-schemaName%>-detail.component.css', './<%-schemaName%>-detail-sub.component.css']
 })
 export class <%-SchemaName%>DetailSubComponent extends <%-SchemaName%>DetailComponent 
         implements OnInit {
@@ -21,7 +21,7 @@ export class <%-SchemaName%>DetailSubComponent extends <%-SchemaName%>DetailComp
         public router: Router,
         public route: ActivatedRoute,
         public location: Location) {
-            super(<%if (sFeatures.hasRef) {%>null,<%}%><%-schemaName%>Service, injector, router, route, location);
+            super(<%-schemaName%>Service, injector, router, route, location);
     }
 
     ngOnInit() {

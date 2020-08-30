@@ -1,0 +1,14 @@
+<ngb-carousel *ngIf="list&&list.length>0" [pauseOnHover]="false" #carousel>
+	<ng-template ngFor let-detail [ngForOf]="list" let-idx="index">
+		<ng-template ngbSlide>
+			<img src="{{detail[picturelinkFn]}}" alt="" class="slide-image">
+			<div class="carousel-caption d-none d-md-block">
+				<p class="carousel-caption-h3 mb-5">{{detail[titleFn]}}</p>
+
+				<p class="carousel-caption-h5">{{detail[subtitleFn]}}</p>
+				<p class="carousel-caption-p">{{detail[descriptionFn]}}</p>
+			</div>
+		</ng-template>
+	</ng-template>
+</ngb-carousel>
+<div *ngIf="errMsg"><i style="color: red;">{{errMsg}}</i></div>

@@ -7,17 +7,35 @@ import { <%-SchemaName%>ListCustComponent } from '../../../<%-moduleName%>-cust/
 import { ViewType } from '../<%-schemaName%>.component';
 import { <%-SchemaName%>Service } from '../<%-schemaName%>.service';
 
-<%if (sFeatures.hasRef) {%>
-import { ComponentFactoryResolver } from '@angular/core';<%}%>
-  
 @Component({
-  selector: 'app-<%-schemaName%>-list',
-  templateUrl: './<%-schemaName%>-list.component.html',
-  styleUrls: ['./<%-schemaName%>-list.component.css']
+  template: '',
 })
 export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustComponent implements OnInit {
   <%_ if (sFeatures.hasDate) { %>
-  public minDate = {year: (new Date()).getFullYear() - 100, month: 1, day: 1};<%}%>
+  public minDate = {year: (new Date()).getFullYear() - 100, month: 1, day: 1};<%}%><%
+  let jsonData = JSON.stringify(listViewProperties);
+  let unquoted = jsonData.replace(/"([^"-]+)":/g, '$1:').replace(/"([^"]+)":/g, `'$1':`);
+  %>
+  public listViewProperties: any = <%-unquoted%>;
+
+  // used by association widget for the associated schema
+  public assoCompInstance: any;
+  public assoCompFields: any = [];
+  public assoCompObjects: any = [];
+
+  public clickItemAction: string = '<%-listViewObj.clickItemAction%>';
+  public cardHasLink: boolean = <%-listViewObj.cardHasLink%>;
+  public cardHasSelect: boolean = <%-listViewObj.cardHasSelect%>;
+  public includeSubDetail: boolean = <%-listViewObj.includeSubDetail%>;
+  public canUpdate: boolean = <%-listViewObj.canUpdate%>;
+  public canDelete: boolean = <%-listViewObj.canDelete%>;
+  public canArchive: boolean = <%-listViewObj.canArchive%>;
+  public canCheck: boolean = <%-listViewObj.canCheck%>;
+  public itemMultiSelect: boolean = <%-listViewObj.itemMultiSelect%>;
+  public majorUi: boolean = <%-listViewObj.majorUi%>;
+
+  // Do query on NgInit in this base class
+  public queryOnNgInit: boolean = true;
 
   // @Input() options: any; {disableCatetory: false, disablePagination: false, disbleActionButtons: false
   //                        disableListSearch: false, disableTitle: false, disableRefs: false
@@ -32,30 +50,21 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustCompone
   // public categoryBy:string; //field name whose value is used as category
 
   constructor(
-      <% if (sFeatures.hasRef) {%>public componentFactoryResolver: ComponentFactoryResolver,<%}%>
       public <%-schemaName%>Service: <%-SchemaName%>Service,
       public injector: Injector,
       public router: Router,
       public route: ActivatedRoute,
       public location: Location) {
-          super(<%if (sFeatures.hasRef) {%>componentFactoryResolver,<%}%>
-                <%-schemaName%>Service, injector, router, route, location);
+          super(<%-schemaName%>Service, injector, router, route, location);
           this.view = ViewType.LIST;
 <% let theView = briefView; %><%_ include schema-construct.component.ts %>
 
-          this.listViewFilter = '<%-listTypes[0][0]%>';<% if (defaultSortField) { %>
+          <% if (defaultSortField) { %>
           this.setListSort('<%-defaultSortField%>', '<%-defaultSortFieldDisplay%>', '<%-defaultSortOrder%>');<%}%>
           <%_ const listCategoriesString = JSON.stringify(listCategories);%>
           const listCategories = <%-listCategoriesString%>;
           this.listCategory1 = listCategories[0] || {};
           this.listCategory2 = listCategories[1] || {};
-
-          <%let clickToDetail = api.includes('R') && listToDetail === 'click'; if (clickToDetail) {%>this.clickItemAction = 'detail';<%}%>
-          this.itemMultiSelect = true;
-
-          // initialize detail structure for search
-          let detail = {};
-          this.detail = this.formatDetail(detail);
   }
 
   ngOnInit() {
@@ -63,17 +72,30 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustCompone
 
       this.adjustListViewForWindowSize();
 
-      this.clickItemAction = typeof this.options.clickItemAction === 'undefined'? this.clickItemAction : this.options.clickItemAction;
-      this.itemMultiSelect = typeof this.options.itemMultiSelect === 'boolean' ?  this.options.itemMultiSelect : this.itemMultiSelect;
-  
       if (!this.options) {
         this.options = {};
       }
+
+      const properties = [
+        'clickItemAction',
+        'cardHasLink',
+        'cardHasSelect',
+        'includeSubDetail',
+        'canUpdate',
+        'canDelete',
+        'canArchive',
+        'canCheck',
+        'itemMultiSelect',
+        'majorUi',
+      ];
+      this.applyProperties(this.options, this, properties);
   
       if (this.options.disableCatetory) {
         this.listCategory1 = {}; // no do query based on category for home view;
         this.listCategory2 = {}; // no do query based on category for home view;
       }
+
+      this.listViewFilter = this.options.listViewFilter || this.listViewFilter
 
       // this is to initialize the detail that will be used for search condition selection
       let detail = {};
@@ -89,15 +111,21 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustCompone
         }
       }
       this.detail = this.formatDetail(detail);
-      this.searchList();
 
-      // get editHintFields
-      this.searchHintFieldValues();
+      if (this.queryOnNgInit) {
+        this.searchList();
+        // get editHintFields
+        this.searchHintFieldValues();
+      }
+  }
+
+  viewUIEvent(evt: any) {
+    const thisObject = this;
+    thisObject[evt.type].apply(this, evt.params);
   }
 
   static getInstance() {
     //used by others to call some common functions
-    return new <%-SchemaName%>ListComponent(<%_ if (sFeatures.hasRef) {%>null, <%}%>null, null, null, null, null);
+    return new <%-SchemaName%>ListComponent(null, null, null, null, null);
   }
 }
-
