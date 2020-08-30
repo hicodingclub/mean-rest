@@ -1,19 +1,19 @@
 {
   "name": "@hicoder/angular-action-email",
-  "version": "0.9.46",
+  "version": "0.9.48",
   "peerDependencies": {
     "@angular/common": "^10.0.2",
     "@angular/core": "^10.0.2",
     "@angular/forms": "^10.0.2",
-    "@hicoder/angular-richtext": "0.9.46",
-    "@hicoder/angular-action-base": "0.9.46"
+    "@hicoder/angular-richtext": "0.9.48",
+    "@hicoder/angular-action-base": "0.9.48"
   },
   "devDependencies": {
     "@angular/common": "^10.0.2",
     "@angular/core": "^10.0.2",
     "@angular/forms": "^10.0.2",
-    "@hicoder/angular-action-base": "0.9.46",
-    "@hicoder/angular-richtext": "0.9.46"
+    "@hicoder/angular-action-base": "0.9.48",
+    "@hicoder/angular-richtext": "0.9.48"
   },
   "dependencies": {
     "tslib": "^2.0.0"

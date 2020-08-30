@@ -1,5 +1,5 @@
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { Injector, EventEmitter, Type } from '@angular/core';
+import { Injector, ComponentFactoryResolver, EventEmitter, Type } from '@angular/core';
 
 import { Location } from '@angular/common';
 
@@ -81,7 +81,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public briefFieldsInfo = []; // from base contructor. All breifFields
 
   public listRouterLink: string = '../../list'; //router link from detail to list; overridden by component
-  public listViewFilter = 'table'; // list, or grid
+  public listViewFilter: string = 'table'; // list, or grid
+  public listViews: string[] = [];
+  public listViewProperties: any = {};
   public listSortField: string;
   public listSortFieldDisplay: string;
   public listSortOrder: string; // 'asc', 'desc'
@@ -122,8 +124,6 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public loaded = false;
 
   // actions (pipeline/composite)
-  public isDropdownList = false;
-  public dropdownItems: { displayName: string; id: string }[];
   public dropdownSelectedIdx: number;
   public actionType: string;
 
@@ -160,14 +160,22 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   // **** For parent component of modal UI
   public refSelectDirective: any;
   public selectComponents: any; // {fieldName: component-type} format
-  public componentFactoryResolver: any; // injected by extended class, if needed.
+  public componentFactoryResolver: ComponentFactoryResolver; // injected by extended class, if needed.
   public componentSubscription: any;
 
   public clickedId = null;
   public selectedId; //used by single selection components
 
+  // list View UI control
   public clickItemAction: string = '';
   public itemMultiSelect: boolean = false;
+  public cardHasLink: boolean = false;
+  public canUpdate: boolean = false;
+  public canDelete: boolean = false;
+  public canArchive: boolean = false;
+  public canCheck: boolean = false;
+  public includeSubDetail: boolean = false;
+  public cardHasSelect: boolean = false;
 
   /*Date Range Selection */
   hoveredDate: any;
@@ -176,7 +184,6 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public parentData: any;
   public parentId: any;
   public isAdding: boolean = false;
-
   public isEditing: boolean = false;
 
   // archived search
@@ -198,6 +205,9 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       this.commonService = injector.get<MddsCommonService>(
         MddsCommonService as Type<MddsCommonService>
       );
+      this.componentFactoryResolver = injector.get<ComponentFactoryResolver>(
+        ComponentFactoryResolver
+      );
     }
   }
 
@@ -205,6 +215,14 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     this.itemCamelName = itemCamelName;
     this.ItemCamelName = itemCamelName.charAt(0).toUpperCase() + itemCamelName.substr(1);
     this.itemName = itemCamelName.toLowerCase();
+  }
+
+  public applyProperties(source: any, target: any, properties: string[]) {
+    for (let property of properties) {
+      if (typeof source[property] !== 'undefined') {
+        target[property] = source[property];
+      }
+    }
   }
 
   public onServiceError(error: MddsServiceError): void {
@@ -361,8 +379,14 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       this.datePickerDisplayMonths = 1;
     }
     if (this.windowWidth < 992) {
-      if (this.listViewFilter === 'table') {
-        this.listViewFilter = 'list'; // use list instead
+      if (!this.listViewProperties[this.listViewFilter].mobile) {
+        // support mobile
+        for (let view of this.listViews) {
+          if (this.listViewProperties[view].mobile) {
+            this.listViewFilter = view;
+            break;
+          }
+        }
       }
     }
   }
@@ -1518,7 +1542,10 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         }) => {
           this.list = result.items.map((x: any) => {
             let d = this.formatDetail(x);
-            return this.formatTextareaFields(d);
+            d = this.formatTextareaFields(d);
+            let display = this.stringify(d);
+            d.mddsDisplayName = display; // assign a display name
+            return d;
           });
           this.originalList = result.items;
 
@@ -1662,13 +1689,6 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
             }); // update the url
           }
 
-          if (this.isDropdownList) {
-            this.dropdownItems = this.list.map((x, idx) => ({
-              displayName: this.stringify(x),
-              id: x._id,
-              idx,
-            }));
-          }
           this.page = result.page;
           this.perPage = result.per_page;
           this.totalCount = result.total_count;
@@ -1700,7 +1720,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   /*UI operations handlers*/
   public setListViewFilter(view: string): void {
     this.listViewFilter = view;
-    this.putToStorage('listViewFilter', view);
+    this.putToStorage('listViewFilter', this.listViewFilter);
   }
   public isShowListView(view: string): boolean {
     const cached = this.getFromStorage('listViewFilter');
@@ -1734,7 +1754,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       this.searchList();
     } // call search list, instead of populate list, in case there are other search context.
   }
-  public toggleListSort(field: string, fieldDisplay: string): void {
+  public toggleListSort(field: string, displayName?: string): void {
     if (field !== this.listSortField) {
       this.listSortOrder = 'asc';
     } else {
@@ -1744,7 +1764,10 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         this.listSortOrder = 'asc';
       }
     }
-    this.setListSort(field, fieldDisplay, this.listSortOrder);
+    if (!displayName) {
+      displayName = this.fieldDisplayNames[field] || field;
+    }
+    this.setListSort(field, displayName, this.listSortOrder);
 
     this.populateList();
   }
@@ -2016,7 +2039,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     modal.show();
   }
 
-  public onArchive(id: string, idx: number, archived): void {
+  public onArchive(id: string, idx: number, archived: boolean): void {
     const modalConfig: ModalConfig = {
       title: 'Archive Confirmation',
       content:
@@ -2517,22 +2540,19 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     }
   }
   selectOneItem(i: number) {
+    this.checkedItem[i] = !this.checkedItem[i];
     const detail = this.list[i];
     this.clickedId = detail._id;
+    this.selectedId = detail._id;
 
-    if (!this.itemMultiSelect) {
-      this.clearSelectItems();
-    }
-    this.checkedItem[i] = !this.checkedItem[i];
-    this.notifyItemSelected();
-  }
-  onDropdownSelected() {
-    for (let i=0; i<=this.list.length; i++) {
-      if (this.list[i]._id === this.selectedId) {
-        this.selectOneItem(i);
-        break;
+    if (this.checkedItem[i]) {
+      // selected
+      if (!this.itemMultiSelect) {
+        this.clearSelectItems();
       }
+      this.checkedItem[i] = true;
     }
+    this.notifyItemSelected();
   }
   // triggered when there is a change of page or search condition
   clearSelectItems() {
@@ -2542,7 +2562,6 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       false
     );
     this.checkAll = false;
-
   }
   // Second step of two-step selection
   selectItemConfirmed() {
@@ -2686,30 +2705,32 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     this.list[i].mddsShowDetail = !this.list[i].mddsShowDetail;
   }
 
-  public onAdd() {
+  public onEmbeddedAdd() {
     this.isAdding = true;
   }
-  public toggleAdd() {
-    this.isAdding = !this.isAdding;
-  }
-  public onEdit(id: string) {
+  public onEmbeddedEdit(id: string) {
     this.isEditing = true;
     this.parentId = id;
   }
-
-  public onActionDone(result: boolean) {
+  public onEmbeddedEditDone(result: boolean) {
     this.isAdding = false;
     this.isEditing = false;
     if (result) {
       // add successful. Re-populate the current list
-      if (this.view === ViewType.LIST) {
-        this.populateList();
-      }
-    } else {
-      // do nothing
+      this.populateList();
     }
   }
 
+  public onEdit(id: string) {
+    this.clickedId = id;
+    if (this.modulePath) {
+      this.router.navigate([this.modulePath, this.schemaName, 'edit', id]); // {relativeTo: this.getParentActivatedRouter() }
+    } else {
+      this.router.navigate([this.itemName, 'edit', id], {
+        relativeTo: this.getParentActivatedRouter(),
+      });
+    }
+  }
   /***general action handling from angular-action-base */
   public onActionBaseEvent(event: {
     actionType: any;

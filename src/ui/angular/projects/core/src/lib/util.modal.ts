@@ -43,12 +43,18 @@ const modalCss = `
     margin: auto;
     padding: 0;
     border: 1px solid #888;
-    width: 50%;
+    width: 80%;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
     -webkit-animation-name: modalanimatetop;
     -webkit-animation-duration: 0.4s;
     animation-name: modalanimatetop;
     animation-duration: 0.4s
+}
+
+@media screen and (min-width: 768px) {
+  .meanExpressAngularModal-content {
+    width: 50%;
+  }
 }
 
 @-webkit-keyframes modalanimatetop {
