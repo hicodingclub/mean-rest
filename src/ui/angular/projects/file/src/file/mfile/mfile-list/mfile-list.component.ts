@@ -22,13 +22,8 @@ import {
 import {
   MfileService
 } from '../mfile.service';
-import {
-  ComponentFactoryResolver
-} from '@angular/core';
 @Component({
-  selector: 'app-mfile-list',
-  templateUrl: './mfile-list.component.html',
-  styleUrls: ['./mfile-list.component.css']
+  template: '',
 })
 export class MfileListComponent extends MfileListCustComponent implements OnInit {
   public minDate = {
@@ -36,6 +31,27 @@ export class MfileListComponent extends MfileListCustComponent implements OnInit
     month: 1,
     day: 1
   };
+  public listViewProperties: any = {
+    'gallery-bottom-title': {
+      mobile: true
+    }
+  };
+  // used by association widget for the associated schema
+  public assoCompInstance: any;
+  public assoCompFields: any = [];
+  public assoCompObjects: any = [];
+  public clickItemAction: string = '';
+  public cardHasLink: boolean = false;
+  public cardHasSelect: boolean = false;
+  public includeSubDetail: boolean = false;
+  public canUpdate: boolean = false;
+  public canDelete: boolean = false;
+  public canArchive: boolean = false;
+  public canCheck: boolean = false;
+  public itemMultiSelect: boolean = true;
+  public majorUi: boolean = false;
+  // Do query on NgInit in this base class
+  public queryOnNgInit: boolean = true;
   // @Input() options: any; {disableCatetory: false, disablePagination: false, disbleActionButtons: false
   //                        disableListSearch: false, disableTitle: false, disableRefs: false
   //                        disableListHead: false, disableTitleRow: false}
@@ -47,8 +63,8 @@ export class MfileListComponent extends MfileListCustComponent implements OnInit
   // public queryParams: any;  // {listSortField: 'a', listSortOrder: 'asc' / 'desc', perPage: 6}
   // @Input()
   // public categoryBy:string; //field name whose value is used as category
-  constructor(public componentFactoryResolver: ComponentFactoryResolver, public mfileService: MfileService, public injector: Injector, public router: Router, public route: ActivatedRoute, public location: Location) {
-    super(componentFactoryResolver, mfileService, injector, router, route, location);
+  constructor(public mfileService: MfileService, public injector: Injector, public router: Router, public route: ActivatedRoute, public location: Location) {
+    super(mfileService, injector, router, route, location);
     this.view = ViewType.LIST;
     this.fieldDisplayNames = {
       'link': 'Link',
@@ -63,7 +79,6 @@ export class MfileListComponent extends MfileListCustComponent implements OnInit
     this.dateFields = ['createdAt', ];
     this.numberFields = ['size', ];
     this.viewHiddenFields = ['size', 'group', ];
-    this.listViewFilter = 'galleryBottomTitle';
     const listCategories = [{
       "listCategoryField": "group",
       "showCategoryCounts": true,
@@ -72,23 +87,20 @@ export class MfileListComponent extends MfileListCustComponent implements OnInit
     }];
     this.listCategory1 = listCategories[0] || {};
     this.listCategory2 = listCategories[1] || {};
-    this.itemMultiSelect = true;
-    // initialize detail structure for search
-    let detail = {};
-    this.detail = this.formatDetail(detail);
   }
   ngOnInit() {
     super.ngOnInit();
     this.adjustListViewForWindowSize();
-    this.clickItemAction = typeof this.options.clickItemAction === 'undefined' ? this.clickItemAction : this.options.clickItemAction;
-    this.itemMultiSelect = typeof this.options.itemMultiSelect === 'boolean' ? this.options.itemMultiSelect : this.itemMultiSelect;
     if (!this.options) {
       this.options = {};
     }
+    const properties = ['clickItemAction', 'cardHasLink', 'cardHasSelect', 'includeSubDetail', 'canUpdate', 'canDelete', 'canArchive', 'canCheck', 'itemMultiSelect', 'majorUi', ];
+    this.applyProperties(this.options, this, properties);
     if (this.options.disableCatetory) {
       this.listCategory1 = {}; // no do query based on category for home view;
       this.listCategory2 = {}; // no do query based on category for home view;
     }
+    this.listViewFilter = this.options.listViewFilter || this.listViewFilter
     // this is to initialize the detail that will be used for search condition selection
     let detail = {};
     if (this.searchObj) {
@@ -103,12 +115,18 @@ export class MfileListComponent extends MfileListCustComponent implements OnInit
       }
     }
     this.detail = this.formatDetail(detail);
-    this.searchList();
-    // get editHintFields
-    this.searchHintFieldValues();
+    if (this.queryOnNgInit) {
+      this.searchList();
+      // get editHintFields
+      this.searchHintFieldValues();
+    }
+  }
+  viewUIEvent(evt: any) {
+    const thisObject = this;
+    thisObject[evt.type].apply(this, evt.params);
   }
   static getInstance() {
     //used by others to call some common functions
-    return new MfileListComponent(null, null, null, null, null, null);
+    return new MfileListComponent(null, null, null, null, null);
   }
 }

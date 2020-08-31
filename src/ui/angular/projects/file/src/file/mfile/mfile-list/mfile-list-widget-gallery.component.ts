@@ -21,7 +21,7 @@ const MddsFileCrop = "mdds-file-crop";
   templateUrl: "./mfile-list-widget-gallery.component.html",
   styleUrls: [
     "./mfile-list.component.css",
-    "./mfile-list-widget-galleryBottomTitle.component.css",
+    "./mfile-list-general.component.css",
     "./mfile-list-widget-gallery.component.css",
   ],
 })
@@ -61,8 +61,9 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent
     public location: Location,
     private uploadService: MddsFileUploadService
   ) {
-    super(null, mfileService, injector, router, route, location);
+    super(mfileService, injector, router, route, location);
     this.majorUi = false;
+    this.listViewFilter = 'gallery-bottom-title';
   }
 
   ngOnInit() {
@@ -109,7 +110,7 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent
     }
 
     // this.localImage = URL.createObjectURL(files['0']);
-
+    this.uploading = true;
     this.uploadFiles(null, () => {
       for (const key of Object.keys(this.progress)) {
         const success = this.progress[key].result.success;
@@ -121,6 +122,7 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent
           this.uploadingFiles.push(key);
         }
       }
+      this.uploading = false;
     });
   }
 
@@ -131,8 +133,6 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent
     //    }
     //
     // set the component state to "uploading"
-    this.uploading = true;
-
     let groupName = this.categories[this.selectedCategory].group._id;
     if (groupName === MddsUncategorized) {
       groupName = null;
@@ -166,9 +166,6 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent
       // ... the upload was successful...
       this.uploadSuccessful = true;
       this.localImage = null;
-
-      // ... and the component is no longer uploading
-      this.uploading = false;
 
       this.uploadingFiles = []; // clear
       this.files = new Set();
@@ -210,6 +207,8 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent
   }
   // overload the base one
   selectItemConfirmed() {
+    this.uploading = true; // bring up the spinner. Don't put inside getCroppedCanvas
+
     this.cropper.getCroppedCanvas().toBlob(
       (blob) => {
         // convert to a file
@@ -231,6 +230,7 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent
         this.uploadFiles(MddsFileCrop, () => {
           const success = this.progress[f.name].result.success;
           if (success) {
+
             const fileObj = this.progress[f.name].result.value;
             this.outputData = {
               action: "selected",
@@ -241,6 +241,7 @@ export class MfileListWidgetGalleryComponent extends MfileListComponent
           } else {
             this.uploadingFiles.push(f.name);
           }
+          this.uploading = false;
         });
       },
       "image/jpeg",

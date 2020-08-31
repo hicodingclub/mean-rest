@@ -24,7 +24,23 @@ const schemas = {
      api: 'L',  // api exposed by rest controller
      name: 'Picture',
      mraUI: {
-      listTypeOnly: 'galleryBottomTitle', 
+      listWidgets: {
+        general: {
+          views: ['gallery-bottom-title',],
+        },
+        select: {
+          views: [],
+        },
+        sub: {
+          views: [],
+        }
+      },
+      listWidgetTypes: {
+        general: 'general',
+        select: 'select',
+        sub: 'sub',
+      },
+
       listCategories: [
         {
           listCategoryField: 'group',
@@ -40,7 +56,22 @@ const schemas = {
      api: 'LCU', // api exposed by rest controller
      name: 'Picture Group',
      mraUI: {
-      listSelectType: 'index',
+      listWidgets: {
+        general: {
+          views: [],
+        },
+        select: {
+          views: ['index',],
+        },
+        sub: {
+          views: [],
+        }
+      },
+      listWidgetTypes: {
+        general: 'general',
+        select: 'select',
+        sub: 'sub',
+      },
      },
   },
   'upload': {},

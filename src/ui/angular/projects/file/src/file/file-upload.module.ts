@@ -13,7 +13,8 @@ import { FileSelectComponent } from './file-select.component';
 
 import { MfileListComponent } from './mfile/mfile-list/mfile-list.component';
 import { MfileListWidgetGalleryComponent } from './mfile/mfile-list/mfile-list-widget-gallery.component';
-import { MfileListWidgetGalleryBottomTitleComponent } from './mfile/mfile-list/mfile-list-widget-galleryBottomTitle.component';
+import { MfileListViewComponent } from './mfile/mfile-list/mfile-list-view.component';
+import { MfileListViewWidgetGalleryBottomTitleComponent } from './mfile/mfile-list/mfile-list-view-widget-gallery-bottom-title.component';
 import { MfileComponent } from './mfile/mfile.component';
 import { FileRefSelectDirective } from './file.select.directive';
 import { MfileListCustComponent } from '../file-cust/base/mfile/mfile-list.cust.component';
@@ -22,7 +23,8 @@ import { MfilegroupListComponent } from './mfilegroup/mfilegroup-list/mfilegroup
 import { MfilegroupEditComponent } from './mfilegroup/mfilegroup-edit/mfilegroup-edit.component';
 import { MfilegroupService } from './mfilegroup/mfilegroup.service';
 import { MfilegroupListSelectComponent } from './mfilegroup/mfilegroup-list/mfilegroup-list-select.component';
-import { MfilegroupListSelectIndexComponent } from './mfilegroup/mfilegroup-list/mfilegroup-list-select-index.component';
+import { MfilegroupListViewComponent } from './mfilegroup/mfilegroup-list/mfilegroup-list-view.component';
+import { MfilegroupListViewWidgetIndexComponent } from './mfilegroup/mfilegroup-list/mfilegroup-list-view-widget-index.component';
 import { MfilegroupComponent } from './mfilegroup/mfilegroup.component';
 import { MfilegroupEditCustComponent } from '../file-cust/base/mfilegroup/mfilegroup-edit.cust.component';
 import { MfilegroupListCustComponent } from '../file-cust/base/mfilegroup/mfilegroup-list.cust.component';
@@ -45,7 +47,8 @@ import { SafeUrlPipe } from './pipes';
     declarations: [
         MfileListComponent,
         MfileListWidgetGalleryComponent,
-        MfileListWidgetGalleryBottomTitleComponent,
+        MfileListViewComponent,
+        MfileListViewWidgetGalleryBottomTitleComponent,
         SafeUrlPipe,
 
         FileUploadComponent,
@@ -56,7 +59,8 @@ import { SafeUrlPipe } from './pipes';
         MfileListCustComponent,
 
         MfilegroupListSelectComponent,
-        MfilegroupListSelectIndexComponent,
+        MfilegroupListViewComponent,
+        MfilegroupListViewWidgetIndexComponent,
         MfilegroupEditComponent,
         MfilegroupListComponent,
         MfilegroupComponent,

@@ -28,14 +28,11 @@ import {
   ViewChild
 } from '@angular/core';
 import {
-  ComponentFactoryResolver
-} from '@angular/core';
-import {
   FileRefSelectDirective
 } from '../file.select.directive';
 import {
-  MfilegroupListSelectIndexComponent
-} from '../mfilegroup/mfilegroup-list/mfilegroup-list-select-index.component';
+  MfilegroupListSelectComponent
+} from '../mfilegroup/mfilegroup-list/mfilegroup-list-select.component';
 @Component({
   template: '',
 })
@@ -56,6 +53,10 @@ export class MfileComponent extends MddsBaseComponent implements OnInit {
   public queryParams: any; // {listSortField: 'a', listSortOrder: 'asc' / 'desc', perPage: 6}
   @Input()
   public categoryBy: string; //field name whose value is used as category
+  @Input()
+  public listViews: string[] = [];
+  @Input()
+  public viewInputs: any = {};
   // list-asso component
   @Input('asso') public associationField: string;
   // list select component
@@ -98,14 +99,14 @@ export class MfileComponent extends MddsBaseComponent implements OnInit {
   // @Output() outputData;
   public selectComponents = {
     'group': {
-      'select-type': MfilegroupListSelectIndexComponent,
+      'select-type': MfilegroupListSelectComponent,
       'componentRef': null
     },
   }
   @ViewChild(FileRefSelectDirective, {
     static: true
   }) refSelectDirective: FileRefSelectDirective;
-  constructor(public componentFactoryResolver: ComponentFactoryResolver, public mfileService: MfileService, public injector: Injector, public router: Router, public route: ActivatedRoute, public location: Location) {
+  constructor(public mfileService: MfileService, public injector: Injector, public router: Router, public route: ActivatedRoute, public location: Location) {
     super(mfileService, injector, router, route, location);
     this.setItemNames(itemCamelName);
     this.briefFieldsInfo = [];

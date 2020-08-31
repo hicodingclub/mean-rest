@@ -1,6 +1,12 @@
 .edit {
-  width: 75%;
+  width: 100%;
   margin: 0 auto;
+}
+
+@media screen and (min-width: 992px) {
+  .edit {
+    width: 75%;
+  }
 }
 
 fieldset>.form-control,

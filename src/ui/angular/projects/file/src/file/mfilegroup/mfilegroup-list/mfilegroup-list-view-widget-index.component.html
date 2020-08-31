@@ -1,0 +1,7 @@
+<div class="d-flex align-items-start flex-wrap list-items">
+  <div *ngFor="let detail of list;  let i = index" [ngClass]="{'selected-row': detail['_id']==clickedId}" (click)="selectItemSelected(i)" class="m-2 badge badge-secondary pointer">
+    <span>
+      {{detail['name']}}
+    </span>
+  </div>
+</div>

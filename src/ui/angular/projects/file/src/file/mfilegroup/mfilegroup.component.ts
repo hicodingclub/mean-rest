@@ -50,6 +50,10 @@ export class MfilegroupComponent extends MddsBaseComponent implements OnInit {
   public queryParams: any; // {listSortField: 'a', listSortOrder: 'asc' / 'desc', perPage: 6}
   @Input()
   public categoryBy: string; //field name whose value is used as category
+  @Input()
+  public listViews: string[] = [];
+  @Input()
+  public viewInputs: any = {};
   // list-asso component
   @Input('asso') public associationField: string;
   // list select component
