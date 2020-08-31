@@ -8,6 +8,7 @@ import {
   MddsDirectiveMapRequired,
   MddsDirectiveMultiSelectionRequired,
 } from "./mdds-common.directives";
+import { MDDSLoaderComponent } from './loader.component';
 import { MddsAnchorPipe } from "./anchor.pipe";
 @NgModule({
   imports: [RouterModule],
@@ -18,6 +19,7 @@ import { MddsAnchorPipe } from "./anchor.pipe";
     MddsDirectiveArrayRequired,
     MddsDirectiveMapRequired,
     MddsDirectiveMultiSelectionRequired,
+    MDDSLoaderComponent,
   ],
   exports: [
     MddsMinNumberDirective,
@@ -26,6 +28,7 @@ import { MddsAnchorPipe } from "./anchor.pipe";
     MddsDirectiveArrayRequired,
     MddsDirectiveMapRequired,
     MddsDirectiveMultiSelectionRequired,
+    MDDSLoaderComponent,
   ],
   providers: [],
 })

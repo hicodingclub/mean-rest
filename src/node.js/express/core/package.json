@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/express-core",
-  "version": "0.9.48",
+  "version": "0.9.51",
   "description": "Restful API exposure middleware for Express and Mongoose based framework. Provide Rest API automatically based on Mongoose schema. It can also work with angular-core to develop end to end MEAN stack web applications.",
   "main": "index.js",
   "scripts": {

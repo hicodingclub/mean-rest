@@ -40,7 +40,7 @@ if [ $check != "Y" ] && [ "$#" -ne 1 ]; then
   exit 1
 fi
 
-delay=5
+delay=6
 if [ $check = "Y" ];then
   echo "Check the existing versions..."
   delay=1 

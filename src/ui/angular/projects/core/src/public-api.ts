@@ -6,6 +6,7 @@ export { MddsUncategorized } from "./lib/base.component";
 export { MddsBaseComponentInterface } from "./lib/base.interface";
 export { MddsServiceError, MddsBaseService } from "./lib/base.service";
 export { MddsCommonService } from "./lib/mdds-common.service";
+export { MDDSLoaderComponent } from './lib/loader.component';
 
 export { MddsCoreModule } from "./lib/mdds-core.module";
 export {
