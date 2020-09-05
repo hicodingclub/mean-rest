@@ -266,6 +266,50 @@ const searchObjPatch = function (query, mraBE) {
   return query;
 };
 
+const processMraBE = function (mraBE, owner) {
+  if (typeof mraBE !== 'object') {
+    return {
+      listOnlyAllowSearch: false,
+    };
+  }
+  if (Array.isArray(mraBE.listOnlyAllowSearchOn)) {
+    mraBE.listOnlyAllowSearch = true;
+    mraBE.listOnlyAllowSearchOn.push('_id');
+
+    if (owner && owner.enable) {
+      if (owner.type === 'module') {
+        mraBE.listOnlyAllowSearchOn.push('mmodule_name');
+      } else if (owner.type === 'user') {
+          if (!!owner.field) {
+            mraBE.listOnlyAllowSearchOn.push(owner.field);
+          } else {
+            mraBE.listOnlyAllowSearchOn.push('muser_id');
+          }
+      }
+    }
+
+    mraBE.listOnlyAllowSearchOn = mraBE.listOnlyAllowSearchOn.filter(
+      (x, idx) => mraBE.listOnlyAllowSearchOn.indexOf(x) === idx
+    )
+  } else {
+    mraBE.listOnlyAllowSearch = false;
+  }
+
+  return mraBE;
+};
+
+const searchAllowed = function (query, mraBE) {
+  //TODO: consider $and, $or type of search
+  if (!mraBE.listOnlyAllowSearch) return true;
+  for (let p in query) {
+    if (mraBE.listOnlyAllowSearchOn.includes(p)) {
+      // at least one search fields available
+      return true;
+    }
+  }
+  return false;
+};
+
 const processPages = function (
   __per_page,
   __page,
@@ -348,7 +392,7 @@ class RestController {
     this.views_collection[name] = views;
     this.model_collection[name] = model;
     this.owner_config[name] = ownerConfig;
-    this.mraBE_collection[name] = mraBE;
+    this.mraBE_collection[name] = processMraBE(mraBE, ownerConfig);
     this.tags_collection[name] = tags; // schema tags for special logic handling
     //views in [briefView, detailView, CreateView, EditView, SearchView, IndexView] format
     this.populate_collection[name] = {
@@ -408,6 +452,9 @@ class RestController {
     };
     query = ownerPatch(query, owner, req);
     query = searchObjPatch(query, mraBE);
+    if (!searchAllowed(query, mraBE)) {
+      throw new Error('Search not allowed.');
+    }
 
     try {
       let docs = await model.find(query).exec();
@@ -430,6 +477,9 @@ class RestController {
     let query = {};
     query = ownerPatch(query, owner, req);
     query = searchObjPatch(query, mraBE);
+    if (!searchAllowed(query, mraBE)) {
+      throw new Error('Search not allowed.');
+    }
 
     try {
       // TODO: handle large number of documents...
@@ -621,8 +671,11 @@ class RestController {
     let count = 0;
     if (searchContext) {
       //console.log("searchContext is ....", searchContext);
-      // searchContext ={'$and', [{'$or', []},{'$and', []}]}
-      if (searchContext['$and']) {
+      // searchContext ={'_id': xxx, '$and': [{'$or', []},{'$and', []}]}
+      let searchQuery = searchContext;
+      if (searchContext._id) {
+        searchQuery = {_id: searchContext._id};
+      } else if (searchContext['$and']) {
         for (let subContext of searchContext['$and']) {
           if ('$or' in subContext) {
             if (subContext['$or'].length == 0) subContext['$or'] = [{}];
@@ -636,11 +689,14 @@ class RestController {
         }
       }
       //merge the url query and body query
-      query = searchContext;
+      query = searchQuery;
       //console.log("query is ....", query['$and'][0]['$or'], query['$and'][1]['$and']);
     }
     query = ownerPatch(query, owner, req);
     query = searchObjPatch(query, mraBE);
+    if (!searchAllowed(query, mraBE)) {
+      throw new Error('Search not allowed.');
+    }
 
     let originCategoriesAll = [[], []];
     let categoriesAll = [[], []]; // all reference documents that are used by this model
@@ -674,6 +730,9 @@ class RestController {
           let catQuery = {};
           catQuery = ownerPatch(catQuery, owner, req);
           catQuery = searchObjPatch(catQuery, mraBE);
+          if (!searchAllowed(query, mraBE)) {
+            throw new Error('Search not allowed.');
+          }
 
           originCategoriesAll[i] = await model
             .find(catQuery)
@@ -939,6 +998,11 @@ class RestController {
 
     catQuery = ownerPatch(catQuery, owner, req);
     catQuery = searchObjPatch(catQuery, mraBE);
+    if (!searchAllowed(query, mraBE)) {
+      return next(
+        createError(400, `Search not allowed`)
+      );
+    }
 
     const aggregatePipes = [
       { $match: catQuery },
@@ -1008,6 +1072,11 @@ class RestController {
     }
     query = ownerPatch(query, owner, req);
     query = searchObjPatch(query, mraBE);
+    if (!searchAllowed(query, mraBE)) {
+      return next(
+        createError(400, `Search not allowed`)
+      );
+    }
     model.countDocuments(query).exec(function (err, cnt) {
       if (err) {
         return next(err);
