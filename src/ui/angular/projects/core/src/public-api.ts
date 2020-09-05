@@ -19,6 +19,7 @@ export {
   ErrorToastConfig,
   ErrorToast,
   onServiceError,
+  onServiceErrorMsg,
 } from "./lib/util.errortoast";
 export { ModalConfig, Modal } from "./lib/util.modal";
 export { SnackBarConfig, SnackBar } from "./lib/util.snackbar";

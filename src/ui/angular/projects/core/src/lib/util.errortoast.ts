@@ -34,90 +34,109 @@ var errorCss = `
 declare const $: any;
 
 export class ErrorToastConfig {
-    content: string;
-    more: string;
+  content: string;
+  more: string;
 }
 
 export class ErrorToast {
-
-    constructor(private config: ErrorToastConfig ) {}
-    private getHtml() {
-        const id = 'meanExpressAngularError' + Date.now();
-        const errorHtml = `
+  constructor(private config: ErrorToastConfig) {}
+  private getHtml() {
+    const id = "meanExpressAngularError" + Date.now();
+    const errorHtml =
+      `
 <div class="alert alert-danger fade in alert-dismissible meanExpressAngularError"
-    id="` + id + `">
- <button type="button" class="close" aria-label="Close" id="button` + id + `">
+    id="` +
+      id +
+      `">
+ <button type="button" class="close" aria-label="Close" id="button` +
+      id +
+      `">
     <span aria-hidden="true" style="font-size:20px">×</span>
   </button>
   <div>
     <strong>Error!</strong>
   </div>
-  <div id="content` + id + `">
+  <div id="content` +
+      id +
+      `">
   </div>
-  <a id="link` + id + `" class="meanExpressAngularErrorMoreLink" href="." >Show more details...
+  <a id="link` +
+      id +
+      `" class="meanExpressAngularErrorMoreLink" href="." >Show more details...
   </a>
-  <div id="more` + id + `" class="meanExpressAngularErrorMore">
+  <div id="more` +
+      id +
+      `" class="meanExpressAngularErrorMore">
   </div>
 </div>
 `;
-        return {id, html: errorHtml};
+    return { id, html: errorHtml };
+  }
+
+  public show() {
+    if (!$("#meanExpressAngularErrorCss").length) {
+      $(
+        "<style type='text/css' id='meanExpressAngularErrorCss'>" +
+          errorCss +
+          "</style>"
+      ).appendTo("head");
     }
-
-    public show() {
-        if (!$('#meanExpressAngularErrorCss').length) {
-            $('<style type=\'text/css\' id=\'meanExpressAngularErrorCss\'>' + errorCss + '</style>').appendTo('head');
-        }
-        const html = this.getHtml();
-        const selector = '#' + html.id;
-        const contentSelector = '#content' + html.id;
-        const moreSelector = '#more' + html.id;
-        const linkSelector = '#link' + html.id;
-        const buttonSelector = '#button' + html.id;
-        $('body').append(html.html);
-        $(contentSelector).append(this.config.content);
-        if (this.config.more) {
-            $(moreSelector).append(this.config.more);
-            $(linkSelector).addClass('show');
-            $(linkSelector).click((event) => {
-                event.preventDefault();
-                $(moreSelector).addClass('show');
-            });
-        }
-        $(buttonSelector).click((_) => {$(selector).removeClass('show'); });
-
-        $(selector).addClass('show');
+    const html = this.getHtml();
+    const selector = "#" + html.id;
+    const contentSelector = "#content" + html.id;
+    const moreSelector = "#more" + html.id;
+    const linkSelector = "#link" + html.id;
+    const buttonSelector = "#button" + html.id;
+    $("body").append(html.html);
+    $(contentSelector).append(this.config.content);
+    if (this.config.more) {
+      $(moreSelector).append(this.config.more);
+      $(linkSelector).addClass("show");
+      $(linkSelector).click((event) => {
+        event.preventDefault();
+        $(moreSelector).addClass("show");
+      });
     }
+    $(buttonSelector).click((_) => {
+      $(selector).removeClass("show");
+    });
 
+    $(selector).addClass("show");
+  }
 }
 
-import { MddsServiceError } from './base.service';
+import { MddsServiceError } from "./base.service";
 
 export function onServiceError(error: MddsServiceError): void {
-    let errMsg: string;
-    let more: string;
-    if (error.clientErrorMsg) {
-      errMsg = error.clientErrorMsg;
-    } else if (error.serverError) {
-      if (error.status === 401) {
-        return;
-      } // Don't show unauthorized error
-      if (typeof error.serverError === 'object') {
-        errMsg = error.status + ': ' + JSON.stringify(error.serverError);
-      } else {
-        errMsg = error.status + ': ' + error.serverError;
-      }
+  let { more, errMsg } = onServiceErrorMsg(error);
+  const errorToastConfig: ErrorToastConfig = {
+    content: errMsg,
+    more,
+  };
+  const errorToast = new ErrorToast(errorToastConfig);
+  errorToast.show();
+}
+export function onServiceErrorMsg(error: MddsServiceError): any {
+  let errMsg: string;
+  let more: string;
+  if (error.clientErrorMsg) {
+    errMsg = error.clientErrorMsg;
+  } else if (error.serverError) {
+    if (error.status === 401) {
+      return;
+    } // Don't show unauthorized error
+    if (typeof error.serverError === "object") {
+      errMsg = error.status + ": " + JSON.stringify(error.serverError);
+    } else {
+      errMsg = error.status + ": " + error.serverError;
     }
-    if (!errMsg) {
-      errMsg = 'Unknown error.';
-    }
-    if (errMsg.length > 80) {
-      more = errMsg;
-      errMsg = errMsg.substring(0, 80) + '...';
-    }
-    const errorToastConfig: ErrorToastConfig = {
-      content: errMsg,
-      more,
-    };
-    const errorToast = new ErrorToast(errorToastConfig);
-    errorToast.show();
   }
+  if (!errMsg) {
+    errMsg = "Unknown error.";
+  }
+  if (errMsg.length > 80) {
+    more = errMsg;
+    errMsg = errMsg.substring(0, 80) + "...";
+  }
+  return { errMsg, more };
+}

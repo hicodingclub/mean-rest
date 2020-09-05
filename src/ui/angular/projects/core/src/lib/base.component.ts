@@ -1242,6 +1242,8 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     const orSearchContext = [];
     const andSearchContext = [];
     for (const field in d) {
+      if (field === '_id') continue;
+
       if (typeof d[field] === 'string'
         && !listCategoryFields.includes(field)
         && !this.ownSearchStringFields.includes(field)) {
@@ -1255,6 +1257,8 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     this.searchMoreDetail = [];
     const d2 = this.deFormatDetail(d); // undefined field is deleted after this step.
     for (const field of Object.keys(d2)) {
+      if (field === '_id') continue;
+
       let oValue: any;
       let oValueRaw: any[] = [];
       let valueToShow: any;
@@ -1363,7 +1367,12 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       andSearchContext.push(o);
     }
 
+    if (this.detail._id) {
+      // clear others and only leave the ID
+      this.searchMoreDetail = [['ID', this.detail._id, '_id']];
+    }
     let searchContext = {
+      _id: this.detail._id,
       $and: [{ $or: orSearchContext }, { $and: andSearchContext }],
     };
     /* searchContext ={'$and', [{'$or', []},{'$and', []}]}
@@ -1381,13 +1390,14 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       }
       if (
         this.equalTwoSearchContextArrays(cachedOr, orSearchContext) &&
-        this.equalTwoSearchContextArrays(cachedAnd, andSearchContext)
+        this.equalTwoSearchContextArrays(cachedAnd, andSearchContext) &&
+        context._id === this.detail._id
       ) {
         return;
       }
     }
 
-    if (orSearchContext.length === 0 && andSearchContext.length === 0) {
+    if (orSearchContext.length === 0 && andSearchContext.length === 0 && !this.detail._id) {
       searchContext = null;
     }
     this.putToStorage('searchContext', searchContext);
