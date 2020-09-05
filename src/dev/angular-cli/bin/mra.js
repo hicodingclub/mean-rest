@@ -392,6 +392,7 @@ const analizeSearch = function (
   listCategoryFieldsNotShown,
   listSearchFieldsBlackList,
   ownSearchStringFields,
+  listSearchIDLookup,
   api,
   listActionButtons
 ) {
@@ -402,6 +403,7 @@ const analizeSearch = function (
   let hasArchive = false;
   let hasArray = false;
   let hasDate = false;
+  let IDLookup = listSearchIDLookup;
 
   for (let field of briefView) {
     if (field.hidden) continue;
@@ -412,6 +414,10 @@ const analizeSearch = function (
     }
     if (field.type === 'AngularSelector') {
       continue;
+    }
+    if (field.fieldName === '_id') {
+      IDLookup = true;
+      continue; // cannot text search based on "_id", but enable IDLookup
     }
 
     if (field.type === 'SchemaArray') {
@@ -440,6 +446,7 @@ const analizeSearch = function (
     stringBoxFields,
     noMoreSearchArea,
     ownSearchFields,
+    IDLookup,
     hasArchive,
     hasArray,
     hasDate,
@@ -745,6 +752,8 @@ const generateViewPicture = function (
   };
 
   for (let item of viewDef) {
+    let showDisplayName = true;
+  
     let hidden = !!fieldHidden[item];
     let usedMeta = field2Meta[item];
 
@@ -785,7 +794,7 @@ const generateViewPicture = function (
       flagSharable: false,
     };
 
-    if (item in schema.paths) {
+    if (item !=='_id' && item in schema.paths) {
       if (usedMeta && fieldMeta && fieldMeta[usedMeta]) {
         meta = fieldMeta[usedMeta];
         let sel = meta.pipe || meta.selector;
@@ -900,6 +909,9 @@ const generateViewPicture = function (
       if (parentType == 'SchemaMap') {
         parentType = 'Map';
       }
+    } else if ( item === '_id') {
+      parentType = 'SchemaString';
+      primitiveField.jstype = 'string';
     } else if (item in schema.virtuals) {
       //Handle as a string
       parentType = 'SchemaString';
@@ -907,9 +919,11 @@ const generateViewPicture = function (
     } else if (usedMeta && selectors && selectors.hasSelector(usedMeta)) {
       // selector type:
       parentType = 'AngularSelector';
-
       selector = selectors.getSelector(usedMeta);
       selector.usedCandidate(API);
+
+      showDisplayName = selector.showDisplayName;
+
     } else if (usedMeta) {
       logger.warning(
         `Selector ${usedMeta} for Field ${item} is not defined. Skipped...`
@@ -929,6 +943,7 @@ const generateViewPicture = function (
       FieldName: Util.capitalizeFirst(item),
       displayName: DN,
       displayname: dn,
+      showDisplayName,
       hidden,
 
       type: parentType,
@@ -1049,6 +1064,19 @@ const setFieldProperty = function (view, fieldArr, include, property, value) {
     }
   }
 };
+
+const getAppendFields = function (viewArr, idx) {
+  let fields = [];
+  for (let i = idx + 1; i < viewArr.length; i ++) {
+    let field = viewArr[i];
+    if (field.meta.listShow === 'append') {
+      fields.append(field);
+    } else {
+      break;
+    }
+  }
+  return fields;
+}
 
 const getLoginUserPermission = function (permission) {
   let othersPermisson = permission['others'];
@@ -1482,6 +1510,7 @@ function main() {
 
   const funcs = {
     capitalizeFirst: Util.capitalizeFirst,
+    getAppendFields,
   }
 
   let moduleName;
@@ -1639,6 +1668,7 @@ function main() {
     let listToDetail = 'click';
     let listSearchType = 'normal';
     let listSearchFieldsBlackList = [];
+    let listSearchIDLookup = false;
 
     let defaultSortField, defaultSortOrder;
     let homeListNumber = 4;
@@ -1719,6 +1749,9 @@ function main() {
         mraUI.listSearchFieldsBlackList || listSearchFieldsBlackList;
       if (typeof mraUI.listShowSubDetail === 'boolean') {
         listShowSubDetail = mraUI.listShowSubDetail;
+      }
+      if (typeof mraUI.listSearchIDLookup === 'boolean') {
+        listSearchIDLookup = mraUI.listSearchIDLookup;
       }
 
       if (mraUI.defaultListSort) {
@@ -2110,6 +2143,7 @@ function main() {
       listCategoryFieldsNotShown,
       listSearchFieldsBlackList,
       ownSearchStringFields,
+      listSearchIDLookup,
       api,
       listActionButtons
     );

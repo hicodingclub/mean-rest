@@ -14,6 +14,7 @@
     <%_ for (let field of briefView){
                 if (field.hidden) continue;
                 if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
+                if (field.meta.listShow === 'append') continue;
                 if (field.sortable) { %>
                 <th class="pointer" scope="col"
                     (click)="toggleListSort('<%-field.fieldName%>')"<%_
@@ -49,7 +50,7 @@
                     >
                     {{(page-1)*perPage+i+1}}
                 </td><%_
-    let view = 'list'; for (let field of briefView){
+    let view = 'list'; for (let [idx, field] of briefView.entries()){
                 if (field.hidden) continue;
                 if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
                 let fn = field.fieldName, ft = field.type;

@@ -37,9 +37,14 @@
 									include('/widgets/search/normal/schema-search.field.html', obj) %> 
 								<%_ }) %>
 							</div>
-							<%_ if(sbo.hasArchive) {%>
+						<%_ if(sbo.hasArchive) {%>
 							<hr>
 							<%- include('/widgets/search/normal/schema-search.archive.html'); %>
+							<hr><%}%>
+						<%_ if(sbo.IDLookup) {%>
+							<%_ if(!sbo.hasArchive) {%>
+							<hr><%}%>
+							<%- include('/widgets/search/normal/schema-search.id.html'); %>
 							<hr><%}%>
 
 							<div class="action-buttons">

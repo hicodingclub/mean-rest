@@ -40,9 +40,9 @@
           %><%
           if (field.ref) {%>
           <div *ngIf="referenceFieldsMap['<%-field.fieldName%>'] != parentItem"><%}%>
-            <div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%> class="mr-3 d-inline-flex flex-wrap"><%_ if (ft !== 'AngularSelector') {%>
-              <div><label><%-field.displayName%>:</label></div><%}%>
-              <div class="ml-3"><%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
+            <div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%> class="mr-3 d-inline-flex flex-wrap"><%_ if (field.showDisplayName) {%>
+              <div class="mr-3"><label><%-field.displayName%>:</label></div><%}%>
+              <div><%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
               </div>
             </div><%
           if (field.ref) {%>

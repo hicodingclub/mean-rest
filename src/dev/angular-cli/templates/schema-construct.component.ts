@@ -7,9 +7,16 @@ for (let field of theView) { let fn = field.fieldName;
           this.enums['<%-fn%>'] = [<%for (let ev of field.enumValues) {%>
             '<%-ev%>',<%}%>
           ];<%}}%><%_
-for (let field of theView) { let fn = field.fieldName;
-        if (field.type == "SchemaString") {%>
-          this.stringFields.push('<%-fn%>');<%}}%><%_
+let stringFields = [];
+    for (let field of theView) { let fn = field.fieldName;
+      if (field.type == "SchemaString" && fn !== '_id') {
+        stringFields.push(fn);
+      }
+    }
+    if (stringFields.length > 0) {%>
+          this.stringFields = [<%for (let itm of stringFields) {%>
+            '<%-itm%>',<%}%>
+          ];<%}%><%_
 let refObjects = [];
     for (let field of theView) { 
         if (field.type === "ObjectId"){ refObjects.push([field.fieldName, field.ref]);}

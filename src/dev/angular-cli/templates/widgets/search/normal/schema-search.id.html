@@ -1,0 +1,14 @@
+<div class="container one-column-search mt-3 small">
+    <div class="row col-gutter">
+        <div class="col-12 col-sm-3"><label for="Archived">Search by ID</label></div>
+        <div class="col-11 col-sm-8">
+            <input type="text" class="form-control form-control-sm" id="<%-schemaName%>Edit_id"
+                [(ngModel)]="detail['_id']" name="<%-schemaName%>Edit_id" #<%-schemaName%>Edit_id="ngModel">
+        </div>
+        <div class="col-1">
+            <div class="pointer" (click)="clearValueFromDetail('_id')"
+                *ngIf="checkValueDefinedFromDetail('_id')"><i class="fas fa-times-circle" title="Clear"></i>
+            </div>
+        </div>
+    </div>
+</div>

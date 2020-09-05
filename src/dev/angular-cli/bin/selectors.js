@@ -16,6 +16,7 @@ class SelectorInput {
 
 class Selector {
   valid = false;
+  showDisplayName = false;
   usedCandidates = '';
   usedFlag = false;
 
@@ -30,6 +31,7 @@ class Selector {
       return;
     }
     this.name = name;
+    this.showDisplayName = selector.showDisplayName;
     this.selector = selector.selector;
     this.module = selector.module;
     this.package = selector.package;

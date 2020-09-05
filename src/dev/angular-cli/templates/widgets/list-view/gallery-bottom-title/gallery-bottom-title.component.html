@@ -60,11 +60,11 @@
 						let fn = field.fieldName; let ft = field.type;
 						let fieldObj = {field, fn, ft, ref_link: true,};
 						%>
-					<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%> class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (ft !== 'AngularSelector') {%>
-						<div class="field-label bottome-field-label" [ngStyle]="style['<%-fn%>-label']">
+					<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%> class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (field.showDisplayName) {%>
+						<div class="field-label bottome-field-label mr-1" [ngStyle]="style['<%-fn%>-label']">
 							<%-field.displayName%>:
 						</div><%}%>
-						<div class="<%_ if (ft !== 'AngularSelector') {%>ml-1 <%}%>text-left" [ngStyle]="style['<%-fn%>-value']">
+						<div class="text-left" [ngStyle]="style['<%-fn%>-value']">
 							<%- include(`/ui/${uiFramework}/${uiDesign}/schema-display.field.html`, fieldObj); %>
 						</div>
 					</div><%_  
