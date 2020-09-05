@@ -28,6 +28,7 @@
 
 .link-primary {
   color: #307bff;
+  white-space: normal;
 
 }
 .link-primary:hover {

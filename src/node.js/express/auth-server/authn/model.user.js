@@ -59,7 +59,22 @@ const schemas = {
     name: 'User',
     api: 'LRCUM', // M - email
     mraUI: {
-      listType: 'table',
+      listWidgets: {
+        general: {
+          views: ['table', 'list', 'grid',],
+        },
+        select: {
+          views: ['table', 'list',],
+        },
+        sub: {
+          views: ['table', 'list',],
+        }
+      },
+      listWidgetTypes: {
+        general: 'general',
+        select: 'select',
+        sub: 'sub',
+      },
     },
   }
 };
