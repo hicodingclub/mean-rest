@@ -22,8 +22,8 @@ const FileExpressRouter = function(sysDef, moduleName, authConfig, options) {
   restRouter = meanRestExpress.RestRouter.Hook(restRouter, 'upload', router);
   //2. load 'download' router for file download
   router = express.Router();
-  router.get('/users*', fileController.DownloadUsers.bind(fileController)); // download user specific files
-  router.get('/:fileID', fileController.Download.bind(fileController));
+  // router.get('/users*', fileController.DownloadUsers.bind(fileController)); // download user specific files
+  router.get('/*', fileController.Download.bind(fileController)); // /picture, /file, /users, /:id
   restRouter = meanRestExpress.RestRouter.Hook(restRouter, 'download', router);
 
   restRouter.setMddsProperty('fileController', fileController);

@@ -4,8 +4,9 @@ const deleteFile = function(data, restController) {
         console.error('fileController does not exist in restController');
         return;
     };
-    if (data && data._id) {
-        fileController.DeleteById(data._id, data.hasThumbnail);
+    if (data && data.link) {
+        // fileController.DeleteById(data._id, data.hasThumbnail,);
+        fileController.DeleteByLink(data.link, data.hasThumbnail,);
     }
 }
 

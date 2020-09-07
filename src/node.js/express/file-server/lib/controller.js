@@ -2,12 +2,18 @@ const mongoose = require('mongoose');
 const createError = require('http-errors');
 const path = require('path');
 const imageThumbnail = require('image-thumbnail');
-const sizeOf = require('image-size')
+const sizeOf = require('image-size');
 const fs = require('fs');
 
 const schemas = require('../model/schema');
 const { type } = require('os');
-const { fileSchema, fileGroupSchema, DB_CONFIG} = schemas;
+const {
+  fileSchema,
+  fileGroupSchema,
+  pictureSchema,
+  pictureGroupSchema,
+  DB_CONFIG,
+} = schemas;
 
 let db_app_name, db_module_name;
 if (DB_CONFIG) {
@@ -15,43 +21,64 @@ if (DB_CONFIG) {
   db_module_name = DB_CONFIG.MODULE_NAME;
 }
 if (!db_app_name || !db_module_name) {
-  throw new Error(`APP Name and Module Name not provided for database. Please provide "DB_CONFIG" for your schema definition in module ${moduleName}.`);
+  throw new Error(
+    `APP Name and Module Name not provided for database. Please provide "DB_CONFIG" for your schema definition in module ${moduleName}.`
+  );
 }
 db_app_name = db_app_name.toLowerCase();
 db_module_name = db_module_name.toLowerCase();
 
-const File = mongoose.model('mfile', fileSchema, `${db_app_name}_${db_module_name}_mfile`);
-const FileGroup = mongoose.model('mfilegroup', fileGroupSchema, `${db_app_name}_${db_module_name}_mfilegroup`);
+const File = mongoose.model(
+  'mfile',
+  fileSchema,
+  `${db_app_name}_${db_module_name}_mfile`
+);
+const FileGroup = mongoose.model(
+  'mfilegroup',
+  fileGroupSchema,
+  `${db_app_name}_${db_module_name}_mfilegroup`
+);
 
-const MddsFileCrop= "mdds-file-crop";
+const Picture = mongoose.model(
+  'mpicture',
+  pictureSchema,
+  `${db_app_name}_${db_module_name}_mpicture`
+);
+const PictureGroup = mongoose.model(
+  'mpicturegroup',
+  pictureGroupSchema,
+  `${db_app_name}_${db_module_name}_mpicturegroup`
+);
+
+const MddsFileCrop = 'mdds-file-crop';
 
 defaultSOption = {
   storage: 'db',
-  linkRoot: ''   // link = moduleName.toLowerCase() + "/download" - download needs to be enabled.
+  linkRoot: '', // link = moduleName.toLowerCase() + '/download' - download needs to be enabled.
 };
 /* Config examples:
 const fileSOption = {
-        storage: "fs",
+        storage: 'fs',
         directory: path.join(__dirname, 'storage', 'uploads'),
-        linkRoot: "/api/files", //link = linkRoot + "/download" - download needs to be enabled.
+        linkRoot: '/api/files', //link = linkRoot + '/download' - download needs to be enabled.
 }
 const dbSOption = {
         storage: 'db',
-        linkRoot: '/api/files'   //link = linkRoot + "/download" - download needs to be enabled.
+        linkRoot: '/api/files'   //link = linkRoot + '/download' - download needs to be enabled.
 }
 */
 
-const create_random = function(){
+const create_random = function () {
   let dt = new Date().getTime();
   // const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
   const random = 'xxxxxxxx';
-  const result = random.replace(/[xy]/g, function(c) {
-      const r = (dt + Math.random()*16)%16 | 0;
-      dt = Math.floor(dt/16);
-      return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+  const result = random.replace(/[xy]/g, function (c) {
+    const r = (dt + Math.random() * 16) % 16 | 0;
+    dt = Math.floor(dt / 16);
+    return (c == 'x' ? r : (r & 0x3) | 0x8).toString(16);
   });
   return result;
-}
+};
 
 const ownerPatch = function (query, owner, req) {
   if (owner && owner.enable) {
@@ -76,9 +103,9 @@ const getUserId = function (req) {
     return req.muser._id;
   }
   return 'unknown'; //unknown users
-}
+};
 
-const StoreToFileSystem = function(file, fileId, directory) {
+const StoreToFileSystem = function (file, fileId, directory) {
   // Use the mv() method to place the file somewhere on your server
   let fileName = path.join(directory, fileId);
   return new Promise((resolve, reject) => {
@@ -90,17 +117,16 @@ const StoreToFileSystem = function(file, fileId, directory) {
       reject(err);
     }
 
-
-    file.mv(fileName, function(err) {
+    file.mv(fileName, function (err) {
       if (err) {
-        return reject(err)
+        return reject(err);
       }
-      return resolve(fileName)
+      return resolve(fileName);
     });
   });
 };
 
-const StoreThumbnailToFileSystem = function(buffer, file, directory) {
+const StoreThumbnailToFileSystem = function (buffer, file, directory) {
   return new Promise((resolve, reject) => {
     try {
       if (!fs.existsSync(directory)) {
@@ -114,41 +140,161 @@ const StoreThumbnailToFileSystem = function(buffer, file, directory) {
       return reject(new Error('No thing to write to file'));
     }
     let fileName = path.join(directory, file);
-    
+
     fs.writeFile(fileName, buffer, (err, bytes) => {
-      if (err) { return reject(err); }
+      if (err) {
+        return reject(err);
+      }
       return resolve(bytes);
     });
-  })
+  });
 };
 
-const LoadFromFileSystem = function(fileId, directory, cb) {
+const LoadFromFileSystem = function (fileId, directory, cb) {
   // Use the mv() method to place the file somewhere on your server
-  let fileName = path.join(directory, fileId)
+  let fileName = path.join(directory, fileId);
   fs.readFile(fileName, function (err, data) {
     return cb(err, data);
   });
 };
 
-const DeleteFromFileSystem = function(fileId, directory, hasFile, cb) {
-  if (!hasFile) {return cb(null);}
-  
+const DeleteFromFileSystem = function (fileId, directory, hasFile, cb) {
+  if (!hasFile) {
+    return cb(null);
+  }
+
   // Use the mv() method to remove the file
-  let fileName = path.join(directory, fileId)
+  let fileName = path.join(directory, fileId);
   fs.unlink(fileName, function (err) {
     return cb(err);
   });
 };
 
+const getThumbnail = async function (fo, fileCategory, file) {
+  let thumbnail;
+  // Only get thumbnail for pictures
+  if (fileCategory === 'picture' && fo.type.startsWith('image/')) {
+    // generate thumbnail for image files
+    try {
+      const dimensions = sizeOf(file.data);
+      let options = {
+        height: 160,
+        width: Math.floor((160 * dimensions.width) / dimensions.height),
+        responseType: 'buffer',
+      };
+      thumbnail = await imageThumbnail(file.data.toString('base64'), options);
+    } catch (err) {
+      console.log('thumbnail create error: ', err);
+    }
+  }
+  return thumbnail;
+};
+
+const getStoragePath = function (
+  owner,
+  doc,
+  fileCategory,
+  userID,
+  croppedImage
+) {
+  let savedDocId = doc._id.toString();
+  let crop = croppedImage ? `-cr${create_random()}` : '';
+  let idDir = savedDocId.slice(-2); // last two characters
+
+  let fsFileName = `${savedDocId}${crop}__${doc.name}`;
+  let fsFileNameThumbnail = `${savedDocId}${crop}__${doc.name}_thumbnail`;
+  let fsSubDirecotry = path.join(fileCategory, idDir);
+
+  if (owner && owner.type === 'user') {
+    fsSubDirecotry = path.join('users', userID, fsSubDirecotry);
+  }
+
+  return [fsFileName, fsFileNameThumbnail, fsSubDirecotry];
+};
+
+const processDownloadUrl = function (url) {
+  let thumbnail = false;
+  let link = url;
+  if (link.endsWith('_thumbnail')) {
+    link = link.replace(/_thumbnail$/, '');
+    thumbnail = true;
+  }
+
+  let filePath = link.substring(
+    link.indexOf('/download/') + '/download/'.length
+  );
+  let fileCategory = 'picture';
+
+  function getID(originalFileName) {
+    let pos = originalFileName.indexOf('__');
+    let uploadFileName = pos >=0 ? originalFileName.substring(pos+2) : originalFileName;
+
+    let idPart = originalFileName.split('__')[0]; // get the ID Part
+    let id = idPart;
+    let croppedImage = false;
+    if (
+      originalFileName.startsWith(MddsFileCrop) ||
+      originalFileName.includes('-cr')
+    ) {
+      croppedImage = true;
+      // remove the crop part from idPart
+      id = idPart.replace(`${MddsFileCrop}-`, '').replace(/-cr.*/, '');
+    }
+
+    return [croppedImage, id, uploadFileName];
+  }
+
+  if (!filePath.includes('/')) {
+    // legacy picture
+    // fileName = filePath
+    let fileName = decodeURI(filePath);
+    let [croppedImage, id, uploadFileName] = getID(fileName);
+    return {
+      id,
+      croppedImage,
+      thumbnail,
+      fileCategory,
+      fileSubDir: '',
+      fileName,
+      uploadFileName,
+    };
+  }
+
+  let lastSepPos = filePath.lastIndexOf('/');
+  let fileDir = filePath.substring(0, lastSepPos);
+  let fileSubDir = fileDir.split('/').join(path.sep);
+  let fileName = decodeURI(filePath.substring(lastSepPos + 1));
+  let [croppedImage, id, uploadFileName] = getID(fileName);
+
+  if (fileDir.startsWith('users')) {
+    // users/<id/[file|picture]
+    fileCategory = fileDir.split('/')[2];
+  } else if (fileDir.startsWith('picture')) {
+    fileCategory = 'picture';
+  } else if (fileDir.startsWith('file')) {
+    fileCategory = 'file';
+  }
+
+  return {
+    id,
+    croppedImage,
+    thumbnail,
+    fileCategory,
+    fileSubDir,
+    fileName,
+    uploadFileName,
+  };
+};
+
 class FileController {
   sOption = defaultSOption;
-  config = {  owner: {enable: true, type: 'module'} };
-  
-  constructor() { }
-  getOption = function() {
-    return this.sOption ;
+  config = { owner: { enable: true, type: 'module' } };
+
+  constructor() {}
+  getOption = function () {
+    return this.sOption;
   };
-  getConfig = function() {
+  getConfig = function () {
     return this.config;
   };
   setConfig(moduleName, config) {
@@ -158,7 +304,7 @@ class FileController {
     switch (option.storage) {
       case 'fs':
         if (!option.directory) {
-          throw "File Server: storage directory must be provided for storage type 'fs'";
+          throw `File Server: storage directory must be provided for storage type 'fs'`;
         }
         /*
         if (!fs.existsSync(option.directory)) {
@@ -166,14 +312,23 @@ class FileController {
         }
         */
         if (!fs.existsSync(option.directory)) {
-          throw "File Server: storage directory doesn't exist for storage type 'fs': " + option.directory;
+          throw (
+            `File Server: storage directory doesn't exist for storage type 'fs': ` +
+            option.directory
+          );
         }
-        if (!("linkRoot" in option)) {
-          throw "File Server: please provide 'linkRoot' for storage type " + option.storage;
+        if (!('linkRoot' in option)) {
+          throw (
+            `File Server: please provide 'linkRoot' for storage type ` +
+            option.storage
+          );
         }
         break;
       default:
-        console.error("File Server: storage type is not supported:", option.storage);
+        console.error(
+          `File Server: storage type is not supported:`,
+          option.storage
+        );
     }
     this.sOption = option;
   }
@@ -184,30 +339,38 @@ class FileController {
     let owner = this.getConfig().owner;
     const files = Object.values(req.files); //[mfile1, mfile2, ... ]
 
-    let fileID = req.params["fileID"];
-
     if (files.length == 0) {
-      return next(createError(400, "No files were included in the request."));
+      return next(createError(400, 'No files were included in the request.'));
     }
     if (files.length > 1) {
-      return next(createError(400, "Only one file is allowed in the upload request."));
+      return next(
+        createError(400, 'Only one file is allowed in the upload request.')
+      );
     }
     const file = files[0];
-    if (file.truncated) { //file size > limit
-      return next(createError(400, "File size is over the limit: " + file.Name));
+    if (file.truncated) {
+      //file size > limit
+      return next(
+        createError(400, 'File size is over the limit: ' + file.Name)
+      );
     }
 
-    let fileName, groupName;
+    let fileName, groupName, fileCategory;
     try {
       const nameStructure = JSON.parse(decodeURI(file.name));
       fileName = nameStructure.name;
       groupName = nameStructure.group;
+      fileCategory = nameStructure.fileCategory;
     } catch (e) {
       fileName = file.name;
       groupName = null;
     }
 
-    const skipDb = groupName === MddsFileCrop ? true : false;
+    let FileModel = fileCategory === 'file' ? File : Picture;
+
+    // cropped files. don't store in DB.
+    // TODO: clean up cropped files
+    const croppedImage = groupName === MddsFileCrop ? true : false;
 
     let fo = {
       name: fileName,
@@ -216,137 +379,128 @@ class FileController {
       size: file.size,
       md5: file.md5,
     };
-    let filter = {
-      _id: "doesn't exist"
-    };
-    let thumbnail;
-  
-    if (fo.type.startsWith('image/')) {
-      // generate thumbnail for image files
-      try {
-        const dimensions = sizeOf(file.data);
-        let options = { height: 160, width: Math.floor(160 * dimensions.width / dimensions.height), responseType: 'buffer' };
-        thumbnail = await imageThumbnail(file.data.toString('base64'), options);
-      } catch (err) {
-        console.log("thumbnail create error: ", err);
-      }
-    }
+
+    let thumbnail = await getThumbnail(fo, fileCategory, file);
     fo.hasThumbnail = !!thumbnail;
+
     if (owner && owner.enable) {
       fo = ownerPatch(fo, owner, req);
     }
-    if (fileID) {
-      fo._id = fileID;
-      filter._id = fileID;
-    }
+
+    let dbCreated = false;
     let savedDocId;
     try {
       let savedDoc;
-      if (skipDb) {
+      if (croppedImage) {
+        // cropped file. Don't store in DB
         savedDoc = fo;
-        savedDoc['_id'] = `${fo.group}-${fo.name}-${create_random()}`;
+        // two format: (1) version 1: <id>, (2) version 2: <id>__<filename>
+        let nameArr = fo.name.split('__');
+        savedDoc['_id'] = nameArr[0]; // original ID
       } else {
-        // save or update DB record
-        if (fileID) {
-          await File.update(filter, fo, {upsert: true, setDefaultsOnInsert: true});
-          savedDoc = fo;
-          savedDoc._id = filter._id;
-        } else {
-          savedDoc = await File.create(fo);
-        }
+        savedDoc = await FileModel.create(fo);
+        savedDocId = savedDoc['_id'];
+        dbCreated = true;
       }
 
-      savedDocId = savedDoc._id;
       const doc = {
         _id: savedDoc._id,
         name: savedDoc.name,
         type: savedDoc.type,
         size: savedDoc.size,
-        md5: savedDoc.md5
+        md5: savedDoc.md5,
       };
-      let fsFileName = doc._id.toString();
-      let fsFileNameThumbnail = doc._id.toString() + '_thumbnail';
 
-      let fsDirecotry = sOption.directory;
-      let downloadLink = sOption.linkRoot + '/download/' + fsFileName;
+      let [fsFileName, fsFileNameThumbnail, fsSubDir] = getStoragePath(
+        owner,
+        doc,
+        fileCategory,
+        getUserId(req),
+        croppedImage
+      );
 
-      if (owner && owner.type === 'user') {
-        // user specific files will store under 'users/<user_id>/original_file.name'
-        fsFileName = doc.name;
-        fsFileNameThumbnail = doc.name + '_thumbnail';
-        fsDirecotry = path.join(sOption.directory, 'users', getUserId(req));
+      let fsDirecotry = path.join(sOption.directory, fsSubDir);
 
-        downloadLink = sOption.linkRoot + '/download/' + 'users/' + getUserId(req) + '/' + fsFileName;
-      }
+      let fsSubPathArr = fsSubDir.split(path.sep);
+      fsSubPathArr.push(fsFileName);
+      console.log(`==== fsSubPathArr: `, fsSubPathArr);
+
+      let downloadLink = [sOption.linkRoot, 'download']
+        .concat(fsSubPathArr)
+        .join('/');
 
       if (sOption && sOption.storage == 'fs') {
         await StoreToFileSystem(file, fsFileName, fsDirecotry);
 
         savedDoc.link = downloadLink;
         doc.link = savedDoc.link;
-        if (!skipDb) {
+        if (!croppedImage) {
           savedDoc.save();
         }
         if (!!thumbnail) {
-          await StoreThumbnailToFileSystem(thumbnail, fsFileNameThumbnail, fsDirecotry);
+          await StoreThumbnailToFileSystem(
+            thumbnail,
+            fsFileNameThumbnail,
+            fsDirecotry
+          );
         }
         return res.send(doc);
       }
     } catch (err) {
-      if (!skipDb && savedDocId) {
-        File.findByIdAndDelete(savedDocId).exec();
+      if (dbCreated) {
+        FileModel.findByIdAndDelete(savedDocId).exec();
       }
       return next(err);
     }
   }
-  
+
   Download(req, res, next) {
     let moduleName = req.mddsModuleName;
     let sOption = this.getOption();
-    let fileName = req.params["fileID"];
-    console.log('fileName====', fileName);
-    let id = fileName;
-    let thumbnail = false;
-    if (fileName.endsWith('_thumbnail')) {
-      id = fileName.replace(/_thumbnail$/, '');
-      thumbnail = true;
-    }
-    let skipDb = false;
-    if (fileName.startsWith(MddsFileCrop)) {
-      skipDb = true;
-    }
-    res.setHeader("Cache-Control", "public, max-age=2592000");
-    res.setHeader("Expires", new Date(Date.now() + 2592000000).toUTCString());
+
+    let fileObj = processDownloadUrl(req.originalUrl);
+
+    console.log('==== Download: ', req.originalUrl);
+    res.setHeader('Cache-Control', 'public, max-age=2592000');
+    res.setHeader('Expires', new Date(Date.now() + 2592000000).toUTCString());
 
     function loadAll(filename, directory) {
       LoadFromFileSystem(filename, directory, (err, data) => {
         if (err) {
+          if (err.code === 'ENOENT') {
+            return next(createError(404, 'File not found'));
+          }
           return next(err);
         }
-
         return res.send(data);
       });
     }
 
-    if (!skipDb) {
+    /* No need to check the DB
+    if (!croppedImage) {
       File.findById(id, function (err, doc) {
         if (err) {
           return next(err);
         }
         if (thumbnail && !doc.hasThumbnail) {
-          return next(createError(404, "File not found."));
+          return next(createError(404, 'File not found.'));
         }
         if (sOption && sOption.storage == 'fs') {
           loadAll(fileName, sOption.directory);
         }
       });
+    } 
+    */
+    let fsDirectory = path.join(sOption.directory, fileObj.fileSubDir);
+    let fsFileName = fileObj.fileName;
+    if (sOption && sOption.storage == 'fs') {
+      loadAll(fsFileName, fsDirectory);
     } else {
-      if (sOption && sOption.storage == 'fs') {
-        loadAll(fileName, sOption.directory);
-      }
+      return next(createError(500, 'Non FileSystem storage not supported.'));
     }
   }
 
+  /*
   DownloadUsers(req, res, next) {
     let moduleName = req.mddsModuleName;
     let sOption = this.getOption();
@@ -356,8 +510,8 @@ class FileController {
     fileName = decodeURI(fileName);
     let directory = path.join(sOption.directory, 'users', userId);
     
-    res.setHeader("Cache-Control", "public, max-age=2592000");
-    res.setHeader("Expires", new Date(Date.now() + 2592000000).toUTCString());
+    res.setHeader('Cache-Control', 'public, max-age=2592000');
+    res.setHeader('Expires', new Date(Date.now() + 2592000000).toUTCString());
 
     function loadAll(filename, directory) {
       LoadFromFileSystem(filename, directory, (err, data) => {
@@ -375,7 +529,7 @@ class FileController {
   Delete(req, res, next) {
     let moduleName = req.mddsModuleName;
     let sOption = this.getOption();
-    let id = req.params["fileID"];
+    let id = req.params['fileID'];
 
     let skipDb = false;
     if (fileName.startsWith(MddsFileCrop)) {
@@ -409,6 +563,7 @@ class FileController {
       deleteAll(id, sOption.directory, true);
     }
   }
+  */
 
   DeleteById(id, hasThumbnail) {
     let sOption = this.getOption();
@@ -422,11 +577,47 @@ class FileController {
       if (!hasThumbnail) {
         return;
       }
-      DeleteFromFileSystem(id.toString() + '_thumbnail', directory, true, (err) => {
+      DeleteFromFileSystem(
+        id.toString() + '_thumbnail',
+        directory,
+        true,
+        (err) => {
+          if (err) {
+            console.error(`Failed to delete ${id}__thumbnail`, err);
+          }
+        }
+      );
+    }
+  }
+
+  DeleteByLink(link, hasThumbnail) {
+    let sOption = this.getOption();
+    let fileObj = processDownloadUrl(link);
+
+    let fsDirectory = path.join(sOption.directory, fileObj.fileSubDir);
+    let fsFileName = fileObj.fileName;
+
+    if (sOption && sOption.storage === 'fs') {
+      DeleteFromFileSystem(fsFileName, fsDirectory, true, (err) => {
         if (err) {
-          console.error(`Failed to delete ${id}__thumbnail`, err);
+          console.error(`Failed to delete ${id}`, err);
         }
       });
+      if (!hasThumbnail) {
+        return;
+      }
+      DeleteFromFileSystem(
+        fsFileName + '_thumbnail',
+        fsDirectory,
+        true,
+        (err) => {
+          if (err) {
+            console.error(`Failed to delete ${id}__thumbnail`, err);
+          }
+        }
+      );
+    } else {
+      console.error('Non FileSystem storage not supported.');
     }
   }
 }

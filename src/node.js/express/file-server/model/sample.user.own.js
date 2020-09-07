@@ -1,6 +1,6 @@
 const schema = require('./schema');
 
-const { fileSchema, fileGroupSchema } = schema;
+const { fileSchema, fileGroupSchema, pictureSchema, pictureGroupSchema, DB_CONFIG } = schema;
 
 const fB = 'name type group labels size link createdAt hasThumbnail';
 const fD = 'name type group labels size link createdAt hasThumbnail';
@@ -19,13 +19,14 @@ const lI = 'name';
 const dateFormat = 'MM/DD/YYYY';
 const timeFormat = 'hh:mm:ss';
 
-const schemas = {
-  'mfile': {
-     schema: fileSchema,
-     views: [fB, fD, fC, fE, fTS, fI],
-     api: 'LU',  // api exposed by rest controller
-     name: 'File',
-     mraUI: {
+function getSchemaDef(fileCategory, schema1, schema2) {
+  const name = fileCategory.charAt(0).toUpperCase() + fileCategory.slice(1);
+  const schemaDef1 = { // fileSchemaDef, pictureSchemaDef
+    schema: schema1,
+    views: [fB, fD, fC, fE, fTS, fI],
+    api: 'LU',  // api exposed by rest controller
+    name: name,
+    mraUI: {
       listCategories: [
         {
           listCategoryField: 'group',
@@ -34,16 +35,28 @@ const schemas = {
         },
       ],
      },
-  },
-  'mfilegroup': {
-     schema: fileGroupSchema,
-     views: [lB, lD, lC, lE, lTS, lI],
-     api: 'LRCU', // api exposed by rest controller
-     name: 'File Group',
-     mraUI: {
-      listSelectType: 'index',
-     },
-  },
+  };
+
+  const schemaDef2 = { // fileGroupDef, pictureGroupDef
+    schema: schema2,
+    views: [lB, lD, lC, lE, lTS, lI],
+    api: 'LRCU', // api exposed by rest controller
+    name: `${name} Group`,
+    mraUI: {
+     listSelectType: 'index',
+    },
+  }
+
+  return [schemaDef1, schemaDef2];
+}
+
+const [mfileDef, mfilegroupDef] = getSchemaDef('file', fileSchema, fileGroupSchema);
+const [mpictureDef, mpicturegroupDef] = getSchemaDef('file', pictureSchema, pictureGroupSchema);
+const schemas = {
+  'mfile': mfileDef,
+  'mfilegroup': mfilegroupDef,
+  'mpicture': mpictureDef,
+  'mpicturegroup': mpicturegroupDef,
   'upload': {},
   'download': {},
 };
@@ -59,8 +72,4 @@ const authz = {
   'download': {'LoginUser': {'others': '', 'own': ''}, 'Anyone': 'R'},
 };
 
-const DB_CONFIG = {
-  APP_NAME: process.env.APP_NAME,
-  MODULE_NAME: 'FILE',
-};
 module.exports = {schemas, config, authz, DB_CONFIG};
