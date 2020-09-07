@@ -50,7 +50,7 @@
                     <div class="" *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
                           <lib-mdds-files-display [downloadUrls]="detail['<%-fn%>']['selection']">
                           </lib-mdds-files-display>
-                    </div><%                    
+                    </div><%
                         } else if (field.elementType === 'SchemaString') {%>
                     <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
                         <ng-template ngFor let-element [ngForOf]="detail['<%-fn%>']['selection']" let-idx="index">

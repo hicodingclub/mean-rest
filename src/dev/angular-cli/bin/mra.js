@@ -837,6 +837,15 @@ const generateViewPicture = function (
         importantInfo = fieldSchema.options.important;
       }
 
+      function setFeatures(schFeatures, primitiveField) {
+        if (primitiveField.flagDate) schFeatures.hasDate = true;
+        if (primitiveField.flagRef) schFeatures.hasRef = true;
+        if (primitiveField.editor) schFeatures.hasEditor = true;
+        if (primitiveField.flagPicture || primitiveField.flagFile)
+          schFeatures.hasFileUpload = true;
+        if (primitiveField.mraEmailRecipient) schFeatures.hasEmailing = true;
+      }
+
       switch (parentType) {
         case 'SchemaString':
         case 'SchemaBoolean':
@@ -844,23 +853,21 @@ const generateViewPicture = function (
         case 'ObjectId':
         case 'SchemaDate':
           primitiveField = getPrimitiveField(fieldSchema);
-          if (primitiveField.flagDate) schFeatures.hasDate = true;
-          if (primitiveField.flagRef) schFeatures.hasRef = true;
-          if (primitiveField.editor) schFeatures.hasEditor = true;
-          if (primitiveField.flagPicture || primitiveField.flagFile)
-            schFeatures.hasFileUpload = true;
-          if (primitiveField.mraEmailRecipient) schFeatures.hasEmailing = true;
+          setFeatures(schFeatures, primitiveField);
 
           sortable = true;
           if (
             primitiveField.editor ||
             primitiveField.flagPicture ||
             primitiveField.flagFile
-          )
+          ) {
             sortable = false;
+          }
           break;
         case 'SchemaArray':
           primitiveField = getPrimitiveField(fieldSchema.caster);
+          setFeatures(schFeatures, primitiveField);
+
           //rewrite the default value for array
           let defaultInput = fieldSchema.options.default;
           if (Array.isArray(defaultInput)) {
@@ -883,6 +890,8 @@ const generateViewPicture = function (
         case 'SchemaMap':
         case 'Map':
           primitiveField = getPrimitiveField(fieldSchema['$__schemaType']);
+          setFeatures(schFeatures, primitiveField);
+
           //rewrite the default value for array
           let defaultMap = fieldSchema.options.default;
           if (typeof defaultMap == 'object') {
