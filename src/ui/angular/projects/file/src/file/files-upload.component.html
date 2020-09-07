@@ -1,0 +1,31 @@
+<input type="file" #singFile style="display: none" [accept]="acceptStr" (change)="onFilesAdded()" />
+<input type="file" #multiFiles style="display: none" [accept]="acceptStr" (change)="onFilesAdded()" multiple/>
+
+<div *ngIf="!disableDisplay" style="width: 100%;">
+    <ul>
+        <li *ngFor="let file of fileNames">
+            <small>{{file}}</small>
+        </li>
+    </ul>
+
+    <div class="select-file">
+        <button type="button" class="btn btn-link ml-2" (click)="selectFiles()">
+            <i class="fas fa-file-upload"></i>
+            <span> Upload</span>
+        </button>
+    </div>
+</div>
+
+<div>
+    <ul>
+        <li *ngFor="let file of files">
+            <small>{{file.name}} ---- 
+                <span *ngIf="uploading && progress && progress[file.name]"> {{progress[file.name].progress | async}}% </span>
+                <span *ngIf="progress && progress[file.name] && !uploading">
+                    <span *ngIf="progress[file.name].result.success" style="color: green;"> SUCCESSFUL</span>
+                    <span *ngIf="!progress[file.name].result.success" style="color: red;"> FAILED</span>
+                </span>
+            </small>
+        </li>
+    </ul>
+</div>

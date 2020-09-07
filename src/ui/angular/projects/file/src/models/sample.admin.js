@@ -1,4 +1,4 @@
-const { fileSchema, fileGroupSchema } = require('./schema');
+const { fileSchema, fileGroupSchema, pictureSchema, pictureGroupSchema, DB_CONFIG } = require('./schema');
 
 const fB = 'link name createdAt[Upload time] (size) (group)';
 const fD = 'link name type group labels size createdAt hasThumbnail';
@@ -17,13 +17,17 @@ const lI = 'name';
 const dateFormat = 'MM/DD/YYYY';
 const timeFormat = 'hh:mm:ss';
 
-const schemas = {
-  'mfile': {
-     schema: fileSchema,
-     views: [fB, fD, fC, fE, fTS, fI],
-     api: 'L',  // api exposed by rest controller
-     name: 'Picture',
-     mraUI: {
+
+function getSchemaDef(fileCategory, schema1, schema2) {
+  const name = fileCategory.charAt(0).toUpperCase() + fileCategory.slice(1);
+
+  // fileSchemaDef, pictureSchemaDef
+  const schemaDef1 = {
+    schema: schema1,
+    views: [fB, fD, fC, fE, fTS, fI],
+    api: 'L',  // api exposed by rest controller
+    name: name,
+    mraUI: {
       listWidgets: {
         general: {
           views: ['gallery-bottom-title',],
@@ -41,21 +45,23 @@ const schemas = {
         sub: 'sub',
       },
 
-      listCategories: [
-        {
-          listCategoryField: 'group',
-          showCategoryCounts: true,
-          showEmptyCategory: true,
-        },
-      ],
-     },
-  },
-  'mfilegroup': {
-     schema: fileGroupSchema,
-     views: [lB, lD, lC, lE, lTS, lI],
-     api: 'LCU', // api exposed by rest controller
-     name: 'Picture Group',
-     mraUI: {
+     listCategories: [
+       {
+         listCategoryField: 'group',
+         showCategoryCounts: true,
+         showEmptyCategory: true,
+       },
+     ],
+    }
+  };
+
+  // fileGroupDef, pictureGroupDef
+  const schemaDef2 = {
+    schema: schema2,
+    views: [lB, lD, lC, lE, lTS, lI],
+    api: 'LCU', // api exposed by rest controller
+    name: `${name} Group`,
+    mraUI: {
       listWidgets: {
         general: {
           views: [],
@@ -72,25 +78,28 @@ const schemas = {
         select: 'select',
         sub: 'sub',
       },
-     },
-  },
+    },
+  }
+
+  return [schemaDef1, schemaDef2];
+}
+
+const [mfileDef, mfilegroupDef] = getSchemaDef('file', fileSchema, fileGroupSchema);
+const [mpictureDef, mpicturegroupDef] = getSchemaDef('picture', pictureSchema, pictureGroupSchema);
+
+const schemas = {
+  'mpicture': mpictureDef,
+  'mpicturegroup': mpicturegroupDef,
+  'mfile': mfileDef,
+  'mfilegroup': mfilegroupDef,
   'upload': {},
   'download': {},
 };
 const config = {
   dateFormat,
   timeFormat,
-  patch: ['mmodule_name'], //extra fields to patch to schema
-  owner: {enable: true, type: 'module'},
 };
 
-const authz = {
-  'module-authz': {'LoginUser': {'others': '', 'own': ''}, 'Anyone': ''},
-  'download': {'LoginUser': {'others': '', 'own': ''}, 'Anyone': 'R'},
-};
+const authz = {};
 
-const DB_CONFIG = {
-  APP_NAME: process.env.APP_NAME,
-  MODULE_NAME: 'FILE',
-};
 module.exports = {schemas, config, authz, DB_CONFIG};

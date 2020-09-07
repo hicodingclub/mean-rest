@@ -1,0 +1,20 @@
+<div *ngIf="!disableDisplay" style="width: 100%;">
+  <div class="display-file">
+    <div class="thumbnail">
+        <img *ngIf="downloadUrl" [src]="getDownloadUrl() | SafeUrlPipe">
+        <i *ngIf="!downloadUrl" class="far fa-image"></i>
+    </div>
+  </div>
+
+  <div class="select-file">
+    <button type="button" class="btn btn-link ml-2" (click)="selectFileList()">
+      <i class="far fa-images"></i> Select
+    </button>
+  </div>
+</div>
+
+<lib-mpicture-list-widget-gallery *ngIf="showListWidget"
+  [inputData]="['name', 'link']"
+  [options]="{canSelect: true, largePicture: false, showTitle: true, aspectRatio: this.aspectRatio}"
+  (done)="listWidgetDone($event)"
+></lib-mpicture-list-widget-gallery>

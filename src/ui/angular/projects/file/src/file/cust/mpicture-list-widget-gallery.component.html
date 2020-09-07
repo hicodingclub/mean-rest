@@ -1,0 +1,303 @@
+
+
+<div class="select-model show" (keyup.esc)="uiOnEscapeKey()" tabindex="0" #FilesModal>
+  <div class="select-model-content">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{stepTitle}}</h5>
+        <button type="button" class="close" aria-label="Close" (click)="uiCloseModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+<!--  modal body starts -->
+  <!-- 1. start of selection -->
+  <div [hidden]="croppingPictureLink" class="select-picture">
+
+    <!-- 1.1. Left panel (groups)-->
+    <ul *ngIf="listCategory1.listCategoryField" class="nav nav-pills category-nav">
+      <li *ngFor="let ele of categoryDisplays; let idx = index;" class="nav-item" >
+        <!-- not show idx 0 "All"-->
+        <a *ngIf="idx !==0 && (listCategory1.showEmptyCategory || (!listCategory1.showEmptyCategory && categoriesCounts[idx] > 0))"
+          class="nav-link" [ngClass]="{'active': idx === selectedCategory }" [routerLink]="['.']" queryParamsHandling="preserve" (click)="categorySelected(idx)">
+            {{ele}} <span *ngIf="listCategory1.showCategoryCounts">({{categoriesCounts[idx]}})</span>
+        </a>
+      </li>
+
+      <li class="li-add">
+          <a class="pointer" routerLink="." (click)="onEmbeddedAdd()"><i class="fas fa-plus-square" title="Add"></i> New Group</a>
+          <div class="add-group-pop" *ngIf="isAdding">
+              <app-mpicturegroup-edit [initData]="parentData" [embeddedView]="true" [embedMode]="'create'" (done)="onActionDone($event)" (doneData)="onGroupAdded($event)"></app-mpicturegroup-edit>
+          </div>
+      </li>
+    </ul>
+    <!-- Endo of left panel (groups)-->
+
+    <!-- 1.2. start of right panel-->
+    <div class="main-area">
+      <!-- 1.2.1 Start of select/upload buttons-->
+      <div class="action-buttons">
+        <button type="button" class="btn btn-success" (click)="selectConfirmed()"
+        [disabled]="!isItemSelected()">Confirm Selection</button>
+        <button type="button" class="btn btn-outline-success" (click)="selectFiles()">Upload New</button>            
+      </div>
+      <!-- End of select/upload buttons-->
+      <!-- 1.2.2 Start of gallery widget-->
+      <div>
+        <div *ngIf="!options['disableListHead']" class="container search">
+          <div class="row" *ngIf="!options['disableListSearch']">
+            <div class="col">
+              <div class="input-group">
+                <input type="search" class="form-control border border-secondary" id="mpictureTextSearch" #mpictureTextSearch [(ngModel)]="searchText" (search)="$event.target.blur();searchList();" placeholder="Search for name">
+                <div *ngIf="searchText" class="input-group-append icon-search-clear">
+                  <span>
+                    <i class="fas fa-times-circle" (click)="onSearchTextClear()" title="Clear"></i>
+                  </span>
+                </div>
+                <div class="input-group-append">
+                  <button type="button" class="btn btn-outline-secondary" (click)="searchList()"><i class="fas fa-search"></i></button>
+                </div>
+              </div>
+              <div class="text-center">
+                <span class="pointer" (click)="toggleMoreSearch()">
+                  <span class="refine-search-text">Refine Search &nbsp;</span>
+                  <span>
+                    <i *ngIf="!moreSearchOpened" class="fas fa-plus-circle" title="More"></i>
+                    <i *ngIf="moreSearchOpened" class="fas fa-minus-circle" title="Less"></i>
+                  </span>
+                </span>
+              </div>
+              <div class="shadow" *ngIf="moreSearchOpened">
+                <div class="card search-criteria-card">
+                  <div class="card-body">
+                    <div class="d-flex flex-wrap align-items-center">
+                      <div class="container one-column-search small">
+                        <div class="row col-gutter align-items-center">
+                          <div class="col-12 col-lg-3">
+                            <label for="mpictureEditCreatedAt"> Upload time </label>
+                          </div>
+                          <div class="col-11 col-lg-8">
+                            <div class="row">
+                              <div class="input-group input-group-sm col-12 col-md-6 align-items-center">
+                                <span class="small mx-1" style="width:2rem">From</span>
+                                <input class="form-control form-control-sm" id="mpictureEditCreatedAtFrom" placeholder="{{dateFormat}}" [(ngModel)]="detail['createdAt']['from']" name="mpictureEditCreatedAt" ngbDatepicker [minDate]="minDate" #mpictureEditCreatedAt="ngModel">
+                                <div class="input-group-append">
+                                  <button class="btn btn-outline-secondary" (click)="onDateSelectionToggle('createdAt')" type="button">
+                                    <i class="fas fa-calendar-alt"></i>
+                                  </button>
+                                </div>
+                              </div>
+                              <div class="input-group input-group-sm col-12 col-md-6 align-items-center">
+                                <span class="small mx-1" style="width:2rem">to</span>
+                                <input class="form-control form-control-sm" id="mpictureEditCreatedAtTo" placeholder="{{dateFormat}}" [(ngModel)]="detail['createdAt']['to']" name="mpictureEditCreatedAt" ngbDatepicker [minDate]="minDate" #mpictureEditCreatedAt="ngModel">
+                                <div class="input-group-append">
+                                  <button class="btn btn-outline-secondary" (click)="onDateSelectionToggle('createdAt')" type="button">
+                                    <i class="fas fa-calendar-alt"></i>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="date-selection-pop" *ngIf="detail['createdAt']['pop']">
+                              <ngb-datepicker #dp [minDate]="minDate" (select)="onDateSelection('createdAt', $event)" [displayMonths]="datePickerDisplayMonths" [dayTemplate]="mpictureEditCreatedAtT">
+                              </ngb-datepicker>
+                              <ng-template #mpictureEditCreatedAtT let-mpictureEditCreatedAtDate="date" let-mpictureEditCreatedAtFocused="focused">
+                                <span class="custom-day" [class.focused]="mpictureEditCreatedAtFocused" [class.range]="isRange('createdAt', mpictureEditCreatedAtDate)" [class.faded]="isHovered('createdAt', mpictureEditCreatedAtDate) || isInside('createdAt', mpictureEditCreatedAtDate)" (mouseenter)="hoveredDate = mpictureEditCreatedAtDate" (mouseleave)="hoveredDate = null">
+                                  {{ mpictureEditCreatedAtDate.day }}
+                                </span>
+                              </ng-template>
+                            </div>
+                          </div>
+                          <div class="col-1">
+                            <div class="pointer" (click)="clearValueFromDetail('createdAt')" *ngIf="checkValueDefinedFromDetail('createdAt')"><i class="fas fa-times-circle" title="Clear"></i></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="action-buttons">
+                      <button type="button" class="btn btn-outline-success" (click)="onSearchClear()">Reset</button>
+                      <button type="button" class="btn btn-success" (click)="searchList()">Search</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!moreSearchOpened" style="text-align: left;">
+                <span class="badge badge-pill badge-info" *ngFor="let value of searchMoreDetail">
+                  <div (click)="toggleMoreSearch()" class="pointer search-detail-badge"> {{value[0]}}: {{value[1]}}</div>
+                  <i class="fas fa-times-circle icon-clear-badge" (click)="clearValueFromDetailAndSearchList(value[2])" title="Clear"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="row" *ngIf="!options['disableActionButtons']">
+            <div class="col">
+              <div class="action-buttons">
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div *ngIf="!options['disablePagination']">
+            <div class="row justify-content-end mt-3">
+              <div *ngIf="list.length > 2" class="sort-selection mr-5">
+                <div class="dropdown" style="width: 100%;">
+                  <button class="sort-dropdown btn btn-light btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Sort: <span *ngIf="listSortField && !viewHiddenFields.includes(listSortField)">{{listSortFieldDisplay}}
+                      <i *ngIf="listSortOrder === 'asc'" class="fas fa-arrow-up"></i>
+                      <i *ngIf="listSortOrder === 'desc'" class="fas fa-arrow-down"></i>
+                    </span>
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item pointer" (click)="setListSortAndRefresh('name', 'Name', 'asc')">Name<i class="fas fa-arrow-up"></i></a>
+                    <a class="dropdown-item pointer" (click)="setListSortAndRefresh('name', 'Name', 'desc')">Name<i class="fas fa-arrow-down"></i></a>
+                    <a class="dropdown-item pointer" (click)="setListSortAndRefresh('createdAt', 'Upload time', 'asc')">Upload time<i class="fas fa-arrow-up"></i></a>
+                    <a class="dropdown-item pointer" (click)="setListSortAndRefresh('createdAt', 'Upload time', 'desc')">Upload time<i class="fas fa-arrow-down"></i></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between">
+              <div>
+              </div>
+              <div>
+                <div class="total_counts">
+                  <span *ngIf="totalCount > 2">Total: <b>{{totalCount}}</b></span>
+                  <a class="ml-3" routerLink="." (click)="onRefresh()"><i class="fa fa-sync-alt"></i></a>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-center flex-wrap mt-2">
+              <div *ngIf="totalPages > 1">
+                <ul class="pagination justify-content-center">
+                  <li class="page-item" [ngClass]="{'disabled': page<=1}">
+                    <a class="page-link" routerLink="." (click)="onPreviousPage()" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                      <span class="sr-only">Previous</span>
+                    </a>
+                  </li>
+                  <li *ngIf="leftMore" class="page-item"><a class="page-link">...</a></li>
+                  <li *ngFor="let p of pages;  let i = index" class="page-item" [ngClass]="{'active': p==page}">
+                    <a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
+                  </li>
+                  <li *ngIf="rightMore" class="page-item"><a class="page-link">...</a></li>
+                  <li class="page-item" [ngClass]="{'disabled': page>=totalPages}">
+                    <a class="page-link" routerLink="." (click)="onNextPage()" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                      <span class="sr-only">Next</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div class="ml-3" *ngIf="totalPages > 1">
+                <small>Page</small>&nbsp;<input type="number" class="page-control form-control" [value]="page" (input)="onGotoPage($event.target.value)" />&nbsp;/&nbsp;{{totalPages}}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="no-records" *ngIf="list.length === 0">
+          <span *ngIf="loaded">No records found.</span>
+          <span *ngIf="!loaded">Loading...</span>
+        </div>
+        <div *ngIf="list.length > 0">
+          <ng-template [ngIf]="isShowListView('gallery-bottom-title')">
+            <app-mpicture-list-view-widget-gallery-bottom-title [style]="style" [options]="options" [inputData]="inputData" [viewInputs]="viewInputs" [list]="list" [clickItemAction]="clickItemAction" [clickedId]="clickedId" [checkedItem]="checkedItem" [parentItem]="parentItem" [referenceFieldsMap]="referenceFieldsMap" [listSortOrder]="listSortOrder" [listSortField]="listSortField" [page]="page" [perPage]="perPage" [archivedSearch]="archivedSearch" [enums]="enums" [clickItemAction]="clickItemAction" [cardHasLink]="cardHasLink" [cardHasSelect]="cardHasSelect" [canArchive]="canArchive" [canCheck]="canCheck" [canDelete]="canDelete" [canUpdate]="canUpdate" [includeSubDetail]="includeSubDetail" (uiEvents)="viewUIEvent($event)">
+            </app-mpicture-list-view-widget-gallery-bottom-title>
+          </ng-template>
+        </div>
+        <div class="container">
+          <div *ngIf="!options['disablePagination']">
+            <div class="row justify-content-end mt-3">
+            </div>
+            <div class="d-flex justify-content-between">
+              <div>
+              </div>
+              <div>
+                <div class="total_counts">
+                  <span *ngIf="totalCount > 2">Total: <b>{{totalCount}}</b></span>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-center flex-wrap mt-2">
+              <div *ngIf="totalPages > 1">
+                <ul class="pagination justify-content-center">
+                  <li class="page-item" [ngClass]="{'disabled': page<=1}">
+                    <a class="page-link" routerLink="." (click)="onPreviousPage()" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                      <span class="sr-only">Previous</span>
+                    </a>
+                  </li>
+                  <li *ngIf="leftMore" class="page-item"><a class="page-link">...</a></li>
+                  <li *ngFor="let p of pages;  let i = index" class="page-item" [ngClass]="{'active': p==page}">
+                    <a class="page-link" routerLink="." (click)="onGotoPage(p)">{{p}}</a>
+                  </li>
+                  <li *ngIf="rightMore" class="page-item"><a class="page-link">...</a></li>
+                  <li class="page-item" [ngClass]="{'disabled': page>=totalPages}">
+                    <a class="page-link" routerLink="." (click)="onNextPage()" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                      <span class="sr-only">Next</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div class="ml-3" *ngIf="totalPages > 1">
+                <small>Page</small>&nbsp;<input type="number" class="page-control form-control" [value]="page" (input)="onGotoPage($event.target.value)" />&nbsp;/&nbsp;{{totalPages}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- End of gallery widget-->
+      <!-- 1.2.3 Start of select/upload buttons-->
+      <div *ngIf="list && list.length > 10" class="action-buttons">
+        <button type="button" class="btn btn-success" (click)="selectConfirmed()"
+        [disabled]="!isItemSelected()">Confirm Selection</button>
+        <button type="button" class="btn btn-outline-success" (click)="selectFiles()">Upload New</button>            
+      </div>
+      <!-- End of select/upload buttons-->
+    </div>
+    <!-- end of right panel-->
+
+    <input type="file" #file style="display: none" (change)="onFilesSelected()"  accept="image/*" multiple/><!-- add 'multiple' to allow multiple file selection -->
+    <ng-template files-ref-select></ng-template>
+  </div>
+  <!-- end of selection -->
+
+  <!-- 2. start of crop-->
+  <div *ngIf="croppingPictureLink" class="crop-area">
+    <div class="crop-area-ratio"></div>
+      <lib-mdds-cropper  class="crop-area-box"
+        [downloadUrl]="croppingPictureLink"
+        [aspectRatio]="options['aspectRatio']"
+        (cropper)="cropperCreated($event)"
+      ></lib-mdds-cropper>
+    <hr>
+  </div>
+  <div *ngIf="croppingPictureLink" class="crop-actions">
+    <div class="action-buttons text-center">
+  
+      <button type="button" class="btn btn-success" (click)="selectItemConfirmed()">Finish</button>
+      <button type="button" class="btn btn-outline-success" (click)="backSelect()">Back</button>            
+    </div>
+    <div class="d-flex justify-content-center">
+      <div class="mx-3" *ngFor="let file of uploadingFiles">
+        <small *ngIf="progress" >
+            <span>{{progress[file].progress | async}}% </span>
+            <span *ngIf="uploadSuccessful">
+                <span *ngIf="progress[file].result.success">SUCC</span>
+                <span *ngIf="!progress[file].result.success">FAIL</span>
+            </span>
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="uploading"><lib-mdds-loader></lib-mdds-loader></div>
+
+  <!-- end of crop-->
+<!--  model body ends -->
+
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div> 

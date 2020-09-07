@@ -1,0 +1,397 @@
+.read-more {
+  /*font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;*/
+  /*color: #307bff;*/
+  color: #28a745;
+  font-style: italic;
+  font-size: 0.85rem;
+  cursor: pointer;
+  position: relative;
+  white-space: nowrap;
+}
+
+.read-more:hover {
+  /*color: #0056b3;*/
+  color: #218838;
+  /*text-decoration: underline;*/
+}
+
+.read-more i {
+  position: relative;
+  transition: all 0.3s;
+  top: 0;
+  right: 0;
+}
+
+.read-more:hover i {
+  top: 0px;
+  right: -3px;
+}
+
+.link-primary {
+  color: #307bff;
+  white-space: normal;
+}
+
+.link-primary:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.link {}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.show-detail {
+  position: relative;
+  margin-top: 15px;
+  transition: all 0.5s;
+}
+
+.show-detail:before {
+  content: '';
+  border-style: solid;
+  border-width: 0 10px 15px 10px;
+  border-color: transparent transparent rgba(0, 0, 0, .125) transparent;
+  position: absolute;
+  top: -15px;
+  left: 10px;
+}
+
+.fa-edit {
+  width: 1rem;
+}
+
+.thin-devider {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+.clicked-row {}
+
+.selected-row {
+  /*background-color: rgba(167, 224, 169, 0.175);*/
+  box-shadow: 0 0 0 2px #44b549;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.clickable-card {}
+
+.clickable-card:hover {
+  background-color: rgba(0, 0, 0, 0.075);
+}
+
+.card-action-links {
+  display: flex;
+  align-items: baseline;
+}
+
+.card-action-icons-container {
+  flex-grow: 1;
+  display: flex;
+  align-items: flex-end;
+}
+
+.card-action-icons {
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.field-label {
+  font-weight: bold;
+}
+
+td input,
+.card-action-icons input {
+  margin: 0.5rem;
+}
+
+td a i,
+.card-action-icons a i {
+  color: rgb(196, 191, 191);
+  margin: 0.5rem;
+}
+
+/*change the icon color when card is hoverred*/
+tr:hover td a i,
+.clickable-card:hover .card-action-icons a i {
+  color: black;
+}
+
+tr:hover td i.fa-edit:hover,
+.clickable-card:hover .card-action-icons i.fa-edit:hover {
+  color: blue;
+}
+
+tr:hover td i.fa-trash-alt:hover,
+.clickable-card:hover .card-action-icons i.fa-trash-alt:hover {
+  color: red;
+}
+
+/* action buttons and paginations
+*/
+.action-buttons {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  flex-flow: wrap;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.action-buttons .btn {
+  margin: 0.25rem;
+}
+
+.pagination li {
+  min-width: 2.5rem;
+}
+
+.total_counts {
+  padding-top: 0.8rem;
+  text-align: right;
+}
+
+.page-link {
+  padding: 0.25rem 0.5rem;
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+.page-control {
+  display: inline-block;
+  width: 3rem;
+  height: 1.5rem;
+  font-size: 0.8rem;
+  padding: 0 0.25rem;
+}
+
+/* search area
+*/
+::-ms-clear {
+  display: none;
+}
+
+.ref-badge {
+  border: 1px solid #eceff3;
+  /*rgba(0,0,0,.125); */
+  background-color: #eceff3;
+}
+
+/* pop-up models
+*/
+.select-model {
+  display: block;
+  position: fixed;
+  z-index: 1000;
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.select-model.show {
+  display: block;
+}
+
+.select-model-content {
+  position: relative;
+  background-color: #fefefe;
+  /*margin: auto;*/
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+  border: 1px solid #888;
+  width: 90%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.add-area {
+  margin-left: 0.75rem;
+  margin-top: 1rem;
+}
+
+.badge-click {
+  cursor: pointer;
+}
+
+div.badge-click:hover {
+  background-color: #495057 !important;
+  text-decoration: underline;
+}
+
+/* Grid/List view filter
+*/
+.view-radio+label {
+  transition: all 0.2s ease-in-out;
+  color: #bbbdbf;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 1rem 0 0;
+}
+
+.view-radio:checked+label {
+  color: #212529;
+}
+
+.view-radio+label:hover {
+  color: #212529;
+}
+
+.view-radio {
+  display: none;
+}
+
+.list-title {
+  font-size: 1.5rem;
+}
+
+.sort-selection {
+  min-width: 200px;
+  position: relative;
+}
+
+.sort-dropdown {
+  width: 100%;
+  text-align: left;
+}
+
+.category2-dropdown {
+  width: 250px;
+  text-align: left;
+  font-size: 1.1rem;
+  color: #007bff;
+}
+
+.sort-selection i {
+  color: #007bff;
+  margin-left: 1rem;
+  margin-right: 2rem;
+}
+
+.th-sort-arrow {
+  color: #007bff;
+  margin-left: 1rem;
+}
+
+.font-size-75 {
+  /*font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;*/
+  font-size: 0.75rem;
+}
+
+.no-records {
+  margin: 1rem auto 1rem auto;
+  /*centering*/
+  width: 20rem;
+  font-size: 1rem;
+}
+
+.list-selection {
+  max-width: 500px;
+  width: 90%;
+}
+
+.modal-back {
+  position: fixed;
+  width: 100vw;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  height: 100%;
+  min-height: 100vh;
+  z-index: 9;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-front {
+  position: relative;
+  width: 96%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  margin-top: 100px;
+  margin-bottom: 100px;
+}
+
+@media screen and (min-width: 768px) {
+  .modal-front {
+    position: relative;
+    min-width: 500px;
+    width: 75%;
+  }
+}
+
+.category-nav {
+  background: linear-gradient(180deg,
+      rgba(233, 236, 239, 1) 0%,
+      rgba(233, 236, 239, 0.2) 80%);
+  padding: 1rem 20px 1rem 20px;
+  margin-bottom: 1rem;
+}
+
+.asso-link {
+  font-style: italic;
+  font-size: 0.8rem;
+}
+
+.list-check-box {
+  zoom: 1.1;
+}
+
+.currency {
+  margin-right: 10px;
+}
+
+.col-gutter {}
+
+@media screen and (max-width: 576px) {
+  .col-gutter>[class*="col-"] {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+}
+
+/*  Search part */
+/* clears the 'X' from Internet Explorer */
+input[type=search]::-ms-clear {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+input[type=search]::-ms-reveal {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* clears the 'X' from Chrome */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  display: none;
+}
+
+.icon-search-clear {
+  z-index: 3;
+  vertical-align: middle;
+  padding: 0.5rem 0.5rem 0rem 0.5rem;
+  cursor: pointer;
+  position: relative;
+  margin-left: -2rem;
+  /* text 1 + left 0.5 + right 0.5 = 2 rem*/
+  border: 0;
+  height: 2rem;
+}

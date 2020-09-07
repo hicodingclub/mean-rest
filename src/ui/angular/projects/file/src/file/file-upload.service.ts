@@ -16,13 +16,14 @@ export class MddsFileUploadService {
     @Inject(FILE_UPLOAD_URI) private fileUploadUrl: string,
     private http: HttpClient) {}
 
-  public upload(files: Set<File>, groupName): UploadStatus {
+  public upload(files: Set<File>, groupName, fileCategory): UploadStatus {
     // this will be the our resulting map
     const status: UploadStatus = {};
     files.forEach(file => {
       const nameStructure = {
         group: groupName,
         name: file.name,
+        fileCategory,
       };
       // create a new multipart-form for every file
       const formData: FormData = new FormData();

@@ -1,0 +1,7 @@
+<div style="width: 100%;">
+    <ul>
+        <li *ngFor="let file of fileNames; let i=index">
+            <a href="{{downloadUrls[i]}}" download>{{file}}</a>
+        </li>
+    </ul>
+</div>
