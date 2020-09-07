@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import { FileUploadModule } from '@hicoder/angular-file';
+import { FilesModule } from '@hicoder/angular-file';
 import { MddsCoreModule } from '@hicoder/angular-core';
 
 import { ShoppingCartRoutingModule } from './shopping-cart-routing.module';
@@ -30,7 +30,7 @@ import { ClickElsewhereDirective } from './click-elsewhere.directive';
     RouterModule,
     FormsModule,
     MddsCoreModule,
-    FileUploadModule,
+    FilesModule,
 
     ShoppingCartRoutingModule,
   ],
