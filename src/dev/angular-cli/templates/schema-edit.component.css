@@ -120,6 +120,15 @@ margin-left: 0.5rem;
 	margin-left: 1rem;
 }
 
+.icon-clear-badge-light {
+	cursor: pointer;
+  margin-left: 1rem;
+  opacity: 0.7;
+}
+.icon-clear-badge-light:hover {
+  opacity: 1;
+}
+
 .icon-clear-badge-ontop {
   cursor: pointer;
   position: absolute;

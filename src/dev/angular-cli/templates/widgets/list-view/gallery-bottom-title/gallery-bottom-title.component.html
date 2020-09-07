@@ -28,8 +28,8 @@
 					[ngClass]="{'grid-head-picture-large': options['largePicture'], 'clickable-card pointer': clickItemAction}"
 					[ngStyle]="style['picture']"
 					(click)="clickOneItem(i)">
-					<lib-mdds-file-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']">
-					</lib-mdds-file-display>
+					<lib-mdds-picture-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']">
+					</lib-mdds-picture-display>
 				</div>
 				<div class="text-center">
 					<div *ngIf="!options['notShowTitle']" class="grid-picture-title"

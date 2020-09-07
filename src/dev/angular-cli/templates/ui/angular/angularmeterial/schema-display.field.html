@@ -41,11 +41,16 @@
                         } else if (field.elementType === 'SchemaString' && field.picture) {%>
                     <div class="d-flex align-items-center" *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
                         <div class="picture-small-block" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
-                          <lib-mdds-file-display [downloadUrl]="element" [isLarge]="false"
+                          <lib-mdds-picture-display [downloadUrl]="element" [isLarge]="false"
                             [style]="{img: {'background-color': '#8080801f', 'object-fit': 'contain', width: '100%'}}">
-                          </lib-mdds-file-display>
+                          </lib-mdds-picture-display>
                         </div>
                     </div><%
+                        } else if (field.elementType === 'SchemaString' && field.file) {%>
+                    <div class="" *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
+                          <lib-mdds-files-display [downloadUrls]="detail['<%-fn%>']['selection']">
+                          </lib-mdds-files-display>
+                    </div><%                    
                         } else if (field.elementType === 'SchemaString') {%>
                     <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
                         <ng-template ngFor let-element [ngForOf]="detail['<%-fn%>']['selection']" let-idx="index">
@@ -88,7 +93,7 @@
                             let isLarge;
                             if (typeof largePicture === 'undefined') isLarge = false;
                             else isLarge = largePicture;%>
-                    <lib-mdds-file-display [downloadUrl]="detail['<%-fn%>']" [isLarge]="<%-isLarge%>" [aspectRatio]="<%-field.aspectRatio%>"></lib-mdds-file-display><%
+                    <lib-mdds-picture-display [downloadUrl]="detail['<%-fn%>']" [isLarge]="<%-isLarge%>" [aspectRatio]="<%-field.aspectRatio%>"></lib-mdds-picture-display><%
                         } else if (field.textarea) {%>
                     <div [innerHTML]="detail['<%-fn%>']"></div><%
                         } else if (field.meta.innerHtml) {%>

@@ -131,7 +131,7 @@
                   [(ngModel)]="detail['<%-fn%>']" name="Edit<%-Fn%>"
                   #Edit<%-Fn%>="ngModel">
               <div style="display: inline-block; width: 80%;" >
-                  <lib-mdds-file-select [(downloadUrl)]="detail['<%-fn%>']" [aspectRatio]="<%-field.aspectRatio%>"></lib-mdds-file-select>
+                  <lib-mdds-picture-select [(downloadUrl)]="detail['<%-fn%>']" [aspectRatio]="<%-field.aspectRatio%>"></lib-mdds-picture-select>
               </div>
               <span *ngIf="detail['<%-fn%>']" 
                 class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
@@ -146,6 +146,32 @@
               </div><%}%>
           </div><%_
       } else if (field.file) { %>
+          <div class="form-check"<%_
+              if (field.required) {%>
+                [ngClass]="{'ng-valid': detail['<%-fn%>'],
+                            'ng-invalid': !detail['<%-fn%>']}"<%
+              } else { %>
+                [ngClass]="{'ng-valid': true} "<%_ } %>
+              >
+              <input type="text" class="form-control rounded" id="Edit<%-Fn%>" style="display: none;"
+                  <%if (field.required) {%>required<%}%>
+                  [(ngModel)]="detail['<%-fn%>']" name="Edit<%-Fn%>"
+                  #Edit<%-Fn%>="ngModel">
+              <div style="display: inline-block; width: 80%;" >
+                  <lib-mdds-files-upload [(downloadUrl)]="detail['<%-fn%>']"></lib-mdds-files-upload>
+              </div>
+              <span *ngIf="detail['<%-fn%>']" 
+                class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
+                <i class="fas fa-times-circle" title="Clear"></i>
+              </span>     
+          </div>
+          <div [hidden]="Edit<%-Fn%>.valid || Edit<%-Fn%>.pristine"
+            class="alert alert-danger"><%_
+              if (field.required) {%>
+              <div *ngIf="Edit<%-Fn%>.errors && Edit<%-Fn%>.errors.required">
+              <%-Fn%> is required.
+              </div><%}%>
+          </div>
       <%_ } %><%_
     } else if (field.type === "SchemaBoolean") { %>
           <div class="form-check"<%_
@@ -460,9 +486,9 @@
             >
             <div class="d-flex align-items-center">
               <div class="picture-small-block" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
-                <lib-mdds-file-display [downloadUrl]="element" [isLarge]="false"
+                <lib-mdds-picture-display [downloadUrl]="element" [isLarge]="false"
                   [style]="{img: {'background-color': '#8080801f', 'object-fit': 'contain', width: '100%'}}">
-                </lib-mdds-file-display>
+                </lib-mdds-picture-display>
                 <i class="fas fa-times-circle icon-clear-badge-ontop" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
               </div>
               <span *ngIf="arraySelected('<%-fn%>')" 
@@ -481,11 +507,61 @@
               </div>
             </div>
             <div *ngIf="detail['<%-fn%>']['adding']">
-              <lib-mdds-file-select [aspectRatio]="<%-field.aspectRatio%>"
+              <lib-mdds-picture-select [aspectRatio]="<%-field.aspectRatio%>"
                 [disableDisplay]="true" [askForSelect]="detail['<%-fn%>']['adding']"
                 (downloadUrlChange)="detail['<%-fn%>']['new'] = $event; onAddArrayItem('<%-fn%>')">
-              </lib-mdds-file-select>
+              </lib-mdds-picture-select>
             </div>
+            <!-- fake hidden input ngModel for directive to check the values-->
+            <input type="checkbox" name="Edit<%-Fn%>Selection" 
+              style="display:none"
+              id="Edit<%-Fn%>Selection"
+                [(ngModel)]="detail['<%-fn%>']['selection'].length" 
+                #Edit<%-Fn%>Selection="ngModel">
+
+          </div><%_
+
+        } else if (field.elementType === 'SchemaString' && field.file) { %>
+          <div class="form-check"
+                ngModelGroup="Edit<%-Fn%>"<%
+              if (field.required) {%>
+                libMddsArrayRequired<%}%>
+                #Edit<%-Fn%>="ngModelGroup" 
+            >
+            <div class="d-flex align-items-center">
+              <div>
+                <div class="d-flex align-items-center" *ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
+                  <lib-mdds-files-display [downloadUrls]="[element]">
+                  </lib-mdds-files-display>
+                  <i class="fas fa-times-circle icon-clear-badge-light" (click)="clearValueFromArrayField('<%-fn%>', i)" title="Remove"></i>
+                </div>
+              </div>
+              <span *ngIf="arraySelected('<%-fn%>') && detail['<%-fn%>']['selection'].length > 1" 
+                class="icon-clear" (click)="clearValueFromDetail('<%-fn%>')">
+                <i class="fas fa-times-circle" title="Clear All"></i>
+              </span>
+            </div>
+            <hr>
+            <div class="new-area">
+              <div class="mt-1">
+                <a class="pointer" routerLink="." (click)="onAddArrayItemClicked('<%-fn%>')"
+                  style="font-size: 0.75rem;">
+                  <i class="fas fa-plus-square" title="Upload"></i>
+                  Upload
+                </a>
+              </div>
+            </div>
+            <lib-mdds-files-upload
+                [disableDisplay]="true" [askForSelect]="detail['<%-fn%>']['adding']"
+                (downloadUrlChange)="detail['<%-fn%>']['new'] = $event; onAddArrayItem('<%-fn%>')">
+            </lib-mdds-files-upload>
+
+            <!-- fake hidden input ngModel for directive to check the values-->
+            <input type="checkbox" name="Edit<%-Fn%>Selection" 
+              style="display:none"
+              id="Edit<%-Fn%>Selection"
+                [(ngModel)]="detail['<%-fn%>']['selection'].length" 
+                #Edit<%-Fn%>Selection="ngModel">
           </div><%_
         } else if (field.elementType === 'SchemaString') { %>
           <div class="form-check"
@@ -598,7 +674,7 @@
             <button type="button" class="btn btn-light ml-3" (click)="onRefSelect('<%-fn%>')">
                 <i class="fas fa-plus"  title="Add"></i>
             </button>
-                  <!-- fake hidden input ngModel for directive to check the values-->
+            <!-- fake hidden input ngModel for directive to check the values-->
             <input type="checkbox" name="Edit<%-Fn%>Selection" 
               style="display:none"
               id="Edit<%-Fn%>Selection"

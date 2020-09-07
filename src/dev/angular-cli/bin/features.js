@@ -197,7 +197,7 @@ const angularImports = {
     ],
     hasFileUpload: {
       type: 'module',
-      import: 'FileUploadModule',
+      import: 'FilesModule',
       from: '@hicoder/angular-file',
     },
     hasEmailingR: {
@@ -237,7 +237,7 @@ const angularImports = {
     ],
     hasFileUpload: {
       type: 'module',
-      import: 'FileUploadModule',
+      import: 'FilesModule',
       from: '@hicoder/angular-file',
     },
     hasEmailingR: {
