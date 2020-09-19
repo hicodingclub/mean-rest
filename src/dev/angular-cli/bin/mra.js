@@ -389,6 +389,7 @@ const stripFieldMeta = function (viewStr) {
 
 const analizeSearch = function (
   briefView,
+  listCategoryFields,
   listCategoryFieldsNotShown,
   listSearchFieldsBlackList,
   ownSearchStringFields,
@@ -407,8 +408,8 @@ const analizeSearch = function (
 
   for (let field of briefView) {
     if (field.hidden) continue;
-    if (listCategoryFieldsNotShown.includes(field.fieldName)) continue;
-    if (field.picture) continue;
+    if (listCategoryFields.includes(field.fieldName)) continue;
+    if (field.picture || field.file) continue;
     if (listSearchFieldsBlackList.includes(field.fieldName)) {
       continue;
     }
@@ -420,18 +421,30 @@ const analizeSearch = function (
       continue; // cannot text search based on "_id", but enable IDLookup
     }
 
-    if (field.type === 'SchemaArray') {
-      hasArray = true;
-    }
     if (field.type === 'SchemaDate') {
       hasDate = true;
     }
-    if (
+
+    if (field.type === 'SchemaArray') {
+      if (
+        field.elementType === 'SchemaString'
+        && !field.elementMultiSelect   // will provide select for field select
+        && !field.hint                 // will provide hint for field select
+        && !ownSearchStringFields.includes(field.fieldName)
+        ) {
+        showSearchBox = true;
+        stringBoxFields.push(field);
+      } else {
+        hasArray = true;
+        noMoreSearchArea = false;
+        ownSearchFields.push(field);
+      }
+    } else if (
       field.type == 'SchemaString' &&
       !ownSearchStringFields.includes(field.fieldName)
     ) {
       showSearchBox = true;
-      stringBoxFields.push(field.displayname);
+      stringBoxFields.push(field);
     } else {
       noMoreSearchArea = false;
       ownSearchFields.push(field);
@@ -581,6 +594,7 @@ const getPrimitiveField = function (fieldSchema) {
     RefCamel: undefined,
     editor: false,
     mraType: '',
+    urlDisplay: '',
     textarea: false,
     mraEmailRecipient: false,
     flagDate: false,
@@ -629,6 +643,9 @@ const getPrimitiveField = function (fieldSchema) {
 
             break;
           case 'httpurl':
+            if (fieldSchema.options.urlDisplay) {
+              primitiveField.urlDisplay = fieldSchema.options.urlDisplay;
+            }
             break;
           default:
             logger.warning(
@@ -973,6 +990,7 @@ const generateViewPicture = function (
       aspectRatio: primitiveField.aspectRatio,
       file: primitiveField.flagFile, // a file field
       sharable: primitiveField.flagSharable, // picture or file is sharable
+      urlDisplay: primitiveField.urlDisplay, // display text for httpUrl type
 
       //TODO: required could be a function
       required: requiredField,
@@ -2149,6 +2167,7 @@ function main() {
 
     const searchBarObj = analizeSearch(
       briefView,
+      listCategoryFields,
       listCategoryFieldsNotShown,
       listSearchFieldsBlackList,
       ownSearchStringFields,

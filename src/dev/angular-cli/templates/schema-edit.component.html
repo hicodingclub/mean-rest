@@ -13,7 +13,7 @@
 					editView.forEach( (field) => {
 						let fn=field.fieldName, ft = field.type, fD=field.displayName, Fn=field.FieldName;
 						let sn=schemaName, Sn=SchemaName, mn=moduleName, Mn=ModuleName;
-						let fieldObj = {field, fn, ft, ref_link: true,};%>
+						let fieldObj = {field, fn, fD, ft, ref_link: true,};%>
 					<ng-template [ngIf]="!hiddenFields.includes('<%-fn%>')">
 				<fieldset class="form-group">
 					<label for="Edit<%-Fn%>"><%-fD%></label><%
@@ -40,7 +40,7 @@
 					createView.forEach( (field) => {
 						let fn=field.fieldName, ft = field.type, fD=field.displayName, Fn=field.FieldName;
 						let sn=schemaName, Sn=SchemaName, mn=moduleName, Mn=ModuleName;
-						let fieldObj = {field, fn, ft, ref_link: true,};%>
+						let fieldObj = {field, fn, fD, ft, ref_link: true,};%>
 					<ng-template [ngIf]="!hiddenFields.includes('<%-fn%>')">
 				<fieldset class="form-group">
 					<label for="Edit<%-Fn%>"><%-fD%></label><%

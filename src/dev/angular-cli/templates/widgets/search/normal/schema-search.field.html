@@ -127,7 +127,7 @@
 										<span class="form-check-label"><%-f%></span>
 									</div><%_
 											}) %><%_
-										} else if (!field.picture) { %>
+										} else if (!field.picture && !field.file) { %>
 									<div class="badge-group" *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
 										<div class="badge badge-pill badge-secondary"
 											*ngFor="let element of detail['<%-fn%>']['selection']; let i = index;">
@@ -149,7 +149,8 @@
 												{{hintEle['_id']}}
 											</div>
 										</ng-template><%_ }
-											if (!field.hint) {%>
+											if (!field.hint && !field.mraType === 'httpurl') { 
+												/* httpurl not supported yet. also search not based on regex */%>
 										<div class="mt-1">
 											<a class="pointer small" routerLink="." (click)="onAddArrayItemClicked('<%-fn%>')">
 												<i class="fas fa-plus-square" title="New"></i>
@@ -158,7 +159,8 @@
 										</div><%_
 											}%>
 									</div><%_
-											if (!field.hint) {%>
+											if (!field.hint && !field.mraType === 'httpurl') {
+												/* httpurl not supported yet. also search not based on regex */%>
 									<div *ngIf="detail['<%-fn%>']['adding']" class="new-modal">
 										<div class="card text-center new-card">
 											<div class="card-body">

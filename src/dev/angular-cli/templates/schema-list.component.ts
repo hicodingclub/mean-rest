@@ -58,6 +58,19 @@ export class <%-SchemaName%>ListComponent extends <%-SchemaName%>ListCustCompone
           super(<%-schemaName%>Service, injector, router, route, location);
           this.view = ViewType.LIST;
 <% let theView = briefView; %><%_ include schema-construct.component.ts %>
+<% if (ownSearchStringFields.length > 0) {%>
+          this.ownSearchStringFields = [<%for (let itm of ownSearchStringFields) {%>
+            '<%-itm%>',<%}%>
+          ];<%}%>
+<% let sbo = searchBarObj; %>
+<% if (sbo.stringBoxFields.length > 0) {%>
+          this.stringBoxFields = [<%for (let itm of sbo.stringBoxFields) {%>
+            '<%-itm.fieldName%>',<%}%>
+          ];<%}%>
+<% if (sbo.ownSearchFields.length > 0) {%>
+          this.ownSearchFields = [<%for (let itm of sbo.ownSearchFields) {%>
+            '<%-itm.fieldName%>',<%}%>
+          ];<%}%>
 
           <% if (defaultSortField) { %>
           this.setListSort('<%-defaultSortField%>', '<%-defaultSortFieldDisplay%>', '<%-defaultSortOrder%>');<%}%>

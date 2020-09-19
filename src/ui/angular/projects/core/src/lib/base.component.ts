@@ -66,12 +66,13 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public numberFields = [];
   public indexFields = [];
   public multiSelectionFields = [];
-  public arrayFields = []; // element is [fieldName, elementType]
+  public arrayFields = []; // element is [fieldName, elementType, elementObj]
   public mapFields = []; // element is [fieldName, elementType, mapKey]
   public fileFields = {}; // fieldName: {selectedFiles: [selected files]}
   public textareaFields = [];
   public requiredFields = []; // collection of required fields. used by category field to check of 'other' need to present
   public emailFields = []; // [displayName, fieldName]
+  public httpurlFields = []; // [fieldName, urlDisplay]
   public editHintFields = {}; // fields that need hint for their values
   public fieldDisplayNames = {}; // display names of field
   public dateFormat = 'MM/DD/YYYY';
@@ -133,6 +134,8 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   public searchMoreDetail: any;
   public moreSearchOpened = false;
   public ownSearchStringFields = []; //list of strings that should have own search field in the search area
+  public stringBoxFields = []; // list of fields shown on list search box
+  public ownSearchFields = []; // list of fields having own search createria
 
   // windows width adjust for list (replace table view, which is not good for narrow screen)
   public windowWidth = 600;
@@ -869,9 +872,12 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
   /***End: handle map fields***/
   /***Start: handle array fields***/
-  public formatArrayField(field: any, elementType: string): any {
+  public formatArrayField(field: any, elementType: string, elementObj: any): any {
     const selectArray = [];
     let values = [];
+    if (typeof elementObj !== 'object') {
+      elementObj = {};
+    }
     if (Array.isArray(field)) {
       // not defined
       for (const e of field) {
@@ -879,6 +885,13 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
           const ref = this.formatReferenceField(e, '...');
           selectArray.push(ref);
           values.push(ref.value);
+        } else if (
+          elementType === 'SchemaString'
+          && elementObj.mraType === 'httpurl'
+          ) {
+          const urlObj = this.formatHttpurlField(e, elementObj.urlDisplay);
+          selectArray.push(urlObj);
+          values.push(urlObj.display || urlObj.url);
         } else if (elementType === 'SchemaString') {
           selectArray.push(e);
           values.push(e);
@@ -891,17 +904,18 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
   public formatArrayFields(detail: any): any {
     for (const f of this.arrayFields) {
-      // [fieldName, elementType]
-      detail[f[0]] = this.formatArrayField(detail[f[0]], f[1]);
+      // [fieldName, elementType, elementObj]
+      detail[f[0]] = this.formatArrayField(detail[f[0]], f[1], f[2]);
     }
     return detail;
   }
 
   public deFormatArrayFields(detail: any): any {
     for (const f of this.arrayFields) {
-      // [fieldName, elementType]
+      // [fieldName, elementType, elementObj]
       const fnm = f[0];
       const elementType = f[1];
+      const elementObj = f[2] || {};
 
       if (typeof detail[fnm] !== 'object') {
         // not defined
@@ -916,6 +930,12 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
               if (e && e._id && typeof e._id === 'string') {
                 selectArray.push(e._id);
               }
+            } else if (
+              elementType === 'SchemaString'
+              && elementObj.mraType === 'httpurl'
+              ) {
+              if (!e || !e.url) continue;
+              selectArray.push(JSON.stringify(e));
             } else if (elementType === 'SchemaString') {
               if (e) {
                 selectArray.push(e);
@@ -959,6 +979,78 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     return this.isDefinedFieldArray(this.detail[fieldName]);
   }
   /***End: handle array fields***/
+  /***Start: handle httpurl fields***/
+  public formatHttpurlField(field: string, urlDisplay: string): any {
+    if (!field) {
+      return {
+        display: urlDisplay || '',
+        url: '',
+      }
+    }
+    if (typeof field !== 'string') {
+      return field;
+    }
+    try {
+      let obj = JSON.parse(field);
+      return obj; // expect to be in {url, display} format
+    } catch(err) {
+      // this is just a http url
+      return {
+        display: urlDisplay || '',
+        url: field,
+      }
+    }
+  }
+
+  public formatHttpurlFields(detail: any): any {
+    for (const f of this.httpurlFields) {
+      // [fieldName, urlDisplay]
+      detail[f[0]] = this.formatHttpurlField(detail[f[0]], f[1]);
+    }
+    return detail;
+  }
+
+  public deFormatHttpurlFields(detail: any): any {
+    for (const f of this.httpurlFields) {
+      // [fieldName, urlDisplay]
+      const fnm = f[0];
+      const urlDisplay = f[1];
+
+      if (typeof detail[fnm] !== 'object') {
+        // not defined
+        delete detail[fnm];
+      } else {
+        if (!detail[fnm].url) {
+          delete detail[fnm];
+        } else {
+          let objStr = JSON.stringify(detail[fnm]);
+          detail[fnm] = objStr;
+        }
+      }
+    }
+    return detail;
+  }
+  public clearHttpurlField(field: any): any {
+    return {
+      display: '',
+      url: '',
+    };
+  }
+  public isDefinedHttpurlField(field: any): any {
+    if (field.url) {
+      return true;
+    }
+    return false;
+  }
+  public HttpurlFieldSelected(fieldName: string | number) {
+    if (
+      !this.detail[fieldName]
+    ) {
+      return false;
+    }
+    return this.isDefinedHttpurlField(this.detail[fieldName]);
+  }
+  /***End: handle array fields***/
 
   public formatDetail(detail: any): any {
     let cpy = Util.clone(detail);
@@ -969,6 +1061,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     cpy = this.formatArrayMultiSelection(cpy);
     cpy = this.formatArrayFields(cpy);
     cpy = this.formatMapFields(cpy);
+    cpy = this.formatHttpurlFields(cpy);
     return cpy;
   }
 
@@ -1022,6 +1115,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     cpy = this.deFormatArrayMultiSelection(cpy);
     cpy = this.deFormatArrayFields(cpy);
     cpy = this.deFormatMapFields(cpy);
+    cpy = this.deFormatHttpurlFields(cpy);
     return cpy;
   }
 
@@ -1226,30 +1320,12 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         d[field] = this.categories2[this.selectedCategory2][field];
       }
     }
-
-    const listCategoryFields = [
-      cate1.listCategoryField,
-      cate2.listCategoryField,
-    ];
-    if (!this.searchDetailReady) {
-      for (const s of this.stringFields) {
-        if (!listCategoryFields.includes(s) &&!this.ownSearchStringFields.includes(s)) {
-          // listCategoryField, as well as the strings fields requring own search, will be put to 'and' context
-          d[s] = this.searchText;
-        }
-      }
-    }
     const orSearchContext = [];
     const andSearchContext = [];
-    for (const field in d) {
-      if (field === '_id') continue;
-
-      if (typeof d[field] === 'string'
-        && !listCategoryFields.includes(field)
-        && !this.ownSearchStringFields.includes(field)) {
-        // listCategoryField, as well as the strings fields requring own search, will be put to 'and' context
+    if (!this.searchDetailReady) {
+      for (const s of this.stringBoxFields) {
         const o = {};
-        o[field] = d[field];
+        o[s] = this.searchText;
         orSearchContext.push(o);
       }
     }
@@ -1262,45 +1338,35 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
       let oValue: any;
       let oValueRaw: any[] = [];
       let valueToShow: any;
-      if (this.stringFields.indexOf(field) >= 0) {
-        if (listCategoryFields.includes(field) || this.ownSearchStringFields.includes(field)) {
-          // put category field to 'and'
-          oValue = d[field];
-          oValueRaw = [oValue];
 
-          valueToShow = oValue;
-        } else {
-          continue; // other string fields already put to orSearchContext
-        }
+      // Non string fields
+      oValue = d2[field];
+      oValueRaw = [oValue];
+
+      if (this.multiSelectionFields.includes(field)) {
+        oValue = { $in: d2[field] }; // use $in for or, and $all for and
+        oValueRaw = d2[field];
+
+        const t = this.formatArrayMultiSelectionField(
+          d2[field],
+          this.enums[field]
+        );
+        valueToShow = t.value;
+      } else if (this.arrayFields.some((x) => x[0] === field)) {
+        oValue = { $in: d2[field] }; // use $in for or, and $all for and
+        oValueRaw = d2[field];
+
+        valueToShow = d[field].value;
+      } else if (this.dateFields.includes(field)) {
+        const t = this.formatDateField(d2[field]);
+        valueToShow = t.value;
+      } else if (this.referenceFields.includes(field)) {
+        valueToShow = valueToShow = d[field].value;
       } else {
-        // Non string fields
-        oValue = d2[field];
-        oValueRaw = [oValue];
-
-        if (this.multiSelectionFields.includes(field)) {
-          oValue = { $in: d2[field] }; // use $in for or, and $all for and
-          oValueRaw = d2[field];
-
-          const t = this.formatArrayMultiSelectionField(
-            d2[field],
-            this.enums[field]
-          );
-          valueToShow = t.value;
-        } else if (this.arrayFields.some((x) => x[0] === field)) {
-          oValue = { $in: d2[field] }; // use $in for or, and $all for and
-          oValueRaw = d2[field];
-
-          valueToShow = d[field].value;
-        } else if (this.dateFields.includes(field)) {
-          const t = this.formatDateField(d2[field]);
-          valueToShow = t.value;
-        } else if (this.referenceFields.includes(field)) {
-          valueToShow = valueToShow = d[field].value;
-        } else {
-          valueToShow = d[field]; // take directly from what we get
-        }
+        valueToShow = d[field]; // take directly from what we get
       }
-      if (!listCategoryFields.includes(field)) {
+
+      if (this.ownSearchFields.includes(field)) {
         // don't show category field
         this.searchMoreDetail.push([this.fieldDisplayNames[field] || field, valueToShow, field]);
       }
@@ -2269,6 +2335,8 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
         this.detail[field] = this.clearFieldDate(this.detail[field]);
       } else if (this.referenceFields.includes(field)) {
         this.detail[field] = this.clearFieldReference(this.detail[field]);
+      } else if (this.httpurlFields.includes(field)) {
+        this.detail[field] = this.clearHttpurlField(this.detail[field]);
       }
       // check if any info needs to change after clear certain values;
       this.extraInfoPopulate();
@@ -2297,6 +2365,18 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     if (this.detail[field].selection) {
       this.detail[field].selection[key] = undefined;
       // check if any info needs to change after clear certain values;
+      this.extraInfoPopulate();
+    }
+  }
+  public clearValueFromUrlLink(field: string) {
+    if (this.detail[field].url) {
+      this.detail[field].url = '';
+      this.extraInfoPopulate();
+    }
+  }
+  public clearValueFromUrlDisplay(field: string) {
+    if (this.detail[field].display) {
+      this.detail[field].display = '';
       this.extraInfoPopulate();
     }
   }
@@ -2342,21 +2422,36 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
 
   public onAddArrayItem(fieldName: string) {
-    if (this.arrayFields.some((x) => x[0] === fieldName)) {
+    this.detail[fieldName].adding = false;
+
+    let arrayField = this.arrayFields.find(x => x[0] === fieldName);
+    if (arrayField) {
+      let elementType = arrayField[1];
+      let elementObj = arrayField[2] || {};
       if (this.detail[fieldName].new) {
         // where new added item is stored
         const item = this.detail[fieldName].new;
-        this.detail[fieldName].new = undefined; // clear it
+        let value = item;
 
-        if (!this.detail[fieldName].selection.includes(item)) {
-          this.detail[fieldName].selection.push(item);
+        let r = this.formatArrayField([undefined], elementType, elementObj);
+        this.detail[fieldName].new = r.selection[0]; // initialize the new obj
 
-          this.detail[fieldName].value = this.detail[fieldName].selection.join(' | ');
-          // see if related info needs to change after the change of this value
-          this.extraInfoPopulate();
+        if (
+          elementType === 'SchemaString'
+          && elementObj.mraType === 'httpurl'
+          ) {
+          if (!item.url) return; // no url entered.
+          value = item.display || item.url;
         }
+
+        this.detail[fieldName].selection.push(item);
+
+        let valueArr = this.detail[fieldName].value.split(' | ');
+        valueArr.push(value);
+        this.detail[fieldName].value = valueArr.join(' | ');
+        // see if related info needs to change after the change of this value
+        this.extraInfoPopulate();
       }
-      this.detail[fieldName].adding = false;
     }
   }
 
@@ -2366,8 +2461,12 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
   }
 
   public onAddArrayItemClicked(fieldName: string) {
-    if (this.arrayFields.some((x) => x[0] === fieldName)) {
+    let arrayField = this.arrayFields.find(x => x[0] === fieldName);
+
+    if (arrayField) {
       this.detail[fieldName].adding = true;
+      let r = this.formatArrayField([undefined], arrayField[1], arrayField[2]);
+      this.detail[fieldName].new = r.selection[0]; // initialize the new obj
     }
   }
   public onAddArrayItemCancelled(fieldName: string) {
@@ -2441,7 +2540,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
               // outputData.detail is an array
               if (this.arrayFields.some((x) => x[0] === fieldName)) {
                 let arr = this.detail[fieldName].selection.concat(outputData.detail);
-                this.detail[fieldName] = this.formatArrayField(arr, 'ObjectId');
+                this.detail[fieldName] = this.formatArrayField(arr, 'ObjectId', undefined);
               } else if (this.referenceFields.includes(fieldName)) {
                 this.detail[fieldName] = this.formatReferenceField(outputData.detail[0], '');
               }
@@ -2497,7 +2596,7 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
             // outputData.detail is an array
             if (this.arrayFields.some((x) => x[0] === fieldName)) {
               let arr = this.detail[fieldName].selection.concat(outputData.detail);
-              this.detail[fieldName] = this.formatArrayField(arr, 'ObjectId');
+              this.detail[fieldName] = this.formatArrayField(arr, 'ObjectId', undefined);
             } else if (this.referenceFields.includes(fieldName)) {
               this.detail[fieldName] = this.formatReferenceField(outputData.detail[0], '');
             }

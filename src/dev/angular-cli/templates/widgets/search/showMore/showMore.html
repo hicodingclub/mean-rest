@@ -3,7 +3,7 @@
 	              <input type="search" class="form-control border border-secondary" id="<%-schemaName%>TextSearch" 
 						#<%-schemaName%>TextSearch [(ngModel)]="searchText"
 						(search)="$event.target.blur();searchList();"
-						placeholder="Search for <%for (let [idx,nm] of sbo.stringBoxFields.entries()){%><%if (idx!=0) {%>, <%}%><%-nm%><%}%>">
+						placeholder="Search for <%for (let [idx,fld] of sbo.stringBoxFields.entries()){%><%if (idx!=0) {%>, <%}%><%-fld.displayName%><%}%>">
 				  <div *ngIf="searchText" class="input-group-append icon-search-clear">
 						<span >
 							<i class="fas fa-times-circle" (click)="onSearchTextClear()" title="Clear"></i>

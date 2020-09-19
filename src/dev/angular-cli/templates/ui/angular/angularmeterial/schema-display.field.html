@@ -62,7 +62,7 @@
                         } else if (field.elementType === 'ObjectId') {%>
                     <div *ngIf="detail['<%-fn%>'] && detail['<%-fn%>']['selection']">
                         <ng-template ngFor let-element [ngForOf]="detail['<%-fn%>']['selection']" let-idx="index">
-                            <div class="badge-click badge badge-pill badge-secondary" 
+                            <div class="badge-click badge badge-primary" 
                                 (click)="onDisplayRefClicked('<%-fn%>', detail['<%-fn%>']['selection'][idx], $event)">
                                 {{element.valueMedium}}
                             </div>
@@ -99,7 +99,7 @@
                         } else if (field.meta.innerHtml) {%>
                     <div [innerHTML]="<%-fieldValue%>"></div><%
                         } else if (field.mraType === 'httpurl') {%>
-                    <a href="{{detail['<%-fn%>']}}">{{detail['<%-fn%>']}}</a><%
+                    <a href="{{detail['<%-fn%>']['url']}}">{{detail['<%-fn%>']['display'] || detail['<%-fn%>']['url']}}</a><%
                         } else {%>
                     {{<%-fieldValue%>}}<%_
                         }%><%

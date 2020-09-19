@@ -1,6 +1,7 @@
 
-        this.briefFieldsInfo = [];
-        <%for (let f of briefView) {%>this.briefFieldsInfo.push(['<%-f.fieldName%>', '<%-f.displayName%>']);<%}%>
+        this.briefFieldsInfo = [<%for (let f of briefView) {%>
+            ['<%-f.fieldName%>', '<%-f.displayName%>'],<%}%>
+        ];
 
 <%_ let refObjects = []; let requiredFields = []; let emailFields = [];
   for (let field of compositeEditBriefView) { 

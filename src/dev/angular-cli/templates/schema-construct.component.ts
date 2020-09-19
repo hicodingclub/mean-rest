@@ -71,7 +71,8 @@ let multiSelectionFields = [];
 let arrayFields = []; let arrayRefFields = [];
     for (let field of theView) {
         if (field.type === "SchemaArray" && !field.elementMultiSelect) {
-          arrayFields.push([field.fieldName, field.elementType]);
+          let elementObj = {mraType: field.mraType, urlDisplay: field.urlDisplay};
+          arrayFields.push([field.fieldName, field.elementType, JSON.stringify(elementObj)]);
           if (field.elementType == 'ObjectId') {
             arrayRefFields.push([field.fieldName, field.ref]);
           }
@@ -79,7 +80,7 @@ let arrayFields = []; let arrayRefFields = [];
     }
     if (arrayFields.length > 0) {%>
           this.arrayFields = [<%for (let f of arrayFields) {%>
-            ['<%-f[0]%>', '<%-f[1]%>'],<%}%>
+            ['<%-f[0]%>', '<%-f[1]%>', <%-f[2]%>,],<%}%>
           ];<%}
     if (arrayRefFields.length > 0) { 
         for (let itm of arrayRefFields) {%>
@@ -110,8 +111,14 @@ let hintFields = [];
     if (hintFields.length > 0) {%>
           this.editHintFields = {<%for (let itm of hintFields) {%>
             '<%-itm%>': [],<%}%>
-          };<%}%><%_ 
-if (ownSearchStringFields.length > 0) {%>
-          this.ownSearchStringFields = [<%for (let itm of ownSearchStringFields) {%>
-            '<%-itm%>',<%}%>
+          };<%}%><%
+let httpurlFields = [];
+    for (let field of theView) {
+      if (field.type === "SchemaString" && field.mraType === 'httpurl') {
+        httpurlFields.push([field.fieldName, field.urlDisplay]);
+      }
+    }
+    if (httpurlFields.length > 0) {%>
+          this.httpurlFields = [<%for (let itm of httpurlFields) {%>
+            ['<%-itm[0]%>','<%-itm[1]%>'],<%}%>
           ];<%}%>
