@@ -65,6 +65,7 @@ export class MpicturegroupListComponent extends MpicturegroupListCustComponent i
       'name': 'Name',
     };
     this.stringFields = ['name', ];
+    this.stringBoxFields = ['name', ];
     const listCategories = [];
     this.listCategory1 = listCategories[0] || {};
     this.listCategory2 = listCategories[1] || {};

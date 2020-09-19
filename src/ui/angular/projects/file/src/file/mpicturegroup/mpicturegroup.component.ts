@@ -100,8 +100,9 @@ export class MpicturegroupComponent extends MddsBaseComponent implements OnInit 
   constructor(public mpicturegroupService: MpicturegroupService, public injector: Injector, public router: Router, public route: ActivatedRoute, public location: Location) {
     super(mpicturegroupService, injector, router, route, location);
     this.setItemNames(itemCamelName);
-    this.briefFieldsInfo = [];
-    this.briefFieldsInfo.push(['name', 'Name']);
+    this.briefFieldsInfo = [
+      ['name', 'Name'],
+    ];
     this.requiredFields = ['name', ];
     this.schemaName = 'mpicturegroup';
     this.modulePath = 'file';

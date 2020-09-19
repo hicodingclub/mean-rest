@@ -173,10 +173,16 @@ fieldset>.form-control,
 }
 
 .new-card {
-  width: 400px;
+  width: 500px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+@media screen and (max-width: 576px) {
+  .new-card {
+    width: 90%;
+  }
 }
 
 .badge-group {

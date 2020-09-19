@@ -226,8 +226,9 @@ tr:hover td i.fa-trash-alt:hover,
 }
 
 div.badge-click:hover {
-  background-color: #495057 !important;
-  text-decoration: underline;
+  color: #fff;
+  text-decoration: none;
+  background-color: #0062cc;
 }
 
 /* Grid/List view filter

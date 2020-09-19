@@ -14,7 +14,7 @@
             <div class="row" *ngIf="!options['disableListSearch']">
               <div class="col">
                 <div class="input-group">
-                  <input type="search" class="form-control border border-secondary" id="mpicturegroupTextSearch" #mpicturegroupTextSearch [(ngModel)]="searchText" (search)="$event.target.blur();searchList();" placeholder="Search for name">
+                  <input type="search" class="form-control border border-secondary" id="mpicturegroupTextSearch" #mpicturegroupTextSearch [(ngModel)]="searchText" (search)="$event.target.blur();searchList();" placeholder="Search for Name">
                   <div *ngIf="searchText" class="input-group-append icon-search-clear">
                     <span>
                       <i class="fas fa-times-circle" (click)="onSearchTextClear()" title="Clear"></i>

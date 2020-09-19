@@ -109,12 +109,13 @@ export class MpictureComponent extends MddsBaseComponent implements OnInit {
   constructor(public mpictureService: MpictureService, public injector: Injector, public router: Router, public route: ActivatedRoute, public location: Location) {
     super(mpictureService, injector, router, route, location);
     this.setItemNames(itemCamelName);
-    this.briefFieldsInfo = [];
-    this.briefFieldsInfo.push(['link', 'Link']);
-    this.briefFieldsInfo.push(['name', 'Name']);
-    this.briefFieldsInfo.push(['createdAt', 'Upload time']);
-    this.briefFieldsInfo.push(['size', 'Size']);
-    this.briefFieldsInfo.push(['group', 'Group']);
+    this.briefFieldsInfo = [
+      ['link', 'Link'],
+      ['name', 'Name'],
+      ['createdAt', 'Upload time'],
+      ['size', 'Size'],
+      ['group', 'Group'],
+    ];
     this.referenceFieldsMap = {
       'group': 'mpicturegroup',
     };
