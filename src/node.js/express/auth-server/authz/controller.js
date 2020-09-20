@@ -3,14 +3,25 @@ const meanRestExpress = require('@hicoder/express-core')
 const AuthzController = function() {
 }
 
-function getUserRole(restController, userId) {
+function getUserRoles(restController, userId) {
   const muserrole = restController.getModelNameByTag('auth-user-role');
   
   // a promise
   return restController.ModelExecute(
     muserrole,
-    'findOne',
+    'findOne', // fine one user
     {account: userId} //search criteria
+  );
+}
+
+function getLoginUserRole(restController) {
+  const mrole = restController.getModelNameByTag('auth-role');
+
+  // a promise
+  return restController.ModelExecute(
+    mrole,
+    'findOne', // fine one user
+    {role: 'LoginUser'} //search criteria
   );
 }
 
@@ -27,6 +38,26 @@ function getRolePermissions(restController, roles) {
   );
 }
 
+function mergePermissions(permResults, permissions) {
+  for (let p of permResults) {
+    let m = p.module.module; // module name
+    let mp = p.modulePermission || '';
+    let mr = p.resourcePermission || {};
+
+    // merge m with existing m permissions from other roles
+    permissions[m] = permissions[m] || { mp: '', mr: {}};
+    permissions[m].mp += mp;
+    for (let [key, value] of mr) {
+      if (permissions[m].mr[key]) {
+        permissions[m].mr[key] += value;
+      } else {
+        permissions[m].mr[key] = value;
+      }
+    }
+  }
+  return permissions;
+}
+
 AuthzController.getAccountRoles = function(restController) {
   function func(req, res, next) {
     if (!req.muser) {
@@ -35,30 +66,29 @@ AuthzController.getAccountRoles = function(restController) {
     }
     let userId = req.muser['_id'];
     if (!userId) return next(); //without setting roles. User becomes normal login user.
-    getUserRole(restController, userId).then(result => {
+    getUserRoles(restController, userId).then(async (result) => {
       let role = [];
       if (result) {
         role = result.role;
       }
       let permissions = {};
-      getRolePermissions(restController, role).then(results => {
-        for (let p of results) {
-          let m = p.module.module; // module name
-          let mp = p.modulePermission || '';
-          let mr = p.resourcePermission || {};
-          permissions[m] = {
-            mp,
-            mr,
-          };
-        }
+      try {
+        let results = await getRolePermissions(restController, role);
+        permissions = mergePermissions(results, permissions);
+
+        // Also get the login user role permissions
+        let loginUserRole = await getLoginUserRole(restController);
+        let loginUserRolePerm = await getRolePermissions(restController, [loginUserRole._id]);
+        permissions = mergePermissions(loginUserRolePerm, permissions);
+
         req.muser.role = role;
         req.muser.rolep = permissions;
         return next();
-      }).catch(err => {
+      } catch(err) {
         req.muser.role = role;
         req.muser.rolep = permissions;
         return next();
-      });
+      }
     }).catch(err => {
       return next(err);
     });
