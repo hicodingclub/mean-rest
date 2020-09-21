@@ -47,26 +47,12 @@ export class MddsUiRoleCheckDirective implements OnChanges {
       expectedPermission = this.rolePermission.toUpperCase();
     }
 
-    const rolep = this.authService.getRolePermissions();
     if (!Array.isArray(this.libMddsUiRoleCheck)) {
       //this.elementRef.nativeElement.style.display = UNSET_DISPLAY;
       UNSETFUNCTION(this.elementRef.nativeElement);
       return;
     }
-    const module = (this.libMddsUiRoleCheck[0] || '').toLowerCase();
-    const resource = (this.libMddsUiRoleCheck[1] || '').toLowerCase();
-
-    if (!module || !rolep[module]) {
-      UNSETFUNCTION(this.elementRef.nativeElement);
-      return;
-    }
-    let resourcepermission = '';
-    if (rolep[module].mr && resource && rolep[module].mr[resource]) {
-      resourcepermission = rolep[module].mr[resource];
-    }
-    const givenPermission = resourcepermission || rolep[module].mp || '';
-    if (givenPermission.toUpperCase().includes(expectedPermission)) {
-      // this.elementRef.nativeElement.style.display = SET_DISPLAY;
+    if (this.authService.uiRolePermission(this.libMddsUiRoleCheck, expectedPermission)) {
       SETFUNCTION(this.elementRef.nativeElement);
       return;
     }

@@ -41,7 +41,11 @@
 							let fn = field.fieldName; let ft = field.type;
 							let fieldObj = {field, fn, ft, ref_link: true,};
 							%>
-						<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%> class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (field.showDisplayName) {%>
+						<div <%_ if (ft !== 'AngularSelector') {%> *ngIf="fieldHasValue(detail['<%-fn%>'])"<%}%>
+							<% if (field.meta.directive) {
+								%><%- include(`/ui/${uiFramework}/schema-display.field.directive.html`, fieldObj); %><%
+							  }%>
+							class="mx-1 d-flex flex-wrap" [ngStyle]="style['<%-fn%>']"><%_ if (field.showDisplayName) {%>
 							<div class="field-label text-right w-50 mr-1" [ngStyle]="style['<%-fn%>-label']">
 								<%-field.displayName%>:
 							</div><%}%>

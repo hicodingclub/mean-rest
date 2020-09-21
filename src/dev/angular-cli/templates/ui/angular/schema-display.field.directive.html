@@ -1,0 +1,18 @@
+<%
+let directive = field.meta.directive;
+if (directive) {
+    let selector = selectors[directive].selector;
+    let str = '';
+    let inputs = selectors[directive].inputs || [];
+    let ignoreSelector = false;
+    for (let inputObj of inputs) {
+        if (inputObj.key === selector) {
+            ignoreSelector = true;
+        }
+        str += `[${inputObj.key}]="${inputObj.value}" `;
+    }
+    if (!ignoreSelector) {
+        str = `[${selector}] ` + str;
+    }
+    str = str.trim();
+%><%-str%><%}%>

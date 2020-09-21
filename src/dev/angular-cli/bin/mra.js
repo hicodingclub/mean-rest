@@ -814,16 +814,17 @@ const generateViewPicture = function (
     if (item !=='_id' && item in schema.paths) {
       if (usedMeta && fieldMeta && fieldMeta[usedMeta]) {
         meta = fieldMeta[usedMeta];
-        let sel = meta.pipe || meta.selector;
-        if (sel) {
-          if (selectors.hasSelector(sel)) {
-            selector = selectors.getSelector(sel);
-            selector.usedCandidate(API);
-          } else {
-            logger.warning(
-              `Selector ${sel} for Field ${item} is not defined. Skipped...`
-            );
-            continue;
+        for (let sel of [meta.pipe, meta.directive, meta.selector]) {
+          if (sel) {
+            if (selectors.hasSelector(sel)) {
+              selector = selectors.getSelector(sel);
+              selector.usedCandidate(API);
+            } else {
+              logger.warning(
+                `Selector ${sel} for Field ${item} is not defined. Skipped...`
+              );
+              continue;
+            }
           }
         }
       } else if (usedMeta) {

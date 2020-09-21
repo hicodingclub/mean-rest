@@ -319,4 +319,30 @@ export class AuthenticationService {
   allowTemporayToken() {
     this.temporayTokenAllowed = true;
   }
+
+  // modules: [module, resource]
+  uiRolePermission( modules: string[], rolePermission: string) {
+    let expectedPermission = 'R';
+    if (rolePermission) {
+      expectedPermission = rolePermission.toUpperCase();
+    }
+
+    const rolep = this.getRolePermissions();
+    const module = (modules[0] || '').toLowerCase();
+    const resource = (modules[1] || '').toLowerCase();
+
+    if (!module || !rolep[module]) {
+      return false;
+    }
+    let resourcepermission = '';
+    if (rolep[module].mr && resource && rolep[module].mr[resource]) {
+      resourcepermission = rolep[module].mr[resource];
+    }
+    const givenPermission = resourcepermission || rolep[module].mp || '';
+    if (givenPermission.toUpperCase().includes(expectedPermission)) {
+      // this.elementRef.nativeElement.style.display = SET_DISPLAY;
+      return true;
+    }
+    return false;
+  }
 }
