@@ -39,13 +39,10 @@ export class MddsRouteReuseStrategy implements RouteReuseStrategy {
     }
     /* End */
 
-    private isLogoutReload(): boolean {
-        if (this.isAuthorized()) {
-            return false;
-        }
-        const currentTs = Date.now();
-        const logoutTs = this.getLogoutTime();
-        if (currentTs - logoutTs < 1000) {
+    private isAuthReload(): boolean {
+        const auth = this.isAuth;
+        this.isAuth = this.isAuthorized();
+        if (this.isAuth !== auth) {
             return true;
         }
         return false;
@@ -56,9 +53,7 @@ export class MddsRouteReuseStrategy implements RouteReuseStrategy {
     }
 
     private checkAuthentication() {
-        const auth = this.isAuth;
-        this.isAuth = this.isAuthorized();
-        if (this.isAuth !== auth) {
+        if (this.isAuthReload) {
             // authentication status changed. Not attach;
             this.detachedRouteHandles = {}; // empty the map
         }
@@ -127,7 +122,7 @@ export class MddsRouteReuseStrategy implements RouteReuseStrategy {
         // return future.routeConfig == curr.routeConfig;
         // Now is the customization:
         if (future.routeConfig !== curr.routeConfig) {return false;}
-        if (this.isLogoutReload()) {
+        if (this.isAuthReload()) {
             return false; // authentication status changed. Don't reuse.
         }
         if (this.isMraRoutePath(future, 'detail/:id')
