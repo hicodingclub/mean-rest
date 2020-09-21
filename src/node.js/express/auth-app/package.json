@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/express-auth-app",
-  "version": "0.9.55",
+  "version": "0.9.58",
   "description": "Model Driver Development Stack - authentication and authorization client for express application. Works with MDDS auth server to provide user login verification and access permission check.",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,7 @@
   "peerDependencies": {
     "express": "^4.16.3",
     "http-errors": "~1.6.2",
-    "@hicoder/express-core": "0.9.55"
+    "@hicoder/express-core": "0.9.58"
   },
   "devDependencies": {}
 }

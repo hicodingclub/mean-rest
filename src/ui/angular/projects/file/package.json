@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/angular-file",
-  "version": "0.9.55",
+  "version": "0.9.58",
   "dependencies": {
     "cropperjs": "^1.5.7",
     "tslib": "^2.0.0"
@@ -10,7 +10,7 @@
     "@angular/core": "^10.0.2",
     "@angular/forms": "^10.0.2",
     "@angular/router": "^10.0.2",
-    "@hicoder/angular-core": "0.9.55",
+    "@hicoder/angular-core": "0.9.58",
     "@ng-bootstrap/ng-bootstrap": "^6.1.0"
   },
   "devDependencies": {
@@ -18,7 +18,7 @@
     "@angular/core": "^10.0.2",
     "@angular/forms": "^10.0.2",
     "@angular/router": "^10.0.2",
-    "@hicoder/angular-core": "0.9.55",
+    "@hicoder/angular-core": "0.9.58",
     "@ng-bootstrap/ng-bootstrap": "^6.1.0",
     "mongoose": "^5.9.21"
   }
