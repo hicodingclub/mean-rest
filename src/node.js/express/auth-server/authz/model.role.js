@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const roleSchema = new Schema({
   role: { type: String, required: true, index: { unique: true }, maxlength: 50 },
   description: { type: String, maxlength: 200}
-});
+}, {autoIndex: true});
 
 const roleBrief = "role description";
 const roleDetail = "role description";
@@ -19,7 +19,7 @@ const roleIndex = "role";
 const moduleSchema = new Schema({
   module: { type: String, required: true, index: { unique: true }},
   resources: {type: [String]},
-});
+}, {autoIndex: true});
 
 const moduleBrief = "module resources";
 const moduleDetail = "module resources";
@@ -34,7 +34,7 @@ const permissionSchema = new Schema({
   module: { type: Schema.Types.ObjectId, ref: 'mmodule', required: true }, 
   modulePermission: { type: String }, //"CRUD" 
   resourcePermission: {type: Map, of: String},  //{resource: "CRUD"}
-});
+}, {autoIndex: true});
 //to make the association unique
 permissionSchema.index({ role: 1, module: 1}, {unique: true}); // schema level
 
