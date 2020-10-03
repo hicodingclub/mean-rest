@@ -195,8 +195,8 @@
           </div><%}%><%_
 
           if (!field.enumValues && field.hint) {%>
-          <div class="new-area">
-              <div *ngIf="editHintFields['<%-fn%>'].length > 0" style="font-size: 0.9rem;">Type in new value or select from available ones: </div>
+          <div *ngIf="editHintFields['<%-fn%>'].length > 0" class="new-area">
+              <div style="font-size: 0.9rem;">Type in new value or select from available ones: </div>
               <ng-template ngFor let-hintEle [ngForOf]="editHintFields['<%-fn%>']" let-i="index">
                 <div class="badge badge-pill badge-primary pointer"
                   *ngIf="detail['<%-fn%>'] !== hintEle['_id']" 

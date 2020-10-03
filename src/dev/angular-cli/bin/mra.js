@@ -814,6 +814,9 @@ const generateViewPicture = function (
     if (item !=='_id' && item in schema.paths) {
       if (usedMeta && fieldMeta && fieldMeta[usedMeta]) {
         meta = fieldMeta[usedMeta];
+        if (typeof meta['showDisplayName'] === 'boolean') {
+          showDisplayName = meta.showDisplayName;
+        }
         for (let sel of [meta.pipe, meta.directive, meta.selector]) {
           if (sel) {
             if (selectors.hasSelector(sel)) {

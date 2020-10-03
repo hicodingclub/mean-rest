@@ -5,11 +5,12 @@
 
 <%_ let refObjects = []; let requiredFields = []; let emailFields = [];
   for (let field of compositeEditBriefView) { 
-      if (field.type === "ObjectId") { refObjects.push([field.fieldName, field.ref]);}
-      if (field.required) { requiredFields.push(field.fieldName); }
-      if (field.mraEmailRecipient) {
-          emailFields.push([field.displayName, field.fieldName]);
-      }
+    if (field.type === "ObjectId") { refObjects.push([field.fieldName, field.ref]);}
+    if (field.type === "SchemaArray" && field.elementType === "ObjectId") { refObjects.push([field.fieldName, field.ref]);}
+    if (field.required) { requiredFields.push(field.fieldName); }
+    if (field.mraEmailRecipient) {
+        emailFields.push([field.displayName, field.fieldName]);
+    }
   }
   if (refObjects.length > 0) {%>
         this.referenceFieldsMap = {<%for (let itm of refObjects) {%>'<%-itm[0]%>': '<%-itm[1]%>',<%}%>};
