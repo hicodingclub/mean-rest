@@ -730,7 +730,7 @@ class RestController {
           let catQuery = {};
           catQuery = ownerPatch(catQuery, owner, req);
           catQuery = searchObjPatch(catQuery, mraBE);
-          if (!searchAllowed(query, mraBE)) {
+          if (!searchAllowed(catQuery, mraBE)) {
             throw new Error('Search not allowed.');
           }
 

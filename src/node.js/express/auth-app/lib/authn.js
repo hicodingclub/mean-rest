@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken');
+const createError = require('http-errors');
+
 const ACCESS_SECRETE = 'server secret random';
 
 const verifyToken = function(req, res, next) {
@@ -22,8 +24,8 @@ const verifyToken = function(req, res, next) {
 
   jwt.verify(token, ACCESS_SECRETE, function(err, decoded) {
     if (err || !decoded) {
-      req.muser = undefined;
-      return next();
+      // A bad token. Reject the request.
+      return next(createError(401, "Not Authorized.")); // so user can login to get it
     }
     req.muser = decoded;
     return next();
