@@ -336,6 +336,7 @@ const templates = {
 const PredefinedPatchFields = {
   muser_id: { type: String, index: true },
   mmodule_name: { type: String, index: true },
+  permissionTags: { type: [{ type: String }], required: false, },
 };
 
 const stripDisplayNames = function (viewStr) {
@@ -1672,6 +1673,7 @@ function main() {
       continue;
     }
 
+    let hasItemPermissionTags = false;
     if (mongooseSchema) {
       //patch fields
       const patchFields = schemaDef.patch || patch;
@@ -1680,6 +1682,10 @@ function main() {
           const f = {};
           f[p] = PredefinedPatchFields[p];
           mongooseSchema.add(f);
+
+          if ( p === 'permissionTags') {
+            hasItemPermissionTags = true;
+          }
         } else {
           logger.warning(
             `ignore patching. Field is not a predefined patch fields: ${p}`
@@ -1841,6 +1847,9 @@ function main() {
     let editHintFields = [];
     if (schemaDef.mraBE) {
       editHintFields = schemaDef.mraBE.valueSearchFields || editHintFields;
+    }
+    if (hasItemPermissionTags && !editHintFields.includes('permissionTags')) {
+      editHintFields.push('permissionTags');
     }
 
     let selectors = new Selectors();

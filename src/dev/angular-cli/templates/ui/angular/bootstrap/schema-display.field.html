@@ -107,7 +107,7 @@
                         } else if (field.meta.innerHtml) {%>
                     <div [innerHTML]="<%-fieldValue%>"></div><%
                         } else if (field.mraType === 'httpurl') {%>
-                    <a href="{{detail['<%-fn%>']['url']}}">{{detail['<%-fn%>']['display'] || detail['<%-fn%>']['url']}}</a><%
+                    <a href="{{detail['<%-fn%>']['url']}}" target="_blank">{{detail['<%-fn%>']['display'] || detail['<%-fn%>']['url']}}</a><%
                         } else {%>
                     {{<%-fieldValue%>}}<%_
                         }%><%
