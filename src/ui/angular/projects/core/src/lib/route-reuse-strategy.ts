@@ -53,7 +53,7 @@ export class MddsRouteReuseStrategy implements RouteReuseStrategy {
     }
 
     private checkAuthentication() {
-        if (this.isAuthReload) {
+        if (this.isAuthReload()) {
             // authentication status changed. Not attach;
             this.detachedRouteHandles = {}; // empty the map
         }
