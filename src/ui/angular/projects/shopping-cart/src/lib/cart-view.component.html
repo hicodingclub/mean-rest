@@ -73,7 +73,7 @@
 </div>
 
 <div *ngIf="quantityPop" class="new-modal">
-    <div class="card text-center new-card">
+    <div class="card new-card">
         <div class="card-body">
             <form #editForm="ngForm">
                 <input type="number" class="form-control border" min="0" [max]="maxQuantity" id="EditQuantityNew"
@@ -91,6 +91,10 @@
                     <div *ngIf="EditQuantityNew.errors && EditQuantityNew.errors.required">
                         Please enter the quantity number.
                     </div>
+                </div>
+                <div [hidden]="maxQuantity - 5 > newQuantity"
+                    class="small p-1">
+                    {{maxQuantity}} in stock
                 </div>
                 <div class="d-flex my-3 justify-content-center">
                     <button type="button" class="btn btn-outline-primary mx-1" [disabled]="!EditQuantityNew.valid" (click)="quantityChanged()">Confirm</button>

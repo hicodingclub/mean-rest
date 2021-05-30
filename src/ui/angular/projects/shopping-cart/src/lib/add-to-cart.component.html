@@ -1,3 +1,10 @@
-<button class="cart-button" [ngStyle]="style.button" (click)="addToCart()">
-    Add to Cart
-</button>
+<div>
+    <button *ngIf="stockNumber > inCartQuantity " class="cart-button" [ngStyle]="style.button" (click)="addToCart()">
+        Add to Cart
+    </button>
+    <div *ngIf="stockNumber > inCartQuantity" style="color: green;">{{stockNumber - inCartQuantity}} in stock</div>
+
+    <button *ngIf="stockNumber <= inCartQuantity " class="out-of-stock-button" [ngStyle]="style.button" >
+        Out of stock
+    </button>
+</div>

@@ -34,8 +34,8 @@ export interface ShowCart {
   errorItems: ShoppingItem[];
 }
 
+export const DEFAULTSTOCKNUMBER = 10000;
 const SHOPPINGCARTKEY = "mdds-shopping-cart";
-const DEFAULTSTOCKNUMBER = 10000;
 
 @Injectable({
   providedIn: "root",
@@ -53,11 +53,11 @@ export class ShoppingCartService {
 
   private store() {
     localStorage.setItem(SHOPPINGCARTKEY, JSON.stringify(this.items));
-    this.itemNumberPublisher.next(this.getItemNumber());
+    this.itemNumberPublisher.next(this.getTotalItemNumber());
   }
   private clear() {
     localStorage.removeItem(SHOPPINGCARTKEY);
-    this.itemNumberPublisher.next(this.getItemNumber());
+    this.itemNumberPublisher.next(this.getTotalItemNumber());
   }
 
   private findItem(itemUrl: string): number {
@@ -68,7 +68,15 @@ export class ShoppingCartService {
     }
     return -1;
   }
-  public getItemNumber(): number {
+  public getItemQuantity(itemUrl: string): number {
+    for (let i = 0; i < this.items.length; i += 1) {
+      if (this.items[i].url === itemUrl) {
+        return this.items[i].quantity;
+      }
+    }
+    return 0;
+  }
+  public getTotalItemNumber(): number {
     let cnt = 0;
     for (let i = 0; i < this.items.length; i += 1) {
       cnt += this.items[i].quantity;
@@ -117,6 +125,7 @@ export class ShoppingCartService {
       this.showItems = [];
       this.totalPrice = 0;
       this.totalQuantity = 0;
+      const items: Item[] = [];
     
       const promises: Promise<any>[] = [];
       for (const item of this.items) {
@@ -131,6 +140,7 @@ export class ShoppingCartService {
           let totalPrice = 0;
           let totalQuantity = 0;
           let showItem: ShoppingItem;
+          let item: Item;
           for (let i = 0; i < this.items.length; i += 1) {
             const result: any = results[i];
             let subPrice = 0;
@@ -150,17 +160,22 @@ export class ShoppingCartService {
               errorItems.push(showItem);
             } else {
               const meta: ItemMeta = this.items[i].meta;
+              const stockNumber: number = meta.stockNumber? result[meta.stockNumber] : DEFAULTSTOCKNUMBER, // stock number not given. Use a very large number
               showItem = {
                 picture: meta.picture ? result[meta.picture] : '',
                 name: result[meta.name],
                 description: meta.description? result[meta.description] : '',
-                quantity: this.items[i].quantity,
+                quantity: this.items[i].quantity < stockNumber? this.items[i].quantity : stockNumber,
                 price: result[meta.price],
-                stockNumber: meta.stockNumber? result[meta.stockNumber] : DEFAULTSTOCKNUMBER, // stock number not given. Use a very large number
+                stockNumber: stockNumber,
                 url: this.items[i].url,
                 pageUrl: this.items[i].pageUrl,
                 skuID: meta.skuID? result[meta.skuID] : this.items[i].pageUrl.split('/').slice(-1)[0],
               };
+              item = this.items[i];
+              item.quantity = showItem.quantity
+              items.push(item);
+
               showItems.push(showItem);
               subPrice = showItem.price * showItem.quantity;
               subQuantity = showItem.quantity;
@@ -170,6 +185,9 @@ export class ShoppingCartService {
             }
             totalQuantity += subQuantity;
           }
+          this.items = items; // Update items with information from server. Error items is removed.
+          this.store();
+
           this.showItems = showItems;
           this.totalPrice = totalPrice;
           this.totalQuantity = totalQuantity;

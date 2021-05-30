@@ -22,7 +22,7 @@ export class CartIconComponent implements OnInit {
     private router: Router,
     private scService: ShoppingCartService,
     @Inject(SHOPPING_CART_CHECKOUT_PATH) private checkoutPath: string) {
-    this.itemNumber = this.scService.getItemNumber();
+    this.itemNumber = this.scService.getTotalItemNumber();
     this.scService.getItemNumberPublisher().subscribe((n: number) => {
       this.itemNumber = n;
     });
