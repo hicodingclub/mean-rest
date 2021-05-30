@@ -47,7 +47,6 @@
                         <div *ngIf="f.subject.errors.required">Please enter the email subject</div>
                     </div>
                 </div>
-
                 <div class="form-group input-group">
                     <label for="content">Email Content</label>
                     <!--
@@ -60,11 +59,11 @@
                     </div>
 
                 </div>
-            </div>
-            <div *ngIf="stringFields.length > 0">
-                You can use the following tokens in the composed email content to substitute the actual field value:
-                <div>
-                    <span *ngFor="let f of stringFields; let i = index;">{{'{'+'{'+f+'}'+'}'}}&nbsp;</span>
+                <div *ngIf="stringFields.length > 0">
+                    Tips: You can use the following tokens in the composed email content to substitute the actual field value:
+                    <div>
+                        <span *ngFor="let f of stringFields; let i = index;">{{'{'+'{'+f+'}'+'}'}}&nbsp;</span>
+                    </div>
                 </div>
             </div>
             <div class="form-group action-buttons-center">
