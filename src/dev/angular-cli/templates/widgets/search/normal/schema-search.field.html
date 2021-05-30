@@ -23,7 +23,14 @@
 							}
 							
 						%>
-						<div class="container <%-lineClass%> <%-lineSize%>">
+						<div class="container <%-lineClass%> <%-lineSize%>"
+							<%
+							let fn = field.fieldName; let ft = field.type;
+							let fieldObj = {field, fn, ft,};
+							if (field.meta.directive) {
+								%><%- include(`/ui/${uiFramework}/schema-display.field.directive.html`, fieldObj); %><%
+							  }%>
+							>
 							<div class="row col-gutter align-items-center">
 								<div class="<%-labelCol%>">
 									<label for="<%-sn%>Edit<%-Fn%>">
