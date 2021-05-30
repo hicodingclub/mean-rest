@@ -15,6 +15,7 @@ const RestRouter = require('./rest_sub_router');
 const PredefinedPatchFields = {
   muser_id: { type: String, index: true },
   mmodule_name: { type: String, index: true },
+  permissionTags: { type: [{ type: String }], required: false, },
 };
 
 const _setModuleName = function (name) {

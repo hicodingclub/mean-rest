@@ -6,6 +6,7 @@ import { Router, NavigationEnd  } from '@angular/router';
 
 import { AUTHENTICATION_SERVER_ROOT_URI } from './tokens';
 
+const ALL_MODULES = 'all modules';
 export interface temporayTokenIntf {
   expiresIn: number;
   token: string;
@@ -328,6 +329,15 @@ export class AuthenticationService {
     }
 
     const rolep = this.getRolePermissions();
+
+    if (rolep[ALL_MODULES] && rolep[ALL_MODULES].mp) {
+      // check "all modules" permissions;
+      let givenPermission = rolep[ALL_MODULES].mp;
+      if (givenPermission.toUpperCase().includes(expectedPermission)) {
+        return true;
+      }
+    }
+
     const module = (modules[0] || '').toLowerCase();
     const resource = (modules[1] || '').toLowerCase();
 
