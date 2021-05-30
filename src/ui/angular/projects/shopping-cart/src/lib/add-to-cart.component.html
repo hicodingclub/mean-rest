@@ -2,7 +2,9 @@
     <button *ngIf="stockNumber > inCartQuantity " class="cart-button" [ngStyle]="style.button" (click)="addToCart()">
         Add to Cart
     </button>
-    <div *ngIf="stockNumber > inCartQuantity" style="color: green;">{{stockNumber - inCartQuantity}} in stock</div>
+    <div>
+        <span *ngIf="(stockNumber > inCartQuantity) && (stockNumber - inCartQuantity < 10)" style="color: green;">{{stockNumber - inCartQuantity}} in stock</span>
+    </div>
 
     <button *ngIf="stockNumber <= inCartQuantity " class="out-of-stock-button" [ngStyle]="style.button" >
         Out of stock

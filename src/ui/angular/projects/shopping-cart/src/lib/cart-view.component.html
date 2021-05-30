@@ -92,8 +92,8 @@
                         Please enter the quantity number.
                     </div>
                 </div>
-                <div [hidden]="maxQuantity - 5 > newQuantity"
-                    class="small p-1">
+                <div [hidden]="maxQuantity - 10 > newQuantity"
+                    class="small p-1" style="color: green;">
                     {{maxQuantity}} in stock
                 </div>
                 <div class="d-flex my-3 justify-content-center">
