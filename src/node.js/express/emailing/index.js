@@ -106,7 +106,7 @@ class MddsEmailer {
   async sendEmailTemplate(to, templateTag, substitution, substitutions) {
     let template;
 
-    let success = 0, fail = 0, errors = [];
+    let success = 0, fail = 0, queuing = 0, errors = [];
     try {
       template = await this.restController.ModelExecute(
         "emailTemplate",
@@ -123,7 +123,14 @@ class MddsEmailer {
     }
 
     let content = template.content;
-
+    if (!to || (Array.isArray(to) && to.length === 0)) {
+      if (template.toEmails && template.toEmails.length > 0) {
+        to = template.toEmails;
+      } else {
+        errors.push(new Error('No recipients are specified'))
+        return {success, fail, queuing, errors};
+      }
+    }
     return await this.sendEmail(template.fromEmail, to, template.subject, content, substitution, substitutions);
   }
 

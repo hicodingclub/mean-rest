@@ -1528,13 +1528,20 @@ class RestController {
       const replacement = emailerConf.replacement || {};
       const emailHooks = emailerConf.hooks || {};
       if (emailHooks[action]) {
-        emailHooks[action](
-          emailer,
-          data,
-          replacement,
-          emailerObj,
-          restController
-        );
+        let hooksArr = emailHooks[action];
+        if (!Array.isArray(hooksArr)) {
+          hooksArr = [emailHooks[action]];
+        }
+        for (let func of hooksArr) {
+          // TODO: add error handling.
+          func(
+            emailer,
+            data,
+            replacement,
+            emailerObj,
+            restController
+          );
+        }
       }
     }
 
@@ -1546,6 +1553,7 @@ class RestController {
         hooksArr = [hooks[action]];
       }
       for (let func of hooksArr) {
+        // TODO: add error handling.
         func(data, restController);
       }
     }

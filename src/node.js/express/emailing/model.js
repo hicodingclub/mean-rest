@@ -23,6 +23,19 @@ const emailTemplateSchema = new Schema(
       description:
         'Leave it blank if default sender email address in email settings is used',
     },
+    toEmails: {
+      type: [{
+        type: String,
+        trim: true,
+        lowercase: true,
+        validate: [validateEmail, 'Please fill a valid email address'],
+        match: [
+          /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+          'Please fill a valid email address',
+        ],
+      }],
+      description: 'Email will be sent to these recipients if not specified',
+    },
     subject: { type: String, required: true },
     content: { type: String, editor: true, required: true },
     tag: { type: String, required: true, unique: true },
@@ -32,10 +45,10 @@ const emailTemplateSchema = new Schema(
 emailTemplateSchema.index({ tag: 1 }, { unique: true }); // schema level
 
 const brief = 'templateName fromEmail subject tag';
-const detail = 'templateName fromEmail subject content tag';
-const create = 'templateName fromEmail subject content tag';
-const edit = 'templateName fromEmail subject content tag';
-const textSearch = 'templateName fromEmail subject content tag';
+const detail = 'templateName fromEmail toEmails subject content tag';
+const create = 'templateName fromEmail toEmails subject content tag';
+const edit = 'templateName fromEmail toEmails subject content tag';
+const textSearch = 'templateName fromEmail toEmails subject content tag';
 const index = 'templateName';
 
 const emailLogSchema = new Schema(
