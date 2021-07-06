@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef } from "@angular/core";
+import { Component, OnInit, ChangeDetectorRef, Input, ViewChild, ElementRef } from "@angular/core";
 import { Location } from "@angular/common";
 import { Router, ActivatedRoute } from "@angular/router";
 import { Injector } from "@angular/core";
@@ -55,6 +55,7 @@ export class MpictureListWidgetGalleryComponent extends MpictureListComponent
   cropper: Cropper;
 
   constructor(
+    private changeDetectorRef: ChangeDetectorRef,
     public mpictureService: MpictureService,
     public injector: Injector,
     public router: Router,
@@ -124,6 +125,7 @@ export class MpictureListWidgetGalleryComponent extends MpictureListComponent
         }
       }
       this.uploading = false;
+      this.changeDetectorRef.detectChanges(); // Force application change detection.
     });
   }
 
@@ -243,11 +245,13 @@ export class MpictureListWidgetGalleryComponent extends MpictureListComponent
             this.uploadingFiles.push(f.name);
           }
           this.uploading = false;
+          this.changeDetectorRef.detectChanges(); // Force application change detection.
         });
       },
       "image/jpeg",
       0.9
     );
+    this.changeDetectorRef.detectChanges(); // Force application change detection.
   }
 
   backSelect() {

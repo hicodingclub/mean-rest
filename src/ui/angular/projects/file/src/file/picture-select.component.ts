@@ -7,6 +7,7 @@
   ViewChild,
   OnChanges,
   SimpleChanges,
+  ChangeDetectorRef,
 } from "@angular/core";
 
 import { getDownloadUrl } from './download-url'
@@ -34,7 +35,9 @@ export class PictureSelectComponent
 
   public componentSubscription;
 
-  constructor(public mpictureService: MpictureService) {}
+  constructor(
+    private ChangeDetectorRef: ChangeDetectorRef,
+    public mpictureService: MpictureService) {}
 
   ngOnInit() {}
 
@@ -66,6 +69,7 @@ export class PictureSelectComponent
     }
     if (val) {
       this.showListWidget = false;
+      this.ChangeDetectorRef.detectChanges();
     }
   }
 }
