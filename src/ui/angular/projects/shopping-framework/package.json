@@ -1,6 +1,6 @@
 {
   "name": "@hicoder/angular-shopping-framework",
-  "version": "0.9.59",
+  "version": "0.9.60",
   "peerDependencies": {
     "@angular/common": "^10.0.2",
     "@angular/core": "^10.0.2"
