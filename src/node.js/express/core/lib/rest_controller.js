@@ -1494,7 +1494,7 @@ class RestController {
     let model = this.model_collection[modelname];
     if (!model) {
       let err = new Error(
-        `model ${modelname} or mode API ${apiName} doesn't exit`
+        `model ${modelname} doesn't exit`
       );
       return new Promise(function (resolve, reject) {
         reject(err);
