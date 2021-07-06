@@ -1698,6 +1698,7 @@ function main() {
 
     let detailType = 'normal';
     let detailTitle = '';
+    let detailNote = '';
 
     let listTitle = '';
     let listRouterLink = '../../list';
@@ -1717,7 +1718,7 @@ function main() {
     let listShowSubDetail = false;
 
     let detailActions = []; //extra buttons that trigger other pipelines
-    let detailActionButtons = ['Edit', 'New', 'Delete', 'Archive'];
+    let detailActionButtons = ['Edit', 'New', 'Delete', 'Archive', 'Print'];
     let listActionButtons = ['Create', 'Delete', 'Send Email', 'Archive'];
 
     let detailRefBlackList = undefined;
@@ -1772,6 +1773,7 @@ function main() {
       listTitle = mraUI.listTitle;
       listRouterLink = mraUI.listRouterLink || listRouterLink;
       detailTitle = mraUI.detailTitle;
+      detailNote = mraUI.detailNote;
       disableListSearch = !!mraUI.disableListSearch;
       detailActionButtons = mraUI.detailActionButtons || detailActionButtons;
       listActionButtons = mraUI.listActionButtons || listActionButtons;
@@ -1814,7 +1816,7 @@ function main() {
 
     let embeddedViewOnly = schemaDef.embeddedViewOnly ? true : false;
     let viewName = schemaDef.name; //Display name on UI
-    let api = schemaDef.api || 'LCRUDA'; //APIs exposed to front end ('LCRUDA')
+    let api = schemaDef.api || 'LCRUDAP'; //APIs exposed to front end ('LCRUDAP')
     if (schemaDef.mraUI && schemaDef.mraUI.api) {
       api = schemaDef.mraUI.api;
     }
@@ -2256,6 +2258,7 @@ function main() {
       detailActionButtons,
       detailRefName,
       detailTitle,
+      detailNote,
       detailActions,
       detailRefBlackList,
       detailWidgets,

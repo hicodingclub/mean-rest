@@ -4,6 +4,8 @@
 </div><%}%>
 <div class="detail" *ngIf="detail">
 	<div *ngIf="!options['disableActionButtons']"><%_ include schema-detail.d.actions.html %></div>
+	<% if (detailNote) {%>
+	<p *ngIf="!options['disableDetailNote']"><%-detailNote%></p><%}%>
 	<div class="card text-left transparent-border ">
 		<div class="grid-fields">
 	<%_ viewFields = detailView; let viewGrp = detailViewGrp; let view='detail'; let largePicture=false;%><%_ include schema-display.detail.html %>

@@ -6,10 +6,13 @@
     if (api.includes('C') && detailActionButtons[1]) {%>
     <a *ngIf="!options['disableActionNew']" [routerLink]="['../../new']" [queryParams]="{cid: detail['_id']}" [skipLocationChange]="false" class="btn btn-outline-primary"><%-detailActionButtons[1]%></a><%}%><%
     if (api.includes('D') && detailActionButtons[2]) {%>
-    <a *ngIf="!options['disableActionDelete']" routerLink="." class="btn btn-outline-primary" (click)="onDelete(detail['_id'], null)"><%-detailActionButtons[2]%></a><%}%><%
+    <button *ngIf="!options['disableActionDelete']" class="btn btn-outline-primary" (click)="onDelete(detail['_id'], null)"><%-detailActionButtons[2]%></button><%}%><%
     if (api.includes('A') && detailActionButtons[3]) {%>
-    <a *ngIf="!options['disableActionArchive']" routerLink="." class="btn btn-outline-primary" (click)="onArchive(detail['_id'], null, detail['archived'])">
+    <button *ngIf="!options['disableActionArchive']" class="btn btn-outline-primary" (click)="onArchive(detail['_id'], null, detail['archived'])">
         <ng-template [ngIf]="!detail['archived']"><%-detailActionButtons[3]%></ng-template>
         <ng-template [ngIf]="detail['archived']">Unarchive</ng-template>
-    </a><%}%>
+    </button><%}%><%
+    if (api.includes('P') && detailActionButtons[4]) {%>
+    <button *ngIf="!options['disableActionPrint']" class="btn btn-outline-primary" (click)="onPrint()"><%-detailActionButtons[4]%>
+    </button><%}%>
 </div>

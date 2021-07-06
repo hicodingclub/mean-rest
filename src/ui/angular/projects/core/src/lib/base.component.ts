@@ -2153,6 +2153,10 @@ export class MddsBaseComponent implements MddsBaseComponentInterface {
     modal.show();
   }
 
+  public onPrint(): void {
+    window.print();
+  }
+
   public onArchiveSelected(): void {
     const archivedItem = [];
     this.checkedItem.forEach((value, index) => {
