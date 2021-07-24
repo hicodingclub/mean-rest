@@ -7,7 +7,7 @@
   "assets": [
     "./assets/*"
   ],
-  "whitelistedNonPeerDependencies": [
+  "allowedNonPeerDependencies": [
     "cropperjs"
   ]
 }
