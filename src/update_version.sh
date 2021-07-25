@@ -61,6 +61,8 @@ packages=(
   "/node.js/express/file-server"
 )
 
+#packages=()
+
 ANDROIDDIR="/ui/angular"
 ANDROIDPROJECT="$ANDROIDDIR/projects"
 ANDROIDDIST="$ANDROIDDIR/dist"
@@ -153,6 +155,8 @@ do
     libName=${names[0]}
     dirName=${names[1]}
 
+    sleep $delay
+
     DIR=$BASEDIR/$ANDROIDPROJECT/$dirName
     DISTDIR=$BASEDIR/$ANDROIDDIST/$dirName
     if ! [ -d $DIR ]; then
@@ -170,7 +174,7 @@ do
 
         if [ $build = "Y" ] || [ $publish = "Y" ];then
           cd $BASEDIR/$ANDROIDDIR
-          ng build $libName --prod
+          ng build $libName
         fi
 
         if [ $publish = "Y" ];then

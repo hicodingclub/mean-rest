@@ -1,14 +1,14 @@
 {
   "name": "@hicoder/angular-core",
-  "version": "0.9.60",
+  "version": "0.9.62",
   "peerDependencies": {
     "@angular/common": "^12.1.3",
     "@angular/core": "^12.1.3",
     "@angular/router": "^12.1.3",
-    "@ng-bootstrap/ng-bootstrap": "^6.1.0"
+    "@ng-bootstrap/ng-bootstrap": "^10.0.0"
   },
   "devDependencies": {
-    "@ng-bootstrap/ng-bootstrap": "^6.1.0"
+    "@ng-bootstrap/ng-bootstrap": "^10.0.0"
   },
   "dependencies": {
     "tslib": "^2.0.0",
