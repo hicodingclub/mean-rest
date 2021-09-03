@@ -126,6 +126,13 @@ class MddsEmailer {
     if (!to || (Array.isArray(to) && to.length === 0)) {
       if (template.toEmails && template.toEmails.length > 0) {
         to = template.toEmails;
+        if (substitutions && substitutions.length == 1) {
+          newSubstitutions = [];
+          for(let i = 0; i < template.toEmails.length; i++) {
+            newSubstitutions.push(substitutions[0]);
+          }
+          substitutions = newSubstitutions;
+        }
       } else {
         errors.push(new Error('No recipients are specified'))
         return {success, fail, queuing, errors};
