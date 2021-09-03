@@ -1323,10 +1323,14 @@ class RestController {
 
         let mapFields = {};
         let hasMap = false;
+        let changes = {};
         for (let field in body) {
           let income = body[field];
-
           let existing = result[field];
+
+          if (income != existing) { // object will always be added.
+            changes[field] = {old: existing, new: income};
+          }
           if (existing instanceof Map) {
             // first remove the map filed, and save it for later update.
             mapFields[field] = income;
@@ -1340,6 +1344,8 @@ class RestController {
         for (let field of viewFields) {
           if (!(field in body)) {
             //not in body means user deleted this field
+            changes[field] = {old: result[field], new: undefined}
+
             // delete result[field]
             result[field] = undefined;
           }
@@ -1354,7 +1360,7 @@ class RestController {
             result[field] = mapFields[field];
           }
           if (!hasMap) {
-            this.handleHooks('update', result, mraBE);
+            this.handleHooks('update', result, mraBE, changes);
             return res.send();
           }
           // update second time for the map field.
@@ -1363,7 +1369,7 @@ class RestController {
             if (err) {
               return next(err);
             }
-            this.handleHooks('update', result, mraBE);
+            this.handleHooks('update', result, mraBE, changes);
             return res.send();
           });
         });
@@ -1516,7 +1522,7 @@ class RestController {
     return dbExe.exec();
   }
 
-  async handleHooks(action, data, mraBE) {
+  async handleHooks(action, data, mraBE, changes) {
     //action: insert, update
 
     const restController = this;
@@ -1539,7 +1545,8 @@ class RestController {
             data,
             replacement,
             emailerObj,
-            restController
+            restController,
+            changes
           );
         }
       }
@@ -1554,7 +1561,7 @@ class RestController {
       }
       for (let func of hooksArr) {
         // TODO: add error handling.
-        func(data, restController);
+        func(data, restController, changes);
       }
     }
   }
