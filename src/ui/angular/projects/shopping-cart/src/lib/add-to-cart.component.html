@@ -7,6 +7,6 @@
     </div>
 
     <button *ngIf="stockNumber <= inCartQuantity " class="out-of-stock-button" [ngStyle]="style.button" >
-        Out of stock
+        {{outOfStockText}}
     </button>
 </div>

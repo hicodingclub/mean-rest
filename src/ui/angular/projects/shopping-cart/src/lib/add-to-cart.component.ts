@@ -1,6 +1,7 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, Inject } from '@angular/core';
 
 import { ShoppingCartService, Item, ItemMeta, DEFAULTSTOCKNUMBER } from './shopping-cart.service';
+import { SHOPPING_CART_OUTOFSTOCK_TEXT } from "./tokens"
 
 @Component({
   selector: 'lib-mdds-add-to-cart',
@@ -20,7 +21,8 @@ export class AddToCartComponent implements OnInit, OnChanges {
 
   public inCartQuantity: number = 0;
 
-  constructor(private scService: ShoppingCartService) { }
+  constructor(private scService: ShoppingCartService,
+    @Inject(SHOPPING_CART_OUTOFSTOCK_TEXT) public outOfStockText: string) { }
 
   ngOnInit() {
   }
