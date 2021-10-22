@@ -41,5 +41,5 @@
 
 /* list of items*/
 .cart-list {
-    width: 350px;
+    max-width: 350px;
 }

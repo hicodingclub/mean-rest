@@ -32,12 +32,13 @@ export class CartIconComponent implements OnInit {
 
   public toggle(event) {
     if (!this.popup) {
-      const right = (window.innerWidth - event.x) - 2;
+      const right = (window.innerWidth - event.x);
       const top = event.y + 15;
 
       this.popupStyle = {
         right: right.toString() + 'px',
         top: top.toString() + 'px',
+        'max-width': (event.x - 2).toString() + 'px',
       };
     }
     this.popup = !this.popup;
