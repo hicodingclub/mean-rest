@@ -17,7 +17,8 @@
 				<div class="grid-fields" (click)="clickOneItem(idx)">
 					<div class="grid-head-picture" [ngClass]="{'grid-head-picture-large': options['largePicture']}"
 						[ngStyle]="style['picture']">
-						<lib-mdds-picture-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']">
+						<lib-mdds-picture-display [downloadUrl]="detail['<%-fn0%>']" [isLarge]="options['largePicture']"
+							[style]="{img: {'width': '100%', 'object-fit': 'contain'}}">
 						</lib-mdds-picture-display>
 					</div>
 				</div>
