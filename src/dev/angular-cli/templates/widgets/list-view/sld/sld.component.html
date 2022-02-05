@@ -2,7 +2,7 @@
 	<ng-template ngFor let-detail [ngForOf]="list" let-idx="index">
 		<ng-template ngbSlide>
 			<img src="{{detail[picturelinkFn]}}" alt="" class="slide-image">
-			<div class="carousel-caption d-none d-md-block">
+			<div class="carousel-caption d-none d-md-block" [ngStyle]="style['caption']">
 				<p class="carousel-caption-h3 mb-5">{{detail[titleFn]}}</p>
 
 				<p class="carousel-caption-h5">{{detail[subtitleFn]}}</p>
