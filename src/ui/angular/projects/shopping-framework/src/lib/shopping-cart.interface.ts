@@ -36,7 +36,12 @@ export class ShoppingItemsPre implements PipeTransform {
       return x;
     })
     delete obj.ready;
-    const yaml = JsonToYamlConverterService.json2yaml(obj);
+    const cvt = new JsonToYamlConverterService(
+      new Map<string, string>(),
+      2,
+      new Map<string, number>([["quantity", 0]])
+    );
+    const yaml = cvt.json2yaml(obj);
     return `<pre style="white-space: pre-wrap;">${decodeURI(yaml)}</pre>`;
   }
 }

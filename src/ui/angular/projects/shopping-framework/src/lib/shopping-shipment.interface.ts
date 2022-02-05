@@ -27,7 +27,8 @@ export class ShippingInfoPre implements PipeTransform {
       obj.notes = shippingInfo.notes;
     }
      
-    const yaml = JsonToYamlConverterService.json2yaml(obj);
+    const cvt = new JsonToYamlConverterService(new Map<string, string>(), 2, new Map<string, number>())
+    const yaml = cvt.json2yaml(obj);
     return `<pre style="white-space: pre-wrap;">${decodeURI(yaml)}</pre>`;
   }
 }
