@@ -24,6 +24,8 @@ export interface Item {
   price: number;
   description?: string;
   pageUrl: string; //link to show the item on UI
+
+  type: string,
 }
 
 // Interface to show items when user see cart details
@@ -156,6 +158,8 @@ export class ShoppingCartService {
                 url: this.items[i].url,
                 pageUrl: this.items[i].pageUrl,
                 skuID: this.items[i].pageUrl.split('/').slice(-1)[0],
+
+                type: this.items[i].type,
               };
               errorItems.push(showItem);
             } else {
@@ -171,6 +175,8 @@ export class ShoppingCartService {
                 url: this.items[i].url,
                 pageUrl: this.items[i].pageUrl,
                 skuID: meta.skuID? result[meta.skuID] : this.items[i].pageUrl.split('/').slice(-1)[0],
+
+                type: this.items[i].type,
               };
               item = this.items[i];
               item.quantity = showItem.quantity

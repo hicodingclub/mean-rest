@@ -8,6 +8,7 @@ export interface ShoppingItem {
   url: string;
   pageUrl: string;
   skuID: string;
+  type: string;
 }
 
 export interface ShoppingItems {

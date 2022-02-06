@@ -18,6 +18,8 @@ export class AddToCartComponent implements OnInit, OnChanges {
   @Input() public price: number;
   @Input() public pageUrl: string;
   @Input() public stockNumber: number = DEFAULTSTOCKNUMBER;
+  @Input() public type: string;
+
 
   public inCartQuantity: number = 0;
 
@@ -48,6 +50,8 @@ export class AddToCartComponent implements OnInit, OnChanges {
         description: this.description,
         price: this.price,
         pageUrl: this.pageUrl,
+
+        type: this.type,
       };
       this.scService.addItem(item);
       this.inCartQuantity = this.scService.getItemQuantity(this.url);
